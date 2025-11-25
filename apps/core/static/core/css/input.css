@@ -1,0 +1,418 @@
+/**
+ * Mini-up.ir - Tailwind Input File
+ * RTL Dark Neon Gaming Theme
+ * 
+ * This file is processed by Tailwind CLI to generate main.css
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYER 1: BASE - Tailwind base + custom resets
+   ═══════════════════════════════════════════════════════════════ */
+@tailwind base;
+
+@layer base {
+  /* ─────────────────────────────────────────────
+     Font Face Declarations - Vazirmatn
+     ───────────────────────────────────────────── */
+  @font-face {
+    font-family: 'Vazirmatn';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Vazirmatn';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Vazirmatn';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Vazirmatn';
+    src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ─────────────────────────────────────────────
+     Root Variables & Global Resets
+     ───────────────────────────────────────────── */
+  :root {
+    /* Theme colors as CSS variables for JS access */
+    --color-primary: #00ffff;
+    --color-secondary: #ff0055;
+    --color-accent: #b400ff;
+    --color-bg: #0a0a0f;
+    --color-surface: #15151f;
+    
+    /* RTL support */
+    --direction: rtl;
+    
+    /* Scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) var(--color-bg);
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Base body styling */
+  body {
+    @apply bg-dark text-white font-vazir;
+    @apply min-h-screen;
+    direction: rtl;
+    text-align: right;
+  }
+
+  /* Custom scrollbar for WebKit browsers */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neon-cyan/50 rounded-full;
+    @apply hover:bg-neon-cyan/70;
+  }
+
+  /* Selection styling */
+  ::selection {
+    @apply bg-neon-pink/30 text-white;
+  }
+
+  /* Focus visible for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-neon-cyan;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold leading-tight;
+  }
+
+  /* Links */
+  a {
+    @apply transition-colors duration-300;
+  }
+
+  /* Images */
+  img {
+    @apply max-w-full h-auto;
+  }
+
+  /* Remove default button styles */
+  button {
+    @apply font-vazir;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYER 2: COMPONENTS - Reusable component styles
+   ═══════════════════════════════════════════════════════════════ */
+@tailwind components;
+
+@layer components {
+  /* ─────────────────────────────────────────────
+     NAVBAR COMPONENTS
+     ───────────────────────────────────────────── */
+  .navbar {
+    @apply fixed top-0 right-0 left-0 z-50;
+    @apply bg-dark/80 backdrop-blur-lg;
+    @apply border-b border-white/5;
+    @apply transition-all duration-300;
+  }
+
+  .navbar.scrolled {
+    @apply bg-dark/95 shadow-lg;
+    @apply border-b-neon-cyan/20;
+  }
+
+  .navbar__container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply flex items-center justify-between h-16 lg:h-20;
+  }
+
+  .navbar__logo {
+    @apply text-2xl font-black;
+    @apply bg-gradient-to-l from-neon-cyan to-neon-pink bg-clip-text text-transparent;
+    @apply hover:drop-shadow-neon-cyan transition-all duration-300;
+  }
+
+  .navbar__menu {
+    @apply hidden lg:flex items-center gap-1;
+  }
+
+  .navbar__link {
+    @apply relative px-4 py-2 text-white/70 font-medium rounded-lg;
+    @apply hover:text-white hover:bg-white/5;
+    @apply transition-all duration-300;
+  }
+
+  .navbar__link::after {
+    @apply content-[''] absolute bottom-0 right-0 w-0 h-0.5;
+    @apply bg-gradient-to-l from-neon-cyan to-neon-pink;
+    @apply transition-all duration-300;
+  }
+
+  .navbar__link:hover::after,
+  .navbar__link.active::after {
+    @apply w-full;
+  }
+
+  .navbar__link.active {
+    @apply text-neon-cyan;
+  }
+
+  /* Mobile menu button */
+  .navbar__toggle {
+    @apply lg:hidden p-2 text-white/70;
+    @apply hover:text-neon-cyan transition-colors;
+  }
+
+  .navbar__toggle-icon {
+    @apply w-6 h-6 relative;
+  }
+
+  .navbar__toggle-icon span {
+    @apply absolute right-0 h-0.5 w-6 bg-current;
+    @apply transition-all duration-300;
+  }
+
+  .navbar__toggle-icon span:nth-child(1) { @apply top-1; }
+  .navbar__toggle-icon span:nth-child(2) { @apply top-3; }
+  .navbar__toggle-icon span:nth-child(3) { @apply top-5; }
+
+  .navbar__toggle.active span:nth-child(1) {
+    @apply top-3 rotate-45;
+  }
+  .navbar__toggle.active span:nth-child(2) {
+    @apply opacity-0;
+  }
+  .navbar__toggle.active span:nth-child(3) {
+    @apply top-3 -rotate-45;
+  }
+
+  /* Mobile menu */
+  .navbar__mobile {
+    @apply lg:hidden fixed inset-0 top-16 z-40;
+    @apply bg-dark/98 backdrop-blur-xl;
+    @apply transform translate-x-full;
+    @apply transition-transform duration-300 ease-smooth;
+  }
+
+  .navbar__mobile.open {
+    @apply translate-x-0;
+  }
+
+  .navbar__mobile-menu {
+    @apply flex flex-col p-6 gap-2;
+  }
+
+  .navbar__mobile-link {
+    @apply flex items-center gap-3 px-4 py-3 text-lg text-white/70;
+    @apply rounded-xl hover:bg-white/5 hover:text-neon-cyan;
+    @apply transition-all duration-300;
+  }
+
+  .navbar__mobile-link.active {
+    @apply bg-neon-cyan/10 text-neon-cyan border-r-4 border-neon-cyan;
+  }
+
+  /* ─────────────────────────────────────────────
+     HERO SECTION
+     ───────────────────────────────────────────── */
+  .hero {
+    @apply relative min-h-screen flex items-center justify-center;
+    @apply overflow-hidden;
+  }
+
+  .hero__bg {
+    @apply absolute inset-0;
+    @apply bg-gradient-to-b from-dark via-dark-100 to-dark;
+  }
+
+  .hero__bg::before {
+    content: '';
+    @apply absolute inset-0;
+    @apply bg-hero-gradient;
+    @apply animate-glow-pulse;
+  }
+
+  .hero__content {
+    @apply relative z-10 text-center px-4;
+    @apply max-w-4xl mx-auto;
+  }
+
+  .hero__title {
+    @apply text-display-1 font-black mb-6;
+    @apply animate-slide-down;
+  }
+
+  .hero__subtitle {
+    @apply text-xl md:text-2xl text-white/70 mb-8;
+    @apply max-w-2xl mx-auto;
+    @apply animate-fade-in;
+    animation-delay: 0.2s;
+  }
+
+  .hero__cta {
+    @apply flex flex-wrap justify-center gap-4;
+    @apply animate-slide-up;
+    animation-delay: 0.4s;
+  }
+
+  /* ─────────────────────────────────────────────
+     SECTION COMPONENTS
+     ───────────────────────────────────────────── */
+  .section {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+
+  .section__container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section__header {
+    @apply text-center mb-12 md:mb-16;
+  }
+
+  .section__title {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold mb-4;
+  }
+
+  .section__subtitle {
+    @apply text-lg text-white/60 max-w-2xl mx-auto;
+  }
+
+  /* ─────────────────────────────────────────────
+     CARD COMPONENTS
+     ───────────────────────────────────────────── */
+  .card {
+    @apply relative bg-dark-100 rounded-2xl overflow-hidden;
+    @apply border border-white/5;
+    @apply transition-all duration-500;
+    @apply hover:border-neon-cyan/30;
+    @apply hover:shadow-neon-cyan;
+    @apply hover:-translate-y-2;
+  }
+
+  .card__image {
+    @apply relative overflow-hidden;
+    @apply aspect-video;
+  }
+
+  .card__image img {
+    @apply w-full h-full object-cover;
+    @apply transition-transform duration-500;
+  }
+
+  .card:hover .card__image img {
+    @apply scale-110;
+  }
+
+  .card__overlay {
+    @apply absolute inset-0;
+    @apply bg-gradient-to-t from-dark via-transparent to-transparent;
+    @apply opacity-60;
+  }
+
+  .card__body {
+    @apply p-6;
+  }
+
+  .card__title {
+    @apply text-xl font-bold mb-2;
+    @apply text-white group-hover:text-neon-cyan;
+    @apply transition-colors duration-300;
+  }
+
+  .card__description {
+    @apply text-white/60 text-sm leading-relaxed;
+  }
+
+  .card__footer {
+    @apply px-6 pb-6 pt-0;
+    @apply flex items-center justify-between;
+  }
+
+  .card__price {
+    @apply text-neon-cyan font-bold text-lg;
+  }
+
+  .card__badge {
+    @apply absolute top-4 left-4 z-10;
+    @apply px-3 py-1 text-xs font-bold rounded-full;
+    @apply bg-neon-pink text-white;
+  }
+
+  /* Service Card Variant */
+  .card--service {
+    @apply text-center p-8;
+    @apply bg-gradient-to-b from-dark-100 to-dark;
+  }
+
+  .card--service .card__icon {
+    @apply w-16 h-16 mx-auto mb-6;
+    @apply flex items-center justify-center;
+    @apply bg-neon-cyan/10 rounded-2xl;
+    @apply text-neon-cyan text-3xl;
+    @apply transition-all duration-300;
+  }
+
+  .card--service:hover .card__icon {
+    @apply bg-neon-cyan text-dark;
+    @apply shadow-neon-cyan;
+  }
+
+  /* ─────────────────────────────────────────────
+     BUTTON COMPONENTS
+     ───────────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply px-6 py-3 font-bold rounded-xl;
+    @apply transition-all duration-300;
+    @apply active:scale-95;
+  }
+
+  .btn--primary {
+    @apply bg-neon-cyan text-dark;
+    @apply hover:shadow-neon-cyan-lg hover:scale-105;
+  }
+
+  .btn--secondary {
+    @apply bg-transparent border-2 border-neon-pink text-neon-pink;
+    @apply hover:bg-neon-pink hover:text-white hover:shadow-neon-pink;
+  }
+
+  .btn--outline {
+    @apply bg-transparent border-2 border-white/20 text-white;
+    @apply hover:border-neon-cyan hover:text-neon-cyan;
+  }
+
+  .btn--ghost {
+    @apply bg-white/5 text-white;
+    @apply hover:bg-white/10 hover:text-neon-cyan;
+  }
+
+  .btn--lg {
+    @apply px-8 py-4

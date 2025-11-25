@@ -1,17 +1,16 @@
 {
-  "name": "mini-up",
+  "name": "mini-up-frontend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Mini-up.ir Front-end Assets",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "css:build": "tailwindcss -i ./apps/core/static/core/css/input.css -o ./apps/core/static/core/css/main.css --minify",
+    "css:watch": "tailwindcss -i ./apps/core/static/core/css/input.css -o ./apps/core/static/core/css/main.css --watch",
+    "css:dev": "tailwindcss -i ./apps/core/static/core/css/input.css -o ./apps/core/static/core/css/main.css"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "autoprefixer": "^10.4.22",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.17"
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.32",
+    "autoprefixer": "^10.4.16"
   }
 }
+
