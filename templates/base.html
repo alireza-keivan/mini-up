@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }} | {{ SITE_NAME }}</title>
+    <link rel="stylesheet" href="{% static 'core/css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/responsive.css' %}">
+</head>
+<body class="dark-theme">
+    {% include 'partials/_header.html' %}
+    {% include 'partials/_navbar.html' %}
+
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'partials/_footer.html' %}
+    <script src="{% static 'core/js/dropdown.js' %}"></script>
+    <script src="{% static 'core/js/main.js' %}"></script>
+</body>
+</html>

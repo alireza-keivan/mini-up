@@ -1,0 +1,19 @@
+# Django
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+*.log
+
+# Node / Tailwind
+node_modules/
+package-lock.json
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Compiled static assets
+apps/core/static/core/css/main.css
+apps/core/static/core/js/*.min.js

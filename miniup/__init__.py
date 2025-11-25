@@ -1,0 +1,1 @@
+"""Mini-up.ir - Persian Gaming & E-commerce Platform."""

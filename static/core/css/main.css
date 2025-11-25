@@ -1,0 +1,41 @@
+body.dark-theme {
+    font-family: 'Vazirmatn', sans-serif;
+    direction: rtl;
+    background-color: #0d0d0f;
+    color: #eee;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #0ff;
+}
+
+a:hover {
+    color: #ff00ff;
+}
+
+.navbar {
+    display: flex;
+    background: #1a1a1d;
+    padding: 1rem;
+}
+
+.navbar ul {
+    display: flex;
+    list-style: none;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.dropdown-content {
+    display: none;
+    background: #232323;
+    position: absolute;
+    min-width: 160px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
