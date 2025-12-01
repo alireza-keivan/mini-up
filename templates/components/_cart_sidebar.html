@@ -1,0 +1,538 @@
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   ███████████████████████████████████████████████████████████████████████████████████████
+   █                                                                                     █
+   █   CART SIDEBAR COMPONENT                                                           █
+   █   Slide-in cart drawer from left side (RTL)                                        █
+   █                                                                                     █
+   █   Features:                                                                         █
+   █   - Real-time cart updates via AJAX                                                █
+   █   - Quantity adjustment (+/-)                                                       █
+   █   - Remove items with undo option                                                  █
+   █   - Apply discount codes                                                           █
+   █   - Free shipping progress bar                                                     █
+   █   - Empty cart state                                                               █
+   █   - Loading states                                                                 █
+   █                                                                                     █
+   █   Dependencies:                                                                     █
+   █   - components/_cart_sidebar.css                                                   █
+   █   - static/js/components/cart-sidebar.js                                           █
+   █                                                                                     █
+   █   Triggers:                                                                         █
+   █   - [data-cart-toggle] buttons                                                     █
+   █   - Navbar cart icon                                                               █
+   █                                                                                     █
+   ███████████████████████████████████████████████████████████████████████████████████████
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   CART SIDEBAR OVERLAY (Backdrop)
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<div class="cart-sidebar-overlay" 
+     id="cartSidebarOverlay"
+     aria-hidden="true"
+     data-cart-close>
+</div>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   CART SIDEBAR CONTAINER
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<aside class="cart-sidebar" 
+       id="cartSidebar"
+       role="dialog"
+       aria-modal="true"
+       aria-label="سبد خرید"
+       aria-hidden="true"
+       tabindex="-1">
+    
+    {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 1: CART SIDEBAR HEADER
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <header class="cart-sidebar-header">
+        
+        {# Title with item count #}
+        <div class="cart-sidebar-title">
+            <i class="fas fa-shopping-cart"></i>
+            <h3>سبد خرید</h3>
+            <span class="cart-sidebar-count" id="cartSidebarCount" data-cart-count>
+                {% if cart and cart.items_count > 0 %}
+                    ({{ cart.items_count }} کالا)
+                {% else %}
+                    (خالی)
+                {% endif %}
+            </span>
+        </div>
+        
+        {# Close Button #}
+        <button type="button" 
+                class="cart-sidebar-close"
+                data-cart-close
+                aria-label="بستن سبد خرید">
+            <i class="fas fa-times"></i>
+        </button>
+        
+    </header>
+    
+    
+        {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 2: FREE SHIPPING PROGRESS BAR
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <div class="cart-sidebar-shipping-progress" id="cartShippingProgress">
+        
+        {% if cart and cart.total_price >= 500000 %}
+            {# Free shipping achieved #}
+            <div class="shipping-progress-achieved">
+                <i class="fas fa-check-circle"></i>
+                <span>تبریک! ارسال رایگان شامل سفارش شما می‌شود</span>
+            </div>
+            
+        {% elif cart and cart.total_price > 0 %}
+            {# Progress towards free shipping - Calculate in JS or use data attributes #}
+            <div class="shipping-progress-bar-container"
+                 data-threshold="500000"
+                 data-current="{{ cart.total_price }}">
+                <div class="shipping-progress-text">
+                    <i class="fas fa-truck"></i>
+                    <span>
+                        تا ارسال رایگان: 
+                        <strong id="shippingRemaining"></strong> 
+                        تومان دیگر
+                    </span>
+                </div>
+                <div class="shipping-progress-bar">
+                    <div class="shipping-progress-fill" 
+                         id="shippingProgressFill">
+                    </div>
+                </div>
+            </div>
+            
+        {% else %}
+            {# Empty cart - show target #}
+            <div class="shipping-progress-bar-container">
+                <div class="shipping-progress-text">
+                    <i class="fas fa-truck"></i>
+                    <span>
+                        خرید بالای 
+                        <strong>۵۰۰,۰۰۰</strong> 
+                        تومان، ارسال رایگان!
+                    </span>
+                </div>
+                <div class="shipping-progress-bar">
+                    <div class="shipping-progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        {% endif %}
+        
+    </div>
+
+    {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 3: CART ITEMS CONTAINER (Scrollable)
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <div class="cart-sidebar-body" id="cartSidebarBody">
+        
+        {# ─────────────────────────────────────────────────────────────────────────────
+           3.1 LOADING STATE (Hidden by default)
+           ───────────────────────────────────────────────────────────────────────────── #}
+        <div class="cart-sidebar-loading" id="cartSidebarLoading" hidden>
+            <div class="cart-skeleton-item">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-price"></div>
+                </div>
+            </div>
+            <div class="cart-skeleton-item">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-price"></div>
+                </div>
+            </div>
+            <div class="cart-skeleton-item">
+                <div class="skeleton-image"></div>
+                <div class="skeleton-content">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-price"></div>
+                </div>
+            </div>
+        </div>
+        
+        
+        {# ─────────────────────────────────────────────────────────────────────────────
+           3.2 EMPTY CART STATE
+           ───────────────────────────────────────────────────────────────────────────── #}
+        <div class="cart-sidebar-empty" 
+             id="cartSidebarEmpty"
+             {% if cart and cart.items_count > 0 %}hidden{% endif %}>
+            
+            <div class="cart-empty-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-empty-badge">
+                    <i class="fas fa-plus"></i>
+                </span>
+            </div>
+            
+            <h4 class="cart-empty-title">سبد خرید شما خالی است</h4>
+            
+            <p class="cart-empty-text">
+                محصولات مورد علاقه‌تان را به سبد خرید اضافه کنید
+            </p>
+            
+            <a href="{% url 'products:list' %}" class="cart-empty-btn" data-cart-close>
+                <i class="fas fa-store"></i>
+                مشاهده محصولات
+            </a>
+            
+            {# Quick Suggestions #}
+            <div class="cart-empty-suggestions">
+                <span class="cart-suggestions-label">پیشنهاد ما:</span>
+                <div class="cart-suggestions-tags">
+                    <a href="{% url 'products:category' slug='gaming' %}" class="cart-suggestion-tag">
+                        <i class="fas fa-gamepad"></i>
+                        گیمینگ
+                    </a>
+                    <a href="{% url 'products:category' slug='giftcard' %}" class="cart-suggestion-tag">
+                        <i class="fas fa-gift"></i>
+                        گیفت کارت
+                    </a>
+                    <a href="{% url 'products:category' slug='subscription' %}" class="cart-suggestion-tag">
+                        <i class="fas fa-crown"></i>
+                        اشتراک
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+        
+        
+        {# ─────────────────────────────────────────────────────────────────────────────
+           3.3 CART ITEMS LIST
+           ───────────────────────────────────────────────────────────────────────────── #}
+        <div class="cart-sidebar-items" 
+             id="cartSidebarItems"
+             {% if not cart or cart.items_count == 0 %}hidden{% endif %}>
+            
+            {% if cart and cart.items.all %}
+                {% for item in cart.items.all %}
+                    
+                    <div class="cart-item" 
+                         data-cart-item
+                         data-item-id="{{ item.id }}"
+                         data-product-id="{{ item.product.id }}">
+                        
+                        {# Item Image #}
+                        <div class="cart-item-image">
+                            <a href="{{ item.product.get_absolute_url }}" data-cart-close>
+                                {% if item.product.image %}
+                                    <img src="{{ item.product.image.url }}" 
+                                         alt="{{ item.product.name }}"
+                                         loading="lazy">
+                                {% else %}
+                                    <div class="cart-item-image-placeholder">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                {% endif %}
+                            </a>
+                            
+                            {# Discount Badge #}
+                            {% if item.product.discount_percent > 0 %}
+                                <span class="cart-item-discount-badge">
+                                    {{ item.product.discount_percent }}%-
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        {# Item Details #}
+                        <div class="cart-item-details">
+                            
+                            {# Product Name #}
+                            <a href="{{ item.product.get_absolute_url }}" 
+                               class="cart-item-title"
+                               data-cart-close>
+                                {{ item.product.name }}
+                            </a>
+                            
+                            {# Product Variant (if any) #}
+                            {% if item.variant %}
+                                <div class="cart-item-variant">
+                                    <span class="cart-item-variant-label">{{ item.variant.name }}:</span>
+                                    <span class="cart-item-variant-value">{{ item.variant.value }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            {# Product Type Badge #}
+                            <div class="cart-item-type">
+                                {% if item.product.is_digital %}
+                                    <span class="cart-item-type-badge digital">
+                                        <i class="fas fa-download"></i>
+                                        دیجیتال
+                                    </span>
+                                {% else %}
+                                    <span class="cart-item-type-badge physical">
+                                        <i class="fas fa-box"></i>
+                                        فیزیکی
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            {# Price Section #}
+                            <div class="cart-item-price">
+                                {% if item.product.discount_percent > 0 %}
+                                    <span class="cart-item-price-original">
+                                        {{ item.product.original_price|intcomma }}
+                                    </span>
+                                {% endif %}
+                                <span class="cart-item-price-current">
+                                    {{ item.product.final_price|intcomma }}
+                                    <small>تومان</small>
+                                </span>
+                            </div>
+                            
+                            {# Quantity Controls #}
+                            <div class="cart-item-quantity">
+                                
+                                <button type="button" 
+                                        class="cart-quantity-btn decrease"
+                                        data-action="decrease"
+                                        data-item-id="{{ item.id }}"
+                                        aria-label="کاهش تعداد"
+                                        {% if item.quantity <= 1 %}disabled{% endif %}>
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                
+                                <input type="number" 
+                                       class="cart-quantity-input"
+                                       value="{{ item.quantity }}"
+                                       min="1"
+                                       max="{{ item.product.stock|default:99 }}"
+                                       data-item-id="{{ item.id }}"
+                                       aria-label="تعداد">
+                                
+                                <button type="button" 
+                                        class="cart-quantity-btn increase"
+                                        data-action="increase"
+                                        data-item-id="{{ item.id }}"
+                                        aria-label="افزایش تعداد"
+                                        {% if item.quantity >= item.product.stock %}disabled{% endif %}>
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                
+                            </div>
+                            
+                            {# Item Total #}
+                            <div class="cart-item-total">
+                                <span class="cart-item-total-label">جمع:</span>
+                                <span class="cart-item-total-value" data-item-total>
+                                    {{ item.total_price|intcomma }}
+                                </span>
+                                <small>تومان</small>
+                            </div>
+                            
+                        </div>
+                        
+                        {# Remove Button #}
+                        <button type="button" 
+                                class="cart-item-remove"
+                                data-action="remove"
+                                data-item-id="{{ item.id }}"
+                                aria-label="حذف از سبد خرید">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        
+                    </div> 
+                    {# End of .cart-item #}
+                    
+                {% endfor %}
+            {% endif %}
+            
+        </div>
+        {# End of cart-sidebar-items #}
+        
+    </div>
+    {# End of cart-sidebar-body #}
+    
+    
+    {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 4: DISCOUNT / COUPON CODE
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <div class="cart-sidebar-coupon" id="cartSidebarCoupon">
+        
+        <div class="coupon-input-wrapper">
+            
+            <input type="text"
+                   class="coupon-input"
+                   id="couponCodeInput"
+                   placeholder="کد تخفیف را وارد کنید"
+                   autocomplete="off">
+            
+            <button type="button"
+                    class="coupon-apply-btn"
+                    id="applyCouponBtn"
+                    data-coupon-apply>
+                اعمال
+            </button>
+        </div>
+        
+        <div class="coupon-status" id="couponStatus" hidden>
+            <i class="fas"></i>
+            <span></span>
+        </div>
+        
+    </div>
+    
+    
+    {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 5: CART FOOTER (Total Summary + CTA)
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <footer class="cart-sidebar-footer" id="cartSidebarFooter"
+            {% if not cart or cart.items_count == 0 %}hidden{% endif %}>
+        
+        {# Subtotal Section #}
+        <div class="cart-summary-row">
+            <span class="cart-summary-label">جمع جزء:</span>
+            <span class="cart-summary-value" id="cartSubtotal">
+                {% if cart %}
+                    {{ cart.subtotal|intcomma }}
+                {% else %}
+                    ۰
+                {% endif %}
+                تومان
+            </span>
+        </div>
+        
+        {# Discount Section #}
+        <div class="cart-summary-row" id="cartDiscountRow"
+             {% if not cart or cart.discount_total <= 0 %}hidden{% endif %}>
+            <span class="cart-summary-label">تخفیف:</span>
+            <span class="cart-summary-value discount" id="cartDiscount">
+                {% if cart %}
+                    {{ cart.discount_total|intcomma }}
+                {% endif %}
+                تومان
+            </span>
+        </div>
+        
+        {# Final Total Section #}
+        <div class="cart-summary-total">
+            <span class="cart-summary-total-label">مجموع قابل پرداخت:</span>
+            <span class="cart-summary-total-value" id="cartTotal">
+                {% if cart %}
+                    {{ cart.total_price|intcomma }}
+                {% else %}
+                    ۰
+                {% endif %}
+                تومان
+            </span>
+        </div>
+        
+        {# Checkout Button #}
+        <a href="{% url 'orders:checkout' %}" 
+           class="cart-sidebar-checkout-btn"
+           id="checkoutBtn"
+           {% if not cart or cart.items_count == 0 %}disabled{% endif %}>
+            <i class="fas fa-credit-card"></i>
+            ادامه خرید و پرداخت
+        </a>
+        
+    </footer>
+    
+    
+</aside>
+{# End of cart-sidebar #}
+
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   TEMPLATES (hidden) - used by JavaScript for dynamic rendering
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+
+{# CART ITEM TEMPLATE #}
+<template id="cartItemTemplate">
+    <div class="cart-item" data-cart-item>
+        
+        <div class="cart-item-image">
+            <a href="" class="cart-item-link" data-cart-close>
+                <img src="" alt="" loading="lazy">
+            </a>
+            <span class="cart-item-discount-badge" hidden></span>
+        </div>
+        
+        <div class="cart-item-details">
+            <a href="" class="cart-item-title" data-cart-close></a>
+            <div class="cart-item-variant" hidden>
+                <span class="cart-item-variant-label"></span>
+                <span class="cart-item-variant-value"></span>
+            </div>
+            
+            <div class="cart-item-type"></div>
+            
+            <div class="cart-item-price">
+                <span class="cart-item-price-original" hidden></span>
+                <span class="cart-item-price-current"></span>
+                <small>تومان</small>
+            </div>
+            
+            <div class="cart-item-quantity">
+                <button class="cart-quantity-btn decrease" data-action="decrease">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input class="cart-quantity-input" type="number" min="1">
+                <button class="cart-quantity-btn increase" data-action="increase">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <div class="cart-item-total">
+                <span class="cart-item-total-label">جمع:</span>
+                <span class="cart-item-total-value"></span>
+                <small>تومان</small>
+            </div>
+        </div>
+        
+        <button class="cart-item-remove" data-action="remove">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+        
+    </div>
+</template>
+
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   INLINE JS INITIALIZATION (Minimal)
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Calculate free shipping progress
+        var progressContainer = document.querySelector('.shipping-progress-bar-container[data-threshold]');
+        if (progressContainer) {
+            var threshold = parseInt(progressContainer.dataset.threshold) || 500000;
+            var current = parseInt(progressContainer.dataset.current) || 0;
+            var remaining = threshold - current;
+            var percentage = Math.min((current / threshold) * 100, 100);
+            
+            // Update remaining text
+            var remainingEl = document.getElementById('shippingRemaining');
+            if (remainingEl) {
+                remainingEl.textContent = remaining.toLocaleString('fa-IR');
+            }
+            
+            // Update progress bar width
+            var fillEl = document.getElementById('shippingProgressFill');
+            if (fillEl) {
+                fillEl.style.width = percentage + '%';
+            }
+        }
+        
+        // Rest of initialization...
+        if (typeof window.CartSidebar !== 'undefined') {
+            // ... existing code
+        }
+    });
+</script>
+

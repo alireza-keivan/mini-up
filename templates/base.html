@@ -4,721 +4,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{{ site_description|default:'پلتفرم خدمات و محصولات گیمینگ' }}">
-    <title>{% block title %}{{ site_name_fa|default:'مینی‌آپ' }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}مینی‌آپ - خدمات مجازی و محصولات گیمینگ با بهترین کیفیت و قیمت{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}گیمینگ، خدمات مجازی، پرمیوم تلگرام، اسپاتیفای{% endblock %}">
     
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/logo.svg' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/logo.svg' %}">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>{% block title %}مینی‌آپ{% endblock %} | خدمات مجازی و گیمینگ</title>
+
+    <!-- ========================================
+         CSS Strategy: Tailwind + Modular Custom
+         ======================================== -->
     
-    <!-- Main CSS (Tailwind Output) -->
-    <link rel="stylesheet" href="{% static 'core/css/main.css' %}">
+    <!-- Main Compiled CSS (Tailwind + Custom) -->
+    <link rel="stylesheet" href="{% static 'css/dist/main.css' %}">
     
+    <!-- Page-specific CSS (optional) -->
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-dark-950 text-gray-100 font-vazir min-h-screen flex flex-col">
-    
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <!-- HEADER & NAVIGATION                                                    -->
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <header class="header-main">
-        
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <!-- Top Contact Bar (Desktop Only)                                      -->
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <div class="top-bar">
-            <div class="container mx-auto px-4 py-2">
-                <div class="flex justify-between items-center text-sm">
-                    <!-- Contact Info -->
-                    <div class="flex items-center gap-6">
-                        <a href="tel:+982112345678" class="top-bar-link">
-                            <i class="fas fa-phone"></i>
-                            <span>۰۲۱-۱۲۳۴-۵۶۷۸</span>
-                        </a>
-                        <a href="mailto:info@mini-up.ir" class="top-bar-link">
-                            <i class="fas fa-envelope"></i>
-                            <span>info@mini-up.ir</span>
-                        </a>
-                    </div>
-                    <!-- Social Links -->
-                    <div class="flex items-center gap-4">
-                        <a href="#" class="social-link" aria-label="Telegram">
-                            <i class="fab fa-telegram"></i>
-                        </a>
-                        <a href="#" class="social-link" aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="social-link" aria-label="WhatsApp">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <!-- Main Navigation Bar                                                 -->
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <nav class="navbar-main">
-            <div class="container mx-auto px-4">
-                <div class="flex items-center justify-between h-16 lg:h-20">
-                    
-                    <!-- ═══════════════════════════════════════════════════════ -->
-                    <!-- LOGO                                                    -->
-                    <!-- ═══════════════════════════════════════════════════════ -->
-                    <a href="{% url 'core:home' %}" class="logo-wrapper group">
-                        <div class="logo-icon">
-                            <i class="fas fa-gamepad text-xl"></i>
-                        </div>
-                        <div class="logo-text">
-                            <span class="logo-brand">Mini-up</span>
-                            <span class="logo-tagline">گیمینگ و خدمات مجازی</span>
-                        </div>
-                    </a>
-                    
-                    <!-- ═══════════════════════════════════════════════════════ -->
-                    <!-- DESKTOP NAVIGATION                                      -->
-                    <!-- ═══════════════════════════════════════════════════════ -->
-                    <div class="hidden lg:flex items-center gap-1">
-                        
-                        <!-- Home Link -->
-                        <a href="{% url 'core:home' %}" class="nav-link">
-                            <i class="fas fa-home"></i>
-                            <span>خانه</span>
-                        </a>
-                        
-                        <!-- ─────────────────────────────────────────────────── -->
-                        <!-- DROPDOWN: خدمات مجازی                               -->
-                        <!-- ─────────────────────────────────────────────────── -->
-                        <div class="nav-dropdown">
-                            <a href="{% url 'core:virtual_services' %}" class="nav-link">
-                                <i class="fas fa-cloud"></i>
-                                <span>خدمات مجازی</span>
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-wide">
-                                <div class="dropdown-header cyan">
-                                    <i class="fas fa-cloud"></i>
-                                    <span>خدمات مجازی</span>
-                                </div>
-                                <div class="dropdown-grid">
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fab fa-telegram"></i>
-                                        <span>پرمیوم تلگرام</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fab fa-instagram"></i>
-                                        <span>فالوور اینستاگرام</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fas fa-users"></i>
-                                        <span>ممبر تلگرام</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fab fa-apple"></i>
-                                        <span>اپل آیدی</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fab fa-spotify"></i>
-                                        <span>اسپاتیفای</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fab fa-soundcloud"></i>
-                                        <span>ساندکلاد</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fab fa-itunes-note"></i>
-                                        <span>اپل موزیک</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <span>ایکلود</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fas fa-shield-alt"></i>
-                                        <span>وایرگارد</span>
-                                    </a>
-                                    <a href="{% url 'core:virtual_services' %}" class="dropdown-item">
-                                        <i class="fas fa-network-wired"></i>
-                                        <span>V2ray</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- ─────────────────────────────────────────────────── -->
-                        <!-- DROPDOWN: محصولات گیمینگ                            -->
-                        <!-- ─────────────────────────────────────────────────── -->
-                        <div class="nav-dropdown">
-                            <a href="{% url 'core:gaming_products' %}" class="nav-link">
-                                <i class="fas fa-gamepad"></i>
-                                <span>محصولات گیمینگ</span>
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </a>
-                            <div class="dropdown-menu">
-                                <div class="dropdown-header purple">
-                                    <i class="fas fa-gamepad"></i>
-                                    <span>محصولات گیمینگ</span>
-                                </div>
-                                <a href="{% url 'core:gaming_products' %}" class="dropdown-item">
-                                    <i class="fas fa-fan"></i>
-                                    <span>فن</span>
-                                </a>
-                                <a href="{% url 'core:gaming_products' %}" class="dropdown-item">
-                                    <i class="fas fa-hand-pointer"></i>
-                                    <span>انگشتی</span>
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <!-- ─────────────────────────────────────────────────── -->
-                        <!-- DROPDOWN: خرید محصولات (محصولات جانبی)              -->
-                        <!-- ─────────────────────────────────────────────────── -->
-                        <div class="nav-dropdown">
-                            <a href="{% url 'core:buy_products' %}" class="nav-link">
-                                <i class="fas fa-shopping-cart"></i>
-                                <span>خرید محصولات</span>
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </a>
-                            <div class="dropdown-menu">
-                                <div class="dropdown-header pink">
-                                    <i class="fas fa-box"></i>
-                                    <span>محصولات جانبی</span>
-                                </div>
-                                <a href="{% url 'core:buy_products' %}" class="dropdown-item">
-                                    <i class="fas fa-shield-alt"></i>
-                                    <span>گارد</span>
-                                </a>
-                                <a href="{% url 'core:buy_products' %}" class="dropdown-item">
-                                    <i class="fas fa-mobile-alt"></i>
-                                    <span>گلس</span>
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <!-- ─────────────────────────────────────────────────── -->
-                        <!-- DROPDOWN: مینی گیم                                  -->
-                        <!-- ─────────────────────────────────────────────────── -->
-                        <div class="nav-dropdown">
-                            <a href="{% url 'core:mini_game' %}" class="nav-link">
-                                <i class="fas fa-puzzle-piece"></i>
-                                <span>مینی گیم</span>
-                                <i class="fas fa-chevron-down dropdown-arrow"></i>
-                            </a>
-                            <div class="dropdown-menu">
-                                <div class="dropdown-header yellow">
-                                    <i class="fas fa-coins"></i>
-                                    <span>مینی گیم</span>
-                                </div>
-                                <a href="{% url 'core:mini_game' %}" class="dropdown-item">
-                                    <i class="fas fa-crosshairs"></i>
-                                    <span>یوسی پابجی</span>
-                                </a>
-                                <a href="{% url 'core:mini_game' %}" class="dropdown-item">
-                                    <i class="fas fa-fire"></i>
-                                    <span>جم فری فایر</span>
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <!-- About Link -->
-                        <a href="{% url 'core:about' %}" class="nav-link">
-                            <i class="fas fa-info-circle"></i>
-                            <span>درباره ما</span>
-                        </a>
 
-                        <!-- Login/User Button (Desktop & Mobile) -->
-                        <div class="flex items-center gap-3">
-                            
-                            <!-- Login Button (When NOT logged in) -->
-                            <div id="auth-buttons" class="flex items-center gap-2">
-                                <!-- Login Icon Button - Opens Modal -->
-                                <button type="button" 
-                                        id="header-login-btn"
-                                        class="login-header-btn"
-                                        aria-label="ورود به حساب کاربری">
-                                    <i class="fas fa-user"></i>
-                                    <span class="hidden sm:inline">ورود</span>
-                                </button>
-                                
-                                <!-- Register Button (Optional - can remove if not needed) -->
-                                <a href="{% url 'core:register' %}" 
-                                class="register-header-btn hidden sm:inline-flex">
-                                    <i class="fas fa-user-plus"></i>
-                                    <span>ثبت نام</span>
-                                </a>
-                            </div>
-                    </div>
-                    
-                    <!-- ═══════════════════════════════════════════════════════ -->
-                    <!-- CTA BUTTON (Desktop)                                    -->
-                    <!-- ═══════════════════════════════════════════════════════ -->
-                    <div class="hidden lg:block">
-                        <a href="{% url 'core:consulting' %}" class="btn-neon">
-                            <i class="fas fa-comments"></i>
-                            <span>مشاوره رایگان</span>
-                        </a>
-                    </div>
-                    
-                    <!-- ═══════════════════════════════════════════════════════ -->
-                    <!-- MOBILE MENU BUTTON                                      -->
-                    <!-- ═══════════════════════════════════════════════════════ -->
-                    <button type="button" class="mobile-menu-btn lg:hidden" id="mobileMenuBtn" aria-label="Toggle Menu">
-                        <span class="hamburger-line line-1"></span>
-                        <span class="hamburger-line line-2"></span>
-                        <span class="hamburger-line line-3"></span>
-                    </button>
-                    
-                </div>
-            </div>
-        </nav>
-        
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <!-- MOBILE NAVIGATION MENU                                              -->
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <div class="mobile-menu" id="mobileMenu">
-            <div class="mobile-menu-inner">
-                
-                <!-- Mobile Home -->
-                <a href="{% url 'core:home' %}" class="mobile-link">
-                    <i class="fas fa-home"></i>
-                    <span>خانه</span>
-                </a>
-                
-                <!-- Mobile: خدمات مجازی -->
-                <div class="mobile-dropdown">
-                    <button type="button" class="mobile-link mobile-dropdown-toggle">
-                        <span class="flex items-center gap-3">
-                            <i class="fas fa-cloud"></i>
-                            <span>خدمات مجازی</span>
-                        </span>
-                        <i class="fas fa-chevron-down mobile-arrow"></i>
-                    </button>
-                    <div class="mobile-dropdown-content">
-                                                <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fab fa-telegram"></i> پرمیوم تلگرام
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fab fa-instagram"></i> فالوور اینستاگرام
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fas fa-users"></i> ممبر تلگرام
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fab fa-apple"></i> اپل آیدی
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fab fa-spotify"></i> اسپاتیفای
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fab fa-soundcloud"></i> ساندکلاد
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fab fa-itunes-note"></i> اپل موزیک
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fas fa-cloud-upload-alt"></i> ایکلود
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fas fa-shield-alt"></i> وایرگارد
-                        </a>
-                        <a href="{% url 'core:virtual_services' %}" class="mobile-sub-link">
-                            <i class="fas fa-network-wired"></i> V2ray
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Mobile: محصولات گیمینگ -->
-                <div class="mobile-dropdown">
-                    <button type="button" class="mobile-link mobile-dropdown-toggle">
-                        <span class="flex items-center gap-3">
-                            <i class="fas fa-gamepad"></i>
-                            <span>محصولات گیمینگ</span>
-                        </span>
-                        <i class="fas fa-chevron-down mobile-arrow"></i>
-                    </button>
-                    <div class="mobile-dropdown-content">
-                        <a href="{% url 'core:gaming_products' %}" class="mobile-sub-link">
-                            <i class="fas fa-fan"></i> فن
-                        </a>
-                        <a href="{% url 'core:gaming_products' %}" class="mobile-sub-link">
-                            <i class="fas fa-hand-pointer"></i> انگشتی
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Mobile: خرید محصولات -->
-                <div class="mobile-dropdown">
-                    <button type="button" class="mobile-link mobile-dropdown-toggle">
-                        <span class="flex items-center gap-3">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>خرید محصولات</span>
-                        </span>
-                        <i class="fas fa-chevron-down mobile-arrow"></i>
-                    </button>
-                    <div class="mobile-dropdown-content">
-                        <a href="{% url 'core:buy_products' %}" class="mobile-sub-link">
-                            <i class="fas fa-shield-alt"></i> گارد
-                        </a>
-                        <a href="{% url 'core:buy_products' %}" class="mobile-sub-link">
-                            <i class="fas fa-mobile-alt"></i> گلس
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Mobile: مینی گیم -->
-                <div class="mobile-dropdown">
-                    <button type="button" class="mobile-link mobile-dropdown-toggle">
-                        <span class="flex items-center gap-3">
-                            <i class="fas fa-puzzle-piece"></i>
-                            <span>مینی گیم</span>
-                        </span>
-                        <i class="fas fa-chevron-down mobile-arrow"></i>
-                    </button>
-                    <div class="mobile-dropdown-content">
-                        <a href="{% url 'core:mini_game' %}" class="mobile-sub-link">
-                            <i class="fas fa-crosshairs"></i> یوسی پابجی
-                        </a>
-                        <a href="{% url 'core:mini_game' %}" class="mobile-sub-link">
-                            <i class="fas fa-fire"></i> جم فری فایر
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Mobile: درباره ما -->
-                <a href="{% url 'core:about' %}" class="mobile-link">
-                    <i class="fas fa-info-circle"></i>
-                    <span>درباره ما</span>
-                </a>
-                
-                <!-- Mobile CTA -->
-                <div class="mobile-cta">
-                    <a href="{% url 'core:consulting' %}" class="btn-neon w-full text-center">
-                        <i class="fas fa-comments"></i>
-                        <span>مشاوره رایگان</span>
-                    </a>
-                </div>
-                
-            </div>
-        </div>
-        
-    </header>
+<body class="bg-dark-900 text-white font-vazir min-h-screen flex flex-col antialiased">
     
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <!-- MAIN CONTENT                                                           -->
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <main class="flex-grow">
+    <!-- ========================================
+         Skip Link for Accessibility
+         ======================================== -->
+    <a href="#main-content" 
+       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:right-4 
+              bg-neon-cyan text-dark-900 px-4 py-2 rounded-lg z-[9999]">
+        رفتن به محتوای اصلی
+    </a>
+
+    <!-- ========================================
+         Header & Navigation
+         ======================================== -->
+    {% include 'components/_navbar.html' %}
+
+    <!-- ========================================
+         Mobile Menu (Hidden by default)
+         ======================================== -->
+    {% include 'components/_mobile_menu.html' %}
+
+    <!-- ========================================
+         Main Content Area
+         ======================================== -->
+    <main id="main-content" class="flex-grow">
+        
+        <!-- Breadcrumb (optional per page) -->
+        {% block breadcrumb %}{% endblock %}
+        
+        <!-- Flash Messages -->
+        {% if messages %}
+            {% include 'components/_messages.html' %}
+        {% endif %}
+        
+        <!-- Page Content -->
         {% block content %}{% endblock %}
+        
     </main>
+
+    <!-- ========================================
+         Footer
+         ======================================== -->
+    {% include 'components/_footer.html' %}
+
+    <!-- ========================================
+         Global Modals & Overlays
+         ======================================== -->
     
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <!-- FOOTER                                                                 -->
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <footer class="footer-main">
-        <div class="container mx-auto px-4">
-            
-            <!-- Footer Top -->
-            <div class="footer-grid">
-                
-                <!-- Brand Column -->
-                <div class="footer-col">
-                    <a href="{% url 'core:home' %}" class="footer-logo">
-                        <div class="logo-icon">
-                            <i class="fas fa-gamepad text-xl"></i>
-                        </div>
-                        <span class="logo-brand">Mini-up</span>
-                    </a>
-                    <p class="footer-desc">
-                        پلتفرم خدمات مجازی و محصولات گیمینگ با بهترین کیفیت و قیمت.
-                        تجربه‌ای متفاوت از خرید آنلاین.
-                    </p>
-                    <div class="footer-social">
-                        <a href="#" class="social-icon" aria-label="Telegram">
-                            <i class="fab fa-telegram"></i>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="WhatsApp">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- Quick Links -->
-                <div class="footer-col">
-                    <h4 class="footer-heading">دسترسی سریع</h4>
-                    <ul class="footer-links">
-                        <li><a href="{% url 'core:home' %}">خانه</a></li>
-                        <li><a href="{% url 'core:virtual_services' %}">خدمات مجازی</a></li>
-                        <li><a href="{% url 'core:gaming_products' %}">محصولات گیمینگ</a></li>
-                        <li><a href="{% url 'core:buy_products' %}">خرید محصولات</a></li>
-                        <li><a href="{% url 'core:mini_game' %}">مینی گیم</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Services -->
-                <div class="footer-col">
-                    <h4 class="footer-heading">خدمات ما</h4>
-                    <ul class="footer-links">
-                        <li><a href="{% url 'core:virtual_services' %}">پرمیوم تلگرام</a></li>
-                        <li><a href="{% url 'core:virtual_services' %}">اسپاتیفای</a></li>
-                        <li><a href="{% url 'core:virtual_services' %}">اپل آیدی</a></li>
-                        <li><a href="{% url 'core:consulting' %}">مشاوره</a></li>
-                        <li><a href="{% url 'core:about' %}">درباره ما</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Contact -->
-                <div class="footer-col">
-                    <h4 class="footer-heading">تماس با ما</h4>
-                    <ul class="footer-contact">
-                        <li>
-                            <i class="fas fa-phone"></i>
-                            <a href="tel:+982112345678">۰۲۱-۱۲۳۴-۵۶۷۸</a>
-                        </li>
-                        <li>
-                            <i class="fas fa-envelope"></i>
-                            <a href="mailto:info@mini-up.ir">info@mini-up.ir</a>
-                        </li>
-                        <li>
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>تهران، ایران</span>
-                        </li>
-                    </ul>
-                </div>
-                
-            </div>
-            
-            <!-- Footer Bottom -->
-            <div class="footer-bottom">
-                <p>© {{ current_year|default:"2025" }} {{ site_name_fa|default:"مینی‌آپ" }}. تمامی حقوق محفوظ است.</p>
-            </div>
-            
-        </div>
-    </footer>
+    <!-- Auth Modal (Login/Register) -->
+    {% include 'components/_auth_modal.html' %}
     
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <!-- JAVASCRIPT                                                             -->
-    <!-- ══════════════════════════════════════════════════════════════════════ -->
-    <script src="{% static 'core/js/main.js' %}"></script>
+    <!-- Cart Sidebar -->
+    {% include 'components/_cart_sidebar.html' %}
+    
+    <!-- Search Modal -->
+    {% include 'components/_search_modal.html' %}
+    
+    <!-- Toast Notifications Container -->
+    {% include 'components/_toast.html' %}
+
+    <!-- ========================================
+         JavaScript
+         ======================================== -->
+    
+    <!-- Core Utilities (must load first) -->
+    <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'js/core.js' %}"></script>
+    
+    <!-- Component Scripts -->
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/toast.js' %}"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+    
+    <!-- Page-specific JS (optional) -->
     {% block extra_js %}{% endblock %}
     
-    <!-- ═══════════════════════════════════════════════════════════════════════════
-     LOGIN MODAL
-     ═══════════════════════════════════════════════════════════════════════════ -->
-    <div id="login-modal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <!-- Modal Backdrop -->
-        <div class="modal-backdrop" id="login-modal-backdrop"></div>
-        
-        <!-- Modal Content -->
-        <div class="modal-container">
-            <div class="login-modal-content">
-                <!-- Close Button -->
-                <button type="button" id="login-modal-close" class="modal-close-btn" aria-label="بستن">
-                    <i class="fas fa-times"></i>
-                </button>
-                
-                <!-- Modal Header with Logo -->
-                <div class="login-modal-header">
-                    <div class="login-logo">
-                        <div class="login-logo-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <div class="login-logo-text">
-                            <span class="login-logo-brand">Mini-up</span>
-                            <span class="login-logo-tagline">گیمینگ و خدمات مجازی</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Tab Switcher -->
-                <div class="auth-tabs" role="tablist">
-                    <button type="button" 
-                            class="auth-tab active" 
-                            id="tab-login" 
-                            role="tab" 
-                            aria-selected="true"
-                            aria-controls="panel-login"
-                            data-tab="login">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>ورود</span>
-                    </button>
-                    <button type="button" 
-                            class="auth-tab" 
-                            id="tab-register" 
-                            role="tab" 
-                            aria-selected="false"
-                            aria-controls="panel-register"
-                            data-tab="register">
-                        <i class="fas fa-user-plus"></i>
-                        <span>ثبت نام</span>
-                    </button>
-                    <div class="auth-tab-indicator"></div>
-                </div>
-                
-                <!-- Login Panel -->
-                <div id="panel-login" class="auth-panel active" role="tabpanel" aria-labelledby="tab-login">
-                    <form id="login-form" class="auth-form" novalidate>
-                        <!-- Step 1: Phone/Email Input -->
-                        <div id="login-step-1" class="auth-step active">
-                            <div class="form-group">
-                                <label for="login-identifier" class="form-label">
-                                    <i class="fas fa-mobile-alt"></i>
-                                    شماره موبایل یا ایمیل
-                                </label>
-                                <div class="input-wrapper">
-                                    <input type="text" 
-                                        id="login-identifier" 
-                                        name="identifier"
-                                        class="form-input"
-                                        placeholder="09123456789 یا email@example.com"
-                                        autocomplete="username"
-                                        dir="ltr"
-                                        required>
-                                    <div class="input-icon">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    <div class="input-status"></div>
-                                </div>
-                                <div class="form-error" id="login-identifier-error"></div>
-                                <div class="form-hint">
-                                    شماره موبایل با ۰۹ شروع شود یا ایمیل معتبر وارد کنید
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="btn-auth-submit" id="login-submit-btn">
-                                <span class="btn-text">ورود</span>
-                                <span class="btn-loader">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </span>
-                                <i class="fas fa-arrow-left btn-icon"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- Step 2: OTP Verification -->
-                        <div id="login-step-2" class="auth-step">
-                            <div class="otp-header">
-                                <button type="button" class="otp-back-btn" id="otp-back-btn">
-                                    <i class="fas fa-arrow-right"></i>
-                                    <span>بازگشت</span>
-                                </button>
-                                <p class="otp-sent-text">
-                                    کد تأیید ارسال شد به:
-                                    <strong id="otp-destination" dir="ltr"></strong>
-                                </p>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label">
-                                    <i class="fas fa-key"></i>
-                                    کد تأیید را وارد کنید
-                                </label>
-                                
-                                <!-- OTP Input Boxes -->
-                                <div class="otp-inputs" dir="ltr">
-                                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="0" autocomplete="one-time-code">
-                                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="1">
-                                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="2">
-                                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="3">
-                                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="4">
-                                    <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" data-index="5">
-                                </div>
-                                <div class="form-error" id="otp-error"></div>
-                            </div>
-                            
-                            <!-- Timer Section -->
-                            <div class="otp-timer-section">
-                                <div id="otp-timer-active" class="otp-timer">
-                                    <i class="fas fa-clock"></i>
-                                    <span>مدت زمان باقی‌مانده برای وارد کردن کد:</span>
-                                    <strong id="otp-timer-display">02:00</strong>
-                                </div>
-                                <div id="otp-timer-expired" class="otp-expired hidden">
-                                    <p>کد منقضی شده است</p>
-                                    <button type="button" class="otp-resend-btn" id="otp-resend-btn">
-                                        <i class="fas fa-redo"></i>
-                                        ارسال مجدد کد
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <button type="button" class="btn-auth-submit" id="otp-verify-btn">
-                                <span class="btn-text">تأیید و ورود</span>
-                                <span class="btn-loader">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </span>
-                                <i class="fas fa-check btn-icon"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Register Panel -->
-                <div id="panel-register" class="auth-panel" role="tabpanel" aria-labelledby="tab-register">
-                    <form id="register-form" class="auth-form" novalidate>
-                        <div class="form-group">
-                            <label for="register-identifier" class="form-label">
-                                <i class="fas fa-mobile-alt"></i>
-                                شماره موبایل یا ایمیل
-                            </label>
-                            <div class="input-wrapper">
-                                <input type="text" 
-                                    id="register-identifier" 
-                                    name="identifier"
-                                    class="form-input"
-                                    placeholder="09123456789 یا email@example.com"
-                                    autocomplete="username"
-                                    dir="ltr"
-                                    required>
-                                <div class="input-icon">
-                                    <i class="fas fa-user-plus"></i>
-                                </div>
-                                <div class="input-status"></div>
-                            </div>
-                            <div class="form-error" id="register-identifier-error"></div>
-                        </div>
-                        
-                        <button type="submit" class="btn-auth-submit" id="register-submit-btn">
-                            <span class="btn-text">ثبت نام</span>
-                            <span class="btn-loader">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </span>
-                            <i class="fas fa-arrow-left btn-icon"></i>
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Terms & Conditions -->
-                <div class="auth-terms">
-                    <p>
-                        ورود شما به معنای پذیرش 
-                        <a href="{% url 'core:terms' %}">شرایط استفاده</a>
-                        و 
-                        <a href="{% url 'core:privacy' %}">اظهارنامه حریم خصوصی</a>
-                        است.
-                    </p>
-                </div>
-                
-                <!-- Social Login (Optional) -->
-                <div class="auth-divider">
-                    <span>یا</span>
-                </div>
-                
-                <div class="social-login">
-                    <button type="button" class="social-btn google">
-                        <i class="fab fa-google"></i>
-                        <span>ورود با گوگل</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Inline Scripts (optional) -->
+    {% block inline_js %}{% endblock %}
 
 </body>
 </html>

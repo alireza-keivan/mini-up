@@ -1,0 +1,596 @@
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   ███████████████████████████████████████████████████████████████████████████████████████
+   █                                                                                     █
+   █   SEARCH MODAL COMPONENT                                                           █
+   █   ─────────────────────────────────────────────────────────────────────────────    █
+   █   File: templates/components/_search_modal.html                                    █
+   █   Project: Mini-up - Gaming & Virtual Services Platform                            █
+   █   Author: Mini-up Development Team                                                 █
+   █   Created: 1404/09                                                                 █
+   █   ─────────────────────────────────────────────────────────────────────────────    █
+   █   Full-screen search overlay with live search functionality                        █
+   █   Features: Live search, recent searches, popular searches, category filter        █
+   █   ─────────────────────────────────────────────────────────────────────────────    █
+   █   Dependencies:                                                                    █
+   █   - CSS: static/css/components/_search_modal.css                                   █
+   █   - JS: static/js/components/search-modal.js                                       █
+   █   - API: /api/search/live/ (for live search results)                               █
+   █                                                                                     █
+   ███████████████████████████████████████████████████████████████████████████████████████
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   SEARCH MODAL OVERLAY (Backdrop)
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<div class="search-modal-overlay" 
+     id="searchModalOverlay"
+     aria-hidden="true"
+     data-search-close>
+</div>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   ███████████████████████████████████████████████████████████████████████████████████████
+   █                                                                                     █
+   █   MAIN SEARCH MODAL CONTAINER                                                      █
+   █                                                                                     █
+   ███████████████████████████████████████████████████████████████████████████████████████
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<div class="search-modal" 
+     id="searchModal"
+     role="dialog"
+     aria-modal="true"
+     aria-label="جستجو"
+     aria-hidden="true">
+    
+    {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 1: SEARCH MODAL HEADER
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <header class="search-modal-header">
+        
+        {# Search Form #}
+        <form action="{% url 'core:search' %}" 
+              method="GET" 
+              class="search-modal-form"
+              id="searchModalForm"
+              role="search">
+            
+            {# Search Icon #}
+            <div class="search-modal-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            
+            {# Search Input #}
+            <input type="text" 
+                   name="q"
+                   id="searchModalInput"
+                   class="search-modal-input"
+                   placeholder="جستجو در محصولات، خدمات و مقالات..."
+                   autocomplete="off"
+                   autocapitalize="off"
+                   spellcheck="false"
+                   aria-label="عبارت جستجو"
+                   data-search-input>
+            
+            {# Clear Button (Hidden by default) #}
+            <button type="button" 
+                    class="search-modal-clear"
+                    id="searchModalClear"
+                    aria-label="پاک کردن"
+                    data-search-clear
+                    hidden>
+                <i class="fas fa-times-circle"></i>
+            </button>
+            
+            {# Loading Spinner (Hidden by default) #}
+            <div class="search-modal-loading" 
+                 id="searchModalLoading"
+                 aria-hidden="true"
+                 hidden>
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            
+            {# Keyboard Shortcut Hint #}
+            <div class="search-modal-shortcut">
+                <kbd>ESC</kbd>
+            </div>
+            
+        </form>
+        
+        {# Close Button #}
+        <button type="button" 
+                class="search-modal-close"
+                id="searchModalClose"
+                aria-label="بستن جستجو"
+                data-search-close>
+            <i class="fas fa-times"></i>
+        </button>
+        
+    </header>
+    
+    
+    {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 2: CATEGORY FILTER TABS
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <div class="search-modal-categories">
+        <button type="button" 
+                class="search-modal-category active"
+                data-search-category="all">
+            <i class="fas fa-globe"></i>
+            <span>همه</span>
+        </button>
+        <button type="button" 
+                class="search-modal-category"
+                data-search-category="virtual">
+            <i class="fas fa-cloud"></i>
+            <span>خدمات مجازی</span>
+        </button>
+        <button type="button" 
+                class="search-modal-category"
+                data-search-category="gaming">
+            <i class="fas fa-gamepad"></i>
+            <span>گیمینگ</span>
+        </button>
+        <button type="button" 
+                class="search-modal-category"
+                data-search-category="products">
+            <i class="fas fa-shopping-bag"></i>
+            <span>محصولات</span>
+        </button>
+        <button type="button" 
+                class="search-modal-category"
+                data-search-category="articles">
+            <i class="fas fa-newspaper"></i>
+            <span>مقالات</span>
+        </button>
+    </div>
+    
+    
+    {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 3: SEARCH MODAL BODY (Content Area)
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <div class="search-modal-body" id="searchModalBody">
+        
+        {# ─────────────────────────────────────────────────────────────────────────────
+           3.1 DEFAULT STATE: Recent & Popular Searches
+           ───────────────────────────────────────────────────────────────────────────── #}
+        <div class="search-modal-default" id="searchModalDefault">
+            
+            {# Recent Searches #}
+            <div class="search-modal-section" id="recentSearchesSection">
+                <div class="search-modal-section-header">
+                    <h3 class="search-modal-section-title">
+                        <i class="fas fa-history"></i>
+                        جستجوهای اخیر
+                    </h3>
+                    <button type="button" 
+                            class="search-modal-section-action"
+                            id="clearRecentSearches"
+                            data-clear-recent>
+                        <i class="fas fa-trash-alt"></i>
+                        پاک کردن
+                    </button>
+                </div>
+                <div class="search-modal-recent-list" id="recentSearchesList">
+                    {# Will be populated by JavaScript from localStorage #}
+                    <div class="search-modal-empty-state small">
+                        <i class="fas fa-search"></i>
+                        <span>هنوز جستجویی انجام نداده‌اید</span>
+                    </div>
+                </div>
+            </div>
+            
+            {# Popular Searches #}
+            <div class="search-modal-section">
+                <div class="search-modal-section-header">
+                    <h3 class="search-modal-section-title">
+                        <i class="fas fa-fire"></i>
+                        جستجوهای پرطرفدار
+                    </h3>
+                </div>
+                <div class="search-modal-popular-list">
+                    <a href="{% url 'core:search' %}?q=پرمیوم+تلگرام" 
+                       class="search-modal-popular-item"
+                       data-popular-search="پرمیوم تلگرام">
+                        <i class="fab fa-telegram"></i>
+                        <span>پرمیوم تلگرام</span>
+                        <span class="search-modal-popular-badge hot">پرفروش</span>
+                    </a>
+                    <a href="{% url 'core:search' %}?q=اسپاتیفای" 
+                       class="search-modal-popular-item"
+                       data-popular-search="اسپاتیفای">
+                        <i class="fab fa-spotify"></i>
+                        <span>اسپاتیفای</span>
+                    </a>
+                    <a href="{% url 'core:search' %}?q=یوسی+پابجی" 
+                       class="search-modal-popular-item"
+                       data-popular-search="یوسی پابجی">
+                        <i class="fas fa-coins"></i>
+                        <span>یوسی پابجی</span>
+                    </a>
+                    <a href="{% url 'core:search' %}?q=فالوور+اینستاگرام" 
+                       class="search-modal-popular-item"
+                       data-popular-search="فالوور اینستاگرام">
+                        <i class="fab fa-instagram"></i>
+                        <span>فالوور اینستاگرام</span>
+                    </a>
+                    <a href="{% url 'core:search' %}?q=اپل+آیدی" 
+                       class="search-modal-popular-item"
+                       data-popular-search="اپل آیدی">
+                        <i class="fab fa-apple"></i>
+                        <span>اپل آیدی</span>
+                    </a>
+                    <a href="{% url 'core:search' %}?q=وایرگارد" 
+                       class="search-modal-popular-item"
+                       data-popular-search="وایرگارد">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>وایرگارد</span>
+                        <span class="search-modal-popular-badge new">جدید</span>
+                    </a>
+                </div>
+            </div>
+            
+            {# Quick Categories #}
+            <div class="search-modal-section">
+                <div class="search-modal-section-header">
+                    <h3 class="search-modal-section-title">
+                        <i class="fas fa-th-large"></i>
+                        دسته‌بندی‌های سریع
+                    </h3>
+                </div>
+                <div class="search-modal-quick-categories">
+                    <a href="{% url 'core:virtual_services' %}?category=telegram" 
+                       class="search-modal-quick-category">
+                        <div class="search-modal-quick-category-icon telegram">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <span>تلگرام</span>
+                    </a>
+                    <a href="{% url 'core:virtual_services' %}?category=instagram" 
+                       class="search-modal-quick-category">
+                        <div class="search-modal-quick-category-icon instagram">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <span>اینستاگرام</span>
+                    </a>
+                    <a href="{% url 'core:virtual_services' %}?category=spotify" 
+                       class="search-modal-quick-category">
+                        <div class="search-modal-quick-category-icon spotify">
+                            <i class="fab fa-spotify"></i>
+                        </div>
+                        <span>اسپاتیفای</span>
+                    </a>
+                    <a href="{% url 'core:gaming_products' %}?category=pubg" 
+                       class="search-modal-quick-category">
+                        <div class="search-modal-quick-category-icon gaming">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <span>پابجی</span>
+                    </a>
+                    <a href="{% url 'core:virtual_services' %}?category=vpn" 
+                       class="search-modal-quick-category">
+                        <div class="search-modal-quick-category-icon vpn">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <span>VPN</span>
+                    </a>
+                    <a href="{% url 'core:virtual_services' %}?category=apple" 
+                       class="search-modal-quick-category">
+                        <div class="search-modal-quick-category-icon apple">
+                            <i class="fab fa-apple"></i>
+                        </div>
+                        <span>اپل</span>
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+        
+        
+        {# ─────────────────────────────────────────────────────────────────────────────
+           3.2 LIVE SEARCH RESULTS (Hidden by default)
+           ───────────────────────────────────────────────────────────────────────────── #}
+        <div class="search-modal-results" id="searchModalResults" hidden>
+            
+            {# Results Header #}
+            <div class="search-modal-results-header" id="searchResultsHeader">
+                <span class="search-modal-results-count">
+                    <span id="searchResultsCount">0</span> نتیجه برای
+                    "<span id="searchResultsQuery"></span>"
+                </span>
+                <a href="#" 
+                   class="search-modal-results-viewall"
+                   id="searchResultsViewAll">
+                    مشاهده همه نتایج
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+            
+            {# Results List #}
+            <div class="search-modal-results-list" id="searchResultsList">
+                {# Results will be populated by JavaScript #}
+            </div>
+            
+        </div>
+        
+        
+        {# ─────────────────────────────────────────────────────────────────────────────
+           3.3 NO RESULTS STATE (Hidden by default)
+           ───────────────────────────────────────────────────────────────────────────── #}
+        <div class="search-modal-no-results" id="searchModalNoResults" hidden>
+            <div class="search-modal-empty-state">
+                <div class="search-modal-empty-icon">
+                    <i class="fas fa-search"></i>
+                    <i class="fas fa-times no-result-x"></i>
+                </div>
+                <h4 class="search-modal-empty-title">نتیجه‌ای یافت نشد</h4>
+                <p class="search-modal-empty-text">
+                    متأسفانه نتیجه‌ای برای "<span id="noResultsQuery"></span>" پیدا نشد.
+                    <br>
+                    پیشنهاد می‌کنیم:
+                </p>
+                <ul class="search-modal-suggestions-list">
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        املای کلمات را بررسی کنید
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        از کلمات کلیدی‌تر استفاده کنید
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        دسته‌بندی دیگری را امتحان کنید
+                    </li>
+                </ul>
+                
+                {# Suggested Alternatives #}
+                <div class="search-modal-alternatives">
+                    <span class="search-modal-alternatives-label">شاید منظور شما این بود:</span>
+                    <div class="search-modal-alternatives-list" id="searchAlternatives">
+                        {# Will be populated by JavaScript if available #}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        {# ─────────────────────────────────────────────────────────────────────────────
+           3.4 ERROR STATE (Hidden by default)
+           ───────────────────────────────────────────────────────────────────────────── #}
+        <div class="search-modal-error" id="searchModalError" hidden>
+            <div class="search-modal-empty-state error">
+                <div class="search-modal-empty-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4 class="search-modal-empty-title">خطا در جستجو</h4>
+                <p class="search-modal-empty-text">
+                    متأسفانه در برقراری ارتباط مشکلی پیش آمد.
+                    <br>
+                    لطفاً دوباره تلاش کنید.
+                </p>
+                <button type="button" 
+                        class="search-modal-retry-btn"
+                        id="searchRetryBtn"
+                        data-search-retry>
+                    <i class="fas fa-redo"></i>
+                    تلاش مجدد
+                </button>
+            </div>
+        </div>
+        
+        
+        {# ─────────────────────────────────────────────────────────────────────────────
+           3.5 LOADING STATE (Hidden by default)
+           ───────────────────────────────────────────────────────────────────────────── #}
+        <div class="search-modal-loading-state" id="searchModalLoadingState" hidden>
+            <div class="search-modal-skeleton">
+                <div class="search-modal-skeleton-item">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-price"></div>
+                    </div>
+                </div>
+                <div class="search-modal-skeleton-item">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-price"></div>
+                    </div>
+                </div>
+                <div class="search-modal-skeleton-item">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-title"></div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-price"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    {# End of search-modal-body #}
+    
+    
+    {# ═══════════════════════════════════════════════════════════════════════════════════
+       SECTION 4: SEARCH MODAL FOOTER
+       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    <footer class="search-modal-footer">
+        
+        {# Keyboard Shortcuts Guide #}
+        <div class="search-modal-shortcuts">
+            <div class="search-modal-shortcut-item">
+                <kbd>↵</kbd>
+                <span>جستجو</span>
+            </div>
+            <div class="search-modal-shortcut-item">
+                <kbd>↑</kbd>
+                <kbd>↓</kbd>
+                <span>انتخاب</span>
+            </div>
+            <div class="search-modal-shortcut-item">
+                <kbd>ESC</kbd>
+                <span>بستن</span>
+            </div>
+            <div class="search-modal-shortcut-item">
+                <kbd>Ctrl</kbd>
+                <kbd>K</kbd>
+                <span>باز کردن</span>
+            </div>
+        </div>
+        
+        {# Powered By #}
+        <div class="search-modal-powered">
+            <i class="fas fa-bolt"></i>
+            <span>جستجوی هوشمند Mini-up</span>
+        </div>
+        
+    </footer>
+    
+</div>
+{# End of search-modal #}
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   ███████████████████████████████████████████████████████████████████████████████████████
+   █                                                                                     █
+   █   SEARCH RESULT ITEM TEMPLATE (Hidden - Used by JavaScript)                        █
+   █                                                                                     █
+   ███████████████████████████████████████████████████████████████████████████████████████
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<template id="searchResultItemTemplate">
+    <a href="" class="search-result-item" data-result-item>
+        
+        {# Result Image #}
+        <div class="search-result-image">
+            <img src="" alt="" loading="lazy">
+            <span class="search-result-badge"></span>
+        </div>
+        
+        {# Result Content #}
+        <div class="search-result-content">
+            <div class="search-result-category">
+                <i class=""></i>
+                <span></span>
+            </div>
+            <h4 class="search-result-title"></h4>
+            <p class="search-result-description"></p>
+            <div class="search-result-meta">
+                <span class="search-result-price">
+                    <span class="price-current"></span>
+                    <span class="price-original"></span>
+                </span>
+                <span class="search-result-rating">
+                    <i class="fas fa-star"></i>
+                    <span></span>
+                </span>
+            </div>
+        </div>
+        
+        {# Result Arrow #}
+        <div class="search-result-arrow">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        
+    </a>
+</template>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   RECENT SEARCH ITEM TEMPLATE (Hidden - Used by JavaScript)
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<template id="recentSearchItemTemplate">
+    <div class="search-recent-item" data-recent-item>
+        <button type="button" 
+                class="search-recent-btn"
+                data-search-term="">
+            <i class="fas fa-history"></i>
+            <span class="search-recent-text"></span>
+        </button>
+        <button type="button" 
+                class="search-recent-remove"
+                data-remove-recent=""
+                aria-label="حذف">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</template>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   SEARCH CATEGORY GROUP TEMPLATE (Hidden - Used by JavaScript)
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<template id="searchCategoryGroupTemplate">
+    <div class="search-results-group" data-result-group>
+        <div class="search-results-group-header">
+            <h5 class="search-results-group-title">
+                <i class=""></i>
+                <span></span>
+            </h5>
+            <a href="" class="search-results-group-more">
+                مشاهده همه
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+        <div class="search-results-group-items">
+            {# Items will be inserted here #}
+        </div>
+    </div>
+</template>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   ███████████████████████████████████████████████████████████████████████████████████████
+   █                                                                                     █
+   █   INLINE INITIALIZATION SCRIPT                                                     █
+   █   Note: Main logic should be in static/js/components/search-modal.js               █
+   █                                                                                     █
+   ███████████████████████████████████████████████████████████████████████████████████████
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<script>
+    // Initialize search modal when DOM is ready 
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Check if SearchModal class exists (from search-modal.js)
+        if (typeof window.SearchModal !== 'undefined') {
+            window.searchModal = new SearchModal({
+                modalId: 'searchModal',
+                overlayId: 'searchModalOverlay',
+                inputId: 'searchModalInput',
+                apiEndpoint: '{% url "core:search_api" %}',
+                minChars: 2,
+                debounceTime: 300,
+                maxRecentSearches: 10,
+                storageKey: 'miniup_recent_searches'
+            });
+        }
+        
+        // Keyboard shortcut to open search (Ctrl/Cmd + K)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                if (window.searchModal) {
+                    window.searchModal.open();
+                } else {
+                    // Fallback: manual trigger
+                    const modal = document.getElementById('searchModal');
+                    const overlay = document.getElementById('searchModalOverlay');
+                    if (modal && overlay) {
+                        modal.classList.add('active');
+                        modal.setAttribute('aria-hidden', 'false');
+                        overlay.classList.add('active');
+                        overlay.setAttribute('aria-hidden', 'false');
+                        document.getElementById('searchModalInput')?.focus();
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            }
+        });
+        
+    });
+</script>

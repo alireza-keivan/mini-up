@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   NAVBAR — Neon Glass Floating Navigation
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+
+    .navbar-main {
+        @apply sticky top-0 w-full z-[300];
+        background: rgba(10, 10, 15, 0.92);
+        border-bottom: 1px solid var(--border-neon-pink);
+        backdrop-filter: blur(18px);
+        transition: background var(--duration-base) var(--ease-smooth),
+                    border-color var(--duration-base) var(--ease-smooth);
+    }
+
+    .navbar-main.scrolled {
+        background: rgba(10, 10, 15, 0.98);
+        border-color: rgba(255, 0, 85, 0.4);
+    }
+
+    /* Logo */
+    .logo-wrapper {
+        @apply flex items-center gap-3;
+    }
+
+    .logo-icon {
+        @apply w-10 h-10 rounded-xl flex items-center justify-center;
+        background: var(--gradient-neon);
+        box-shadow: var(--shadow-neon-pink);
+        transition: transform var(--duration-base) var(--ease-smooth),
+                    box-shadow var(--duration-base) var(--ease-smooth);
+    }
+
+    .logo-wrapper:hover .logo-icon {
+        transform: scale(1.05) rotate(-3deg);
+        box-shadow: 0 0 35px var(--neon-pink-glow);
+    }
+
+    .logo-brand {
+        @apply text-xl font-black tracking-tight;
+        background: var(--gradient-neon-full);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .logo-tagline {
+        @apply text-xs text-gray-500 hidden sm:block;
+    }
+
+    /* Desktop Navigation */
+    .nav-menu {
+        @apply hidden lg:flex items-center gap-1;
+    }
+
+    .nav-link {
+        @apply px-4 py-2 rounded-lg text-gray-300 text-sm
+               transition-all duration-200 relative;
+    }
+
+    .nav-link:hover {
+        @apply text-white bg-white/5;
+    }
+
+    .nav-link.active {
+        @apply text-pink-400;
+    }
+
+    .nav-link.active::after {
+        content: '';
+        @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-pink-500;
+        box-shadow: 0 0 12px var(--neon-pink-glow);
+    }
+
+    /* Desktop Dropdown */
+    .nav-dropdown {
+        @apply relative;
+    }
+
+    .nav-dropdown-menu {
+        @apply absolute top-full right-0 mt-2 min-w-[220px] 
+               opacity-0 invisible translate-y-2 rounded-xl py-2
+               transition-all duration-200;
+        background: rgba(15, 15, 22, 0.98);
+        border: 1px solid var(--border-medium);
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(20px);
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu {
+        @apply opacity-100 visible translate-y-0;
+    }
+
+    .nav-dropdown-item {
+        @apply flex items-center gap-3 px-4 py-2.5 text-gray-300 text-sm
+               transition-all duration-150;
+    }
+
+    .nav-dropdown-item:hover {
+        @apply text-white bg-pink-500/10;
+    }
+
+    /* Navbar Action Buttons */
+    .nav-icon-btn {
+        @apply w-10 h-10 rounded-xl flex items-center justify-center
+               text-gray-400 text-lg transition-all duration-200 relative;
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .nav-icon-btn:hover {
+        @apply text-white;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--border-neon-pink);
+    }
+
+    .nav-icon-btn .badge {
+        @apply absolute -top-1 -right-1 w-5 h-5 rounded-full text-[10px]
+               flex items-center justify-center text-white font-bold;
+        background: var(--gradient-neon);
+        box-shadow: var(--shadow-neon-pink);
+    }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+        @apply w-10 h-10 rounded-xl flex flex-col items-center justify-center gap-1.5
+               lg:hidden bg-white/5 transition-colors duration-200;
+    }
+
+    .mobile-menu-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .hamburger-line {
+        @apply w-5 h-0.5 bg-white rounded-full transition-all duration-300;
+    }
+
+    .mobile-menu-btn.active .line-1 {
+        transform: translateY(6px) rotate(45deg);
+    }
+
+    .mobile-menu-btn.active .line-2 {
+        @apply opacity-0;
+    }
+
+    .mobile-menu-btn.active .line-3 {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+
+    /* Mobile Menu Panel */
+    .mobile-menu {
+        @apply fixed inset-x-0 top-[64px] bottom-0 lg:hidden
+               opacity-0 invisible overflow-y-auto transition-all duration-300;
+        background: rgba(8, 8, 12, 0.98);
+        transform: translateX(100%);
+        backdrop-filter: blur(20px);
+    }
+
+    .mobile-menu.active {
+        @apply opacity-100 visible;
+        transform: translateX(0);
+    }
+}

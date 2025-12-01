@@ -1,0 +1,49 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   GLOBAL RESET & BASE STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        font-family: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--gradient-dark);
+        background-attachment: fixed;
+        color: var(--text-primary);
+        line-height: 1.7;
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+
+    /* Selection */
+    ::selection {
+        background: var(--neon-pink);
+        color: white;
+    }
+
+    ::-moz-selection {
+        background: var(--neon-pink);
+        color: white;
+    }
+
+    /* Focus States */
+    :focus {
+        outline: none;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--

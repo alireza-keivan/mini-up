@@ -1,0 +1,891 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   DROPDOWNS — Desktop & Mobile Menus
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       BASE DROPDOWN CONTAINER
+       ───────────────────────────────────────────────────────────────────────── */
+    .dropdown {
+        @apply relative;
+    }
+
+    .dropdown-trigger {
+        @apply flex items-center gap-2 cursor-pointer;
+        @apply transition-all duration-200;
+    }
+
+    .dropdown-arrow {
+        @apply text-xs text-gray-500;
+        @apply transition-transform duration-200;
+    }
+
+    .dropdown:hover .dropdown-arrow,
+    .dropdown.active .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       DROPDOWN MENU (Desktop)
+       ───────────────────────────────────────────────────────────────────────── */
+    .dropdown-menu {
+        @apply absolute top-full right-0 mt-2;
+        @apply min-w-[220px] py-2 rounded-xl;
+        @apply opacity-0 invisible translate-y-2;
+        @apply transition-all duration-200;
+        @apply z-[var(--z-dropdown)];
+        background: rgba(15, 15, 22, 0.98);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-neon-pink);
+        box-shadow: var(--shadow-xl), 0 0 30px var(--neon-pink-soft);
+    }
+
+    .dropdown:hover .dropdown-menu,
+    .dropdown.active .dropdown-menu {
+        @apply opacity-100 visible translate-y-0;
+    }
+
+    /* Wide Dropdown (Mega Menu) */
+    .dropdown-menu-wide {
+        @apply min-w-[400px];
+    }
+
+    .dropdown-menu-mega {
+        @apply w-[600px] p-4;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       DROPDOWN HEADER
+       ───────────────────────────────────────────────────────────────────────── */
+    .dropdown-header {
+        @apply flex items-center gap-2 px-4 py-2 mb-2;
+        @apply text-sm font-bold;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dropdown-header.pink {
+        @apply text-pink-400;
+    }
+
+    .dropdown-header.cyan {
+        @apply text-cyan-400;
+    }
+
+    .dropdown-header.purple {
+        @apply text-purple-400;
+    }
+
+    .dropdown-header.yellow {
+        @apply text-yellow-400;
+    }
+
+    .dropdown-header.green {
+        @apply text-green-400;
+    }
+
+    .dropdown-header i {
+        @apply text-base;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       DROPDOWN ITEMS
+       ───────────────────────────────────────────────────────────────────────── */
+    .dropdown-item {
+        @apply flex items-center gap-3 px-4 py-2.5 rounded-lg mx-2;
+        @apply text-gray-300 text-sm;
+        @apply transition-all duration-150;
+        @apply cursor-pointer;
+    }
+
+    .dropdown-item:hover {
+        @apply text-white;
+        background: rgba(255, 0, 85, 0.1);
+    }
+
+    .dropdown-item i {
+        @apply w-5 text-center;
+        color: rgba(255, 0, 85, 0.7);
+    }
+
+    .dropdown-item:hover i {
+        @apply text-pink-400;
+    }
+
+    .dropdown-item.active {
+        @apply text-pink-400;
+        background: rgba(255, 0, 85, 0.15);
+    }
+
+    .dropdown-item.disabled {
+        @apply opacity-50 pointer-events-none;
+    }
+
+    /* Dropdown Item with Badge */
+    .dropdown-item-badge {
+        @apply mr-auto px-2 py-0.5 rounded-full;
+        @apply text-[10px] font-bold text-white;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       DROPDOWN GRID LAYOUT
+       ───────────────────────────────────────────────────────────────────────── */
+    .dropdown-grid {
+        @apply grid grid-cols-2 gap-1 px-2;
+    }
+
+    .dropdown-grid-3 {
+        @apply grid-cols-3;
+    }
+
+    .dropdown-grid-item {
+        @apply flex flex-col items-center gap-2 p-4 rounded-xl;
+        @apply text-gray-300 text-sm text-center;
+        @apply transition-all duration-200;
+        @apply cursor-pointer;
+    }
+
+    .dropdown-grid-item:hover {
+        @apply text-white;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .dropdown-grid-item i {
+        @apply text-2xl text-pink-500;
+        @apply transition-transform duration-200;
+    }
+
+    .dropdown-grid-item:hover i {
+        transform: scale(1.15);
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       DROPDOWN DIVIDER
+       ───────────────────────────────────────────────────────────────────────── */
+    .dropdown-divider {
+        @apply my-2 mx-4;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       DROPDOWN FOOTER
+       ───────────────────────────────────────────────────────────────────────── */
+    .dropdown-footer {
+        @apply mt-2 pt-2 px-4;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dropdown-footer-link {
+        @apply flex items-center justify-center gap-2 py-2;
+        @apply text-sm text-pink-400 font-medium;
+        @apply transition-colors duration-200;
+    }
+
+    .dropdown-footer-link:hover {
+        @apply text-pink-300;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       USER DROPDOWN (Profile Menu)
+       ───────────────────────────────────────────────────────────────────────── */
+    .user-dropdown-trigger {
+        @apply flex items-center gap-3 px-3 py-2 rounded-xl;
+        @apply transition-all duration-200 cursor-pointer;
+    }
+
+    .user-dropdown-trigger:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .user-dropdown-avatar {
+        @apply w-9 h-9 rounded-full overflow-hidden;
+        @apply ring-2 ring-pink-500/30;
+        @apply transition-all duration-200;
+    }
+
+    .user-dropdown-trigger:hover .user-dropdown-avatar {
+        @apply ring-pink-500;
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+    }
+
+    .user-dropdown-avatar img {
+        @apply w-full h-full object-cover;
+    }
+
+    .user-dropdown-info {
+        @apply hidden sm:block text-right;
+    }
+
+    .user-dropdown-name {
+        @apply text-sm font-medium text-white;
+    }
+
+    .user-dropdown-role {
+        @apply text-xs text-gray-500;
+    }
+
+    .user-dropdown-menu {
+        @apply min-w-[240px];
+    }
+
+    .user-dropdown-header {
+        @apply flex items-center gap-3 p-4 mb-2;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-dropdown-header-avatar {
+        @apply w-12 h-12 rounded-full overflow-hidden;
+        @apply ring-2 ring-pink-500/50;
+    }
+
+    .user-dropdown-header-name {
+        @apply text-white font-bold;
+    }
+
+    .user-dropdown-header-email {
+        @apply text-xs text-gray-500 truncate max-w-[150px];
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       NOTIFICATION DROPDOWN
+       ───────────────────────────────────────────────────────────────────────── */
+    .notification-dropdown {
+        @apply min-w-[320px] max-h-[400px] overflow-hidden;
+    }
+
+    .notification-header {
+        @apply flex items-center justify-between px-4 py-3;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .notification-header-title {
+        @apply text-white font-bold;
+    }
+
+    .notification-header-action {
+        @apply text-xs text-pink-400 hover:text-pink-300;
+        @apply cursor-pointer transition-colors;
+    }
+
+    .notification-list {
+        @apply max-h-[300px] overflow-y-auto;
+    }
+
+    .notification-item {
+        @apply flex gap-3 px-4 py-3;
+        @apply transition-colors duration-150;
+        @apply cursor-pointer;
+    }
+
+    .notification-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .notification-item.unread {
+        background: rgba(255, 0, 85, 0.05);
+    }
+
+    .notification-item.unread::before {
+        content: '';
+        @apply absolute right-2 top-1/2 -translate-y-1/2;
+        @apply w-2 h-2 rounded-full;
+        background: var(--neon-pink);
+        box-shadow: 0 0 8px var(--neon-pink);
+    }
+
+    .notification-icon {
+        @apply w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0;
+        @apply text-lg;
+    }
+
+    .notification-icon.success {
+        background: rgba(0, 255, 136, 0.15);
+        color: var(--neon-green);
+    }
+
+    .notification-icon.warning {
+        background: rgba(255, 204, 0, 0.15);
+        color: var(--neon-yellow);
+    }
+
+    .notification-icon.error {
+        background: rgba(255, 0, 85, 0.15);
+        color: var(--neon-pink);
+    }
+
+    .notification-icon.info {
+        background: rgba(0, 245, 255, 0.15);
+        color: var(--neon-cyan);
+    }
+
+    .notification-content {
+        @apply flex-1 min-w-0;
+    }
+
+    .notification-title {
+        @apply text-sm text-white font-medium;
+        @apply line-clamp-1;
+    }
+
+    .notification-text {
+        @apply text-xs text-gray-400;
+        @apply line-clamp-2;
+    }
+
+    .notification-time {
+        @apply text-[10px] text-gray-600 mt-1;
+    }
+
+    .notification-empty {
+        @apply py-10 text-center;
+    }
+
+    .notification-empty i {
+        @apply text-4xl text-gray-700 mb-3;
+    }
+
+    .notification-empty p {
+        @apply text-sm text-gray-500;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       CART DROPDOWN
+       ───────────────────────────────────────────────────────────────────────── */
+    .cart-dropdown {
+        @apply min-w-[350px];
+    }
+
+    .cart-header {
+        @apply flex items-center justify-between px-4 py-3;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cart-header-title {
+        @apply text-white font-bold;
+    }
+
+    .cart-header-count {
+        @apply text-xs text-gray-500;
+    }
+
+    .cart-list {
+        @apply max-h-[280px] overflow-y-auto p-2;
+    }
+
+    .cart-item {
+        @apply flex gap-3 p-3 rounded-xl;
+        @apply transition-colors duration-150;
+    }
+
+    .cart-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .cart-item-image {
+        @apply w-16 h-16 rounded-lg overflow-hidden flex-shrink-0;
+        background: var(--dark-800);
+    }
+
+    .cart-item-image img {
+        @apply w-full h-full object-cover;
+    }
+
+    .cart-item-info {
+        @apply flex-1 min-w-0;
+    }
+
+    .cart-item-title {
+        @apply text-sm text-white font-medium;
+        @apply line-clamp-1;
+    }
+
+    .cart-item-meta {
+        @apply text-xs text-gray-500;
+    }
+
+    .cart-item-price {
+        @apply text-sm font-bold;
+        color: var(--neon-green);
+    }
+
+    .cart-item-remove {
+        @apply w-8 h-8 rounded-lg flex items-center justify-center;
+        @apply text-gray-500 hover:text-red-400;
+        @apply hover:bg-red-500/10;
+        @apply transition-all duration-150 cursor-pointer;
+    }
+
+    .cart-footer {
+        @apply p-4 space-y-3;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cart-total {
+        @apply flex items-center justify-between;
+    }
+
+    .cart-total-label {
+        @apply text-gray-400;
+    }
+
+    .cart-total-value {
+        @apply text-lg font-black;
+        color: var(--neon-cyan);
+    }
+
+    .cart-empty {
+        @apply py-10 text-center;
+    }
+
+    .cart-empty i {
+        @apply text-4xl text-gray-700 mb-3;
+    }
+
+    .cart-empty p {
+        @apply text-sm text-gray-500;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       SEARCH DROPDOWN
+       ───────────────────────────────────────────────────────────────────────── */
+    .search-dropdown {
+        @apply min-w-[400px];
+    }
+
+    .search-dropdown-input {
+        @apply w-full px-4 py-3 rounded-t-xl;
+        @apply bg-transparent text-white;
+        @apply border-b border-white/10;
+        @apply focus:outline-none focus:border-pink-500/50;
+        @apply placeholder-gray-500;
+        transition: border-color 0.2s ease;
+    }
+
+    .search-dropdown-input::placeholder {
+        @apply text-gray-500;
+    }
+
+    .search-dropdown-body {
+        @apply p-2 max-h-[350px] overflow-y-auto;
+    }
+
+    .search-section {
+        @apply mb-3;
+    }
+
+    .search-section:last-child {
+        @apply mb-0;
+    }
+
+    .search-section-title {
+        @apply px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider;
+    }
+
+    .search-result-item {
+        @apply flex items-center gap-3 px-3 py-2.5 rounded-lg;
+        @apply transition-all duration-150 cursor-pointer;
+    }
+
+    .search-result-item:hover {
+        background: rgba(255, 0, 85, 0.1);
+    }
+
+    .search-result-item.active {
+        background: rgba(255, 0, 85, 0.15);
+    }
+
+    .search-result-image {
+        @apply w-10 h-10 rounded-lg overflow-hidden flex-shrink-0;
+        background: var(--dark-800);
+    }
+
+    .search-result-image img {
+        @apply w-full h-full object-cover;
+    }
+
+    .search-result-icon {
+        @apply w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0;
+        @apply text-pink-500;
+        background: rgba(255, 0, 85, 0.1);
+    }
+
+    .search-result-info {
+        @apply flex-1 min-w-0;
+    }
+
+    .search-result-title {
+        @apply text-sm text-white font-medium;
+        @apply line-clamp-1;
+    }
+
+    .search-result-meta {
+        @apply text-xs text-gray-500;
+    }
+
+    .search-result-price {
+        @apply text-sm font-bold text-left;
+        color: var(--neon-green);
+    }
+
+    .search-result-tag {
+        @apply px-2 py-0.5 rounded-full;
+        @apply text-[10px] font-bold;
+    }
+
+    .search-result-tag.game {
+        @apply text-cyan-400;
+        background: rgba(0, 245, 255, 0.15);
+    }
+
+    .search-result-tag.product {
+        @apply text-pink-400;
+        background: rgba(255, 0, 85, 0.15);
+    }
+
+    .search-result-tag.service {
+        @apply text-purple-400;
+        background: rgba(191, 0, 255, 0.15);
+    }
+
+    /* Search Loading State */
+    .search-loading {
+        @apply flex items-center justify-center py-8;
+    }
+
+    .search-loading-spinner {
+        @apply w-8 h-8 rounded-full;
+        @apply border-2 border-gray-700 border-t-pink-500;
+        @apply animate-spin;
+    }
+
+    /* Search Empty State */
+    .search-empty {
+        @apply py-8 text-center;
+    }
+
+    .search-empty i {
+        @apply text-3xl text-gray-700 mb-2;
+    }
+
+    .search-empty-title {
+        @apply text-sm text-gray-400 mb-1;
+    }
+
+    .search-empty-text {
+        @apply text-xs text-gray-600;
+    }
+
+    /* Search Suggestions */
+    .search-suggestions {
+        @apply flex flex-wrap gap-2 px-3 py-3;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .search-suggestion-tag {
+        @apply px-3 py-1.5 rounded-full;
+        @apply text-xs text-gray-400;
+        @apply transition-all duration-150 cursor-pointer;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid transparent;
+    }
+
+    .search-suggestion-tag:hover {
+        @apply text-white;
+        border-color: rgba(255, 0, 85, 0.3);
+        background: rgba(255, 0, 85, 0.1);
+    }
+
+    /* Keyboard Navigation Hints */
+    .search-keyboard-hints {
+        @apply flex items-center justify-center gap-4 px-4 py-2;
+        @apply text-[10px] text-gray-600;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .search-keyboard-hint {
+        @apply flex items-center gap-1;
+    }
+
+    .search-keyboard-key {
+        @apply px-1.5 py-0.5 rounded;
+        @apply text-gray-500 font-mono;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       LANGUAGE/CURRENCY DROPDOWN
+       ───────────────────────────────────────────────────────────────────────── */
+    .locale-dropdown {
+        @apply min-w-[180px];
+    }
+
+    .locale-item {
+        @apply flex items-center gap-3 px-4 py-2.5 rounded-lg mx-2;
+        @apply text-gray-300 text-sm;
+        @apply transition-all duration-150 cursor-pointer;
+    }
+
+    .locale-item:hover {
+        @apply text-white;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .locale-item.active {
+        @apply text-pink-400;
+        background: rgba(255, 0, 85, 0.1);
+    }
+
+    .locale-item-flag {
+        @apply w-5 h-5 rounded-sm overflow-hidden;
+    }
+
+    .locale-item-flag img {
+        @apply w-full h-full object-cover;
+    }
+
+    .locale-item-check {
+        @apply mr-auto text-pink-500;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       CONTEXT MENU (Right-click Dropdown)
+       ───────────────────────────────────────────────────────────────────────── */
+    .context-menu {
+        @apply fixed py-2 rounded-xl min-w-[180px];
+        @apply opacity-0 invisible scale-95;
+        @apply transition-all duration-150;
+        @apply z-[9999];
+        background: rgba(15, 15, 22, 0.98);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .context-menu.active {
+        @apply opacity-100 visible scale-100;
+    }
+
+    .context-menu-item {
+        @apply flex items-center gap-3 px-4 py-2;
+        @apply text-gray-300 text-sm;
+        @apply transition-all duration-150 cursor-pointer;
+    }
+
+    .context-menu-item:hover {
+        @apply text-white;
+        background: rgba(255, 0, 85, 0.1);
+    }
+
+    .context-menu-item i {
+        @apply w-4 text-center text-gray-500;
+    }
+
+    .context-menu-item:hover i {
+        @apply text-pink-400;
+    }
+
+    .context-menu-item.danger {
+        @apply text-red-400;
+    }
+
+    .context-menu-item.danger:hover {
+        @apply text-red-300;
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .context-menu-item.danger i {
+        @apply text-red-500;
+    }
+
+    .context-menu-divider {
+        @apply my-1 mx-2;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       SELECT DROPDOWN (Form Element)
+       ───────────────────────────────────────────────────────────────────────── */
+    .select-dropdown {
+        @apply relative;
+    }
+
+    .select-trigger {
+        @apply w-full flex items-center justify-between;
+        @apply px-4 py-3 rounded-xl;
+        @apply text-white text-sm;
+        @apply cursor-pointer;
+        @apply transition-all duration-200;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .select-trigger:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .select-trigger:focus,
+    .select-dropdown.active .select-trigger {
+        border-color: var(--neon-pink);
+        box-shadow: 0 0 0 3px rgba(255, 0, 85, 0.1);
+    }
+
+    .select-trigger-placeholder {
+        @apply text-gray-500;
+    }
+
+    .select-trigger-value {
+        @apply flex items-center gap-2;
+    }
+
+    .select-trigger-arrow {
+        @apply text-xs text-gray-500;
+        @apply transition-transform duration-200;
+    }
+
+    .select-dropdown.active .select-trigger-arrow {
+        transform: rotate(180deg);
+    }
+
+    .select-menu {
+        @apply absolute top-full right-0 left-0 mt-2;
+        @apply py-2 rounded-xl;
+        @apply opacity-0 invisible translate-y-2;
+        @apply transition-all duration-200;
+        @apply z-50 max-h-[250px] overflow-y-auto;
+        background: rgba(15, 15, 22, 0.98);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .select-dropdown.active .select-menu {
+        @apply opacity-100 visible translate-y-0;
+    }
+
+    .select-option {
+        @apply flex items-center justify-between;
+        @apply px-4 py-2.5;
+        @apply text-gray-300 text-sm;
+        @apply transition-all duration-150 cursor-pointer;
+    }
+
+    .select-option:hover {
+        @apply text-white;
+        background: rgba(255, 0, 85, 0.1);
+    }
+
+    .select-option.active {
+        @apply text-pink-400;
+        background: rgba(255, 0, 85, 0.15);
+    }
+
+    .select-option-check {
+        @apply text-pink-500 opacity-0;
+        @apply transition-opacity duration-150;
+    }
+
+    .select-option.active .select-option-check {
+        @apply opacity-100;
+    }
+
+    .select-option.disabled {
+        @apply opacity-50 pointer-events-none;
+    }
+
+    .select-group-label {
+        @apply px-4 py-2 text-xs font-bold text-gray-500 uppercase;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       MULTI-SELECT DROPDOWN
+       ───────────────────────────────────────────────────────────────────────── */
+    .multi-select-tags {
+        @apply flex flex-wrap gap-1;
+    }
+
+    .multi-select-tag {
+        @apply inline-flex items-center gap-1 px-2 py-1 rounded-lg;
+        @apply text-xs text-white;
+        background: rgba(255, 0, 85, 0.2);
+        border: 1px solid rgba(255, 0, 85, 0.3);
+    }
+
+    .multi-select-tag-remove {
+        @apply w-4 h-4 rounded-full flex items-center justify-center;
+        @apply text-[10px] text-pink-300;
+        @apply hover:bg-pink-500/30;
+        @apply cursor-pointer transition-colors duration-150;
+    }
+
+    .multi-select-option {
+        @apply flex items-center gap-3;
+    }
+
+    .multi-select-checkbox {
+        @apply w-4 h-4 rounded;
+        @apply border border-gray-600;
+        @apply flex items-center justify-center;
+        @apply transition-all duration-150;
+    }
+
+    .multi-select-option.active .multi-select-checkbox {
+        @apply border-pink-500;
+        background: var(--neon-pink);
+    }
+
+    .multi-select-option.active .multi-select-checkbox i {
+        @apply text-[10px] text-white;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       DROPDOWN ANIMATIONS
+       ───────────────────────────────────────────────────────────────────────── */
+    @keyframes dropdownFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes dropdownFadeOut {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
+
+    .dropdown-animate-in {
+        animation: dropdownFadeIn 0.2s ease forwards;
+    }
+
+    .dropdown-animate-out {
+        animation: dropdownFadeOut 0.15s ease forwards;
+    }
+
+    /* Scale Animation Variant */
+    @keyframes dropdownScaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .dropdown-scale-in {
+        animation: dropdownScaleIn 0.15s ease forwards;
+        transform-origin: top right;
+    }
+
+} /* End @layer components */

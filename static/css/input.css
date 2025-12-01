@@ -1,0 +1,49 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MINI-UP.IR — NEON DARK GAMING THEME
+   Main Entry Point — All imports centralized here
+   
+   Build Command:
+   npx tailwindcss -i ./static/css/input.css -o ./static/css/dist/main.css --watch
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAILWIND DIRECTIVES
+   ───────────────────────────────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BASE LAYER IMPORTS
+   ───────────────────────────────────────────────────────────────────────────── */
+@import './base/_variables.css';
+@import './base/_reset.css';
+@import './base/_typography.css';
+@import './base/_scrollbar.css';
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   COMPONENT IMPORTS
+   ───────────────────────────────────────────────────────────────────────────── */
+@import './components/_navbar.css';
+@import './components/_dropdown.css';
+@import './components/_buttons.css';
+@import './components/_cards.css';
+@import './components/_forms.css';
+@import './components/_modal.css';
+@import './components/_toast.css';
+@import './components/_footer.css';
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PAGE-SPECIFIC IMPORTS
+   ───────────────────────────────────────────────────────────────────────────── */
+@import './pages/_auth.css';
+@import './pages/_home.css';
+@import './pages/_dashboard.css';
+@import './pages/_wallet.css';
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   UTILITIES IMPORTS
+   ───────────────────────────────────────────────────────────────────────────── */
+@import './utilities/_animations.css';
+@import './utilities/_effects.css';
+@import './utilities/_helpers.css';
