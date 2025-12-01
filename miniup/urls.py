@@ -12,6 +12,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.core.urls', namespace='core')),
+    path('wallet/', include('apps.wallet.urls', namespace='wallet')),
+    path("wallet/api/v1/", include("apps.wallet.urls_api", namespace='wallet_api')),
+    
 ]
 
 # Serve static and media files in development

@@ -1,0 +1,56 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RESET & BASE STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+        background: var(--gradient-dark);
+        background-attachment: fixed;
+        color: var(--text-primary);
+        line-height: 1.7;
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--dark-900);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--dark-600);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--neon-pink);
+    }
+
+    /* Selection */
+    ::selection {
+        background: var(--neon-pink);
+        color: white;
+    }
+
+    /* Focus Styles */
+    :focus-visible {
+        outline: 2px solid var(--neon-cyan);
+        outline-offset: 2px;
+    }
+}

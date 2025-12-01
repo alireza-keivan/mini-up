@@ -1,16 +1,16 @@
 {
-  "name": "mini-up-frontend",
+  "name": "mini-up",
   "version": "1.0.0",
-  "description": "Mini-up.ir Front-end Assets",
+  "description": "Mini-up.ir - Gaming & Virtual Services Platform",
   "scripts": {
-    "css:build": "tailwindcss -i ./apps/core/static/core/css/input.css -o ./apps/core/static/core/css/main.css --minify",
-    "css:watch": "tailwindcss -i ./apps/core/static/core/css/input.css -o ./apps/core/static/core/css/main.css --watch",
-    "css:dev": "tailwindcss -i ./apps/core/static/core/css/input.css -o ./apps/core/static/core/css/main.css"
+    "dev": "postcss ./apps/core/static/core/css/input.css -o ./apps/core/static/core/css/main.css --watch",
+    "build": "postcss ./apps/core/static/core/css/input.css -o ./apps/core/static/core/css/main.css"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.0",
-    "postcss": "^8.4.32",
-    "autoprefixer": "^10.4.16"
+    "tailwindcss": "^3.4.17",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.0",
+    "postcss-import": "^16.1.0"
   }
 }
-

@@ -35,10 +35,20 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'compressor',
+    'rest_framework',
 ]
+
 
 LOCAL_APPS = [
     'apps.core',
+    'apps.accounts',
+    'apps.products',
+    'apps.orders',
+    'apps.payments',
+    'apps.wallet',
+    'apps.coupons',
+    'apps.consulting',
+    'apps.content',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -144,3 +154,72 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Site Settings
 SITE_NAME = 'مینی‌آپ'
 SITE_DESCRIPTION = 'فروشگاه آنلاین بازی و خدمات مجازی'
+
+LOCAL_APPS = [
+    'apps.core',
+    'apps.accounts',
+    'apps.products',
+    'apps.orders',
+    'apps.payments',
+    'apps.wallet',
+    'apps.coupons',
+    'apps.consulting',
+    'apps.content',
+]
+
+# Custom User Model
+AUTH_USER_MODEL = 'accounts.User'
+
+# OTP Settings
+OTP_EXPIRE_SECONDS = 120  # 2 minutes
+OTP_LENGTH = 5
+
+# Wallet Settings
+MIN_WALLET_TOPUP = 10000  # Minimum 10,000 Toman
+MAX_WALLET_TOPUP = 10000000  # Maximum 10,000,000 Toman
+
+# Shipping
+FLAT_SHIPPING_RATE = 50000  # 50,000 Toman
+FREE_SHIPPING_THRESHOLD = 500000  # Free above 500,000 Toman
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    # برای محیط توسعه، Browsable API را هم فعال کن:
+    # 'rest_framework.renderers.BrowsableAPIRenderer',
+}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# EMAIL CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# For development (console backend)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For production (SMTP)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'  # or your SMTP server
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+
+DEFAULT_FROM_EMAIL = 'noreply@yoursite.com'
+SERVER_EMAIL = 'server@yoursite.com'
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FIREBASE (Optional - for mobile push)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# FIREBASE_

@@ -1,3 +1,192 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     FOOTER - Mini-up.ir
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+
 <footer class="site-footer">
-    <p>تمامی حقوق برای {{ SITE_NAME }} محفوظ است © ۱۴۰۴</p>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         FEATURE BOXES - 4 بخش توضیحات بالای فوتر
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="footer-features">
+        <div class="container mx-auto px-4">
+            <div class="features-grid">
+                
+                <!-- Feature 1: حریم خصوصی و قوانین -->
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4 class="feature-title">حریم خصوصی و قوانین</h4>
+                        <ul class="feature-links">
+                            <li><a href="{% url 'core:privacy' %}"><i class="fas fa-chevron-left"></i> حریم خصوصی</a></li>
+                            <li><a href="{% url 'core:terms' %}"><i class="fas fa-chevron-left"></i> شرایط استفاده</a></li>
+                            <li><a href="{% url 'core:faq' %}"><i class="fas fa-chevron-left"></i> پرسش‌های متداول</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 2: شبکه‌های اجتماعی -->
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4 class="feature-title">ما را دنبال کنید</h4>
+                        <div class="social-links-grid">
+                            <a href="#" class="social-link-box instagram" title="اینستاگرام">
+                                <i class="fab fa-instagram"></i>
+                                <span>اینستاگرام</span>
+                            </a>
+                            <a href="#" class="social-link-box telegram" title="تلگرام">
+                                <i class="fab fa-telegram-plane"></i>
+                                <span>تلگرام</span>
+                            </a>
+                            <a href="#" class="social-link-box youtube" title="یوتیوب">
+                                <i class="fab fa-youtube"></i>
+                                <span>یوتیوب</span>
+                            </a>
+                            <a href="#" class="social-link-box whatsapp" title="واتساپ">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>واتساپ</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3: امتیاز و تخفیفات -->
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4 class="feature-title">امتیاز و تخفیفات</h4>
+                        <ul class="feature-links">
+                            <li><a href="#"><i class="fas fa-chevron-left"></i> امتیاز و جوایز</a></li>
+                            <li><a href="#"><i class="fas fa-chevron-left"></i> تخفیفات ویژه</a></li>
+                            <li><a href="{% url 'core:buy_products' %}"><i class="fas fa-chevron-left"></i> فروشگاه</a></li>
+                            <li><a href="#"><i class="fas fa-chevron-left"></i> مجله گیمرز شاپ</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Feature 4: پشتیبانی -->
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4 class="feature-title">پشتیبانی ۲۴/۷</h4>
+                        <ul class="feature-info">
+                            <li>
+                                <i class="fas fa-phone-alt"></i>
+                                <span>۰۲۱-۱۲۳۴-۵۶۷۸</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-clock"></i>
+                                <span>۱۰ صبح تا ۱۰ شب</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-envelope"></i>
+                                <span>info@mini-up.ir</span>
+                            </li>
+                        </ul>
+                        <p class="support-text">
+                            <i class="fas fa-heart"></i>
+                            در تمامی مشکلات همراه شما هستیم
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         MAIN FOOTER - 3 ستون اصلی
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="footer-main">
+        <div class="container mx-auto px-4">
+            <div class="footer-grid">
+                
+                <!-- Column 1: درباره ما و لوگو -->
+                <div class="footer-column footer-about">
+                    <a href="{% url 'core:home' %}" class="footer-logo">
+                        <div class="footer-logo-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="footer-logo-text">
+                            <span class="footer-brand">Mini-up</span>
+                            <span class="footer-tagline">گیمینگ و خدمات مجازی</span>
+                        </div>
+                    </a>
+                    <p class="footer-description">
+                        پلتفرم خدمات مجازی و محصولات گیمینگ با بهترین کیفیت و قیمت.
+                        تجربه‌ای متفاوت از خرید آنلاین.
+                    </p>
+                    <!-- نمادهای اعتماد -->
+                    <div class="trust-badges">
+                        <a href="#" class="trust-badge" title="نماد اعتماد الکترونیکی">
+                            <img src="{% static 'images/enamad.png' %}" alt="نماد اعتماد" onerror="this.style.display='none'">
+                        </a>
+                        <a href="#" class="trust-badge" title="ساماندهی">
+                            <img src="{% static 'images/samandehi.png' %}" alt="ساماندهی" onerror="this.style.display='none'">
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Column 2: دسترسی سریع -->
+                <div class="footer-column">
+                    <h4 class="footer-title">
+                        <i class="fas fa-link"></i>
+                        دسترسی سریع
+                    </h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'core:home' %}"><i class="fas fa-home"></i> خانه</a></li>
+                        <li><a href="{% url 'core:virtual_services' %}"><i class="fas fa-cloud"></i> خدمات مجازی</a></li>
+                        <li><a href="{% url 'core:gaming_products' %}"><i class="fas fa-gamepad"></i> محصولات گیمینگ</a></li>
+                        <li><a href="{% url 'core:buy_products' %}"><i class="fas fa-shopping-bag"></i> فروشگاه</a></li>
+                        <li><a href="{% url 'core:mini_game' %}"><i class="fas fa-dice"></i> مینی گیم</a></li>
+                        <li><a href="{% url 'core:about' %}"><i class="fas fa-info-circle"></i> درباره ما</a></li>
+                        <li><a href="{% url 'core:consulting' %}"><i class="fas fa-comments"></i> مشاوره رایگان</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: خدمات ما -->
+                <div class="footer-column">
+                    <h4 class="footer-title">
+                        <i class="fas fa-concierge-bell"></i>
+                        خدمات ما
+                    </h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'core:virtual_services' %}"><i class="fab fa-telegram-plane"></i> پرمیوم تلگرام</a></li>
+                        <li><a href="{% url 'core:virtual_services' %}"><i class="fab fa-spotify"></i> اسپاتیفای</a></li>
+                        <li><a href="{% url 'core:virtual_services' %}"><i class="fab fa-apple"></i> اپل آیدی</a></li>
+                        <li><a href="{% url 'core:virtual_services' %}"><i class="fab fa-instagram"></i> فالوور اینستاگرام</a></li>
+                        <li><a href="{% url 'core:mini_game' %}"><i class="fas fa-coins"></i> یوسی پابجی</a></li>
+                        <li><a href="{% url 'core:mini_game' %}"><i class="fas fa-gem"></i> جم فری فایر</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         FOOTER BOTTOM - کپی رایت
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <section class="footer-bottom">
+        <div class="container mx-auto px-4">
+            <div class="footer-bottom-content">
+                <p class="copyright">
+                    © {{ current_year|default:"2025" }} {{ site_name_fa|default:"مینی‌آپ" }}. 
+                    تمامی حقوق محفوظ است.
+                </p>
+                <p class="made-with">
+                    ساخته شده با <i class="fas fa-heart text-pink-500"></i> برای گیمرها
+                </p>
+            </div>
+        </div>
+    </section>
+
 </footer>

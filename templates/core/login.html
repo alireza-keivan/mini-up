@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ورود به حساب کاربری | Mini-up{% endblock %}
+
+{% block content %}
+<!-- Auth Page Container -->
+<div class="auth-page">
+    <!-- Floating Particles -->
+    <div class="auth-particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 4s;"></div>
+    </div>
+
+    <!-- Main Auth Card -->
+    <div class="auth-container">
+
+        <!-- Header -->
+        <div class="auth-header">
+            <div class="auth-logo">
+                <div class="auth-logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <span class="auth-logo-text">Mini-up</span>
+            </div>
+            <h1 class="auth-title">به مینی‌آپ خوش آمدید</h1>
+            <p class="auth-subtitle">برای دسترسی به حساب کاربری وارد شوید</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">ورود</button>
+            <button class="auth-tab" data-tab="register">ثبت نام</button>
+        </div>
+
+        <!-- Content -->
+        <div class="auth-content">
+
+            <!-- LOGIN PANEL -->
+            <div class="auth-panel active" id="panel-login">
+
+                <!-- Step 1 - Enter Mobile or Email -->
+                <div class="auth-step active" id="login-step-1">
+                    <div class="form-group">
+                        <label class="form-label">شماره موبایل یا ایمیل</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="login-input" class="form-input" placeholder="مثال: 0912xxxxxxx یا email@example.com">
+                        </div>
+                        <p class="form-hint">
+                            <i class="far fa-question-circle"></i>
+                            شماره موبایل با ۰۹ شروع شود یا ایمیل معتبر وارد کنید
+                        </p>
+                    </div>
+                    <button class="auth-btn" id="login-send-code">
+                        <i class="fas fa-paper-plane"></i>
+                        دریافت کد تأیید
+                    </button>
+                </div>
+
+                <!-- Step 2 - Enter OTP -->
+                <div class="auth-step" id="login-step-2">
+                    <div class="back-btn" data-back="login-step-1">
+                        <i class="fas fa-arrow-right"></i> بازگشت
+                    </div>
+
+                    <div class="otp-info">
+                        <p class="otp-info-text">کد ۶ رقمی ارسال شد به:</p>
+                        <p class="otp-info-value" id="login-otp-target">example@gmail.com</p>
+                    </div>
+
+                    <div class="otp-container">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                    </div>
+
+                    <div class="otp-timer">
+                        <p class="timer-label">مدت زمان باقی‌مانده:</p>
+                        <div class="timer-display">
+                            <span class="timer-digit" id="login-timer-minute">02</span>
+                            <span class="timer-separator">:</span>
+                            <span class="timer-digit" id="login-timer-second">00</span>
+                        </div>
+                        <p class="timer-expired hidden" id="login-expired">کد منقضی شده است</p>
+                    </div>
+
+                    <button class="resend-btn" id="login-resend" disabled>ارسال مجدد کد</button>
+
+                    <button class="auth-btn mt-6" id="login-submit">
+                        <i class="fas fa-unlock"></i>
+                        تأیید و ورود
+                    </button>
+                </div>
+
+                <!-- Step 3 - Success -->
+                <div class="auth-step" id="login-step-3">
+                    <div class="auth-success">
+                        <div class="success-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h2 class="success-title">ورود موفقیت‌آمیز</h2>
+                        <p class="success-text">در حال انتقال به داشبورد...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTER PANEL -->
+            <div class="auth-panel" id="panel-register">
+
+                <!-- Step 1 - Enter Mobile or Email -->
+                <div class="auth-step active" id="register-step-1">
+                    <div class="form-group">
+                        <label class="form-label">شماره موبایل یا ایمیل</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="text" id="register-input" class="form-input" placeholder="مثال: 0912xxxxxxx یا email@example.com">
+                        </div>
+                    </div>
+
+                    <button class="auth-btn" id="register-send-code">
+                        <i class="fas fa-paper-plane"></i>
+                        دریافت کد تأیید
+                    </button>
+                </div>
+
+                <!-- Step 2 - Enter OTP -->
+                <div class="auth-step" id="register-step-2">
+                    <div class="back-btn" data-back="register-step-1">
+                        <i class="fas fa-arrow-right"></i> بازگشت
+                    </div>
+
+                    <div class="otp-info">
+                        <p class="otp-info-text">کد ۶ رقمی ارسال شد به:</p>
+                        <p class="otp-info-value" id="register-otp-target">example@gmail.com</p>
+                    </div>
+
+                    <div class="otp-container">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                        <input type="text" maxlength="1" class="otp-input">
+                    </div>
+
+                    <div class="otp-timer">
+                        <p class="timer-label">زمان باقی‌مانده:</p>
+                        <div class="timer-display">
+                            <span class="timer-digit" id="register-timer-minute">02</span>
+                            <span class="timer-separator">:</span>
+                            <span class="timer-digit" id="register-timer-second">00</span>
+                        </div>
+                        <p class="timer-expired hidden" id="register-expired">کد منقضی شده است</p>
+                    </div>
+
+                    <button class="resend-btn" id="register-resend" disabled>ارسال مجدد کد</button>
+
+                    <button class="auth-btn mt-6" id="register-submit">
+                        <i class="fas fa-check-circle"></i>
+                        تأیید و ادامه
+                    </button>
+                </div>
+
+                <!-- Step 3 - Success -->
+                <div class="auth-step" id="register-step-3">
+                    <div class="auth-success">
+                        <div class="success-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h2 class="success-title">ثبت‌نام با موفقیت انجام شد</h2>
+                        <p class="success-text">در حال انتقال به داشبورد...</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Footer Links -->
+        <div class="auth-footer">
+            <a href="/term-conditions">قوانین و مقررات</a>
+            <span>|</span>
+            <a href="/privacy">حریم خصوصی</a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

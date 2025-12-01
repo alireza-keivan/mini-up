@@ -1,164 +1,2886 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MINI-UP.IR — NEON DARK GAMING THEME
+   RTL Persian Gaming Platform Stylesheet
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ═══════════════════════════════════════════════════════════════
-   MINI-UP.IR — Dark Neon RTL Theme
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYER: BASE — CSS Variables & Root Styles
+   ═══════════════════════════════════════════════════════════════════════════════ */
 
 @layer base {
-  :root {
-    --neon-pink: #ff0055;
-    --neon-cyan: #00f5ff;
-    --neon-purple: #bf00ff;
-    --neon-green: #39ff14;
-    --dark-bg: #0a0a0f;
-    --dark-surface: #12121a;
-    --dark-border: #1e1e2e;
-  }
-
-  html {
-    direction: rtl;
-    scroll-behavior: smooth;
-  }
-
-  body {
-    @apply bg-[#0a0a0f] text-gray-100 antialiased;
-    font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
-  }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-[#0a0a0f];
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-[#ff0055] to-[#bf00ff] rounded-full;
-  }
-
-  ::selection {
-    @apply bg-[#ff0055]/30 text-white;
-  }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       CSS Custom Properties (Design Tokens)
+       ───────────────────────────────────────────────────────────────────────── */
+    :root {
+        /* Neon Accent Colors */
+        --neon-pink: #ff0055;
+        --neon-pink-glow: rgba(255, 0, 85, 0.6);
+        --neon-cyan: #00f5ff;
+        --neon-cyan-glow: rgba(0, 245, 255, 0.6);
+        --neon-purple: #bf00ff;
+        --neon-purple-glow: rgba(191, 0, 255, 0.6);
+        --neon-yellow: #ffcc00;
+        --neon-yellow-glow: rgba(255, 204, 0, 0.6);
+        --neon-green: #00ff88;
+        --neon-green-glow: rgba(0, 255, 136, 0.6);
+        
+        /* Dark Background Palette */
+        --dark-950: #050507;
+        --dark-900: #0a0a0f;
+        --dark-850: #0d0d14;
+        --dark-800: #111118;
+        --dark-700: #16161f;
+        --dark-600: #1c1c28;
+        --dark-500: #252533;
+        
+        /* Text Colors */
+        --text-primary: #f0f0f5;
+        --text-secondary: #a0a0b0;
+        --text-muted: #606070;
+        
+        /* Gradients */
+        --gradient-neon: linear-gradient(135deg, var(--neon-pink), var(--neon-purple), var(--neon-cyan));
+        --gradient-dark: linear-gradient(180deg, var(--dark-900), var(--dark-950));
+        
+        /* Shadows */
+        --shadow-neon-pink: 0 0 20px var(--neon-pink-glow), 0 0 40px rgba(255, 0, 85, 0.3);
+        --shadow-neon-cyan: 0 0 20px var(--neon-cyan-glow), 0 0 40px rgba(0, 245, 255, 0.3);
+        
+        /* Transitions */
+        --transition-fast: 150ms ease;
+        --transition-base: 250ms ease;
+        --transition-slow: 400ms ease;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       Global Reset & Base Styles
+       ───────────────────────────────────────────────────────────────────────── */
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+    
+    html {
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    body {
+        font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+        background: var(--gradient-dark);
+        background-attachment: fixed;
+        color: var(--text-primary);
+        line-height: 1.7;
+        overflow-x: hidden;
+    }
+    
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--dark-900);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--dark-600);
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--neon-pink);
+    }
+    
+    /* Selection */
+    ::selection {
+        background: var(--neon-pink);
+        color: white;
+    }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYER: COMPONENTS — Reusable UI Components
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
 @layer components {
-  .card-glass {
-    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl transition-all duration-300;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       TOP BAR (Contact Strip)
+       ───────────────────────────────────────────────────────────────────────── */
+    .top-bar {
+        @apply hidden lg:block;
+        background: var(--dark-950);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .top-bar-link {
+        @apply flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200;
+    }
+    
+    .top-bar-link i {
+        @apply text-pink-500;
+    }
+    
+    .social-link {
+        @apply w-8 h-8 flex items-center justify-center rounded-full;
+        @apply text-gray-400 hover:text-white;
+        @apply bg-white/5 hover:bg-pink-500/20;
+        @apply transition-all duration-200;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       HEADER & NAVBAR
+       ───────────────────────────────────────────────────────────────────────── */
+    .header-main {
+        @apply sticky top-0 z-50;
+    }
+    
+    .navbar-main {
+        background: rgba(10, 10, 15, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 0, 85, 0.15);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       LOGO
+       ───────────────────────────────────────────────────────────────────────── */
+    .logo-wrapper {
+        @apply flex items-center gap-3;
+    }
+    
+    .logo-icon {
+        @apply w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        box-shadow: var(--shadow-neon-pink);
+        transition: var(--transition-base);
+    }
+    
+    .logo-wrapper:hover .logo-icon {
+        transform: scale(1.05) rotate(-3deg);
+        box-shadow: 0 0 30px var(--neon-pink-glow), 0 0 60px rgba(255, 0, 85, 0.4);
+    }
+    
+    .logo-icon i {
+        @apply text-white;
+    }
+    
+    .logo-text {
+        @apply flex flex-col;
+    }
+    
+    .logo-brand {
+        @apply text-xl lg:text-2xl font-black tracking-tight;
+        background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .logo-tagline {
+        @apply text-xs text-gray-500 hidden sm:block;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       DESKTOP NAVIGATION LINKS
+       ───────────────────────────────────────────────────────────────────────── */
+    .nav-link {
+        @apply flex items-center gap-2 px-4 py-2 rounded-lg;
+        @apply text-gray-300 text-sm font-medium;
+        @apply transition-all duration-200;
+        @apply hover:text-white hover:bg-white/5;
+    }
+    
+    .nav-link i:first-child {
+        @apply text-pink-500;
+    }
+    
+    .dropdown-arrow {
+        @apply text-xs text-gray-500 transition-transform duration-200;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       DROPDOWN MENUS (Desktop)
+       ───────────────────────────────────────────────────────────────────────── */
+    .nav-dropdown {
+        @apply relative;
+    }
+    
+    .dropdown-menu {
+        @apply absolute top-full right-0 mt-2;
+        @apply min-w-[220px] py-2 rounded-xl;
+        @apply opacity-0 invisible translate-y-2;
+        @apply transition-all duration-200;
+        background: rgba(15, 15, 22, 0.98);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 0, 85, 0.1);
+    }
+    
+    .dropdown-wide {
+        @apply min-w-[400px];
+    }
+    
+    .nav-dropdown:hover .dropdown-menu {
+        @apply opacity-100 visible translate-y-0;
+    }
+    
+    .nav-dropdown:hover .dropdown-arrow {
+        @apply rotate-180;
+    }
+    
+    .dropdown-header {
+        @apply flex items-center gap-2 px-4 py-2 mb-2 text-sm font-bold;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .dropdown-header.cyan {
+        @apply text-cyan-400;
+    }
+    
+    .dropdown-header.purple {
+        @apply text-purple-400;
+    }
+    
+    .dropdown-header.pink {
+        @apply text-pink-400;
+    }
+    
+    .dropdown-header.yellow {
+        @apply text-yellow-400;
+    }
+    
+    .dropdown-grid {
+        @apply grid grid-cols-2 gap-1 px-2;
+    }
+    
+    .dropdown-item {
+        @apply flex items-center gap-3 px-4 py-2.5 rounded-lg;
+        @apply text-gray-300 text-sm;
+        @apply transition-all duration-150;
+        @apply hover:bg-pink-500/10 hover:text-white;
+    }
+    
+    .dropdown-item i {
+        @apply w-5 text-center text-pink-500/70;
+    }
+    
+    .dropdown-item:hover i {
+        @apply text-pink-400;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       CTA BUTTON (Neon Style)
+       ───────────────────────────────────────────────────────────────────────── */
+    .btn-neon {
+        @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg;
+        @apply text-white text-sm font-bold;
+        @apply transition-all duration-300;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+    }
+    
+    .btn-neon:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(255, 0, 85, 0.6), 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn-neon:active {
+        transform: translateY(0);
+    }
+    
+    /* Cyan variant */
+    .btn-neon-cyan {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        box-shadow: 0 0 20px rgba(0, 245, 255, 0.4);
+    }
+    
+    .btn-neon-cyan:hover {
+        box-shadow: 0 0 30px rgba(0, 245, 255, 0.6), 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Outline variant */
+    .btn-neon-outline {
+        @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg;
+        @apply text-pink-400 text-sm font-bold;
+        @apply border-2 border-pink-500/50;
+        @apply transition-all duration-300;
+        @apply hover:bg-pink-500/10 hover:border-pink-400;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       MOBILE MENU BUTTON (Hamburger)
+       ───────────────────────────────────────────────────────────────────────── */
+    .mobile-menu-btn {
+        @apply relative w-10 h-10 flex flex-col items-center justify-center gap-1.5;
+        @apply rounded-lg bg-white/5 hover:bg-white/10;
+        @apply transition-colors duration-200;
+    }
+    
+    .hamburger-line {
+        @apply w-5 h-0.5 bg-white rounded-full;
+        @apply transition-all duration-300;
+    }
+    
+    .mobile-menu-btn.active .line-1 {
+        transform: translateY(6px) rotate(45deg);
+    }
+    
+    .mobile-menu-btn.active .line-2 {
+        @apply opacity-0;
+    }
+    
+    .mobile-menu-btn.active .line-3 {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       MOBILE MENU PANEL
+       ───────────────────────────────────────────────────────────────────────── */
+    .mobile-menu {
+        @apply fixed inset-x-0 top-[64px] bottom-0;
+        @apply opacity-0 invisible;
+        @apply transition-all duration-300;
+        @apply overflow-y-auto;
+        @apply lg:hidden;
+        background: rgba(8, 8, 12, 0.98);
+        backdrop-filter: blur(20px);
+        transform: translateX(100%);
+    }
+    
+    .mobile-menu.active {
+        @apply opacity-100 visible;
+        transform: translateX(0);
+    }
+     .mobile-menu-inner {
+        @apply p-4 space-y-2;
+    }
+    
+    .mobile-nav-link {
+        @apply flex items-center gap-3 px-4 py-3 rounded-xl;
+        @apply text-gray-200 font-medium;
+        @apply bg-white/5 hover:bg-pink-500/10;
+        @apply transition-all duration-200;
+    }
+    
+    .mobile-nav-link i:first-child {
+        @apply w-6 text-center text-pink-500;
+    }
+    
+    .mobile-dropdown-btn {
+        @apply w-full flex items-center justify-between px-4 py-3 rounded-xl;
+        @apply text-gray-200 font-medium;
+        @apply bg-white/5 hover:bg-white/10;
+        @apply transition-all duration-200;
+    }
+    
+    .mobile-dropdown-btn i:first-child {
+        @apply w-6 text-center text-pink-500;
+    }
+    
+    .mobile-dropdown-content {
+        @apply overflow-hidden;
+        @apply max-h-0 opacity-0;
+        @apply transition-all duration-300 ease-in-out;
+    }
+    
+    .mobile-dropdown-content.active {
+        @apply max-h-[500px] opacity-100;
+    }
+    
+    .mobile-dropdown-item {
+        @apply flex items-center gap-3 px-6 py-2.5 mr-4 rounded-lg;
+        @apply text-gray-400 text-sm;
+        @apply hover:text-white hover:bg-pink-500/10;
+        @apply transition-all duration-150;
+    }
+    
+    .mobile-dropdown-item i {
+        @apply w-5 text-center text-pink-500/60;
+    }
+    
+    .mobile-cta {
+        @apply mt-4 pt-4;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       GLASS CARDS
+       ───────────────────────────────────────────────────────────────────────── */
+    .card-glass {
+        @apply relative rounded-2xl p-6;
+        @apply transition-all duration-300;
+        background: rgba(15, 15, 22, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .card-glass:hover {
+        @apply transform -translate-y-1;
+        border-color: rgba(255, 0, 85, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 0, 85, 0.1);
+    }
+    
+    .card-glass-cyan:hover {
+        border-color: rgba(0, 245, 255, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 245, 255, 0.1);
+    }
+    
+    .card-glass-purple:hover {
+        border-color: rgba(191, 0, 255, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(191, 0, 255, 0.1);
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       HERO SECTION
+       ───────────────────────────────────────────────────────────────────────── */
+    .hero-section {
+        @apply relative min-h-[80vh] flex items-center;
+        @apply overflow-hidden;
+    }
+    
+    .hero-bg-grid {
+        @apply absolute inset-0 opacity-20;
+        background-image: 
+            linear-gradient(rgba(255, 0, 85, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 0, 85, 0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+    }
+    
+    .hero-glow {
+        @apply absolute w-[600px] h-[600px] rounded-full;
+        @apply opacity-30 blur-[120px];
+        @apply pointer-events-none;
+    }
+    
+    .hero-glow-pink {
+        background: var(--neon-pink);
+        top: -200px;
+        right: -100px;
+    }
+    
+    .hero-glow-cyan {
+        background: var(--neon-cyan);
+        bottom: -200px;
+        left: -100px;
+    }
+    
+    .hero-title {
+        @apply text-4xl md:text-5xl lg:text-6xl font-black leading-tight;
+    }
+    
+    .text-gradient-neon {
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-subtitle {
+        @apply text-lg md:text-xl text-gray-400 leading-relaxed;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       FEATURE BADGES (Hero Stats)
+       ───────────────────────────────────────────────────────────────────────── */
+    .feature-badge {
+        @apply flex items-center gap-2 px-4 py-2 rounded-full;
+        @apply text-sm text-gray-300;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .feature-badge i {
+        @apply text-pink-500;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       SECTION STYLING
+       ───────────────────────────────────────────────────────────────────────── */
+    .section-title {
+        @apply text-2xl md:text-3xl font-bold text-white mb-2;
+    }
+    
+    .section-subtitle {
+        @apply text-gray-400;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       FOOTER
+       ───────────────────────────────────────────────────────────────────────── */
+    .footer-main {
+        background: var(--dark-950);
+        border-top: 1px solid rgba(255, 0, 85, 0.15);
+    }
+    
+    .footer-link {
+        @apply text-gray-400 hover:text-pink-400 transition-colors duration-200;
+    }
+    
+    .footer-social {
+        @apply w-10 h-10 flex items-center justify-center rounded-full;
+        @apply text-gray-400 hover:text-white;
+        @apply bg-white/5 hover:bg-pink-500/20;
+        @apply transition-all duration-200;
+    }
+    
+    .footer-bottom {
+        @apply border-t border-white/10 pt-6 mt-8;
+        @apply flex flex-col md:flex-row items-center justify-between gap-4;
+        @apply text-sm text-gray-500;
+    }
+    
+    /* ─────────────────────────────────────────────────────────────────────────
+       HEADER SCROLL STATE
+       ───────────────────────────────────────────────────────────────────────── */
+    .header-scrolled .navbar-main {
+        box-shadow: 0 4px 40px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 0, 85, 0.15);
+    }
+}
 
-  .card-glass:hover {
-    @apply border-[#ff0055]/30 bg-white/10;
-    box-shadow: 0 8px 32px rgba(255, 0, 85, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  }
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYER: UTILITIES — Custom Utility Classes
+   ═══════════════════════════════════════════════════════════════════════════════ */
 
-  .btn-primary {
-    @apply relative px-8 py-3 bg-gradient-to-r from-[#ff0055] to-[#bf00ff] text-white font-bold rounded-xl overflow-hidden transition-all duration-300;
-  }
+@layer utilities {
+    
+    /* Text Glow Effects */
+    .text-glow-pink {
+        text-shadow: 0 0 20px var(--neon-pink-glow), 0 0 40px rgba(255, 0, 85, 0.3);
+    }
+    
+    .text-glow-cyan {
+        text-shadow: 0 0 20px var(--neon-cyan-glow), 0 0 40px rgba(0, 245, 255, 0.3);
+    }
+    
+    /* Box Glow Effects */
+    .glow-pink {
+        box-shadow: 0 0 20px var(--neon-pink-glow);
+    }
+    
+    .glow-cyan {
+        box-shadow: 0 0 20px var(--neon-cyan-glow);
+    }
+    
+    .glow-purple {
+        box-shadow: 0 0 20px var(--neon-purple-glow);
+    }
+    
+    /* Animation Delays */
+    .animation-delay-200 {
+        animation-delay: 200ms;
+    }
+    
+    .animation-delay-400 {
+        animation-delay: 400ms;
+    }
+    
+    .animation-delay-600 {
+        animation-delay: 600ms;
+    }
+    
+    /* RTL-safe transforms */
+    .flip-rtl {
+        transform: scaleX(-1);
+    }
+    
+    [dir="rtl"] .flip-rtl {
+        transform: scaleX(1);
+    }
+}
 
-  .btn-primary:hover {
-    @apply scale-105;
-    box-shadow: 0 0 30px rgba(255, 0, 85, 0.5);
-  }
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════════ */
 
-  .btn-secondary {
-    @apply px-8 py-3 border-2 border-[#00f5ff] text-[#00f5ff] font-bold rounded-xl transition-all duration-300;
-  }
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
 
-  .btn-secondary:hover {
-    @apply bg-[#00f5ff]/10;
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
-  }
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
 
-  .text-neon-pink {
-    @apply text-[#ff0055];
-    text-shadow: 0 0 10px rgba(255, 0, 85, 0.5), 0 0 20px rgba(255, 0, 85, 0.3);
-  }
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-  .text-neon-cyan {
-    @apply text-[#00f5ff];
-    text-shadow: 0 0 10px rgba(0, 245, 255, 0.5), 0 0 20px rgba(0, 245, 255, 0.3);
-  }
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
 
-  .nav-link {
-    @apply relative px-4 py-2 text-gray-300 font-medium transition-all duration-300;
-  }
+.animate-pulse-glow {
+    animation: pulse-glow 4s ease-in-out infinite;
+}
 
-  .nav-link:hover {
-    @apply text-[#ff0055];
-  }
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
 
-  .nav-link::after {
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AUTH PAGE & MODAL STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Auth Page Background */
+.auth-page {
+    @apply min-h-screen flex items-center justify-center py-8 px-4;
+    @apply relative overflow-hidden;
+    background: var(--gradient-dark);
+}
+
+.auth-page::before {
     content: '';
-    @apply absolute bottom-0 right-0 w-0 h-0.5 bg-gradient-to-l from-[#ff0055] to-[#bf00ff] transition-all duration-300;
-  }
+    @apply absolute inset-0;
+    background: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 0, 85, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(0, 245, 255, 0.1), transparent);
+    pointer-events: none;
+}
 
-  .nav-link:hover::after {
-    @apply w-full;
-  }
+/* Auth Container */
+.auth-container {
+    @apply relative w-full max-w-md;
+    @apply bg-dark-900/80 backdrop-blur-xl;
+    @apply rounded-3xl border border-white/10;
+    @apply shadow-2xl;
+    @apply overflow-hidden;
+    z-index: 1;
+}
 
-  .nav-link.active {
-    @apply text-[#ff0055];
-  }
+.auth-header {
+    @apply text-center py-8 px-6;
+    @apply border-b border-white/10;
+    background: linear-gradient(180deg, rgba(255, 0, 85, 0.05) 0%, transparent 100%);
+}
 
-  .nav-link.active::after {
-    @apply w-full;
-  }
+.auth-logo {
+    @apply flex items-center justify-center gap-3 mb-4;
+}
 
-  .section-title {
-    @apply text-3xl md:text-4xl font-black text-center mb-12;
-    background: linear-gradient(135deg, #ff0055, #00f5ff);
+.auth-logo-icon {
+    @apply w-14 h-14 rounded-2xl flex items-center justify-center;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
+}
+
+.auth-logo-icon i {
+    @apply text-2xl text-white;
+}
+
+.auth-logo-text {
+    @apply text-2xl font-black;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  .input-field {
-    @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 transition-all duration-300;
-  }
-
-  .input-field:focus {
-    @apply outline-none border-[#ff0055] ring-2 ring-[#ff0055]/20;
-  }
-
-  .badge {
-    @apply inline-flex items-center px-3 py-1 text-xs font-bold rounded-full;
-  }
-
-  .badge-pink {
-    @apply bg-[#ff0055]/20 text-[#ff0055] border border-[#ff0055]/30;
-  }
-
-  .badge-cyan {
-    @apply bg-[#00f5ff]/20 text-[#00f5ff] border border-[#00f5ff]/30;
-  }
-
-  .hero-gradient {
-    background: 
-      radial-gradient(ellipse at top right, rgba(255, 0, 85, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at bottom left, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
-      linear-gradient(180deg, #0a0a0f 0%, #12121a 100%);
-  }
 }
 
-@layer utilities {
-  .glow-pink {
-    box-shadow: 0 0 20px rgba(255, 0, 85, 0.4), 0 0 40px rgba(255, 0, 85, 0.2);
-  }
-
-  .glow-cyan {
-    box-shadow: 0 0 20px rgba(0, 245, 255, 0.4), 0 0 40px rgba(0, 245, 255, 0.2);
-  }
-
-  .animation-delay-200 {
-    animation-delay: 200ms;
-  }
-
-  .animation-delay-400 {
-    animation-delay: 400ms;
-  }
+.auth-title {
+    @apply text-xl font-bold text-white mb-2;
 }
+
+.auth-subtitle {
+    @apply text-sm text-gray-400;
+}
+
+/* Auth Tabs */
+.auth-tabs {
+    @apply flex border-b border-white/10;
+}
+
+.auth-tab {
+    @apply flex-1 py-4 text-center font-medium;
+    @apply text-gray-400 transition-all duration-300;
+    @apply relative cursor-pointer;
+}
+
+.auth-tab:hover {
+    @apply text-gray-200;
+}
+
+.auth-tab.active {
+    @apply text-pink-400;
+}
+
+.auth-tab.active::after {
+    content: '';
+    @apply absolute bottom-0 left-0 right-0 h-0.5;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+/* Auth Content */
+.auth-content {
+    @apply p-6;
+}
+
+/* Auth Panel - مهم: فقط پنل فعال نمایش داده شود */
+.auth-panel {
+    display: none;
+}
+
+.auth-panel.active {
+    display: block;
+}
+
+/* Auth Steps - مهم: فقط step فعال نمایش داده شود */
+.auth-step {
+    display: none;
+}
+
+.auth-step.active {
+    display: none;
+}
+
+/* Form Group */
+.form-group {
+    @apply mb-5;
+}
+
+.form-label {
+    @apply block text-sm font-medium text-gray-300 mb-2;
+}
+
+/* Input Wrapper with Icon */
+.input-wrapper {
+    @apply relative;
+}
+
+.input-icon {
+    @apply absolute right-4 top-1/2 -translate-y-1/2;
+    @apply text-gray-500 pointer-events-none;
+}
+
+.input-wrapper input {
+    @apply w-full pr-12;
+}
+
+/* Form Input */
+.form-input {
+    @apply w-full px-4 py-3.5 rounded-xl;
+    @apply bg-dark-800/50 border border-white/10;
+    @apply text-white text-right placeholder-gray-500;
+    @apply transition-all duration-300;
+    @apply focus:outline-none focus:border-pink-500/50;
+    @apply focus:ring-2 focus:ring-pink-500/20;
+}
+
+.form-input:focus {
+    @apply bg-dark-800;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.1);
+}
+
+.form-input.error {
+    @apply border-red-500/50;
+}
+
+.form-input.success {
+    @apply border-green-500/50;
+}
+
+/* Form Hint */
+.form-hint {
+    @apply text-xs text-gray-500 mt-2 flex items-center gap-1;
+}
+
+.form-hint i {
+    @apply text-pink-500/70;
+}
+
+.form-error {
+    @apply text-xs text-red-400 mt-2 flex items-center gap-1;
+}
+
+/* Auth Button */
+.auth-btn {
+    @apply w-full py-4 rounded-xl;
+    @apply text-white font-bold text-base;
+    @apply transition-all duration-300;
+    @apply flex items-center justify-center gap-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+}
+
+.auth-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(255, 0, 85, 0.5), 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.auth-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.auth-btn-secondary {
+    @apply bg-transparent border border-white/20;
+    @apply text-gray-300 hover:text-white hover:border-pink-500/50;
+    box-shadow: none;
+}
+
+.auth-btn-secondary:hover:not(:disabled) {
+    transform: none;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.1);
+}
+
+/* Back Button */
+.back-btn {
+    @apply flex items-center gap-2 text-gray-400 text-sm mb-6;
+    @apply hover:text-pink-400 transition-colors duration-200;
+    @apply cursor-pointer;
+}
+
+/* OTP Input Container */
+.otp-container {
+    @apply flex justify-center gap-3 my-6;
+    direction: ltr;
+}
+
+.otp-input {
+    @apply w-12 h-14 text-center text-xl font-bold;
+    @apply bg-dark-800/50 border border-white/20 rounded-xl;
+    @apply text-white transition-all duration-300;
+    @apply focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20;
+}
+
+.otp-input:focus {
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+}
+
+.otp-input.filled {
+    @apply border-pink-500/50 bg-pink-500/10;
+}
+
+/* Timer */
+.otp-timer {
+    @apply text-center mb-6;
+}
+
+.timer-label {
+    @apply text-sm text-gray-400 mb-2;
+}
+
+.timer-display {
+    @apply flex items-center justify-center gap-2 text-2xl font-mono font-bold;
+}
+
+.timer-digit {
+    @apply w-12 h-12 flex items-center justify-center;
+    @apply bg-dark-800 rounded-lg border border-white/10;
+    @apply text-pink-400;
+}
+
+.timer-separator {
+    @apply text-pink-500;
+}
+
+.timer-expired {
+    @apply text-red-400 text-sm mt-2;
+}
+
+/* Resend Button */
+.resend-btn {
+    @apply text-pink-400 hover:text-pink-300 font-medium;
+    @apply transition-colors duration-200 cursor-pointer;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* OTP Info */
+.otp-info {
+    @apply text-center mb-6;
+}
+
+.otp-info-text {
+    @apply text-gray-400 text-sm mb-1;
+}
+
+.otp-info-value {
+    @apply text-pink-400 font-medium text-base;
+    direction: ltr;
+    display: inline-block;
+}
+
+.otp-hint {
+    @apply text-xs text-gray-500 flex items-center justify-center gap-1;
+}
+
+/* Success State */
+.auth-success {
+    @apply text-center py-8;
+}
+
+.success-icon {
+    @apply w-20 h-20 mx-auto mb-4 rounded-full;
+    @apply flex items-center justify-center;
+    @apply text-3xl text-green-400;
+    background: rgba(34, 197, 94, 0.1);
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    animation: successPulse 2s ease-in-out infinite;
+}
+
+@keyframes successPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    50% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+}
+
+.success-title {
+    @apply text-xl font-bold text-white mb-2;
+}
+
+.success-text {
+    @apply text-gray-400 text-sm;
+}
+
+/* Auth Footer */
+.auth-footer {
+    @apply py-4 px-6 border-t border-white/10;
+    @apply flex items-center justify-center gap-4;
+    @apply text-xs text-gray-500;
+}
+
+.auth-footer a {
+    @apply text-gray-400 hover:text-pink-400 transition-colors duration-200;
+}
+
+/* Auth Modal (if used) */
+.auth-modal-overlay {
+    @apply fixed inset-0 bg-black/70 backdrop-blur-sm;
+    @apply flex items-center justify-center p-4;
+    @apply opacity-0 invisible transition-all duration-300;
+    z-index: 1000;
+}
+
+.auth-modal-overlay.active {
+    @apply opacity-100 visible;
+}
+
+.auth-modal {
+    @apply w-full max-w-md;
+    @apply transform scale-95 transition-transform duration-300;
+}
+
+.auth-modal-overlay.active .auth-modal {
+    @apply scale-100;
+}
+
+/* Close Button */
+.modal-close {
+    @apply absolute top-4 left-4 w-8 h-8;
+    @apply flex items-center justify-center rounded-full;
+    @apply text-gray-400 hover:text-white;
+    @apply bg-white/5 hover:bg-white/10;
+    @apply transition-all duration-200 cursor-pointer;
+}
+
+/* Floating Particles (Optional decoration) */
+.auth-particles {
+    @apply absolute inset-0 pointer-events-none overflow-hidden;
+}
+
+.particle {
+    @apply absolute w-1 h-1 rounded-full bg-pink-500/30;
+    animation: float 15s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+}
+
+/* Loading Spinner */
+.auth-loading {
+    @apply inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AUTH SYSTEM STYLES - Login/Register Modal & Page
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Modal Overlay */
+.auth-modal-overlay {
+    @apply fixed inset-0 z-50;
+    @apply flex items-center justify-center;
+    @apply opacity-0 invisible;
+    @apply transition-all duration-300;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+}
+
+.auth-modal-overlay.active {
+    @apply opacity-100 visible;
+}
+
+/* Modal Container */
+.auth-modal {
+    @apply relative w-full max-w-md mx-4;
+    @apply rounded-2xl overflow-hidden;
+    @apply transform scale-95 opacity-0;
+    @apply transition-all duration-300;
+    background: linear-gradient(145deg, rgba(20, 20, 30, 0.95), rgba(10, 10, 15, 0.98));
+    border: 1px solid rgba(255, 0, 85, 0.2);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8),
+                0 0 60px rgba(255, 0, 85, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.auth-modal-overlay.active .auth-modal {
+    @apply scale-100 opacity-100;
+}
+
+/* Close Button */
+.auth-close-btn {
+    @apply absolute top-4 left-4 z-10;
+    @apply w-10 h-10 rounded-full;
+    @apply flex items-center justify-center;
+    @apply text-gray-400 hover:text-white;
+    @apply transition-all duration-200;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.auth-close-btn:hover {
+    background: rgba(255, 0, 85, 0.2);
+    @apply text-pink-400;
+}
+
+/* Header */
+.auth-header {
+    @apply pt-8 pb-6 px-8 text-center;
+    background: linear-gradient(180deg, rgba(255, 0, 85, 0.08) 0%, transparent 100%);
+}
+
+.auth-logo {
+    @apply w-16 h-16 mx-auto mb-4;
+    @apply rounded-2xl;
+    @apply flex items-center justify-center;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 10px 40px rgba(255, 0, 85, 0.4);
+}
+
+.auth-logo i {
+    @apply text-2xl text-white;
+}
+
+.auth-title {
+    @apply text-2xl font-bold text-white mb-2;
+}
+
+.auth-subtitle {
+    @apply text-gray-400 text-sm;
+}
+
+/* Tabs */
+.auth-tabs {
+    @apply flex mx-8 mb-6;
+    @apply rounded-xl overflow-hidden;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.auth-tab {
+    @apply flex-1 py-3 text-center;
+    @apply text-sm font-medium;
+    @apply text-gray-400;
+    @apply transition-all duration-300;
+    @apply cursor-pointer;
+}
+
+.auth-tab:hover {
+    @apply text-gray-200;
+}
+
+.auth-tab.active {
+    @apply text-white;
+    background: linear-gradient(135deg, rgba(255, 0, 85, 0.3), rgba(191, 0, 255, 0.2));
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+}
+
+/* Form Container */
+.auth-form-container {
+    @apply px-8 pb-8;
+}
+
+/* Steps */
+.auth-step {
+    display: none;
+}
+
+.auth-step.active {
+    display: block;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input Groups */
+.auth-input-group {
+    @apply mb-5;
+}
+
+.auth-label {
+    @apply block text-sm font-medium text-gray-300 mb-2;
+}
+
+.auth-input-wrapper {
+    @apply relative;
+}
+
+.auth-input {
+    @apply w-full px-4 py-3.5;
+    @apply rounded-xl;
+    @apply text-white text-right;
+    @apply placeholder-gray-500;
+    @apply transition-all duration-300;
+    @apply outline-none;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-input:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 0, 85, 0.5);
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.15),
+                inset 0 0 20px rgba(255, 0, 85, 0.03);
+}
+
+.auth-input.error {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+.auth-input.success {
+    border-color: rgba(34, 197, 94, 0.5);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+}
+
+.auth-input-icon {
+    @apply absolute top-1/2 -translate-y-1/2 right-4;
+    @apply text-gray-500;
+    @apply transition-colors duration-200;
+    @apply pointer-events-none;
+}
+
+.auth-input:focus + .auth-input-icon,
+.auth-input:focus ~ .auth-input-icon {
+    @apply text-pink-400;
+}
+
+.auth-input-wrapper .auth-input {
+    @apply pr-12;
+}
+
+/* Error Message */
+.auth-error {
+    @apply mt-2 text-xs text-red-400;
+    @apply flex items-center gap-1;
+    @apply opacity-0 h-0 overflow-hidden;
+    @apply transition-all duration-200;
+}
+
+.auth-error.visible {
+    @apply opacity-100 h-auto;
+}
+
+/* OTP Container */
+.otp-container {
+    @apply flex justify-center gap-3 my-6;
+    direction: ltr;
+}
+
+.otp-input {
+    @apply w-12 h-14;
+    @apply rounded-xl;
+    @apply text-center text-xl font-bold text-white;
+    @apply transition-all duration-300;
+    @apply outline-none;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.otp-input:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 0, 85, 0.5);
+    box-shadow: 0 0 25px rgba(255, 0, 85, 0.2);
+    transform: scale(1.05);
+}
+
+.otp-input.filled {
+    border-color: rgba(255, 0, 85, 0.4);
+    background: rgba(255, 0, 85, 0.05);
+}
+
+.otp-input.error {
+    border-color: rgba(239, 68, 68, 0.5);
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+/* Timer */
+.otp-timer {
+    @apply text-center text-sm text-gray-400 mb-4;
+}
+
+.otp-timer-value {
+    @apply text-pink-400 font-bold font-mono;
+}
+
+/* Resend Link */
+.otp-resend {
+    @apply text-center;
+}
+
+.otp-resend-btn {
+    @apply text-sm text-gray-500;
+    @apply cursor-not-allowed;
+    @apply transition-all duration-200;
+}
+
+.otp-resend-btn.active {
+    @apply text-pink-400 cursor-pointer;
+    @apply hover:text-pink-300;
+}
+
+/* Primary Button */
+.auth-btn-primary {
+    @apply w-full py-4 mt-6;
+    @apply rounded-xl;
+    @apply text-white font-bold text-base;
+    @apply flex items-center justify-center gap-2;
+    @apply transition-all duration-300;
+    @apply relative overflow-hidden;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 10px 40px rgba(255, 0, 85, 0.3);
+}
+
+.auth-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 50px rgba(255, 0, 85, 0.4);
+}
+
+.auth-btn-primary:active {
+    transform: translateY(0);
+}
+
+.auth-btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    transform: none;
+}
+
+.auth-btn-primary .btn-loader {
+    display: none;
+}
+
+.auth-btn-primary.loading .btn-text {
+    @apply invisible;
+}
+
+.auth-btn-primary.loading .btn-loader {
+    @apply block absolute;
+    @apply w-5 h-5 border-2 border-white/30 border-t-white rounded-full;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Secondary/Back Button */
+.auth-btn-secondary {
+    @apply w-full py-3 mt-3;
+    @apply rounded-xl;
+    @apply text-gray-400 font-medium text-sm;
+    @apply flex items-center justify-center gap-2;
+    @apply transition-all duration-200;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.auth-btn-secondary:hover {
+    @apply text-white;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Info Box */
+.auth-info {
+    @apply mt-4 p-4 rounded-xl;
+    @apply text-sm text-gray-300 text-center;
+    background: rgba(0, 245, 255, 0.05);
+    border: 1px solid rgba(0, 245, 255, 0.1);
+}
+
+.auth-info i {
+    @apply text-cyan-400 ml-2;
+}
+
+/* Divider */
+.auth-divider {
+    @apply flex items-center my-6;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    @apply flex-1 h-px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    content: '';
+}
+
+.auth-divider span {
+    @apply px-4 text-sm text-gray-500;
+}
+
+/* Social Login */
+.auth-social {
+    @apply flex gap-3;
+}
+
+.auth-social-btn {
+    @apply flex-1 py-3;
+    @apply rounded-xl;
+    @apply flex items-center justify-center gap-2;
+    @apply text-sm font-medium text-gray-300;
+    @apply transition-all duration-200;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.auth-social-btn:hover {
+    @apply text-white;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.auth-social-btn.google:hover {
+    border-color: rgba(234, 67, 53, 0.3);
+    box-shadow: 0 0 20px rgba(234, 67, 53, 0.1);
+}
+
+/* Footer */
+.auth-footer {
+    @apply mt-6 pt-6 text-center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.auth-footer-text {
+    @apply text-sm text-gray-500;
+}
+
+.auth-footer-link {
+    @apply text-pink-400 font-medium;
+    @apply hover:text-pink-300;
+    @apply transition-colors duration-200;
+}
+
+/* Terms */
+.auth-terms {
+    @apply mt-4 text-xs text-gray-500 text-center leading-relaxed;
+}
+
+.auth-terms a {
+    @apply text-pink-400/70 hover:text-pink-400;
+    @apply transition-colors duration-200;
+}
+
+/* Success Animation */
+.auth-success {
+    @apply text-center py-8;
+}
+
+.auth-success-icon {
+    @apply w-20 h-20 mx-auto mb-6;
+    @apply rounded-full;
+    @apply flex items-center justify-center;
+    @apply text-3xl text-white;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 10px 40px rgba(34, 197, 94, 0.4);
+    animation: successPop 0.5s ease-out;
+}
+
+@keyframes successPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.auth-success-title {
+    @apply text-xl font-bold text-white mb-2;
+}
+
+.auth-success-text {
+        @apply text-gray-400 text-sm mb-6;
+}
+
+.auth-success-redirect {
+    @apply text-xs text-gray-500;
+}
+
+.auth-success-redirect span {
+    @apply text-pink-400 font-bold;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   STANDALONE AUTH PAGE (not modal)
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-page {
+    @apply min-h-screen flex items-center justify-center;
+    @apply py-12 px-4;
+    background: linear-gradient(135deg, var(--dark-950) 0%, var(--dark-900) 100%);
+}
+
+.auth-page::before {
+    content: '';
+    @apply absolute inset-0;
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 0, 85, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(191, 0, 255, 0.1), transparent),
+        radial-gradient(ellipse 50% 30% at 0% 100%, rgba(0, 245, 255, 0.08), transparent);
+    pointer-events: none;
+}
+
+.auth-page-card {
+    @apply relative w-full max-w-md;
+    @apply rounded-2xl overflow-hidden;
+    background: linear-gradient(145deg, rgba(20, 20, 30, 0.9), rgba(10, 10, 15, 0.95));
+    border: 1px solid rgba(255, 0, 85, 0.15);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6),
+                0 0 80px rgba(255, 0, 85, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   PASSWORD STRENGTH INDICATOR
+   ───────────────────────────────────────────────────────────────────────── */
+.password-strength {
+    @apply mt-3;
+}
+
+.password-strength-bar {
+    @apply h-1.5 rounded-full overflow-hidden;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.password-strength-fill {
+    @apply h-full rounded-full;
+    @apply transition-all duration-300;
+    width: 0%;
+}
+
+.password-strength-fill.weak {
+    width: 25%;
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.password-strength-fill.fair {
+    width: 50%;
+    background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+.password-strength-fill.good {
+    width: 75%;
+    background: linear-gradient(90deg, #eab308, #facc15);
+}
+
+.password-strength-fill.strong {
+    width: 100%;
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.password-strength-text {
+    @apply mt-1.5 text-xs text-gray-500;
+    @apply flex items-center justify-between;
+}
+
+.password-strength-label {
+    @apply font-medium;
+}
+
+.password-strength-label.weak {
+    @apply text-red-400;
+}
+
+.password-strength-label.fair {
+    @apply text-orange-400;
+}
+
+.password-strength-label.good {
+    @apply text-yellow-400;
+}
+
+.password-strength-label.strong {
+    @apply text-green-400;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CHECKBOX STYLING
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-checkbox-wrapper {
+    @apply flex items-start gap-3;
+}
+
+.auth-checkbox {
+    @apply w-5 h-5 mt-0.5;
+    @apply rounded;
+    @apply cursor-pointer;
+    @apply transition-all duration-200;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.auth-checkbox:checked {
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    border-color: transparent;
+}
+
+.auth-checkbox:checked::after {
+    content: '✓';
+    @apply flex items-center justify-center;
+    @apply w-full h-full;
+    @apply text-white text-xs font-bold;
+}
+
+.auth-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 0, 85, 0.2);
+}
+
+.auth-checkbox-label {
+    @apply text-sm text-gray-400 leading-relaxed;
+}
+
+.auth-checkbox-label a {
+    @apply text-pink-400 hover:text-pink-300;
+    @apply transition-colors duration-200;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   PHONE INPUT WITH COUNTRY CODE
+   ───────────────────────────────────────────────────────────────────────── */
+.phone-input-wrapper {
+    @apply flex gap-2;
+}
+
+.country-code-select {
+    @apply w-24 px-3 py-3.5;
+    @apply rounded-xl;
+    @apply text-white text-center;
+    @apply cursor-pointer;
+    @apply transition-all duration-300;
+    @apply outline-none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.country-code-select:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 0, 85, 0.5);
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.15);
+}
+
+.phone-input-wrapper .auth-input {
+    @apply flex-1;
+    @apply pr-4;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   LOADING SKELETON
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-skeleton {
+    @apply rounded-xl;
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.03) 25%,
+        rgba(255, 255, 255, 0.06) 50%,
+        rgba(255, 255, 255, 0.03) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   TOAST NOTIFICATIONS (for auth feedback)
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-toast {
+    @apply fixed top-6 left-1/2 -translate-x-1/2 z-[60];
+    @apply px-6 py-4 rounded-xl;
+    @apply flex items-center gap-3;
+    @apply text-sm font-medium text-white;
+    @apply transform -translate-y-full opacity-0;
+    @apply transition-all duration-300;
+    background: rgba(20, 20, 30, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.auth-toast.visible {
+    @apply translate-y-0 opacity-100;
+}
+
+.auth-toast.success {
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(34, 197, 94, 0.1);
+}
+
+.auth-toast.success i {
+    @apply text-green-400;
+}
+
+.auth-toast.error {
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(239, 68, 68, 0.1);
+}
+
+.auth-toast.error i {
+    @apply text-red-400;
+}
+
+.auth-toast.warning {
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.1);
+}
+
+.auth-toast.warning i {
+    @apply text-amber-400;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RESPONSIVE ADJUSTMENTS
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .auth-modal {
+        @apply mx-2 rounded-xl;
+    }
+
+    .auth-header {
+        @apply pt-6 pb-4 px-5;
+    }
+
+    .auth-logo {
+        @apply w-14 h-14;
+    }
+
+    .auth-title {
+        @apply text-xl;
+    }
+
+    .auth-tabs {
+        @apply mx-5 mb-4;
+    }
+
+    .auth-form-container {
+        @apply px-5 pb-6;
+    }
+
+    .auth-input {
+        @apply py-3 text-sm;
+    }
+
+    .otp-container {
+        @apply gap-2;
+    }
+
+    .otp-input {
+        @apply w-10 h-12 text-lg;
+    }
+
+    .auth-btn-primary {
+        @apply py-3.5 text-sm;
+    }
+
+    .auth-social {
+        @apply flex-col;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RTL SPECIFIC ADJUSTMENTS
+   ───────────────────────────────────────────────────────────────────────── */
+[dir="rtl"] .auth-close-btn {
+    @apply left-auto right-4;
+}
+
+[dir="rtl"] .auth-input {
+    @apply text-right;
+}
+
+[dir="rtl"] .auth-input-icon {
+    @apply right-auto left-4;
+}
+
+[dir="rtl"] .auth-input-wrapper .auth-input {
+    @apply pr-4 pl-12;
+}
+
+[dir="rtl"] .auth-error i {
+    @apply ml-1 mr-0;
+}
+
+[dir="rtl"] .auth-info i {
+    @apply ml-0 mr-2;
+}
+
+[dir="rtl"] .auth-btn-secondary i {
+    @apply rotate-180;
+}
+
+[dir="rtl"] .phone-input-wrapper {
+    @apply flex-row-reverse;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DARK MODE ENHANCEMENTS (extra polish)
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-modal::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 0, 85, 0.08), transparent 50%);
+}
+
+.auth-page-card::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none;
+    background: radial-gradient(ellipse 100% 100% at 50% 0%, rgba(255, 0, 85, 0.06), transparent 50%);
+}
+
+/* Glow effect on card hover */
+.auth-page-card {
+    @apply transition-all duration-500;
+}
+
+.auth-page-card:hover {
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6),
+                0 0 100px rgba(255, 0, 85, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   STEP PROGRESS INDICATOR
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-steps-indicator {
+    @apply flex items-center justify-center gap-2 mb-6;
+}
+
+.auth-step-dot {
+    @apply w-2 h-2 rounded-full;
+    @apply transition-all duration-300;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.auth-step-dot.active {
+    @apply w-8;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+}
+
+.auth-step-dot.completed {
+    background: var(--neon-pink);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FLOATING LABEL VARIANT (optional enhancement)
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-input-floating {
+    @apply relative;
+}
+
+.auth-input-floating .auth-input {
+    @apply pt-6 pb-2;
+}
+
+.auth-input-floating .auth-label {
+    @apply absolute right-4 top-1/2 -translate-y-1/2;
+    @apply text-gray-500;
+    @apply transition-all duration-200;
+    @apply pointer-events-none;
+}
+
+.auth-input-floating .auth-input:focus ~ .auth-label,
+.auth-input-floating .auth-input:not(:placeholder-shown) ~ .auth-label {
+    @apply top-3 text-xs text-pink-400;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CAPTCHA CONTAINER (if needed)
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-captcha {
+    @apply my-4 flex justify-center;
+}
+
+.auth-captcha > div {
+    @apply rounded-xl overflow-hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ACCOUNT LINKING (for social accounts)
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-linked-accounts {
+    @apply mt-6 space-y-3;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LOGIN MODAL STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Modal Overlay - Full Screen Fixed Position
+   ───────────────────────────────────────────────────────────────────────────── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+/* Modal Backdrop - Dark blur background */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active .modal-backdrop {
+    opacity: 1;
+}
+
+/* Modal Container */
+.modal-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 420px;
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay.active .modal-container {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Login Modal Content Box
+   ───────────────────────────────────────────────────────────────────────────── */
+.login-modal-content {
+    @apply relative rounded-2xl p-6 sm:p-8;
+    background: linear-gradient(165deg, 
+        rgba(20, 20, 30, 0.98) 0%, 
+        rgba(10, 10, 18, 0.99) 100%);
+    border: 1px solid rgba(255, 0, 85, 0.2);
+    box-shadow: 
+        0 25px 60px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(255, 0, 85, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Close Button */
+.modal-close-btn {
+    @apply absolute top-4 left-4 w-10 h-10 rounded-full;
+    @apply flex items-center justify-center;
+    @apply text-gray-400 hover:text-white;
+    @apply bg-white/5 hover:bg-red-500/20;
+    @apply transition-all duration-200;
+    @apply hover:rotate-90;
+}
+
+.modal-close-btn:hover {
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Login Modal Header & Logo
+   ───────────────────────────────────────────────────────────────────────────── */
+.login-modal-header {
+    @apply text-center mb-6;
+}
+
+.login-logo {
+    @apply inline-flex flex-col items-center gap-3;
+}
+
+.login-logo-icon {
+    @apply w-16 h-16 rounded-2xl flex items-center justify-center;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 0 30px rgba(255, 0, 85, 0.5);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.login-logo-icon i {
+    @apply text-white text-2xl;
+}
+
+.login-logo-text {
+    @apply flex flex-col items-center;
+}
+
+.login-logo-brand {
+    @apply text-2xl font-black;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.login-logo-tagline {
+    @apply text-sm text-gray-400;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 0, 85, 0.7);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Auth Tabs (Login/Register Switch)
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-tabs {
+    @apply relative flex rounded-xl p-1 mb-6;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-tab {
+    @apply flex-1 flex items-center justify-center gap-2 py-3 px-4;
+    @apply text-sm font-medium rounded-lg;
+    @apply text-gray-400 transition-all duration-300;
+    @apply relative z-10;
+}
+
+.auth-tab:hover {
+    @apply text-gray-200;
+}
+
+.auth-tab.active {
+    @apply text-white;
+}
+
+.auth-tab-indicator {
+    @apply absolute top-1 bottom-1 rounded-lg;
+    @apply transition-all duration-300 ease-out;
+    width: calc(50% - 4px);
+    right: 4px;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+    z-index: 0;
+}
+
+.auth-tabs[data-active="register"] .auth-tab-indicator {
+    right: auto;
+    left: 4px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Auth Panels
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-panel {
+    display: none;
+}
+
+.auth-panel.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Auth Steps (for multi-step forms) */
+.auth-step {
+    display: none;
+}
+
+.auth-step.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Form Styles
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-form {
+    @apply space-y-5;
+}
+
+.form-group {
+    @apply space-y-2;
+}
+
+.form-label {
+    @apply flex items-center gap-2 text-sm font-medium text-gray-300;
+}
+
+.form-label i {
+    @apply text-pink-500;
+}
+
+.input-wrapper {
+    @apply relative;
+}
+
+.form-input {
+    @apply w-full px-4 py-3.5 pr-12 rounded-xl;
+    @apply text-white text-base;
+    @apply placeholder-gray-500;
+    @apply transition-all duration-200;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-input:focus {
+    @apply outline-none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 0 3px rgba(255, 0, 85, 0.15);
+}
+
+.form-input.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.form-input.success {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.input-icon {
+    @apply absolute top-1/2 right-4 -translate-y-1/2;
+    @apply text-gray-500 pointer-events-none;
+}
+
+.input-status {
+    @apply absolute top-1/2 left-4 -translate-y-1/2;
+    @apply opacity-0 transition-opacity duration-200;
+}
+
+.form-input.success ~ .input-status::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    @apply text-green-500;
+}
+
+.form-input.success ~ .input-status {
+    @apply opacity-100;
+}
+
+.form-error {
+    @apply text-red-400 text-sm hidden;
+}
+
+.form-error.show {
+    display: block;
+}
+
+.form-hint {
+    @apply text-gray-500 text-xs;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Submit Button
+   ───────────────────────────────────────────────────────────────────────────── */
+.btn-auth-submit {
+    @apply w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl;
+    @apply text-white font-bold text-base;
+    @apply transition-all duration-300;
+    @apply relative overflow-hidden;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 4px 20px rgba(255, 0, 85, 0.4);
+}
+
+.btn-auth-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255, 0, 85, 0.5);
+}
+
+.btn-auth-submit:active {
+    transform: translateY(0);
+}
+
+.btn-auth-submit:disabled {
+    @apply opacity-50 cursor-not-allowed;
+    transform: none;
+}
+
+.btn-auth-submit .btn-loader {
+    display: none;
+}
+
+.btn-auth-submit.loading .btn-text,
+.btn-auth-submit.loading .btn-icon {
+    display: none;
+}
+
+.btn-auth-submit.loading .btn-loader {
+    @apply inline-block;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   OTP Section
+   ───────────────────────────────────────────────────────────────────────────── */
+.otp-header {
+    @apply mb-6;
+}
+
+.otp-back-btn {
+    @apply flex items-center gap-2 text-gray-400 hover:text-white;
+    @apply transition-colors duration-200 mb-3;
+}
+
+.otp-sent-text {
+    @apply text-gray-400 text-sm;
+}
+
+.otp-sent-text strong {
+    @apply text-cyan-400 font-mono;
+}
+
+.otp-inputs {
+    @apply flex justify-center gap-2 sm:gap-3;
+}
+
+.otp-input {
+    @apply w-12 h-14 sm:w-14 sm:h-16 rounded-xl;
+    @apply text-center text-xl sm:text-2xl font-bold text-white;
+    @apply transition-all duration-200;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.otp-input:focus {
+    @apply outline-none;
+    border-color: var(--neon-cyan);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.2);
+}
+
+.otp-input.filled {
+    border-color: var(--neon-cyan);
+    background: rgba(0, 245, 255, 0.1);
+}
+
+.otp-input.error {
+    border-color: #ef4444;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+/* OTP Timer */
+.otp-timer-section {
+    @apply text-center my-5;
+}
+
+.otp-timer {
+    @apply flex items-center justify-center gap-2 text-gray-400 text-sm;
+}
+
+.otp-timer strong {
+    @apply text-cyan-400 font-mono text-lg;
+}
+
+.otp-expired {
+    @apply text-red-400;
+}
+
+.otp-expired.hidden {
+    display: none;
+}
+
+.otp-resend-btn {
+    @apply inline-flex items-center gap-2 mt-2 px-4 py-2 rounded-lg;
+    @apply text-cyan-400 hover:text-white text-sm font-medium;
+    @apply bg-cyan-500/10 hover:bg-cyan-500/20;
+    @apply transition-all duration-200;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Auth Terms & Social Login
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-terms {
+    @apply text-center text-xs text-gray-500 mt-6 leading-relaxed;
+}
+
+.auth-terms a {
+    @apply text-pink-400 hover:text-pink-300;
+    @apply transition-colors duration-200;
+}
+
+/* Divider */
+.auth-divider {
+    @apply flex items-center my-6;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    @apply flex-1 h-px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    content: '';
+}
+
+.auth-divider span {
+    @apply px-4 text-sm text-gray-500;
+}
+
+/* Social Login Section */
+.auth-social {
+    @apply space-y-3;
+}
+
+.auth-social-title {
+    @apply text-center text-sm text-gray-400 mb-4;
+}
+
+.auth-social-buttons {
+    @apply flex gap-3;
+}
+
+.btn-social {
+    @apply flex-1 flex items-center justify-center gap-3 py-3 px-4 rounded-xl;
+    @apply text-sm font-medium text-gray-300;
+    @apply transition-all duration-300;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-social:hover {
+    @apply text-white;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Google Button */
+.btn-social.google {
+    @apply hover:border-red-500/30;
+}
+
+.btn-social.google:hover {
+    background: rgba(234, 67, 53, 0.1);
+    box-shadow: 0 0 25px rgba(234, 67, 53, 0.15);
+}
+
+.btn-social.google i {
+    @apply text-red-500;
+}
+
+/* Discord Button */
+.btn-social.discord {
+    @apply hover:border-indigo-500/30;
+}
+
+.btn-social.discord:hover {
+    background: rgba(88, 101, 242, 0.1);
+    box-shadow: 0 0 25px rgba(88, 101, 242, 0.15);
+}
+
+.btn-social.discord i {
+    @apply text-indigo-400;
+}
+
+/* Steam Button */
+.btn-social.steam {
+    @apply hover:border-blue-500/30;
+}
+
+.btn-social.steam:hover {
+    background: rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.15);
+}
+
+.btn-social.steam i {
+    @apply text-blue-400;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Auth Footer
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-footer {
+    @apply mt-6 pt-6 text-center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.auth-footer-text {
+    @apply text-sm text-gray-500;
+}
+
+.auth-footer-link {
+    @apply text-pink-400 font-medium cursor-pointer;
+    @apply hover:text-pink-300;
+    @apply transition-colors duration-200;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Success State Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-success {
+    @apply text-center py-8;
+}
+
+.auth-success-icon {
+    @apply w-20 h-20 mx-auto mb-6;
+    @apply rounded-full;
+    @apply flex items-center justify-center;
+    @apply text-3xl text-white;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 10px 40px rgba(34, 197, 94, 0.4);
+    animation: successPop 0.5s ease-out;
+}
+
+@keyframes successPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.auth-success-title {
+    @apply text-xl font-bold text-white mb-2;
+}
+
+.auth-success-text {
+    @apply text-gray-400 text-sm mb-6;
+}
+
+.auth-success-redirect {
+    @apply text-xs text-gray-500;
+}
+
+.auth-success-redirect span {
+    @apply text-pink-400 font-bold;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Error & Warning States
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-error-box {
+    @apply flex items-start gap-3 p-4 rounded-xl mb-5;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.auth-error-box i {
+    @apply text-red-400 text-lg mt-0.5;
+}
+
+.auth-error-box-content {
+    @apply flex-1;
+}
+
+.auth-error-box-title {
+    @apply text-red-400 font-medium text-sm mb-1;
+}
+
+.auth-error-box-text {
+    @apply text-gray-400 text-xs leading-relaxed;
+}
+
+.auth-warning-box {
+    @apply flex items-start gap-3 p-4 rounded-xl mb-5;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.auth-warning-box i {
+    @apply text-amber-400 text-lg mt-0.5;
+}
+
+.auth-info-box {
+    @apply flex items-start gap-3 p-4 rounded-xl mb-5;
+    background: rgba(0, 245, 255, 0.05);
+    border: 1px solid rgba(0, 245, 255, 0.15);
+}
+
+.auth-info-box i {
+    @apply text-cyan-400 text-lg mt-0.5;
+}
+
+.auth-info-box-text {
+    @apply text-gray-300 text-sm leading-relaxed;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Password Strength Indicator
+   ───────────────────────────────────────────────────────────────────────────── */
+.password-strength {
+    @apply mt-2;
+}
+
+.password-strength-bar {
+    @apply h-1.5 rounded-full overflow-hidden;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.password-strength-fill {
+    @apply h-full rounded-full;
+    @apply transition-all duration-300;
+    width: 0%;
+}
+
+.password-strength-fill.weak {
+    width: 25%;
+    background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.password-strength-fill.fair {
+    width: 50%;
+    background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+.password-strength-fill.good {
+    width: 75%;
+    background: linear-gradient(90deg, #eab308, #facc15);
+}
+
+.password-strength-fill.strong {
+    width: 100%;
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.password-strength-text {
+    @apply mt-1.5 text-xs flex items-center justify-between;
+}
+
+.password-strength-label {
+    @apply font-medium;
+}
+
+.password-strength-label.weak { @apply text-red-400; }
+.password-strength-label.fair { @apply text-orange-400; }
+.password-strength-label.good { @apply text-yellow-400; }
+.password-strength-label.strong { @apply text-green-400; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Remember Me Checkbox
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-remember {
+    @apply flex items-center justify-between mt-4;
+}
+
+.auth-checkbox-wrapper {
+    @apply flex items-center gap-3 cursor-pointer;
+}
+
+.auth-checkbox {
+    @apply w-5 h-5 rounded;
+    @apply cursor-pointer;
+    @apply transition-all duration-200;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.auth-checkbox:checked {
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    border-color: transparent;
+}
+
+.auth-checkbox:checked::after {
+    content: '✓';
+    @apply flex items-center justify-center;
+    @apply w-full h-full;
+    @apply text-white text-xs font-bold;
+}
+
+.auth-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 0, 85, 0.2);
+}
+
+.auth-checkbox-label {
+    @apply text-sm text-gray-400;
+}
+
+.auth-forgot-link {
+    @apply text-sm text-pink-400 hover:text-pink-300;
+    @apply transition-colors duration-200;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Toast Notifications
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-toast {
+    @apply fixed top-6 left-1/2 -translate-x-1/2 z-[10000];
+    @apply flex items-center gap-3 px-5 py-4 rounded-xl;
+    @apply transform -translate-y-4 opacity-0;
+    @apply transition-all duration-300;
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.98), rgba(10, 10, 18, 0.99));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    min-width: 300px;
+    max-width: 90vw;
+}
+
+.auth-toast.visible {
+    @apply translate-y-0 opacity-100;
+}
+
+.auth-toast-icon {
+    @apply w-10 h-10 rounded-full flex items-center justify-center text-lg;
+}
+
+.auth-toast-content {
+    @apply flex-1;
+}
+
+.auth-toast-title {
+    @apply font-medium text-white text-sm;
+}
+
+.auth-toast-text {
+    @apply text-gray-400 text-xs mt-0.5;
+}
+
+.auth-toast-close {
+    @apply text-gray-500 hover:text-white transition-colors duration-200 cursor-pointer;
+}
+
+/* Toast Types */
+.auth-toast.success {
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.auth-toast.success .auth-toast-icon {
+    @apply bg-green-500/20 text-green-400;
+}
+
+.auth-toast.error {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.auth-toast.error .auth-toast-icon {
+    @apply bg-red-500/20 text-red-400;
+}
+
+.auth-toast.warning {
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.auth-toast.warning .auth-toast-icon {
+    @apply bg-amber-500/20 text-amber-400;
+}
+
+.auth-toast.info {
+    border-color: rgba(0, 245, 255, 0.3);
+}
+
+.auth-toast.info .auth-toast-icon {
+    @apply bg-cyan-500/20 text-cyan-400;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Loading Spinner
+   ───────────────────────────────────────────────────────────────────────────── */
+.auth-spinner {
+    @apply inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full;
+    animation: auth-spin 0.8s linear infinite;
+}
+
+.auth-spinner.sm {
+    @apply w-4 h-4;
+}
+
+.auth-spinner.lg {
+    @apply w-8 h-8 border-[3px];
+}
+
+@keyframes auth-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Responsive Adjustments
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .modal-container {
+        @apply mx-2;
+    }
+
+    .login-modal-content {
+        @apply p-5 rounded-xl;
+    }
+
+    .modal-close-btn {
+        @apply top-3 left-3 w-8 h-8;
+    }
+
+    .login-logo-icon {
+        @apply w-14 h-14;
+    }
+
+    .login-logo-brand {
+        @apply text-xl;
+    }
+
+    .auth-tabs {
+        @apply mb-4;
+    }
+
+    .auth-tab {
+        @apply py-2.5 text-xs;
+    }
+
+    .form-input {
+        @apply py-3 text-sm;
+    }
+
+    .btn-auth-submit {
+        @apply py-3.5 text-sm;
+    }
+
+    .otp-inputs {
+        @apply gap-2;
+    }
+
+    .otp-input {
+        @apply w-10 h-12 text-lg;
+    }
+
+    .auth-social-buttons {
+        @apply flex-col;
+    }
+
+    .btn-social {
+        @apply py-3;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RTL Support (Persian/Arabic)
+   ───────────────────────────────────────────────────────────────────────────── */
+[dir="rtl"] .modal-close-btn {
+    @apply left-auto right-4;
+}
+
+[dir="rtl"] .form-input {
+    @apply text-right pr-12;
+}
+
+[dir="rtl"] .input-icon {
+    @apply right-auto left-4;
+}
+
+[dir="rtl"] .auth-checkbox-wrapper {
+    @apply flex-row-reverse;
+}
+
+[dir="rtl"] .auth-checkbox-label {
+    @apply text-right;
+}
+
+[dir="rtl"] .auth-forgot-link {
+    @apply float-left;
+}
+
+[dir="rtl"] .btn-social i {
+    @apply ml-2 mr-0;
+}
+
+[dir="rtl"] .auth-toast {
+    @apply left-1/2 right-auto;
+}
+
+[dir="rtl"] .auth-error-box i,
+[dir="rtl"] .auth-warning-box i,
+[dir="rtl"] .auth-info-box i {
+    @apply ml-2 mr-0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FINAL DECORATIONS & MICRO INTERACTIONS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Input Ripple Click Effect */
+.input-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.input-wrapper .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(0);
+    animation: ripple-anim 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-anim {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Card hover glow in auth modal/page */
+.auth-hover-glow {
+    @apply transition-all duration-300;
+}
+
+.auth-hover-glow:hover {
+    box-shadow: 0 15px 50px rgba(255, 0, 85, 0.25),
+                0 0 40px rgba(0, 245, 255, 0.15);
+}
+
+/* Animated subtle gradient background */
+.auth-animated-bg {
+    background: linear-gradient(-45deg,
+        rgba(255, 0, 85, 0.08),
+        rgba(191, 0, 255, 0.08),
+        rgba(0, 245, 255, 0.08),
+        rgba(255, 0, 85, 0.08));
+    background-size: 400% 400%;
+    animation: animated-bg-move 12s ease infinite;
+}
+
+@keyframes animated-bg-move {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Glow animation for active elements */
+@keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 85, 0.25); }
+    50% { box-shadow: 0 0 25px rgba(255, 0, 85, 0.45); }
+}
+
+.glow-animate {
+    animation: glowPulse 2.5s infinite ease-in-out;
+}
+
+/* Smooth fade transition utility */
+.fade-in {
+    animation: fadeIn 0.4s ease forwards;
+}
+.fade-out {
+    animation: fadeOut 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(10px); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   END OF AUTH SYSTEM CSS
+   ───────────────────────────────────────────────────────────────────────────── */

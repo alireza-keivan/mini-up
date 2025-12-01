@@ -1,0 +1,713 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}شارژ کیف پول | مینی‌آپ{% endblock %}
+
+{% block extra_css %}
+<style>
+    .amount-btn {
+        transition: all 0.3s ease;
+    }
+    .amount-btn:hover {
+        transform: translateY(-2px);
+    }
+    .amount-btn.selected {
+        border-color: rgb(34 197 94) !important;
+        background: rgba(34, 197, 94, 0.1) !important;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+    }
+    .amount-btn.selected .amount-value {
+        color: rgb(34 197 94);
+    }
+    
+    .custom-input:focus {
+        border-color: rgb(236 72 153);
+        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+    }
+    
+    .gateway-card {
+        transition: all 0.3s ease;
+    }
+    .gateway-card:hover {
+        transform: translateY(-2px);
+    }
+    .gateway-card.selected {
+        border-color: rgb(236 72 153) !important;
+        background: rgba(236, 72, 153, 0.1) !important;
+    }
+    
+    .deposit-btn {
+        background: linear-gradient(135deg, rgb(34 197 94), rgb(22 163 74));
+        transition: all 0.3s ease;
+    }
+    .deposit-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 40px rgba(34, 197, 94, 0.4);
+    }
+    .deposit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .spinner {
+        border: 2px solid transparent;
+        border-top-color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .balance-glow {
+        animation: balanceGlow 2s ease-in-out infinite;
+    }
+    
+    @keyframes balanceGlow {
+        0%, 100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.3); }
+        50% { box-shadow: 0 0 40px rgba(236, 72, 153, 0.5); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-8 px-4">
+    <div class="container mx-auto max-w-2xl">
+        
+        <!-- ═══════════════════════════════════════════════════════════════════
+             HEADER
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="mb-8">
+            <a href="{% url 'wallet:dashboard' %}" 
+               class="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm mb-4 transition-colors">
+                <i class="fas fa-arrow-right"></i>
+                بازگشت به کیف پول
+            </a>
+            <h1 class="text-3xl font-black text-white mb-2">
+                <i class="fas fa-plus-circle text-green-500 ml-3"></i>
+                شارژ کیف پول
+            </h1>
+            <p class="text-gray-400">
+                افزایش موجودی کیف پول برای خرید سریع‌تر
+            </p>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             CURRENT BALANCE CARD
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="glass-card p-6 rounded-2xl border border-pink-500/20 mb-8 balance-glow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-gray-400 text-sm mb-1">موجودی فعلی</div>
+                    <div class="text-3xl font-black text-white">
+                        {{ wallet.balance|intcomma }}
+                        <span class="text-lg font-normal text-gray-400">تومان</span>
+                    </div>
+                </div>
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
+                    <i class="fas fa-wallet text-white text-2xl"></i>
+                </div>
+            </div>
+            
+            {% if wallet.gift_balance > 0 %}
+            <div class="mt-4 pt-4 border-t border-white/10">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-400">
+                        <i class="fas fa-gift text-cyan-500 ml-1"></i>
+                        اعتبار هدیه
+                    </span>
+                    <span class="text-cyan-400 font-bold">{{ wallet.gift_balance|intcomma }} تومان</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             DEPOSIT FORM
+             ═══════════════════════════════════════════════════════════════════ -->
+        <form id="deposit-form" method="POST" action="{% url 'wallet:deposit-request' %}">
+            {% csrf_token %}
+            
+            <div class="glass-card rounded-2xl border border-white/10 overflow-hidden">
+                
+                <!-- ─────────────────────────────────────────────────────────────
+                     QUICK AMOUNT SELECTION
+                     ───────────────────────────────────────────────────────────── -->
+                <div class="p-6 border-b border-white/10">
+                    <label class="text-white font-bold mb-4 block">
+                        <i class="fas fa-bolt text-yellow-500 ml-2"></i>
+                        انتخاب سریع مبلغ
+                    </label>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <button type="button" 
+                                class="amount-btn glass-card p-4 rounded-xl border border-white/10 text-center cursor-pointer"
+                                data-amount="50000">
+                            <div class="amount-value text-xl font-bold text-white mb-1">۵۰,۰۰۰</div>
+                            <div class="text-gray-500 text-xs">تومان</div>
+                        </button>
+                        
+                        <button type="button" 
+                                class="amount-btn glass-card p-4 rounded-xl border border-white/10 text-center cursor-pointer"
+                                data-amount="100000">
+                            <div class="amount-value text-xl font-bold text-white mb-1">۱۰۰,۰۰۰</div>
+                            <div class="text-gray-500 text-xs">تومان</div>
+                        </button>
+                        
+                        <button type="button" 
+                                class="amount-btn glass-card p-4 rounded-xl border border-white/10 text-center cursor-pointer relative"
+                                data-amount="200000">
+                            <div class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                پرطرفدار
+                            </div>
+                            <div class="amount-value text-xl font-bold text-white mb-1">۲۰۰,۰۰۰</div>
+                            <div class="text-gray-500 text-xs">تومان</div>
+                        </button>
+                        
+                        <button type="button" 
+                                class="amount-btn glass-card p-4 rounded-xl border border-white/10 text-center cursor-pointer"
+                                data-amount="500000">
+                            <div class="amount-value text-xl font-bold text-white mb-1">۵۰۰,۰۰۰</div>
+                            <div class="text-gray-500 text-xs">تومان</div>
+                        </button>
+                    </div>
+                    
+                    <!-- More amounts (collapsible) -->
+                    <div id="more-amounts" class="hidden mt-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <button type="button" 
+                                    class="amount-btn glass-card p-4 rounded-xl border border-white/10 text-center cursor-pointer"
+                                    data-amount="1000000">
+                                <div class="amount-value text-xl font-bold text-white mb-1">۱,۰۰۰,۰۰۰</div>
+                                <div class="text-gray-500 text-xs">تومان</div>
+                            </button>
+                            
+                            <button type="button" 
+                                    class="amount-btn glass-card p-4 rounded-xl border border-white/10 text-center cursor-pointer"
+                                    data-amount="2000000">
+                                <div class="amount-value text-xl font-bold text-white mb-1">۲,۰۰۰,۰۰۰</div>
+                                <div class="text-gray-500 text-xs">تومان</div>
+                            </button>
+                            
+                            <button type="button" 
+                                    class="amount-btn glass-card p-4 rounded-xl border border-white/10 text-center cursor-pointer"
+                                    data-amount="5000000">
+                                <div class="amount-value text-xl font-bold text-white mb-1">۵,۰۰۰,۰۰۰</div>
+                                <div class="text-gray-500 text-xs">تومان</div>
+                            </button>
+                            
+                            <button type="button" 
+                                    class="amount-btn glass-card p-4 rounded-xl border border-white/10 text-center cursor-pointer relative"
+                                    data-amount="10000000">
+                                <div class="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                    VIP
+                                </div>
+                                <div class="amount-value text-xl font-bold text-white mb-1">۱۰,۰۰۰,۰۰۰</div>
+                                <div class="text-gray-500 text-xs">تومان</div>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="button" 
+                            id="toggle-more-amounts" 
+                            class="mt-4 text-pink-400 hover:text-pink-300 text-sm transition-colors">
+                        <i class="fas fa-chevron-down ml-1" id="toggle-icon"></i>
+                        <span id="toggle-text">نمایش مبالغ بیشتر</span>
+                    </button>
+                </div>
+                
+                <!-- ─────────────────────────────────────────────────────────────
+                     CUSTOM AMOUNT INPUT
+                     ───────────────────────────────────────────────────────────── -->
+                <div class="p-6 border-b border-white/10">
+                    <label for="custom-amount" class="text-white font-bold mb-4 block">
+                        <i class="fas fa-edit text-cyan-500 ml-2"></i>
+                        یا مبلغ دلخواه وارد کنید
+                    </label>
+                    
+                    <div class="relative">
+                        <input type="text" 
+                               id="custom-amount" 
+                               name="amount"
+                               inputmode="numeric"
+                               placeholder="مثلاً ۱۵۰,۰۰۰"
+                               autocomplete="off"
+                               class="custom-input w-full px-4 py-4 pr-12 rounded-xl bg-white/5 border border-white/10 text-white text-lg placeholder-gray-500 focus:outline-none transition-all">
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                            تومان
+                        </div>
+                    </div>
+                    
+                    <!-- Amount Info -->
+                    <div id="amount-info" class="mt-3 hidden">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">موجودی پس از شارژ:</span>
+                            <span id="new-balance" class="text-green-400 font-bold"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Validation Messages -->
+                    <div id="amount-error" class="mt-2 text-red-400 text-sm hidden">
+                        <i class="fas fa-exclamation-circle ml-1"></i>
+                        <span id="error-message"></span>
+                    </div>
+                    
+                    <!-- Min/Max Info -->
+                    <div class="mt-3 flex items-center gap-4 text-xs text-gray-500">
+                        <span>
+                            <i class="fas fa-info-circle ml-1"></i>
+                            حداقل: ۱۰,۰۰۰ تومان
+                        </span>
+                        <span>حداکثر: ۵۰,۰۰۰,۰۰۰ تومان</span>
+                    </div>
+                </div>
+                
+                <!-- ─────────────────────────────────────────────────────────────
+                     PAYMENT GATEWAY SELECTION
+                     ───────────────────────────────────────────────────────────── -->
+                <div class="p-6 border-b border-white/10">
+                    <label class="text-white font-bold mb-4 block">
+                        <i class="fas fa-credit-card text-purple-500 ml-2"></i>
+                        انتخاب درگاه پرداخت
+                    </label>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- ZarinPal -->
+                        <label class="gateway-card glass-card p-4 rounded-xl border border-white/10 cursor-pointer flex items-center gap-4 selected">
+                            <input type="radio" name="gateway" value="zarinpal" class="hidden" checked>
+                            <div class="w-12 h-12 rounded-lg bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                                <img src="https://cdn.zarinpal.com/badges/trustLogo
+
+
+
+                                                                <i class="fas fa-credit-card text-yellow-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-white font-bold">زرین‌پال</div>
+                                <div class="text-gray-500 text-xs">پرداخت امن با کارت بانکی</div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-pink-500 flex items-center justify-center">
+                                <div class="w-2.5 h-2.5 rounded-full bg-pink-500 gateway-check"></div>
+                            </div>
+                        </label>
+                        
+                        <!-- IDPay -->
+                        <label class="gateway-card glass-card p-4 rounded-xl border border-white/10 cursor-pointer flex items-center gap-4">
+                            <input type="radio" name="gateway" value="idpay" class="hidden">
+                            <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-shield-alt text-blue-500 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-white font-bold">آیدی‌پی</div>
+                                <div class="text-gray-500 text-xs">درگاه پرداخت مستقیم</div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-white/30 flex items-center justify-center">
+                                <div class="w-2.5 h-2.5 rounded-full bg-pink-500 gateway-check hidden"></div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <!-- Security Badge -->
+                    <div class="mt-4 flex items-center gap-2 text-xs text-gray-500">
+                        <i class="fas fa-lock text-green-500"></i>
+                        <span>پرداخت شما از طریق درگاه امن بانکی انجام می‌شود</span>
+                    </div>
+                </div>
+                
+                <!-- ─────────────────────────────────────────────────────────────
+                     SUMMARY & SUBMIT
+                     ───────────────────────────────────────────────────────────── -->
+                <div class="p-6 bg-white/5">
+                    <!-- Summary -->
+                    <div id="summary-section" class="mb-6 hidden">
+                        <div class="text-gray-400 text-sm mb-3">خلاصه تراکنش</div>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-400">مبلغ شارژ:</span>
+                                <span id="summary-amount" class="text-white font-bold">۰ تومان</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-400">کارمزد:</span>
+                                <span class="text-green-400 font-bold">رایگان</span>
+                            </div>
+                            <div class="h-px bg-white/10 my-2"></div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-white font-bold">مبلغ قابل پرداخت:</span>
+                                <span id="summary-total" class="text-pink-400 font-black text-xl">۰ تومان</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            id="submit-btn"
+                            disabled
+                            class="deposit-btn w-full py-4 rounded-xl text-white font-bold text-lg flex items-center justify-center gap-3">
+                        <span id="btn-text">انتخاب مبلغ برای ادامه</span>
+                        <span id="btn-spinner" class="spinner hidden"></span>
+                    </button>
+                    
+                    <!-- Terms -->
+                    <p class="text-center text-gray-500 text-xs mt-4">
+                        با کلیک روی دکمه پرداخت، 
+                        <a href="{% url 'core:terms' %}" class="text-pink-400 hover:underline">شرایط و قوانین</a>
+                        را می‌پذیرید.
+                    </p>
+                </div>
+            </div>
+        </form>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════
+             RECENT DEPOSITS
+             ═══════════════════════════════════════════════════════════════════ -->
+        {% if recent_deposits %}
+        <div class="mt-8">
+            <h2 class="text-white font-bold mb-4">
+                <i class="fas fa-history text-gray-500 ml-2"></i>
+                شارژهای اخیر
+            </h2>
+            
+            <div class="glass-card rounded-2xl border border-white/10 overflow-hidden">
+                <div class="divide-y divide-white/10">
+                    {% for deposit in recent_deposits %}
+                    <div class="p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center
+                                        {% if deposit.status == 'completed' %}bg-green-500/20{% elif deposit.status == 'pending' %}bg-yellow-500/20{% else %}bg-red-500/20{% endif %}">
+                                <i class="fas {% if deposit.status == 'completed' %}fa-check text-green-500{% elif deposit.status == 'pending' %}fa-clock text-yellow-500{% else %}fa-times text-red-500{% endif %}"></i>
+                            </div>
+                            <div>
+                                <div class="text-white font-bold">{{ deposit.amount|intcomma }} تومان</div>
+                                <div class="text-gray-500 text-xs">{{ deposit.created_at|date:"Y/m/d - H:i" }}</div>
+                            </div>
+                        </div>
+                        <div class="text-sm {% if deposit.status == 'completed' %}text-green-400{% elif deposit.status == 'pending' %}text-yellow-400{% else %}text-red-400{% endif %}">
+                            {% if deposit.status == 'completed' %}موفق{% elif deposit.status == 'pending' %}در انتظار{% else %}ناموفق{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- ═══════════════════════════════════════════════════════════════════
+             FAQ SECTION
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="mt-8">
+            <h2 class="text-white font-bold mb-4">
+                <i class="fas fa-question-circle text-cyan-500 ml-2"></i>
+                سوالات متداول
+            </h2>
+            
+            <div class="space-y-3">
+                <details class="glass-card rounded-xl border border-white/10 group">
+                    <summary class="p-4 cursor-pointer flex items-center justify-between text-white font-medium">
+                        <span>آیا شارژ کیف پول امن است؟</span>
+                        <i class="fas fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4 text-gray-400 text-sm">
+                        بله، تمام پرداخت‌ها از طریق درگاه‌های معتبر بانکی انجام می‌شود و اطلاعات کارت شما نزد ما ذخیره نمی‌شود.
+                    </div>
+                </details>
+                
+                <details class="glass-card rounded-xl border border-white/10 group">
+                    <summary class="p-4 cursor-pointer flex items-center justify-between text-white font-medium">
+                        <span>زمان واریز به کیف پول چقدر است؟</span>
+                        <i class="fas fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4 text-gray-400 text-sm">
+                        پس از پرداخت موفق، مبلغ به صورت آنی به کیف پول شما اضافه می‌شود.
+                    </div>
+                </details>
+                
+                <details class="glass-card rounded-xl border border-white/10 group">
+                    <summary class="p-4 cursor-pointer flex items-center justify-between text-white font-medium">
+                        <span>آیا امکان برداشت وجود دارد؟</span>
+                        <i class="fas fa-chevron-down text-gray-500 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4 text-gray-400 text-sm">
+                        در حال حاضر امکان برداشت مستقیم وجود ندارد، اما در صورت انصراف از خرید، مبلغ به کیف پول بازگردانده می‌شود.
+                    </div>
+                </details>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CONSTANTS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    const MIN_AMOUNT = 10000;
+    const MAX_AMOUNT = 50000000;
+    const CURRENT_BALANCE = {{ wallet.balance|default:0 }};
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DOM ELEMENTS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    const form = document.getElementById('deposit-form');
+    const amountBtns = document.querySelectorAll('.amount-btn');
+    const customAmountInput = document.getElementById('custom-amount');
+    const submitBtn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const summarySection = document.getElementById('summary-section');
+    const summaryAmount = document.getElementById('summary-amount');
+    const summaryTotal = document.getElementById('summary-total');
+    const amountInfo = document.getElementById('amount-info');
+    const newBalanceEl = document.getElementById('new-balance');
+    const amountError = document.getElementById('amount-error');
+    const errorMessage = document.getElementById('error-message');
+    const toggleMoreBtn = document.getElementById('toggle-more-amounts');
+    const moreAmounts = document.getElementById('more-amounts');
+    const toggleIcon = document.getElementById('toggle-icon');
+    const toggleText = document.getElementById('toggle-text');
+    const gatewayCards = document.querySelectorAll('.gateway-card');
+    
+    let selectedAmount = 0;
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // UTILITY FUNCTIONS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    
+    function parseNumber(str) {
+        return parseInt(str.replace(/[^0-9]/g, '')) || 0;
+    }
+    
+    function toPersianNumber(num) {
+        const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        return formatNumber(num).replace(/[0-9]/g, function(d) {
+            return persianDigits[parseInt(d)];
+        });
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // VALIDATION
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function validateAmount(amount) {
+        if (amount < MIN_AMOUNT) {
+            return { valid: false, message: 'حداقل مبلغ شارژ ' + toPersianNumber(MIN_AMOUNT) + ' تومان است' };
+        }
+        if (amount > MAX_AMOUNT) {
+            return { valid: false, message: 'حداکثر مبلغ شارژ ' + toPersianNumber(MAX_AMOUNT) + ' تومان است' };
+        }
+        return { valid: true };
+    }
+    
+    function showError(message) {
+        errorMessage.textContent = message;
+        amountError.classList.remove('hidden');
+        amountInfo.classList.add('hidden');
+    }
+    
+    function hideError() {
+        amountError.classList.add('hidden');
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // UPDATE UI
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    function updateUI(amount) {
+        selectedAmount = amount;
+        const validation = validateAmount(amount);
+        
+        // Reset states if no amount
+        if (amount === 0) {
+            submitBtn.disabled = true;
+            btnText.textContent = 'انتخاب مبلغ برای ادامه';
+            summarySection.classList.add('hidden');
+            amountInfo.classList.add('hidden');
+            hideError();
+            return;
+        }
+        
+        // Show error if invalid
+        if (!validation.valid) {
+            submitBtn.disabled = true;
+            btnText.textContent = 'انتخاب مبلغ برای ادامه';
+            summarySection.classList.add('hidden');
+            showError(validation.message);
+            return;
+        }
+        
+        // Valid amount - update everything
+        hideError();
+        
+        // Update summary
+        summaryAmount.textContent = toPersianNumber(amount) + ' تومان';
+        summaryTotal.textContent = toPersianNumber(amount) + ' تومان';
+        summarySection.classList.remove('hidden');
+        
+        // Update balance preview
+        const newBalance = CURRENT_BALANCE + amount;
+        newBalanceEl.textContent = toPersianNumber(newBalance) + ' تومان';
+        amountInfo.classList.remove('hidden');
+        
+        // Enable submit
+        submitBtn.disabled = false;
+        btnText.textContent = 'پرداخت ' + toPersianNumber(amount) + ' تومان';
+        
+        // Update hidden input for form submission
+        customAmountInput.value = amount;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // EVENT HANDLERS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    // Quick amount buttons click
+    amountBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const amount = parseInt(this.dataset.amount);
+            
+            // Remove previous selection from all buttons
+            amountBtns.forEach(function(el) {
+                el.classList.remove('selected');
+            });
+            
+            // Add selection to clicked button
+            this.classList.add('selected');
+            
+            // Update UI
+            updateUI(amount);
+        });
+    });
+    
+    // Custom input - format on input
+    customAmountInput.addEventListener('input', function() {
+        let value = this.value.replace(/[^0-9]/g, '');
+        let amount = parseInt(value) || 0;
+        
+        // Format display
+        if (amount > 0) {
+            this.value = formatNumber(amount);
+        } else {
+            this.value = '';
+        }
+        
+        // Remove selection from quick buttons
+        amountBtns.forEach(function(btn) {
+            btn.classList.remove('selected');
+        });
+        
+        // Update UI
+        updateUI(amount);
+    });
+    
+    // Custom input - select all on focus
+    customAmountInput.addEventListener('focus', function() {
+        this.select();
+    });
+    
+    // Toggle more amounts
+    if (toggleMoreBtn && moreAmounts) {
+        toggleMoreBtn.addEventListener('click', function() {
+            const isHidden = moreAmounts.classList.contains('hidden');
+            
+            if (isHidden) {
+                moreAmounts.classList.remove('hidden');
+                toggleIcon.classList.add('rotate-180');
+                toggleText.textContent = 'بستن';
+            } else {
+                moreAmounts.classList.add('hidden');
+                toggleIcon.classList.remove('rotate-180');
+                toggleText.textContent = 'نمایش مبالغ بیشتر';
+            }
+        });
+    }
+    
+    // Gateway selection
+    gatewayCards.forEach(function(card) {
+        card.addEventListener('click', function() {
+            // Remove selected from all
+            gatewayCards.forEach(function(c) {
+                c.classList.remove('selected');
+                const check = c.querySelector('.gateway-check');
+                if (check) check.classList.add('hidden');
+            });
+            
+            // Add selected to clicked
+            this.classList.add('selected');
+            const check = this.querySelector('.gateway-check');
+            if (check) check.classList.remove('hidden');
+            
+            // Check the radio
+            const radio = this.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        });
+    });
+    
+    // Form submission
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Validate before submit
+            if (selectedAmount < MIN_AMOUNT) {
+                e.preventDefault();
+                if (typeof showToast === 'function') {
+                    showToast('لطفاً مبلغی برای شارژ انتخاب کنید', 'error');
+                } else {
+                    alert('لطفاً مبلغی برای شارژ انتخاب کنید');
+                }
+                return false;
+            }
+            
+            // Set loading state
+            submitBtn.disabled = true;
+            btnText.textContent = 'در حال اتصال به درگاه...';
+            btnSpinner.classList.remove('hidden');
+            
+            // Allow form to submit
+            return true;
+        });
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // KEYBOARD SHORTCUTS
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    document.addEventListener('keydown', function(e) {
+        // Enter in input submits form
+        if (e.key === 'Enter' && document.activeElement === customAmountInput) {
+            if (selectedAmount >= MIN_AMOUNT && !submitBtn.disabled) {
+                form.submit();
+            }
+        }
+    });
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // INITIALIZATION
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    // Make first gateway visually selected
+    const firstGateway = document.querySelector('.gateway-card.selected');
+    if (firstGateway) {
+        const check = firstGateway.querySelector('.gateway-check');
+        if (check) check.classList.remove('hidden');
+    }
+    
+    console.log('💰 Deposit page initialized');
+    
+})();
+</script>
+{% endblock %}

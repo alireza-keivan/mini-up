@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}انتقال کیف پول | مینی‌آپ{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-8 px-4">
+    <div class="container mx-auto max-w-lg">
+
+        <a href="{% url 'wallet:dashboard' %}" 
+           class="inline-flex items-center text-gray-400 hover:text-pink-400 transition-colors mb-6">
+            <i class="fas fa-arrow-right ml-2"></i>
+            بازگشت به کیف پول
+        </a>
+
+        <h1 class="text-3xl font-black text-white mb-4">
+            <i class="fas fa-exchange-alt text-purple-500 ml-3"></i>
+            انتقال کیف پول
+        </h1>
+        <p class="text-gray-400 mb-6">
+            انتقال سریع موجودی به کاربر دیگر با شماره موبایل.
+        </p>
+
+        <div class="glass-card p-6 rounded-2xl border border-white/10">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- Receiver -->
+                <label class="block mb-3 text-gray-300 font-medium">شماره موبایل گیرنده</label>
+                <input type="text" name="receiver"
+                       class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-4 focus:border-purple-500"
+                       placeholder="مثلا 09121234567">
+
+                <!-- Amount -->
+                <label class="block mb-3 text-gray-300 font-medium">مبلغ انتقال (تومان)</label>
+                <input type="number" name="amount"
+                       class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white mb-6 focus:border-purple-500"
+                       placeholder="مثلا 150000">
+
+                <button class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold hover:opacity-90 transition">
+                    انتقال موجودی
+                </button>
+            </form>
+
+            <div class="text-gray-400 text-xs mt-5 leading-6">
+                • انتقال فقط به کاربران ثبت‌نام‌شده  
+                • قابل برگشت نیست  
+                • حداقل مبلغ: ۱۰,۰۰۰ تومان  
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
