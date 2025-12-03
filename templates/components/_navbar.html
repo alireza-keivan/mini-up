@@ -1,461 +1,764 @@
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<!-- NAVBAR COMPONENT - Mini-up.ir                                               -->
-<!-- Neon Dark Theme | RTL | Responsive                                          -->
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+{# ═══════════════════════════════════════════════════════════════════════════════
+   NAVBAR COMPONENT - Mini-up Gaming Platform
+   ═══════════════════════════════════════════════════════════════════════════════
+   
+   Structure:
+   1. Topbar (contact info strip)
+   2. Main Navbar
+      - Logo
+      - Desktop Menu (with dropdowns & mega menu)
+      - Action Buttons (search, cart, notifications, user)
+      - Mobile hamburger trigger
+   
+   Dependencies:
+   - _mobile_menu.html (triggered by hamburger)
+   - _search_modal.html (triggered by search button)
+   - _cart_sidebar.html (triggered by cart button)
+   
+   Required Context:
+   - request.user (Django auth)
+   - notifications (from context processor)
+   - cart_count (from context processor)
+   
+   ═══════════════════════════════════════════════════════════════════════════════ #}
 
-<header class="site-header" id="site-header">
-    <div class="header-container">
+{# ─────────────────────────────────────────────────────────────────────────────────
+   SECTION 1: TOP BAR
+   ───────────────────────────────────────────────────────────────────────────────── #}
+{% load humanize %}
+   <div class="topbar">
+    <div class="topbar-container">
         
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <!-- LOGO -->
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <a href="{% url 'core:home' %}" class="header-logo" aria-label="صفحه اصلی مینی‌آپ">
-            <div class="logo-icon">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" rx="10" fill="url(#logo-gradient)"/>
-                    <path d="M12 28V16L20 12L28 16V28L20 24L12 28Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                    <circle cx="20" cy="18" r="3" fill="white"/>
-                    <defs>
-                        <linearGradient id="logo-gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#00f5ff"/>
-                            <stop offset="1" stop-color="#bf00ff"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-            <span class="logo-text">
-                <span class="logo-text-primary">مینی</span>
-                <span class="logo-text-secondary">آپ</span>
+        {# Right Side - Contact Info #}
+        <div class="topbar-right">
+            <a href="tel:02112345678" class="topbar-item">
+                <i class="fas fa-phone-alt"></i>
+                <span>۰۲۱-۱۲۳۴-۵۶۷۸</span>
+            </a>
+            
+            <div class="topbar-divider"></div>
+            
+            <a href="mailto:info@mini-up.ir" class="topbar-item">
+                <i class="fas fa-envelope"></i>
+                <span>info@mini-up.ir</span>
+            </a>
+            
+            <div class="topbar-divider"></div>
+            
+            <span class="topbar-item">
+                <i class="fas fa-clock"></i>
+                <span>پشتیبانی ۲۴/۷</span>
             </span>
+        </div>
+        
+        {# Left Side - Social Links #}
+        <div class="topbar-left">
+            <div class="topbar-social">
+                <a href="#" class="topbar-social-link" title="تلگرام" aria-label="کانال تلگرام">
+                    <i class="fab fa-telegram-plane"></i>
+                </a>
+                <a href="#" class="topbar-social-link" title="اینستاگرام" aria-label="صفحه اینستاگرام">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="topbar-social-link" title="واتساپ" aria-label="واتساپ پشتیبانی">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+            
+            <div class="topbar-divider"></div>
+            
+            <a href="{% url 'core:faq' %}" class="topbar-link">سوالات متداول</a>
+            <a href="{% url 'core:contact' %}" class="topbar-link">تماس با ما</a>
+        </div>
+        
+    </div>
+</div>
+
+
+{# ─────────────────────────────────────────────────────────────────────────────────
+   SECTION 2: MAIN NAVBAR
+   ───────────────────────────────────────────────────────────────────────────────── #}
+<nav class="navbar has-topbar" id="mainNavbar" role="navigation" aria-label="ناوبری اصلی">
+    <div class="navbar-container">
+        
+        {# ═══════════════════════════════════════════════════════════════════════════
+           2.1 LOGO
+           ═══════════════════════════════════════════════════════════════════════════ #}
+        <a href="{% url 'core:home' %}" class="navbar-logo">
+            <div class="navbar-logo-icon">
+                <i class="fas fa-gamepad"></i>
+            </div>
+            <div class="navbar-logo-text">
+                <span class="navbar-logo-brand">Mini<span>-up</span></span>
+                <span class="navbar-logo-tagline">گیمینگ و خدمات مجازی</span>
+            </div>
         </a>
-
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <!-- DESKTOP NAVIGATION -->
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <nav class="header-nav" aria-label="منوی اصلی">
-            <ul class="nav-list">
+        
+        
+        {# ═══════════════════════════════════════════════════════════════════════════
+           2.2 DESKTOP MENU
+           ═══════════════════════════════════════════════════════════════════════════ #}
+        <div class="navbar-menu">
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Menu Item: خانه (No Dropdown)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <div class="navbar-menu-item">
+                <a href="{% url 'core:home' %}" 
+                   class="navbar-menu-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>خانه</span>
+                </a>
+            </div>
+            
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Menu Item: خدمات مجازی (MEGA MENU)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <div class="navbar-menu-item">
+                <a href="{% url 'core:virtual_services' %}" class="navbar-menu-link">
+                    <i class="fas fa-cloud"></i>
+                    <span>خدمات مجازی</span>
+                    <i class="fas fa-chevron-down nav-arrow"></i>
+                </a>
                 
-                <!-- خانه -->
-                <li class="nav-item">
-                    <a href="{% url 'core:home' %}" class="nav-link">
-                        <span>خانه</span>
-                    </a>
-                </li>
-
-                <!-- محصولات - Dropdown -->
-                <li class="nav-item nav-dropdown">
-                    <button class="nav-link nav-dropdown-trigger" aria-expanded="false" aria-haspopup="true">
-                        <span>محصولات</span>
-                        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
-                            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    <div class="dropdown-menu mega-menu">
-                        <div class="mega-menu-inner">
+                {# Mega Menu Dropdown #}
+                <div class="mega-menu">
+                    <div class="mega-menu-container">
+                        
+                        {# Mega Menu Header #}
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">
+                                <i class="fas fa-cloud"></i>
+                                خدمات مجازی
+                            </span>
+                            <a href="{% url 'core:virtual_services' %}" class="mega-menu-link">
+                                مشاهده همه
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
+                        </div>
+                        
+                        {# Mega Menu Body #}
+                        <div class="mega-menu-body">
                             
-                            <!-- خدمات مجازی -->
-                            <div class="mega-menu-section">
-                                <h3 class="mega-menu-title">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                                    </svg>
-                                    خدمات مجازی
-                                </h3>
-                                <ul class="mega-menu-links">
-                                    <li><a href="{% url 'products:category' slug='telegram-premium' %}">پرمیوم تلگرام</a></li>
-                                    <li><a href="{% url 'products:category' slug='spotify' %}">اسپاتیفای پرمیوم</a></li>
-                                    <li><a href="{% url 'products:category' slug='youtube-premium' %}">یوتیوب پرمیوم</a></li>
-                                    <li><a href="{% url 'products:category' slug='netflix' %}">نتفلیکس</a></li>
-                                    <li><a href="{% url 'products:category' slug='discord-nitro' %}">دیسکورد نیترو</a></li>
-                                </ul>
+                            {# Services Grid #}
+                            <div class="mega-menu-grid">
+                                
+                                {# Telegram Premium #}
+                                <a href="{% url 'core:virtual_services' %}?category=telegram" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon cyan">
+                                        <i class="fab fa-telegram-plane"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">پرمیوم تلگرام</div>
+                                        <div class="mega-menu-item-desc">اشتراک ویژه تلگرام</div>
+                                    </div>
+                                </a>
+                                
+                                {# Instagram Followers #}
+                                <a href="{% url 'core:virtual_services' %}?category=instagram" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon pink">
+                                        <i class="fab fa-instagram"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">فالوور اینستاگرام</div>
+                                        <div class="mega-menu-item-desc">فالوور واقعی و فعال</div>
+                                    </div>
+                                </a>
+                                
+                                {# Telegram Members #}
+                                <a href="{% url 'core:virtual_services' %}?category=telegram-member" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon cyan">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">ممبر تلگرام</div>
+                                        <div class="mega-menu-item-desc">افزایش اعضای کانال</div>
+                                    </div>
+                                </a>
+                                
+                                {# Apple ID #}
+                                <a href="{% url 'core:virtual_services' %}?category=apple-id" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon white">
+                                        <i class="fab fa-apple"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">اپل آیدی</div>
+                                        <div class="mega-menu-item-desc">Apple ID آمریکا</div>
+                                    </div>
+                                </a>
+                                
+                                {# Spotify #}
+                                <a href="{% url 'core:virtual_services' %}?category=spotify" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon green">
+                                        <i class="fab fa-spotify"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">اسپاتیفای</div>
+                                        <div class="mega-menu-item-desc">اکانت پرمیوم</div>
+                                    </div>
+                                </a>
+                                
+                                {# SoundCloud #}
+                                <a href="{% url 'core:virtual_services' %}?category=soundcloud" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon orange">
+                                        <i class="fab fa-soundcloud"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">ساندکلاد</div>
+                                        <div class="mega-menu-item-desc">اکانت Pro</div>
+                                    </div>
+                                </a>
+                                
+                                {# Apple Music #}
+                                <a href="{% url 'core:virtual_services' %}?category=apple-music" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon pink">
+                                        <i class="fas fa-music"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">اپل موزیک</div>
+                                        <div class="mega-menu-item-desc">اشتراک ویژه</div>
+                                    </div>
+                                </a>
+                                
+                                {# iCloud #}
+                                <a href="{% url 'core:virtual_services' %}?category=icloud" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon cyan">
+                                        <i class="fas fa-cloud"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">آیکلود</div>
+                                        <div class="mega-menu-item-desc">فضای ذخیره‌سازی</div>
+                                    </div>
+                                </a>
+                                
+                                {# WireGuard VPN #}
+                                <a href="{% url 'core:virtual_services' %}?category=wireguard" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon yellow">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">وایرگارد</div>
+                                        <div class="mega-menu-item-desc">VPN پرسرعت</div>
+                                    </div>
+                                </a>
+                                
+                                {# V2Ray #}
+                                <a href="{% url 'core:virtual_services' %}?category=v2ray" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon purple">
+                                        <i class="fas fa-network-wired"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">V2Ray</div>
+                                        <div class="mega-menu-item-desc">پروکسی امن</div>
+                                    </div>
+                                </a>
+                                
                             </div>
-
-                            <!-- محصولات گیمینگ -->
-                            <div class="mega-menu-section">
-                                <h3 class="mega-menu-title">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="2" y="6" width="20" height="12" rx="2"/>
-                                        <path d="M6 12h4M8 10v4M14 10h.01M18 10h.01M15 14h.01M17 14h.01"/>
-                                    </svg>
-                                    محصولات گیمینگ
-                                </h3>
-                                <ul class="mega-menu-links">
-                                    <li><a href="{% url 'products:category' slug='uc-pubg' %}">یوسی پابجی موبایل</a></li>
-                                    <li><a href="{% url 'products:category' slug='gem-freefire' %}">جم فری فایر</a></li>
-                                    <li><a href="{% url 'products:category' slug='vbucks-fortnite' %}">ویباکس فورتنایت</a></li>
-                                    <li><a href="{% url 'products:category' slug='cp-codm' %}">سی‌پی کالاف موبایل</a></li>
-                                    <li><a href="{% url 'products:category' slug='robux-roblox' %}">روباکس روبلاکس</a></li>
-                                </ul>
-                            </div>
-
-                            <!-- گیفت کارت -->
-                            <div class="mega-menu-section">
-                                <h3 class="mega-menu-title">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="8" width="18" height="13" rx="2"/>
-                                        <path d="M12 8V3M12 3L9 6M12 3l3 3"/>
-                                        <path d="M3 12h18"/>
-                                    </svg>
-                                    گیفت کارت
-                                </h3>
-                                <ul class="mega-menu-links">
-                                    <li><a href="{% url 'products:category' slug='google-play' %}">گوگل پلی</a></li>
-                                    <li><a href="{% url 'products:category' slug='apple-itunes' %}">اپل / آیتونز</a></li>
-                                    <li><a href="{% url 'products:category' slug='steam' %}">استیم</a></li>
-                                    <li><a href="{% url 'products:category' slug='playstation' %}">پلی‌استیشن</a></li>
-                                    <li><a href="{% url 'products:category' slug='xbox' %}">ایکس‌باکس</a></li>
-                                </ul>
-                            </div>
-
-                            <!-- بنر تبلیغاتی -->
-                            <div class="mega-menu-banner">
-                                <div class="banner-content">
-                                    <span class="banner-badge">پیشنهاد ویژه</span>
-                                    <h4>۲۰٪ تخفیف اولین خرید</h4>
-                                    <p>با کد: FIRST20</p>
-                                    <a href="{% url 'products:list' %}" class="banner-btn">مشاهده محصولات</a>
+                            
+                            {# Featured Offers #}
+                            <div class="mega-menu-featured">
+                                <div class="mega-menu-featured-title">
+                                    <i class="fas fa-fire"></i>
+                                    پیشنهاد ویژه
+                                </div>
+                                <div class="mega-menu-featured-items">
+                                    <a href="#" class="mega-menu-featured-card">
+                                        <span class="mega-menu-featured-card-badge">۳۰٪ تخفیف</span>
+                                        <div class="mega-menu-featured-card-content">
+                                            <div class="mega-menu-featured-card-title">پکیج تلگرام پرمیوم</div>
+                                            <div class="mega-menu-featured-card-desc">۳ ماهه با گارانتی</div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="mega-menu-featured-card">
+                                        <span class="mega-menu-featured-card-badge new">جدید</span>
+                                        <div class="mega-menu-featured-card-content">
+                                            <div class="mega-menu-featured-card-title">اسپاتیفای خانوادگی</div>
+                                            <div class="mega-menu-featured-card-desc">۶ نفره - ۱ ساله</div>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
-                </li>
-
-                <!-- مشاوره -->
-                <li class="nav-item">
-                    <a href="{% url 'consulting:consultant_list' %}" class="nav-link">
-                        <span>مشاوره</span>
-                    </a>
-                </li>
-
-                <!-- وبلاگ -->
-                <li class="nav-item">
-                    <a href="{% url 'content:blog_list' %}" class="nav-link">
-                        <span>وبلاگ</span>
-                    </a>
-                </li>
-
-                <!-- درباره ما -->
-                <li class="nav-item">
-                    <a href="{% url 'core:about' %}" class="nav-link">
-                        <span>درباره ما</span>
-                    </a>
-                </li>
-
-                <!-- تماس با ما -->
-                <li class="nav-item">
-                    <a href="{% url 'core:contact' %}" class="nav-link">
-                        <span>تماس با ما</span>
-                    </a>
-                </li>
-
-            </ul>
-        </nav>
-
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <!-- HEADER ACTIONS -->
-        <!-- ─────────────────────────────────────────────────────────────────── -->
-        <div class="header-actions">
+                </div>
+            </div>
             
-            <!-- Search Button -->
-            <button class="header-action-btn" id="search-btn" aria-label="جستجو">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="M21 21l-4.35-4.35"/>
-                </svg>
-            </button>
-
-            <!-- Cart Button -->
-            <button class="header-action-btn cart-btn" id="cart-btn" aria-label="سبد خرید">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                    <line x1="3" y1="6" x2="21" y2="6"/>
-                    <path d="M16 10a4 4 0 0 1-8 0"/>
-                </svg>
-                <span class="cart-badge" id="cart-badge" style="display: none;">0</span>
-            </button>
-
-            <!-- User Menu (Authenticated) -->
-            {% if user.is_authenticated %}
-            <div class="user-menu-wrapper">
-                <button class="header-action-btn user-menu-btn" id="user-menu-btn" aria-expanded="false" aria-haspopup="true">
-                    <div class="user-avatar">
-                        {% if user.avatar %}
-                            <img src="{{ user.avatar.url }}" alt="{{ user.full_name }}">
-                        {% else %}
-                            <span class="avatar-placeholder">{{ user.full_name|slice:":1"|default:"U" }}</span>
-                        {% endif %}
-                    </div>
-                </button>
-                <div class="user-dropdown" id="user-dropdown">
-                    <div class="user-dropdown-header">
-                        <span class="user-name">{{ user.full_name|default:user.phone }}</span>
-                        <span class="user-phone">{{ user.phone }}</span>
-                    </div>
-                    <div class="user-dropdown-divider"></div>
-                    <ul class="user-dropdown-menu">
-                        <li>
-                            <a href="{% url 'accounts:dashboard' %}">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="7" height="7"/>
-                                    <rect x="14" y="3" width="7" height="7"/>
-                                    <rect x="14" y="14" width="7" height="7"/>
-                                    <rect x="3" y="14" width="7" height="7"/>
-                                </svg>
-                                داشبورد
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'accounts:profile' %}">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                </svg>
-                                پروفایل
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'orders:history' %}">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                    <polyline points="14 2 14 8 20 8"/>
-                                    <line x1="16" y1="13" x2="8" y2="13"/>
-                                    <line x1="16" y1="17" x2="8" y2="17"/>
-                                    <polyline points="10 9 9 9 8 9"/>
-                                </svg>
-                                سفارش‌ها
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'wallet:dashboard' %}">
-                                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="1" y="4" width="22" height="16" rx="2"/>
-                                    <line x1="1" y1="10" x2="23" y2="10"/>
-                                </svg>
-                                کیف پول
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'consulting:my_sessions' %}">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                </svg>
-                                جلسات مشاوره
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{% url 'tickets:list' %}">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                    <polyline points="22,6 12,13 2,6"/>
-                                </svg>
-                                تیکت‌های پشتیبانی
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="user-dropdown-divider"></div>
-                    <div class="user-dropdown-footer">
-                        <a href="{% url 'accounts:logout' %}" class="logout-link">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                <polyline points="16 17 21 12 16 7"/>
-                                <line x1="21" y1="12" x2="9" y2="12"/>
-                            </svg>
-                            خروج از حساب
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Menu Item: محصولات گیمینگ (Simple Dropdown)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <div class="navbar-menu-item">
+                <a href="{% url 'core:gaming_products' %}" class="navbar-menu-link">
+                    <i class="fas fa-gamepad"></i>
+                    <span>محصولات گیمینگ</span>
+                                        <i class="fas fa-chevron-down nav-arrow"></i>
+                </a>
+                
+                {# Simple Dropdown #}
+                <div class="navbar-dropdown">
+                    <div class="navbar-dropdown-menu">
+                        <div class="navbar-dropdown-header">
+                            <i class="fas fa-gamepad"></i>
+                            دسته‌بندی محصولات
+                        </div>
+                        <a href="{% url 'core:gaming_products' %}?category_detail=fan" class="navbar-dropdown-item">
+                            <i class="fas fa-wind"></i>
+                            <span>فن گیمینگ</span>
+                        </a>
+                        <a href="{% url 'core:gaming_products' %}?category_detail=finger" class="navbar-dropdown-item">
+                            <i class="fas fa-hand-pointer"></i>
+                            <span>دستکش انگشتی</span>
+                        </a>
+                        <div class="navbar-dropdown-divider"></div>
+                        <a href="{% url 'core:gaming_products' %}" class="navbar-dropdown-item">
+                            <i class="fas fa-th-large"></i>
+                            <span>مشاهده همه محصولات</span>
                         </a>
                     </div>
                 </div>
             </div>
-            {% else %}
-            <!-- Login/Register Buttons (Guest) -->
-            <div class="auth-buttons">
-                <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm">
-                    ورود
-                </a>
-                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm btn-glow">
-                    ثبت‌نام
-                </a>
-            </div>
-            {% endif %}
-
-            <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="منوی موبایل" aria-expanded="false">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-
-        </div>
-    </div>
-</header>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<!-- MOBILE MENU OVERLAY -->
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="mobile-menu-overlay" id="mobile-menu-overlay" aria-hidden="true"></div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<!-- MOBILE MENU SIDEBAR -->
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<aside class="mobile-menu" id="mobile-menu" aria-label="منوی موبایل" aria-hidden="true">
-    
-    <!-- Mobile Menu Header -->
-    <div class="mobile-menu-header">
-        <a href="{% url 'core:home' %}" class="mobile-logo">
-            <div class="logo-icon">
-                <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
-                    <rect width="40" height="40" rx="10" fill="url(#mobile-logo-gradient)"/>
-                    <path d="M12 28V16L20 12L28 16V28L20 24L12 28Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                    <circle cx="20" cy="18" r="3" fill="white"/>
-                    <defs>
-                        <linearGradient id="mobile-logo-gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#00f5ff"/>
-                            <stop offset="1" stop-color="#bf00ff"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-            <span class="logo-text">مینی‌آپ</span>
-        </a>
-        <button class="mobile-menu-close" id="mobile-menu-close" aria-label="بستن منو">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-        </button>
-    </div>
-
-    <!-- Mobile Menu User Info (if authenticated) -->
-    {% if user.is_authenticated %}
-    <div class="mobile-user-info">
-        <div class="mobile-user-avatar">
-            {% if user.avatar %}
-                <img src="{{ user.avatar.url }}" alt="{{ user.full_name }}">
-            {% else %}
-                <span class="avatar-placeholder">{{ user.full_name|slice:":1"|default:"U" }}</span>
-            {% endif %}
-        </div>
-        <div class="mobile-user-details">
-            <span class="mobile-user-name">{{ user.full_name|default:"کاربر" }}</span>
-            <span class="mobile-user-phone">{{ user.phone }}</span>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Mobile Menu Navigation -->
-    <nav class="mobile-nav">
-        <ul class="mobile-nav-list">
             
-            <!-- خانه -->
-            <li class="mobile-nav-item">
-                <a href="{% url 'core:home' %}" class="mobile-nav-link">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                        <polyline points="9 22 9 12 15 12 15 22"/>
-                    </svg>
-                    <span>خانه</span>
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Menu Item: خرید محصولات (Simple Dropdown)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <div class="navbar-menu-item">
+                <a href="{% url 'core:buy_products' %}" class="navbar-menu-link">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>خرید محصولات</span>
+                    <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
-            </li>
-
-            <!-- محصولات - Accordion -->
-            <li class="mobile-nav-item mobile-nav-dropdown">
-                <button class="mobile-dropdown-btn" aria-expanded="false">
-                    <div class="mobile-nav-link-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                            <line x1="3" y1="6" x2="21" y2="6"/>
-                            <path d="M16 10a4 4 0 0 1-8 0"/>
-                        </svg>
-                        <span>محصولات</span>
+                
+                <div class="navbar-dropdown">
+                    <div class="navbar-dropdown-menu">
+                        <div class="navbar-dropdown-header">
+                            <i class="fas fa-mobile-alt"></i>
+                            لوازم جانبی موبایل
+                        </div>
+                        <a href="{% url 'core:buy_products' %}?category=guard" class="navbar-dropdown-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>گارد موبایل</span>
+                        </a>
+                        <a href="{% url 'core:buy_products' %}?category=glass" class="navbar-dropdown-item">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>گلس محافظ</span>
+                        </a>
+                        <div class="navbar-dropdown-divider"></div>
+                        <a href="{% url 'core:buy_products' %}" class="navbar-dropdown-item">
+                            <i class="fas fa-th-large"></i>
+                            <span>همه محصولات</span>
+                        </a>
                     </div>
-                    <svg class="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"/>
-                    </svg>
-                </button>
-                <ul class="mobile-dropdown-content">
-                    <li><a href="{% url 'products:list' %}">همه محصولات</a></li>
-                    <li><a href="{% url 'products:category' slug='telegram-premium' %}">پرمیوم تلگرام</a></li>
-                    <li><a href="{% url 'products:category' slug='spotify' %}">اسپاتیفای</a></li>
-                    <li><a href="{% url 'products:category' slug='youtube-premium' %}">یوتیوب پرمیوم</a></li>
-                    <li><a href="{% url 'products:category' slug='netflix' %}">نتفلیکس</a></li>
-                    <li><a href="{% url 'products:category' slug='discord-nitro' %}">دیسکورد نیترو</a></li>
-                    <li><a href="{% url 'products:category' slug='uc-pubg' %}">یوسی پابجی</a></li>
-                    <li><a href="{% url 'products:category' slug='gem-freefire' %}">جم فری‌فایر</a></li>
-                    <li><a href="{% url 'products:category' slug='vbucks-fortnite' %}">وی‌باکس فورتنایت</a></li>
-                    <li><a href="{% url 'products:category' slug='cp-codm' %}">سی‌پی کالاف موبایل</a></li>
-                    <li><a href="{% url 'products:category' slug='robux-roblox' %}">روباکس روبلاکس</a></li>
-                    <li><a href="{% url 'products:category' slug='google-play' %}">گیفت کارت گوگل پلی</a></li>
-                    <li><a href="{% url 'products:category' slug='apple-itunes' %}">گیفت کارت اپل</a></li>
-                    <li><a href="{% url 'products:category' slug='steam' %}">گیفت کارت استیم</a></li>
-                    <li><a href="{% url 'products:category' slug='playstation' %}">گیفت کارت پلی‌استیشن</a></li>
-                    <li><a href="{% url 'products:category' slug='xbox' %}">گیفت کارت ایکس‌باکس</a></li>
-                </ul>
-            </li>
-
-            <!-- مشاوره -->
-            <li class="mobile-nav-item">
-                <a href="{% url 'consulting:consultant_list' %}" class="mobile-nav-link">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="7" r="4"/>
-                        <path d="M5.5 21a6.5 6.5 0 0 1 13 0"/>
-                    </svg>
-                    <span>مشاوره</span>
+                </div>
+            </div>
+            
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Menu Item: مینی گیم (Simple Dropdown)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <div class="navbar-menu-item">
+                <a href="{% url 'core:mini_game' %}" class="navbar-menu-link">
+                    <i class="fas fa-dice"></i>
+                    <span>مینی گیم</span>
+                    <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
-            </li>
-
-            <!-- وبلاگ -->
-            <li class="mobile-nav-item">
-                <a href="{% url 'content:blog_list' %}" class="mobile-nav-link">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M4 19h16M4 5h16M4 12h16"/>
-                    </svg>
-                    <span>وبلاگ</span>
-                </a>
-            </li>
-
-            <!-- درباره ما -->
-            <li class="mobile-nav-item">
-                <a href="{% url 'core:about' %}" class="mobile-nav-link">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="8" r="4"/>
-                        <path d="M6 20a6 6 0 0 1 12 0"/>
-                    </svg>
+                
+                <div class="navbar-dropdown">
+                    <div class="navbar-dropdown-menu">
+                        <div class="navbar-dropdown-header">
+                            <i class="fas fa-coins"></i>
+                            خرید ارز بازی
+                        </div>
+                        <a href="{% url 'core:mini_game' %}?game=pubg" class="navbar-dropdown-item">
+                            <i class="fas fa-crosshairs"></i>
+                            <span>یوسی پابجی</span>
+                            <span class="navbar-dropdown-item-badge">پرفروش</span>
+                        </a>
+                        <a href="{% url 'core:mini_game' %}?game=freefire" class="navbar-dropdown-item">
+                            <i class="fas fa-fire"></i>
+                            <span>جم فری فایر</span>
+                        </a>
+                        <a href="{% url 'core:mini_game' %}?game=clash" class="navbar-dropdown-item">
+                            <i class="fas fa-gem"></i>
+                            <span>جم کلش</span>
+                        </a>
+                        <div class="navbar-dropdown-divider"></div>
+                        <a href="{% url 'core:mini_game' %}" class="navbar-dropdown-item">
+                            <i class="fas fa-gamepad"></i>
+                            <span>همه بازی‌ها</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Menu Item: درباره ما (No Dropdown)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <div class="navbar-menu-item">
+                <a href="{% url 'core:about' %}" 
+                   class="navbar-menu-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                    <i class="fas fa-info-circle"></i>
                     <span>درباره ما</span>
                 </a>
-            </li>
-
-            <!-- تماس با ما -->
-            <li class="mobile-nav-item">
-                <a href="{% url 'core:contact' %}" class="mobile-nav-link">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M21 15v4a2 2 0 0 1-2 2h-1a16 16 0 0 1-13-13V5a2 2 0 0 1 2-2h4"/>
-                    </svg>
-                    <span>تماس با ما</span>
+            </div>
+            
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Menu Item: مشاوره رایگان (CTA Button Style)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <div class="navbar-menu-item navbar-menu-item-cta">
+                <a href="{% url 'core:consulting' %}" class="navbar-menu-link cta">
+                    <i class="fas fa-headset"></i>
+                    <span>مشاوره رایگان</span>
                 </a>
-            </li>
-
-        </ul>
-    </nav>
-
-    <!-- Mobile Menu Bottom (Authenticated version) -->
-    {% if user.is_authenticated %}
-    <div class="mobile-menu-footer">
-        <a href="{% url 'accounts:dashboard' %}" class="mobile-footer-btn">
-            داشبورد کاربری
-        </a>
-        <a href="{% url 'accounts:logout' %}" class="mobile-footer-btn logout">
-            خروج از حساب
-        </a>
+            </div>
+            
+        </div>
+        {# End .navbar-menu #}
+        
+        
+        {# ═══════════════════════════════════════════════════════════════════════════
+           2.3 ACTION BUTTONS (Right Side)
+           ═══════════════════════════════════════════════════════════════════════════ #}
+        <div class="navbar-actions">
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Search Button (Opens Search Modal)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <button type="button" 
+                    class="navbar-action-btn" 
+                    id="searchToggle"
+                    data-modal-target="searchModal"
+                    aria-label="جستجو"
+                    title="جستجو">
+                <i class="fas fa-search"></i>
+            </button>
+            
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Cart Button (Opens Cart Sidebar)
+               ───────────────────────────────────────────────────────────────────────── #}
+            <button type="button" 
+                    class="navbar-action-btn" 
+                    id="cartToggle"
+                    data-sidebar-target="cartSidebar"
+                    aria-label="سبد خرید"
+                    title="سبد خرید">
+                <i class="fas fa-shopping-cart"></i>
+                {% if cart_count and cart_count > 0 %}
+                    <span class="navbar-action-badge">{{ cart_count }}</span>
+                {% endif %}
+            </button>
+            
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Notifications Button (Dropdown)
+               ───────────────────────────────────────────────────────────────────────── #}
+            {% if user.is_authenticated %}
+            <div class="navbar-action-dropdown">
+                <button type="button" 
+                        class="navbar-action-btn" 
+                        id="notificationToggle"
+                        aria-label="اعلان‌ها"
+                        title="اعلان‌ها"
+                        aria-expanded="false"
+                        aria-haspopup="true">
+                    <i class="fas fa-bell"></i>
+                    {% if unread_notifications_count and unread_notifications_count > 0 %}
+                        <span class="navbar-action-badge pulse">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </button>
+                
+                {# Notifications Dropdown #}
+                <div class="navbar-notification-dropdown" id="notificationDropdown">
+                    <div class="navbar-notification-header">
+                        <span class="navbar-notification-title">
+                            <i class="fas fa-bell"></i>
+                            اعلان‌ها
+                        </span>
+                        {% if unread_notifications_count and unread_notifications_count > 0 %}
+                            <button type="button" class="navbar-notification-mark-read" data-action="mark-all-read">
+                                خواندن همه
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="navbar-notification-body">
+                        {% if notifications %}
+                            {% for notification in notifications|slice:":5" %}
+                                <a href="{{ notification.url }}" 
+                                   class="navbar-notification-item {% if not notification.is_read %}unread{% endif %}"
+                                   data-notification-id="{{ notification.id }}">
+                                    <div class="navbar-notification-item-icon {{ notification.type }}">
+                                        {% if notification.type == 'order' %}
+                                            <i class="fas fa-shopping-bag"></i>
+                                        {% elif notification.type == 'wallet' %}
+                                            <i class="fas fa-wallet"></i>
+                                        {% elif notification.type == 'promo' %}
+                                            <i class="fas fa-gift"></i>
+                                        {% else %}
+                                            <i class="fas fa-info-circle"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="navbar-notification-item-content">
+                                        <div class="navbar-notification-item-title">{{ notification.title }}</div>
+                                        <div class="navbar-notification-item-desc">{{ notification.message|truncatewords:10 }}</div>
+                                        <div class="navbar-notification-item-time">
+                                            <i class="fas fa-clock"></i>
+                                            {{ notification.created_at|timesince }} پیش
+                                        </div>
+                                    </div>
+                                    {% if not notification.is_read %}
+                                        <span class="navbar-notification-item-dot"></span>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="navbar-notification-empty">
+                                <i class="fas fa-bell-slash"></i>
+                                <span>اعلان جدیدی ندارید</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if notifications %}
+                        <div class="navbar-notification-footer">
+                            <a href="{% url 'accounts:notifications' %}" class="navbar-notification-view-all">
+                                مشاهده همه اعلان‌ها
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               User Menu (Authenticated) / Auth Buttons (Guest)
+               ───────────────────────────────────────────────────────────────────────── #}
+            {% if user.is_authenticated %}
+                {# Authenticated User Menu #}
+                <div class="navbar-action-dropdown">
+                    <button type="button" 
+                            class="navbar-user-btn" 
+                            id="userMenuToggle"
+                            aria-label="منوی کاربری"
+                            aria-expanded="false"
+                            aria-haspopup="true">
+                        <div class="navbar-user-avatar">
+                            {% if user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_display_name }}">
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <span class="navbar-user-name">{{ user.get_display_name|default:user.phone }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    {# User Dropdown Menu #}
+                    <div class="navbar-user-dropdown" id="userMenuDropdown">
+                        
+                        {# User Info Header #}
+                        <div class="navbar-user-dropdown-header">
+                            <div class="navbar-user-dropdown-avatar">
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_display_name }}">
+                                {% else %}
+                                    <i class="fas fa-user"></i>
+                                {% endif %}
+                            </div>
+                            <div class="navbar-user-dropdown-info">
+                                <div class="navbar-user-dropdown-name">{{ user.get_display_name|default:"کاربر" }}</div>
+                                <div class="navbar-user-dropdown-phone">{{ user.phone }}</div>
+                            </div>
+                        </div>
+                        
+                        {# Wallet Balance #}
+                        <div class="navbar-user-dropdown-wallet">
+                            <div class="navbar-user-dropdown-wallet-label">
+                                <i class="fas fa-wallet"></i>
+                                موجودی کیف پول
+                            </div>
+                            <div class="navbar-user-dropdown-wallet-amount">
+                                {{ wallet_total_balance|intcomma }} تومان
+                            </div>
+                            <a href="{% url 'wallet:deposit' %}" class="navbar-user-dropdown-wallet-add">
+                                <i class="fas fa-plus"></i>
+                                افزایش موجودی
+                            </a>
+                        </div>
+                        
+                        {# Menu Items #}
+                        <div class="navbar-user-dropdown-menu">
+                            <a href="{% url 'accounts:dashboard' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>داشبورد</span>
+                            </a>
+                            <a href="{% url 'accounts:orders' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span>سفارش‌های من</span>
+                                {% if pending_orders_count %}
+                                    <span class="navbar-user-dropdown-item-badge">{{ pending_orders_count }}</span>
+                                {% endif %}
+                            </a>
+                            <a href="{% url 'accounts:transactions' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-exchange-alt"></i>
+                                <span>تراکنش‌ها</span>
+                            </a>
+                            <a href="{% url 'accounts:tickets' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-headset"></i>
+                                <span>تیکت‌های پشتیبانی</span>
+                                {% if open_tickets_count %}
+                                    <span class="navbar-user-dropdown-item-badge">{{ open_tickets_count }}</span>
+                                {% endif %}
+                            </a>
+                            <a href="{% url 'accounts:favorites' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-heart"></i>
+                                <span>علاقه‌مندی‌ها</span>
+                            </a>
+                            
+                            <div class="navbar-user-dropdown-divider"></div>
+                            
+                            <a href="{% url 'accounts:profile' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-user-edit"></i>
+                                <span>ویرایش پروفایل</span>
+                            </a>
+                            <a href="{% url 'accounts:settings' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>تنظیمات حساب</span>
+                            </a>
+                            
+                            {% if user.is_staff %}
+                                <div class="navbar-user-dropdown-divider"></div>
+                                <a href="{% url 'admin:index' %}" class="navbar-user-dropdown-item admin">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>پنل مدیریت</span>
+                                </a>
+                            {% endif %}
+                            
+                            <div class="navbar-user-dropdown-divider"></div>
+                            
+                            <button type="button" 
+                                    class="navbar-user-dropdown-item logout"
+                                    data-action="logout"
+                                    data-logout-url="{% url 'accounts:logout' %}">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>خروج از حساب</span>
+                            </button>
+                        </div>
+                        {# End .navbar-user-dropdown-menu #}
+                        
+                    </div>
+                    {# End .navbar-user-dropdown #}
+                </div>
+                {# End .navbar-action-dropdown (User) #}
+                
+            {% else %}
+                {# ─────────────────────────────────────────────────────────────────────
+                   Guest User: Auth Buttons
+                   ───────────────────────────────────────────────────────────────────── #}
+                <div class="navbar-auth-buttons">
+                    <button type="button" 
+                            class="navbar-auth-btn login"
+                            data-modal-target="authModal"
+                            data-auth-tab="login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>ورود</span>
+                    </button>
+                    <button type="button" 
+                            class="navbar-auth-btn register"
+                            data-modal-target="authModal"
+                            data-auth-tab="register">
+                        <i class="fas fa-user-plus"></i>
+                        <span>ثبت نام</span>
+                    </button>
+                </div>
+            {% endif %}
+            
+            
+            {# ─────────────────────────────────────────────────────────────────────────
+               Mobile Menu Toggle Button
+               ───────────────────────────────────────────────────────────────────────── #}
+            <button type="button" 
+                    class="navbar-mobile-toggle"
+                    id="mobileMenuToggle"
+                    aria-label="منوی موبایل"
+                    aria-expanded="false"
+                    aria-controls="mobileMenu">
+                <span class="navbar-mobile-toggle-bar"></span>
+                <span class="navbar-mobile-toggle-bar"></span>
+                <span class="navbar-mobile-toggle-bar"></span>
+            </button>
+            
+        </div>
+        {# End .navbar-actions #}
+        
     </div>
-    {% else %}
-    <!-- Mobile Menu Bottom (Guest version) -->
-    <div class="mobile-menu-footer">
-        <a href="{% url 'accounts:login' %}" class="mobile-footer-btn">
-            ورود
-        </a>
-        <a href="{% url 'accounts:register' %}" class="mobile-footer-btn primary">
-            ثبت‌نام
-        </a>
-    </div>
-    {% endif %}
-</aside>
+    {# End .navbar-container #}
+    
+</nav>
+{# ═══════════════════════════════════════════════════════════════════════════════════
+   END MAIN NAVBAR
+   ═══════════════════════════════════════════════════════════════════════════════════ #}
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   ███████████████████████████████████████████████████████████████████████████████████████
+   █                                                                                     █
+   █   SECTION 3: INCLUDED COMPONENTS                                                   █
+   █   ─────────────────────────────────────────────────────────────────────────────    █
+   █   These are separate template files that are included for modularity               █
+   █                                                                                     █
+   ███████████████████████████████████████████████████████████████████████████████████████
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+
+{# ─────────────────────────────────────────────────────────────────────────────────────────
+   3.1 MOBILE MENU
+   Full-screen mobile navigation menu with accordion submenus
+   ───────────────────────────────────────────────────────────────────────────────────────── #}
+{% include 'components/_mobile_menu.html' %}
+
+
+{# ─────────────────────────────────────────────────────────────────────────────────────────
+   3.2 SEARCH MODAL
+   Full-screen search overlay with live search functionality
+   ───────────────────────────────────────────────────────────────────────────────────────── #}
+{% include 'components/_search_modal.html' %}
+
+
+{# ─────────────────────────────────────────────────────────────────────────────────────────
+   3.3 CART SIDEBAR
+   Slide-in cart sidebar showing cart items and checkout options
+   ───────────────────────────────────────────────────────────────────────────────────────── #}
+{% include 'components/_cart_sidebar.html' %}
+
+
+{# ─────────────────────────────────────────────────────────────────────────────────────────
+   3.4 AUTH MODAL (For Guest Users)
+   Login/Register modal with OTP verification
+   ───────────────────────────────────────────────────────────────────────────────────────── #}
+{% if not user.is_authenticated %}
+    {% include 'components/_auth_modal.html' %}
+{% endif %}
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   ███████████████████████████████████████████████████████████████████████████████████████
+   █                                                                                     █
+   █   SECTION 4: NAVBAR SPACER                                                         █
+   █   ─────────────────────────────────────────────────────────────────────────────    █
+   █   Adds spacing below fixed navbar to prevent content overlap                       █
+   █                                                                                     █
+   ███████████████████████████████████████████████████████████████████████████████████████
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}
+<div class="navbar-spacer"></div>
+
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════
+   END _navbar.html
+   ═══════════════════════════════════════════════════════════════════════════════════════ #}

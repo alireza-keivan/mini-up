@@ -263,3 +263,4 @@ class ConsultingService:
             consultant_id=consultant_id,
             is_approved=True
         ).select_related('user').order_by('-created_at')[:limit]
+        

@@ -1,0 +1,106 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FOOTER — Site Footer Styles
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Footer Main Container
+       ───────────────────────────────────────────────────────────────────────── */
+    .footer-main {
+        @apply relative;
+        background: var(--dark-950);
+        border-top: 1px solid rgba(255, 0, 85, 0.15);
+    }
+
+    .footer-main::before {
+        content: '';
+        @apply absolute inset-x-0 top-0 h-px;
+        background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Footer Logo
+       ───────────────────────────────────────────────────────────────────────── */
+    .footer-logo {
+        @apply w-12 h-12 rounded-xl overflow-hidden;
+        @apply ring-2 ring-pink-500/20;
+        @apply transition-all duration-300;
+    }
+
+    .footer-logo:hover {
+        @apply ring-pink-500/40;
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+    }
+
+    .footer-brand {
+        @apply text-xl font-bold;
+        background: linear-gradient(135deg, #fff, var(--neon-pink));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Footer Links
+       ───────────────────────────────────────────────────────────────────────── */
+    .footer-title {
+        @apply text-white font-semibold mb-4;
+    }
+
+    .footer-links {
+        @apply space-y-2;
+    }
+
+    .footer-link {
+        @apply block text-gray-400 hover:text-pink-400;
+        @apply transition-colors duration-200;
+    }
+
+    .footer-link:hover {
+        @apply translate-x-1;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Footer Social Links
+       ───────────────────────────────────────────────────────────────────────── */
+    .footer-social {
+        @apply flex items-center justify-center w-10 h-10 rounded-full;
+        @apply text-gray-400 hover:text-white;
+        @apply bg-white/5 hover:bg-pink-500/20;
+        @apply transition-all duration-200;
+    }
+
+    .footer-social:hover {
+        @apply transform scale-110;
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Footer Bottom
+       ───────────────────────────────────────────────────────────────────────── */
+    .footer-bottom {
+        @apply mt-8 pt-6;
+        @apply flex flex-col md:flex-row items-center justify-between gap-4;
+        @apply text-sm text-gray-500;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-bottom a {
+        @apply text-gray-400 hover:text-pink-400 transition-colors;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Trust Badges
+       ───────────────────────────────────────────────────────────────────────── */
+    .trust-badge {
+        @apply h-12 w-auto opacity-70 hover:opacity-100;
+        @apply transition-opacity duration-200;
+        filter: grayscale(50%);
+    }
+
+    .trust-badge:hover {
+        filter: grayscale(0%);
+    }
+
+} /* End of @layer components */

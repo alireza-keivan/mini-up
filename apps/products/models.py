@@ -398,6 +398,17 @@ class DigitalInventory(models.Model):
         SOLD = 'sold', 'فروخته شده'
         EXPIRED = 'expired', 'منقضی'
     
+    class CredentialType(models.TextChoices):
+        ACCOUNT = 'account', 'اکانت (یوزرنیم/پسورد)'
+        CODE = 'code', 'کد فعال‌سازی'
+        LICENSE = 'license', 'لایسنس'
+        GIFT_CARD = 'gift_card', 'گیفت کارت'
+        SUBSCRIPTION = 'subscription', 'اشتراک'
+        LINK = 'link', 'لینک دانلود'
+        CUSTOM = 'custom', 'سفارشی'
+    # ═══════════════════════════════════════════════════════════════
+    
+    
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
@@ -755,3 +766,97 @@ class RecentlyViewed(models.Model):
             cls.objects.filter(id__in=old_ids).delete()
 
         return obj
+
+class ProductTag(models.Model):
+    """برچسب محصولات برای دسته‌بندی و فیلتر"""
+    
+    name = models.CharField(
+        max_length=50,
+        unique=True,
+        verbose_name='نام برچسب'
+    )
+    slug = models.SlugField(
+        max_length=50,
+        unique=True,
+        allow_unicode=True,
+        verbose_name='اسلاگ'
+    )
+    color = models.CharField(
+        max_length=7,
+        default='#6366f1',
+        verbose_name='رنگ',
+        help_text='کد رنگ HEX مانند #6366f1'
+    )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name='آیکون',
+        help_text='نام آیکون از Heroicons یا FontAwesome'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='فعال'
+    )
+    priority = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='اولویت نمایش'
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
+    
+    class Meta:
+        verbose_name = 'برچسب'
+        verbose_name_plural = 'برچسب‌ها'
+        ordering = ['-priority', 'name']
+    
+    def __str__(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('products:tag_detail', kwargs={'slug': self.slug})
+
+
+class WishlistItem(models.Model):
+    """
+    آیتم‌های لیست علاقه‌مندی
+    این مدل برای سازگاری با WishlistItemSerializer اضافه شده
+    """
+    
+    wishlist = models.ForeignKey(
+        'Wishlist',
+        on_delete=models.CASCADE,
+        related_name='items',
+        verbose_name='لیست علاقه‌مندی'
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='wishlist_items',
+        verbose_name='محصول'
+    )
+    variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='wishlist_items',
+        verbose_name='نوع محصول'
+    )
+    
+    note = models.CharField(
+        max_length=500,
+        blank=True,
+        verbose_name='یادداشت'
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ افزودن')
+    
+    class Meta:
+        verbose_name = 'آیتم علاقه‌مندی'
+        verbose_name_plural = 'آیتم‌های علاقه‌مندی'
+        unique_together = ['wishlist', 'product', 'variant']
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f'{self.wishlist.user} - {self.product.name}'

@@ -16,7 +16,7 @@ urlpatterns = [
     
     # Product detail page
     path('product/<slug:slug>/', views.ProductDetailView.as_view(), name='detail'),
-    path('product/<int:pk>/', views.ProductDetailByIdView.as_view(), name='detail_by_id'),
+    path('product/<int:pk>/', views.ProductDetailView.as_view(), name='detail_by_id'),
     
     # ═══════════════════════════════════════════════════════════════════════════
     # CATEGORY PAGES
@@ -27,7 +27,7 @@ urlpatterns = [
     
     # Category detail (products in category)
     path('category/<slug:slug>/', views.CategoryDetailView.as_view(), name='category_detail'),
-    path('category/<int:pk>/', views.CategoryDetailByIdView.as_view(), name='category_detail_by_id'),
+    path('category/<int:pk>/', views.CategoryDetailView.as_view(), name='category_detail_by_id'),
     
     # ═══════════════════════════════════════════════════════════════════════════
     # BRAND PAGES
@@ -55,5 +55,5 @@ urlpatterns = [
     # COMPARE
     # ═══════════════════════════════════════════════════════════════════════════
     
-    path('compare/', views.ProductCompareView.as_view(), name='compare'),
+    path('compare/', views.CompareView.as_view(), name='compare'),
 ]

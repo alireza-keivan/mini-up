@@ -517,3 +517,277 @@ class ProductCompareSerializer(serializers.ModelSerializer):
     
     def get_review_count(self, obj):
         return obj.reviews.filter(is_approved=True).count()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MISSING SERIALIZERS (اضافه شده)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class CategoryDetailSerializer(serializers.ModelSerializer):
+    """Category detail with full information."""
+    
+    parent = CategoryMinimalSerializer(read_only=True)
+    children = CategoryMinimalSerializer(many=True, read_only=True, source='children.filter(is_active=True)')
+    products_count = serializers.SerializerMethodField()
+    breadcrumbs = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Category
+        fields = [
+            'id', 'name', 'name_en', 'slug', 'parent', 'children',
+            'category_type', 'description', 'image', 'icon',
+            'is_active', 'is_featured', 'sort_order',
+            'products_count', 'breadcrumbs',
+            'meta_title', 'meta_description'
+        ]
+    
+    def get_children(self, obj):
+        children = obj.children.filter(is_active=True).order_by('sort_order')
+        return CategoryMinimalSerializer(children, many=True).data
+    
+    def get_products_count(self, obj):
+        return obj.products.filter(is_active=True).count()
+    
+    def get_breadcrumbs(self, obj):
+        """Get category breadcrumbs from root to current."""
+        breadcrumbs = []
+        current = obj
+        while current:
+            breadcrumbs.insert(0, {
+                'id': current.id,
+                'name': current.name,
+                'slug': current.slug
+            })
+            current = current.parent
+        return breadcrumbs
+
+
+class BrandDetailSerializer(serializers.ModelSerializer):
+    """Brand detail with full information."""
+    
+    products_count = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Brand
+        fields = [
+            'id', 'name', 'name_en', 'slug', 'logo',
+            'description', 'website', 'is_active',
+            'products_count', 'categories',
+            'meta_title', 'meta_description'
+        ]
+    
+    def get_products_count(self, obj):
+        return obj.products.filter(is_active=True).count()
+    
+    def get_categories(self, obj):
+        """Get unique categories that have products from this brand."""
+        category_ids = obj.products.filter(is_active=True).values_list('category_id', flat=True).distinct()
+        categories = Category.objects.filter(id__in=category_ids, is_active=True)
+        return CategoryMinimalSerializer(categories, many=True).data
+
+
+class ProductCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating/updating products (Admin)."""
+    
+    class Meta:
+        model = Product
+        fields = [
+            'name', 'name_en', 'slug', 'category', 'brand',
+            'product_type', 'delivery_type',
+            'short_description', 'description', 'specifications',
+            'price', 'original_price', 'stock', 'low_stock_threshold',
+            'weight', 'dimensions', 'main_image',
+            'meta_title', 'meta_description',
+            'is_active', 'is_featured', 'is_new', 'is_bestseller'
+        ]
+    
+    def validate_price(self, value):
+        if value <= 0:
+            raise serializers.ValidationError('قیمت باید بزرگتر از صفر باشد')
+        return value
+    
+    def validate(self, data):
+        # اگر original_price داده شده، باید از price بیشتر باشد
+        if data.get('original_price') and data.get('price'):
+            if data['original_price'] <= data['price']:
+                raise serializers.ValidationError({
+                    'original_price': 'قیمت اصلی باید از قیمت فروش بیشتر باشد'
+                })
+        return data
+
+
+class ProductAdminSerializer(serializers.ModelSerializer):
+    """Full product serializer for admin panel."""
+    
+    category = CategoryMinimalSerializer(read_only=True)
+    brand = BrandMinimalSerializer(read_only=True)
+    category_id = serializers.IntegerField(write_only=True)
+    brand_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
+    images = ProductImageSerializer(many=True, read_only=True)
+    variants_count = serializers.SerializerMethodField()
+    digital_inventory_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Product
+        fields = '__all__'
+    
+    def get_variants_count(self, obj):
+        return obj.variants.count()
+    
+    def get_digital_inventory_count(self, obj):
+        if obj.is_digital:
+            return DigitalInventory.objects.filter(
+                product=obj,
+                status=DigitalInventory.Status.AVAILABLE
+            ).count()
+        return None
+
+
+class DigitalInventoryAdminSerializer(serializers.ModelSerializer):
+    """Digital inventory admin serializer with sensitive data."""
+    
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    variant_name = serializers.CharField(source='variant.name', read_only=True, allow_null=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    credential_type_display = serializers.CharField(source='get_credential_type_display', read_only=True)
+    sold_to_phone = serializers.CharField(source='sold_to.phone', read_only=True, allow_null=True)
+    
+    class Meta:
+        model = DigitalInventory
+        fields = [
+            'id', 'product', 'product_name', 'variant', 'variant_name',
+            'credential_type', 'credential_type_display',
+            'credential_data', 'status', 'status_display',
+            'sold_to', 'sold_to_phone', 'sold_at',
+            'order_item', 'admin_note',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['sold_to', 'sold_at', 'order_item']
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MISSING SERIALIZERS (Required by api_views.py)
+# Add these at the END of serializers.py
+# ═══════════════════════════════════════════════════════════════════════════════
+
+from apps.products.models import (
+    Category, Brand, Product, ProductVariant, ProductImage,
+    ProductReview, Wishlist, WishlistItem
+)
+
+# -------------------------------
+# CATEGORY SERIALIZERS
+# -------------------------------
+
+class CategoryDetailSerializer(serializers.ModelSerializer):
+    parent = serializers.SerializerMethodField()
+    children = serializers.SerializerMethodField()
+    products_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = [
+            'id', 'name', 'name_en', 'slug',
+            'parent', 'children',
+            'description', 'image', 'icon',
+            'is_active', 'is_featured',
+            'sort_order', 'products_count'
+        ]
+
+    def get_parent(self, obj):
+        if obj.parent:
+            return {
+                'id': obj.parent.id,
+                'name': obj.parent.name,
+                'slug': obj.parent.slug
+            }
+        return None
+
+    def get_children(self, obj):
+        return [
+            {
+                'id': c.id,
+                'name': c.name,
+                'slug': c.slug
+            }
+            for c in obj.children.filter(is_active=True).order_by('sort_order')
+        ]
+
+    def get_products_count(self, obj):
+        return obj.products.filter(is_active=True).count()
+
+
+# -------------------------------
+# BRAND SERIALIZERS
+# -------------------------------
+
+class BrandDetailSerializer(serializers.ModelSerializer):
+    products_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Brand
+        fields = [
+            'id', 'name', 'name_en', 'slug',
+            'logo', 'description', 'website',
+            'is_active', 'products_count'
+        ]
+
+    def get_products_count(self, obj):
+        return obj.products.filter(is_active=True).count()
+
+
+# -------------------------------
+# PRODUCT CARD SERIALIZER (for lists)
+# -------------------------------
+
+class ProductCardSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(source='category.name', read_only=True)
+    brand = serializers.CharField(source='brand.name', read_only=True)
+    price_after_discount = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = [
+            'id', 'name', 'name_en', 'slug',
+            'category', 'brand',
+            'price', 'original_price',
+            'price_after_discount',
+            'is_active', 'is_featured', 'is_new',
+            'image'
+        ]
+
+    def get_image(self, obj):
+        main = obj.images.filter(is_main=True).first()
+        if main:
+            return main.image.url
+        img = obj.images.first()
+        return img.image.url if img else None
+
+    def get_price_after_discount(self, obj):
+        if obj.original_price and obj.original_price > obj.price:
+            return obj.price
+        return obj.price
+
+
+# -------------------------------
+# WISHLIST SERIALIZERS
+# -------------------------------
+
+class WishlistSerializer(serializers.ModelSerializer):
+    items_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Wishlist
+        fields = ['id', 'items_count']
+
+    def get_items_count(self, obj):
+        return obj.items.count()
+
+
+class WishlistItemSerializer(serializers.ModelSerializer):
+    product = ProductCardSerializer(read_only=True)
+
+    class Meta:
+        model = WishlistItem
+        fields = ['id', 'product', 'created_at']

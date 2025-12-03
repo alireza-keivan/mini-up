@@ -29,7 +29,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 
 from .models import PaymentGateway, Transaction
-from .services import PaymentService, ZarinpalService, IDPayService
+from .services import PaymentService, ZarinPalService, IDPayService
 from .serializers import (
     # Gateway serializers
     PaymentGatewaySerializer,
@@ -766,3 +766,194 @@ class RefundRequestAPIView(APIView):
                 'status': refund.status
             }
         }, status=status.HTTP_201_CREATED)
+
+
+# ===================================================================================
+# TRANSACTION DETAIL & STATUS APIs
+# ===================================================================================
+
+class TransactionDetailAPIView(APIView):
+    """
+    جزئیات کامل یک تراکنش
+    
+    GET /api/v1/payments/transactions/<transaction_id>/
+    
+    Response:
+        {
+            "success": true,
+            "data": {
+                "transaction_id": "uuid",
+                "amount": 150000,
+                "status": "completed",
+                "gateway": {...},
+                "order": {...},
+                "created_at": "...",
+                "paid_at": "..."
+            }
+        }
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, transaction_id):
+        try:
+            transaction = Transaction.objects.select_related(
+                'gateway', 'order', 'user'
+            ).get(
+                transaction_id=transaction_id,
+                user=request.user
+            )
+        except Transaction.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'تراکنش یافت نشد'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = TransactionSerializer(
+            transaction,
+            context={'request': request}
+        )
+        
+        return Response({
+            'success': True,
+            'data': serializer.data
+        })
+
+
+class TransactionStatusAPIView(APIView):
+    """
+    وضعیت فعلی تراکنش (برای polling)
+    
+    GET /api/v1/payments/transactions/<transaction_id>/status/
+    
+    Response:
+        {
+            "success": true,
+            "data": {
+                "transaction_id": "uuid",
+                "status": "pending",
+                "status_display": "در انتظار پرداخت",
+                "is_final": false,
+                "can_retry": true
+            }
+        }
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, transaction_id):
+        try:
+            transaction = Transaction.objects.get(
+                transaction_id=transaction_id,
+                user=request.user
+            )
+        except Transaction.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'تراکنش یافت نشد'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # تعیین وضعیت نهایی بودن
+        final_statuses = ['completed', 'failed', 'cancelled', 'refunded']
+        is_final = transaction.status in final_statuses
+        
+        # تعیین قابلیت تلاش مجدد
+        can_retry = transaction.status in ['failed', 'cancelled']
+        
+        # نمایش فارسی وضعیت
+        status_display_map = {
+            'pending': 'در انتظار پرداخت',
+            'processing': 'در حال پردازش',
+            'completed': 'موفق',
+            'failed': 'ناموفق',
+            'cancelled': 'لغو شده',
+            'refunded': 'بازگشت داده شده',
+            'expired': 'منقضی شده',
+        }
+        
+        return Response({
+            'success': True,
+            'data': {
+                'transaction_id': str(transaction.transaction_id),
+                'status': transaction.status,
+                'status_display': status_display_map.get(
+                    transaction.status, 
+                    transaction.status
+                ),
+                'is_final': is_final,
+                'can_retry': can_retry,
+                'amount': transaction.amount,
+                'paid_at': transaction.paid_at.isoformat() if transaction.paid_at else None,
+                'updated_at': transaction.updated_at.isoformat() if hasattr(transaction, 'updated_at') else None,
+            }
+        })
+
+
+# ===================================================================================
+# REFUND STATUS API
+# ===================================================================================
+
+class RefundStatusAPIView(APIView):
+    """
+    وضعیت درخواست بازگشت وجه
+    
+    GET /api/v1/payments/refund/<refund_id>/status/
+    
+    Response:
+        {
+            "success": true,
+            "data": {
+                "refund_id": "uuid",
+                "status": "pending",
+                "status_display": "در انتظار بررسی",
+                "amount": 50000,
+                "reason": "...",
+                "admin_note": "...",
+                "created_at": "...",
+                "processed_at": null
+            }
+        }
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, refund_id):
+        from .models import RefundRequest
+        
+        try:
+            refund = RefundRequest.objects.select_related(
+                'transaction', 'user'
+            ).get(
+                id=refund_id,
+                user=request.user
+            )
+        except RefundRequest.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'درخواست بازگشت وجه یافت نشد'
+            }, status=status.HTTP_404_NOT_FOUND)
+        
+        # نمایش فارسی وضعیت
+        status_display_map = {
+            'pending': 'در انتظار بررسی',
+            'approved': 'تأیید شده',
+            'processing': 'در حال پردازش',
+            'completed': 'انجام شده',
+            'rejected': 'رد شده',
+            'cancelled': 'لغو شده',
+        }
+        
+        return Response({
+            'success': True,
+            'data': {
+                'refund_id': str(refund.id),
+                'status': refund.status,
+                'status_display': status_display_map.get(
+                    refund.status,
+                    refund.status
+                ),
+                'amount': refund.amount,
+                'reason': getattr(refund, 'reason', ''),
+                'admin_note': getattr(refund, 'admin_note', ''),
+                'transaction_id': str(refund.transaction.transaction_id) if refund.transaction else None,
+                'created_at': refund.created_at.isoformat() if hasattr(refund, 'created_at') else None,
+                'processed_at': refund.processed_at.isoformat() if hasattr(refund, 'processed_at') and refund.processed_at else None,
+            }
+        })

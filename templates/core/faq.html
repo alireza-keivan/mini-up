@@ -1,1 +1,27 @@
-1
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-16">
+    <h1 class="text-3xl font-bold text-center mb-8">سوالات متداول</h1>
+    
+    <div class="max-w-3xl mx-auto space-y-4">
+        <!-- سوال ۱ -->
+        <div class="bg-dark-card rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-white mb-2">چگونه سفارش دهم؟</h3>
+            <p class="text-gray-400">برای سفارش کافیست محصول مورد نظر را انتخاب کرده و به سبد خرید اضافه کنید.</p>
+        </div>
+        
+        <!-- سوال ۲ -->
+        <div class="bg-dark-card rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-white mb-2">زمان تحویل چقدر است؟</h3>
+            <p class="text-gray-400">اکثر خدمات دیجیتال به صورت آنی تحویل داده می‌شوند.</p>
+        </div>
+        
+        <!-- سوال ۳ -->
+        <div class="bg-dark-card rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-white mb-2">آیا گارانتی دارید؟</h3>
+            <p class="text-gray-400">بله، تمامی خدمات ما دارای گارانتی هستند.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

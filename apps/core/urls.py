@@ -14,6 +14,8 @@ urlpatterns = [
     path('mini-game/', views.mini_game, name='mini_game'),
     path('consulting/', views.consulting, name='consulting'),
     path('about/', views.about, name='about'),
+    path('faq/', views.faq, name='faq'), 
+    path('accounts/', views.accounts, name='accounts'),
     
     # ===== صفحات احراز هویت =====
     path('login/', views.login_view, name='login'),
@@ -23,4 +25,5 @@ urlpatterns = [
     path('terms/', views.terms, name='terms'),
     path('term-conditions/', views.terms, name='term_conditions'),  # alias
     path('privacy/', views.privacy, name='privacy'),
+    path('contact/', views.contact, name='contact'),
 ]

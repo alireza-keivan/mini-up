@@ -10,8 +10,8 @@ from django.db.models import Q, Prefetch
 from decimal import Decimal
 
 from .models import (
-    Category, Brand, Product, ProductVariant, ProductImage,
-    ProductReview, Wishlist, PhysicalInventory, DigitalInventory
+    Category, Brand, Product, #ProductVariant, ProductImage,
+    ProductReview, #Wishlist, #DigitalInventory
 )
 from .serializers import (
     CategorySerializer, CategoryTreeSerializer, CategoryDetailSerializer,

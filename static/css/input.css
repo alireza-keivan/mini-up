@@ -9,9 +9,7 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    TAILWIND DIRECTIVES
    ───────────────────────────────────────────────────────────────────────────── */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
    BASE LAYER IMPORTS
@@ -29,21 +27,30 @@
 @import './components/_buttons.css';
 @import './components/_cards.css';
 @import './components/_forms.css';
-@import './components/_modal.css';
-@import './components/_toast.css';
+@import './components/_modals.css';
+/* @import './components/_toast.css'; */
+
 @import './components/_footer.css';
+@import './components/_modals.css';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    PAGE-SPECIFIC IMPORTS
    ───────────────────────────────────────────────────────────────────────────── */
 @import './pages/_auth.css';
 @import './pages/_home.css';
-@import './pages/_dashboard.css';
-@import './pages/_wallet.css';
+/* @import './pages/_dashboard.css'; */
+@import './pages/_products.css';
+@import './pages/_accounts.css';  
 
 /* ─────────────────────────────────────────────────────────────────────────────
    UTILITIES IMPORTS
    ───────────────────────────────────────────────────────────────────────────── */
-@import './utilities/_animations.css';
+/*@import './utilities/_animations.css';
 @import './utilities/_effects.css';
 @import './utilities/_helpers.css';
+*/
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

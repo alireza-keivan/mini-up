@@ -1,1 +1,1532 @@
-1
+{# ═══════════════════════════════════════════════════════════════════════════════════════════
+   COMPONENT: Authentication Modal (_auth_modal.html)
+   ═══════════════════════════════════════════════════════════════════════════════════════════
+   
+   PURPOSE:
+   - Handles user login and registration via OTP
+   - Multi-step flow: Input → OTP Verification → Success
+   - Supports both mobile number and email
+   
+   DEPENDENCIES:
+   - CSS: static/css/components/_auth_modal.css
+   - JS: Handled via inline script or main.js AuthModal class
+   
+   USAGE:
+   {% include 'components/_auth_modal.html' %}
+   
+   JAVASCRIPT API:
+   - window.AuthModal.open('login')   // Open login tab
+   - window.AuthModal.open('register') // Open register tab
+   - window.AuthModal.close()          // Close modal
+   
+   ═══════════════════════════════════════════════════════════════════════════════════════════ #}
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════════
+   SECTION 1: MODAL OVERLAY & CONTAINER
+   ═══════════════════════════════════════════════════════════════════════════════════════════ #}
+
+<div class="auth-modal-overlay" id="authModalOverlay" aria-hidden="true">
+    <div class="auth-modal-container" 
+         id="authModalContainer"
+         role="dialog" 
+         aria-modal="true" 
+         aria-labelledby="authModalTitle">
+        
+        {# ═══════════════════════════════════════════════════════════════════════════════════
+           SECTION 2: MODAL HEADER
+           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
+        <div class="auth-modal-header">
+            
+            {# Logo #}
+            <a href="{% url 'core:home' %}" class="auth-modal-logo">
+                <img src="{% static 'images/logo.svg' %}" 
+                     alt="Mini-up" 
+                     class="auth-modal-logo-img">
+                <span class="auth-modal-logo-text">Mini-up</span>
+            </a>
+            
+            {# Close Button #}
+            <button type="button" 
+                    class="auth-modal-close" 
+                    id="authModalClose"
+                    aria-label="بستن">
+                <i class="fas fa-times"></i>
+            </button>
+            
+        </div>
+        
+        {# ═══════════════════════════════════════════════════════════════════════════════════
+           SECTION 3: MODAL TITLE & DESCRIPTION
+           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
+        <div class="auth-modal-title-section">
+            <h2 class="auth-modal-title" id="authModalTitle">
+                به مینی‌آپ خوش آمدید
+            </h2>
+            <p class="auth-modal-subtitle">
+                برای دسترسی به خدمات و محصولات وارد شوید
+            </p>
+        </div>
+        
+        {# ═══════════════════════════════════════════════════════════════════════════════════
+           SECTION 4: TAB SWITCHER (Login / Register)
+           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
+        <div class="auth-modal-tabs" role="tablist">
+            
+            <button type="button" 
+                    class="auth-modal-tab is-active" 
+                    id="loginTab"
+                    role="tab"
+                    aria-selected="true"
+                    aria-controls="loginPanel"
+                    data-tab="login">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>ورود</span>
+            </button>
+            
+            <button type="button" 
+                    class="auth-modal-tab" 
+                    id="registerTab"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="registerPanel"
+                    data-tab="register">
+                <i class="fas fa-user-plus"></i>
+                <span>ثبت نام</span>
+            </button>
+            
+            {# Tab Indicator (sliding underline) #}
+            <div class="auth-modal-tab-indicator" id="tabIndicator"></div>
+            
+        </div>
+        
+        {# ═══════════════════════════════════════════════════════════════════════════════════
+           SECTION 5: LOGIN PANEL
+           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
+        <div class="auth-modal-panel is-active" 
+             id="loginPanel" 
+             role="tabpanel" 
+             aria-labelledby="loginTab">
+            
+            {# ───────────────────────────────────────────────────────────────────────────────
+               STEP 1: Input (Phone/Email)
+               ─────────────────────────────────────────────────────────────────────────────── #}
+            
+            <div class="auth-step is-active" id="loginStep1" data-step="1">
+                
+                <form class="auth-form" id="loginForm" novalidate>
+                    
+                    {# Input Field #}
+                    <div class="auth-input-group">
+                        <label class="auth-input-label" for="loginIdentifier">
+                            شماره موبایل یا ایمیل
+                        </label>
+                        <div class="auth-input-wrapper">
+                            <span class="auth-input-icon">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" 
+                                   class="auth-input" 
+                                   id="loginIdentifier"
+                                   name="identifier"
+                                   placeholder="۰۹۱۲۳۴۵۶۷۸۹ یا example@email.com"
+                                   autocomplete="username"
+                                   inputmode="text"
+                                   dir="ltr"
+                                   required>
+                            <span class="auth-input-status" id="loginInputStatus"></span>
+                        </div>
+                        <span class="auth-input-hint">
+                            شماره موبایل با ۰۹ شروع شود یا ایمیل معتبر وارد کنید
+                        </span>
+                        <span class="auth-input-error" id="loginIdentifierError"></span>
+                    </div>
+                    
+                    {# Submit Button #}
+                    <button type="submit" 
+                            class="auth-submit-btn" 
+                            id="loginSubmitBtn"
+                            disabled>
+                        <span class="auth-submit-text">دریافت کد تأیید</span>
+                        <span class="auth-submit-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>در حال ارسال...</span>
+                        </span>
+                        <i class="fas fa-arrow-left auth-submit-icon"></i>
+                    </button>
+                    
+                </form>
+                
+            </div>
+            
+            {# ───────────────────────────────────────────────────────────────────────────────
+               STEP 2: OTP Verification
+               ─────────────────────────────────────────────────────────────────────────────── #}
+            
+            <div class="auth-step" id="loginStep2" data-step="2">
+                
+                {# Back Button #}
+                <button type="button" 
+                        class="auth-back-btn" 
+                        id="loginBackBtn"
+                        aria-label="بازگشت">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>بازگشت</span>
+                </button>
+                
+                {# OTP Info #}
+                <div class="auth-otp-info">
+                    <div class="auth-otp-icon">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <p class="auth-otp-text">
+                        کد تأیید ارسال شد به:
+                    </p>
+                    <p class="auth-otp-destination" id="loginOtpDestination">
+                        {# Filled by JavaScript #}
+                    </p>
+                    <button type="button" 
+                            class="auth-change-destination" 
+                            id="loginChangeDestination">
+                        <i class="fas fa-edit"></i>
+                        <span>تغییر</span>
+                    </button>
+                </div>
+                
+                {# OTP Input #}
+                <form class="auth-otp-form" id="loginOtpForm" novalidate>
+                    
+                    <label class="auth-otp-label">کد ۶ رقمی را وارد کنید</label>
+                    
+                    <div class="auth-otp-inputs" id="loginOtpInputs" dir="ltr">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               autocomplete="one-time-code"
+                               data-index="0"
+                               aria-label="رقم اول">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="1"
+                               aria-label="رقم دوم">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="2"
+                               aria-label="رقم سوم">
+                        <span class="auth-otp-separator">-</span>
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="3"
+                               aria-label="رقم چهارم">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="4"
+                               aria-label="رقم پنجم">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="5"
+                               aria-label="رقم ششم">
+                    </div>
+                    
+                    <span class="auth-otp-error" id="loginOtpError"></span>
+                    
+                    {# Timer #}
+                    <div class="auth-otp-timer" id="loginOtpTimer">
+                        <span class="auth-timer-label">مدت زمان باقی‌مانده:</span>
+                        <div class="auth-timer-display">
+                            <span class="auth-timer-minutes" id="loginTimerMinutes">02</span>
+                            <span class="auth-timer-separator">:</span>
+                            <span class="auth-timer-seconds" id="loginTimerSeconds">00</span>
+                        </div>
+                    </div>
+                    
+                    {# Timer Expired #}
+                    <div class="auth-otp-expired" id="loginOtpExpired" hidden>
+                        <i class="fas fa-clock"></i>
+                        <span>کد تأیید منقضی شده است</span>
+                    </div>
+                    
+                    {# Resend Button #}
+                    <button type="button" 
+                            class="auth-resend-btn" 
+                            id="loginResendBtn"
+                            disabled>
+                        <i class="fas fa-redo"></i>
+                        <span>ارسال مجدد کد</span>
+                    </button>
+                    
+                    {# Submit OTP #}
+                    <button type="submit" 
+                            class="auth-submit-btn" 
+                            id="loginOtpSubmitBtn"
+                            disabled>
+                        <span class="auth-submit-text">تأیید و ورود</span>
+                        <span class="auth-submit-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>در حال بررسی...</span>
+                        </span>
+                        <i class="fas fa-check auth-submit-icon"></i>
+                    </button>
+                    
+                </form>
+                
+            </div>
+            
+            {# ───────────────────────────────────────────────────────────────────────────────
+               STEP 3: Success
+               ─────────────────────────────────────────────────────────────────────────────── #}
+            
+            <div class="auth-step" id="loginStep3" data-step="3">
+                
+                <div class="auth-success">
+                    <div class="auth-success-icon">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="auth-success-ripple"></div>
+                    </div>
+                    <h3 class="auth-success-title">ورود موفقیت‌آمیز</h3>
+                    <p class="auth-success-text">در حال انتقال به داشبورد...</p>
+                    <div class="auth-success-loader">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        {# ═══════════════════════════════════════════════════════════════════════════════════
+           SECTION 6: REGISTER PANEL
+           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
+        <div class="auth-modal-panel" 
+             id="registerPanel" 
+             role="tabpanel" 
+             aria-labelledby="registerTab"
+             hidden>
+            
+            {# ───────────────────────────────────────────────────────────────────────────────
+               STEP 1: Input (Phone/Email)
+               ─────────────────────────────────────────────────────────────────────────────── #}
+            
+            <div class="auth-step is-active" id="registerStep1" data-step="1">
+                
+                <form class="auth-form" id="registerForm" novalidate>
+                    
+                    {# Input Field #}
+                    <div class="auth-input-group">
+                        <label class="auth-input-label" for="registerIdentifier">
+                            شماره موبایل یا ایمیل
+                        </label>
+                        <div class="auth-input-wrapper">
+                            <span class="auth-input-icon">
+                                                                <i class="fas fa-user-plus"></i>
+                            </span>
+                            <input type="text" 
+                                   class="auth-input" 
+                                   id="registerIdentifier"
+                                   name="identifier"
+                                   placeholder="۰۹۱۲۳۴۵۶۷۸۹ یا example@email.com"
+                                   autocomplete="username"
+                                   inputmode="text"
+                                   dir="ltr"
+                                   required>
+                            <span class="auth-input-status" id="registerInputStatus"></span>
+                        </div>
+                        <span class="auth-input-hint">
+                            با شماره موبایل یا ایمیل ثبت نام کنید
+                        </span>
+                        <span class="auth-input-error" id="registerIdentifierError"></span>
+                    </div>
+                    
+                    {# Terms Agreement #}
+                    <div class="auth-terms">
+                        <label class="auth-checkbox-wrapper">
+                            <input type="checkbox" 
+                                   class="auth-checkbox" 
+                                   id="registerTerms"
+                                   name="terms"
+                                   required>
+                            <span class="auth-checkbox-custom">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span class="auth-checkbox-label">
+                                <a href="{% url 'core:terms' %}" target="_blank">قوانین و مقررات</a>
+                                را مطالعه کرده و می‌پذیرم
+                            </span>
+                        </label>
+                    </div>
+                    
+                    {# Submit Button #}
+                    <button type="submit" 
+                            class="auth-submit-btn" 
+                            id="registerSubmitBtn"
+                            disabled>
+                        <span class="auth-submit-text">ثبت نام</span>
+                        <span class="auth-submit-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>در حال ارسال...</span>
+                        </span>
+                        <i class="fas fa-arrow-left auth-submit-icon"></i>
+                    </button>
+                    
+                </form>
+                
+            </div>
+            
+            {# ───────────────────────────────────────────────────────────────────────────────
+               STEP 2: OTP Verification
+               ─────────────────────────────────────────────────────────────────────────────── #}
+            
+            <div class="auth-step" id="registerStep2" data-step="2">
+                
+                {# Back Button #}
+                <button type="button" 
+                        class="auth-back-btn" 
+                        id="registerBackBtn"
+                        aria-label="بازگشت">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>بازگشت</span>
+                </button>
+                
+                {# OTP Info #}
+                <div class="auth-otp-info">
+                    <div class="auth-otp-icon">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <p class="auth-otp-text">
+                        کد تأیید ارسال شد به:
+                    </p>
+                    <p class="auth-otp-destination" id="registerOtpDestination">
+                        {# Filled by JavaScript #}
+                    </p>
+                    <button type="button" 
+                            class="auth-change-destination" 
+                            id="registerChangeDestination">
+                        <i class="fas fa-edit"></i>
+                        <span>تغییر</span>
+                    </button>
+                </div>
+                
+                {# OTP Input Form #}
+                <form class="auth-otp-form" id="registerOtpForm" novalidate>
+                    
+                    <label class="auth-otp-label">کد ۶ رقمی را وارد کنید</label>
+                    
+                    <div class="auth-otp-inputs" id="registerOtpInputs" dir="ltr">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               autocomplete="one-time-code"
+                               data-index="0"
+                               aria-label="رقم اول">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="1"
+                               aria-label="رقم دوم">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="2"
+                               aria-label="رقم سوم">
+                        <span class="auth-otp-separator">-</span>
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="3"
+                               aria-label="رقم چهارم">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="4"
+                               aria-label="رقم پنجم">
+                        <input type="text" 
+                               class="auth-otp-input" 
+                               maxlength="1" 
+                               inputmode="numeric" 
+                               pattern="[0-9]"
+                               data-index="5"
+                               aria-label="رقم ششم">
+                    </div>
+                    
+                    <span class="auth-otp-error" id="registerOtpError"></span>
+                    
+                    {# Timer #}
+                    <div class="auth-otp-timer" id="registerOtpTimer">
+                        <span class="auth-timer-label">زمان باقی‌مانده برای وارد کردن کد:</span>
+                        <div class="auth-timer-display">
+                            <span class="auth-timer-minutes" id="registerTimerMinutes">02</span>
+                            <span class="auth-timer-separator">:</span>
+                            <span class="auth-timer-seconds" id="registerTimerSeconds">00</span>
+                        </div>
+                    </div>
+                    
+                    {# Timer Expired #}
+                    <div class="auth-otp-expired" id="registerOtpExpired" hidden>
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>کد منقضی شده است</span>
+                    </div>
+                    
+                    {# Resend Button #}
+                    <button type="button" 
+                            class="auth-resend-btn" 
+                            id="registerResendBtn"
+                            disabled>
+                        <i class="fas fa-redo"></i>
+                        <span>ارسال مجدد کد</span>
+                    </button>
+                    
+                    {# Submit OTP #}
+                    <button type="submit" 
+                            class="auth-submit-btn" 
+                            id="registerOtpSubmitBtn"
+                            disabled>
+                        <span class="auth-submit-text">تأیید و ادامه</span>
+                        <span class="auth-submit-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>در حال بررسی...</span>
+                        </span>
+                        <i class="fas fa-check auth-submit-icon"></i>
+                    </button>
+                    
+                </form>
+                
+            </div>
+            
+            {# ───────────────────────────────────────────────────────────────────────────────
+               STEP 3: Success
+               ─────────────────────────────────────────────────────────────────────────────── #}
+            
+            <div class="auth-step" id="registerStep3" data-step="3">
+                
+                <div class="auth-success">
+                    <div class="auth-success-icon">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="auth-success-ripple"></div>
+                    </div>
+                    <h3 class="auth-success-title">ثبت‌نام با موفقیت انجام شد</h3>
+                    <p class="auth-success-text">در حال انتقال به داشبورد...</p>
+                    <div class="auth-success-loader">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        {# ═══════════════════════════════════════════════════════════════════════════════════
+           SECTION 7: SOCIAL LOGIN OPTIONS (Optional)
+           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
+        <div class="auth-social-section" id="authSocialSection">
+            
+            <div class="auth-divider">
+                <span>یا</span>
+            </div>
+            
+            <div class="auth-social-buttons">
+                
+                <button type="button" 
+                        class="auth-social-btn auth-social-google"
+                        id="googleLoginBtn">
+                    <svg class="auth-social-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span>ورود با گوگل</span>
+                </button>
+                
+            </div>
+            
+        </div>
+        
+        {# ═══════════════════════════════════════════════════════════════════════════════════
+           SECTION 8: MODAL FOOTER
+           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
+        <div class="auth-modal-footer">
+            <a href="{% url 'core:terms' %}" class="auth-footer-link">
+                قوانین و مقررات
+            </a>
+            <span class="auth-footer-separator">|</span>
+            <a href="{% url 'core:privacy' %}" class="auth-footer-link">
+                حریم خصوصی
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+{# ═══════════════════════════════════════════════════════════════════════════════════════════
+   SECTION 9: INLINE INITIALIZATION SCRIPT
+   ═══════════════════════════════════════════════════════════════════════════════════════════ #}
+
+<script>
+(function() {
+    'use strict';
+    
+    // ═══════════════════════════════════════════════════════════════════════════════════════
+    // AUTH MODAL CLASS
+    // ═══════════════════════════════════════════════════════════════════════════════════════
+    
+    class AuthModal {
+        constructor() {
+            // Elements
+            this.overlay = document.getElementById('authModalOverlay');
+            this.container = document.getElementById('authModalContainer');
+            this.closeBtn = document.getElementById('authModalClose');
+            
+            // Tabs
+            this.loginTab = document.getElementById('loginTab');
+            this.registerTab = document.getElementById('registerTab');
+            this.tabIndicator = document.getElementById('tabIndicator');
+            
+            // Panels
+            this.loginPanel = document.getElementById('loginPanel');
+            this.registerPanel = document.getElementById('registerPanel');
+            
+            // Social Section
+            this.socialSection = document.getElementById('authSocialSection');
+            
+            // State
+            this.currentTab = 'login';
+            this.isOpen = false;
+            this.timerInterval = null;
+            
+            // API Endpoints
+            this.endpoints = {
+                sendOtp: '/api/auth/send-otp/',
+                verifyOtp: '/api/auth/verify-otp/',
+                googleAuth: '/api/auth/google/'
+            };
+            
+            // Initialize
+            this.init();
+        }
+        
+        init() {
+            this.bindEvents();
+            this.initTabIndicator();
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // EVENT BINDING
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        bindEvents() {
+            // Close modal
+            if (this.closeBtn) {
+                this.closeBtn.addEventListener('click', () => this.close());
+            }
+            
+            if (this.overlay) {
+                this.overlay.addEventListener('click', (e) => {
+                    if (e.target === this.overlay) {
+                        this.close();
+                    }
+                });
+            }
+            
+            // Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.isOpen) {
+                    this.close();
+                }
+            });
+            
+            // Tab switching
+            if (this.loginTab) {
+                this.loginTab.addEventListener('click', () => this.switchTab('login'));
+            }
+            if (this.registerTab) {
+                this.registerTab.addEventListener('click', () => this.switchTab('register'));
+            }
+            
+            // Login form
+            this.bindLoginEvents();
+            
+            // Register form
+            this.bindRegisterEvents();
+            
+            // Social login
+                        // Social login
+            this.bindSocialEvents();
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // LOGIN EVENTS
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        bindLoginEvents() {
+            const loginForm = document.getElementById('loginForm');
+            const loginIdentifier = document.getElementById('loginIdentifier');
+            const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+            const loginBackBtn = document.getElementById('loginBackBtn');
+            const loginChangeDestination = document.getElementById('loginChangeDestination');
+            const loginOtpForm = document.getElementById('loginOtpForm');
+            const loginResendBtn = document.getElementById('loginResendBtn');
+            
+            // Input validation on keyup
+            if (loginIdentifier) {
+                loginIdentifier.addEventListener('input', () => {
+                    const isValid = this.validateIdentifier(loginIdentifier.value);
+                    if (loginSubmitBtn) {
+                        loginSubmitBtn.disabled = !isValid;
+                    }
+                    this.updateInputStatus('loginInputStatus', isValid, loginIdentifier.value);
+                });
+                
+                // Enter key to submit
+                loginIdentifier.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (loginSubmitBtn && !loginSubmitBtn.disabled) {
+                            loginSubmitBtn.click();
+                        }
+                    }
+                });
+            }
+            
+            // Submit login form (send OTP)
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.handleLoginSubmit();
+                });
+            }
+            
+            // Back button
+            if (loginBackBtn) {
+                loginBackBtn.addEventListener('click', () => {
+                    this.goToStep('login', 1);
+                    this.clearTimer();
+                });
+            }
+            
+            // Change destination
+            if (loginChangeDestination) {
+                loginChangeDestination.addEventListener('click', () => {
+                    this.goToStep('login', 1);
+                    this.clearTimer();
+                });
+            }
+            
+            // OTP inputs
+            this.bindOtpInputs('loginOtpInputs', 'loginOtpSubmitBtn');
+            
+            // OTP form submit
+            if (loginOtpForm) {
+                loginOtpForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.handleLoginOtpVerify();
+                });
+            }
+            
+            // Resend OTP
+            if (loginResendBtn) {
+                loginResendBtn.addEventListener('click', async () => {
+                    await this.handleResendOtp('login');
+                });
+            }
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // REGISTER EVENTS
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        bindRegisterEvents() {
+            const registerForm = document.getElementById('registerForm');
+            const registerIdentifier = document.getElementById('registerIdentifier');
+            const registerTerms = document.getElementById('registerTerms');
+            const registerSubmitBtn = document.getElementById('registerSubmitBtn');
+            const registerBackBtn = document.getElementById('registerBackBtn');
+            const registerChangeDestination = document.getElementById('registerChangeDestination');
+            const registerOtpForm = document.getElementById('registerOtpForm');
+            const registerResendBtn = document.getElementById('registerResendBtn');
+            
+            // Combined validation for identifier and terms
+            const validateRegisterForm = () => {
+                const isIdentifierValid = this.validateIdentifier(registerIdentifier?.value || '');
+                const isTermsChecked = registerTerms?.checked || false;
+                
+                if (registerSubmitBtn) {
+                    registerSubmitBtn.disabled = !(isIdentifierValid && isTermsChecked);
+                }
+                
+                this.updateInputStatus('registerInputStatus', isIdentifierValid, registerIdentifier?.value || '');
+            };
+            
+            // Input validation
+            if (registerIdentifier) {
+                registerIdentifier.addEventListener('input', validateRegisterForm);
+                
+                registerIdentifier.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (registerSubmitBtn && !registerSubmitBtn.disabled) {
+                            registerSubmitBtn.click();
+                        }
+                    }
+                });
+            }
+            
+            // Terms checkbox
+            if (registerTerms) {
+                registerTerms.addEventListener('change', validateRegisterForm);
+            }
+            
+            // Submit register form
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.handleRegisterSubmit();
+                });
+            }
+            
+            // Back button
+            if (registerBackBtn) {
+                registerBackBtn.addEventListener('click', () => {
+                    this.goToStep('register', 1);
+                    this.clearTimer();
+                });
+            }
+            
+            // Change destination
+            if (registerChangeDestination) {
+                registerChangeDestination.addEventListener('click', () => {
+                    this.goToStep('register', 1);
+                    this.clearTimer();
+                });
+            }
+            
+            // OTP inputs
+            this.bindOtpInputs('registerOtpInputs', 'registerOtpSubmitBtn');
+            
+            // OTP form submit
+            if (registerOtpForm) {
+                registerOtpForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.handleRegisterOtpVerify();
+                });
+            }
+            
+            // Resend OTP
+            if (registerResendBtn) {
+                registerResendBtn.addEventListener('click', async () => {
+                    await this.handleResendOtp('register');
+                });
+            }
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // SOCIAL LOGIN EVENTS
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        bindSocialEvents() {
+            const googleLoginBtn = document.getElementById('googleLoginBtn');
+            
+            if (googleLoginBtn) {
+                googleLoginBtn.addEventListener('click', () => {
+                    this.handleGoogleLogin();
+                });
+            }
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // OTP INPUT BINDING
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        bindOtpInputs(containerId, submitBtnId) {
+            const container = document.getElementById(containerId);
+            const submitBtn = document.getElementById(submitBtnId);
+            
+            if (!container) return;
+            
+            const inputs = container.querySelectorAll('.auth-otp-input');
+            
+            inputs.forEach((input, index) => {
+                // Input handler
+                input.addEventListener('input', (e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, '');
+                    e.target.value = value;
+                    
+                    if (value.length === 1) {
+                        e.target.classList.add('filled');
+                        // Move to next input
+                        if (index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    } else {
+                        e.target.classList.remove('filled');
+                    }
+                    
+                    // Check if all inputs are filled
+                    const otp = this.getOtpValue(containerId);
+                    if (submitBtn) {
+                        submitBtn.disabled = otp.length !== 6;
+                    }
+                });
+                
+                // Keydown handler
+                input.addEventListener('keydown', (e) => {
+                    // Backspace
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        inputs[index - 1].focus();
+                        inputs[index - 1].value = '';
+                        inputs[index - 1].classList.remove('filled');
+                    }
+                    
+                    // Arrow keys (RTL aware)
+                    if (e.key === 'ArrowLeft' && index < inputs.length - 1) {
+                        e.preventDefault();
+                        inputs[index + 1].focus();
+                    }
+                    if (e.key === 'ArrowRight' && index > 0) {
+                        e.preventDefault();
+                        inputs[index - 1].focus();
+                    }
+                });
+                
+                // Paste handler
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pasteData = (e.clipboardData || window.clipboardData)
+                        .getData('text')
+                        .replace(/[^0-9]/g, '')
+                        .slice(0, 6);
+                    
+                    pasteData.split('').forEach((char, i) => {
+                        if (inputs[i]) {
+                            inputs[i].value = char;
+                            inputs[i].classList.add('filled');
+                        }
+                    });
+                    
+                    // Focus appropriate input
+                    const focusIndex = Math.min(pasteData.length, inputs.length - 1);
+                    inputs[focusIndex].focus();
+                    
+                    // Enable submit if complete
+                    if (submitBtn) {
+                        submitBtn.disabled = pasteData.length !== 6;
+                    }
+                });
+                
+                // Focus handler
+                input.addEventListener('focus', () => {
+                    input.select();
+                });
+            });
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // VALIDATION HELPERS
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        validateIdentifier(value) {
+            if (!value) return false;
+            
+            const trimmed = value.trim();
+            
+            // Iranian mobile number: 09XXXXXXXXX (11 digits)
+            const phoneRegex = /^09[0-9]{9}$/;
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            return phoneRegex.test(trimmed) || emailRegex.test(trimmed);
+        }
+        
+        getIdentifierType(value) {
+            const trimmed = value.trim();
+            const phoneRegex = /^09[0-9]{9}$/;
+            
+            return phoneRegex.test(trimmed) ? 'phone' : 'email';
+        }
+        
+        formatIdentifier(value) {
+            const trimmed = value.trim();
+            const type = this.getIdentifierType(trimmed);
+            
+            if (type === 'phone') {
+                // Format: 0912 xxx xxxx
+                return trimmed.replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3');
+            }
+            
+            return trimmed;
+        }
+        
+        updateInputStatus(statusId, isValid, value) {
+            const statusEl = document.getElementById(statusId);
+            if (!statusEl) return;
+            
+            if (!value) {
+                statusEl.className = 'auth-input-status';
+                statusEl.innerHTML = '';
+                return;
+            }
+            
+            if (isValid) {
+                statusEl.className = 'auth-input-status valid';
+                statusEl.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else {
+                statusEl.className = 'auth-input-status invalid';
+                statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+            }
+        }
+        
+        getOtpValue(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return '';
+            
+            const inputs = container.querySelectorAll('.auth-otp-input');
+            return Array.from(inputs).map(input => input.value).join('');
+        }
+        
+        clearOtpInputs(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const inputs = container.querySelectorAll('.auth-otp-input');
+            inputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('filled', 'error');
+            });
+            
+            // Focus first input
+            if (inputs.length > 0) {
+                inputs[0].focus();
+            }
+        }
+
+        startTimer(panel, duration = 120) {
+            this.clearTimer();
+            
+            const prefix = panel === 'login' ? 'login' : 'register';
+            const minutesEl = document.getElementById(`${prefix}TimerMinutes`);
+            const secondsEl = document.getElementById(`${prefix}TimerSeconds`);
+            const timerEl = document.getElementById(`${prefix}OtpTimer`);
+            const expiredEl = document.getElementById(`${prefix}OtpExpired`);
+            const resendBtn = document.getElementById(`${prefix}ResendBtn`);
+            
+            let timeLeft = duration;
+            
+            // Initial display
+            this.updateTimerDisplay(timeLeft, minutesEl, secondsEl);
+            
+            // Show timer, hide expired
+            if (timerEl) timerEl.hidden = false;
+            if (expiredEl) expiredEl.hidden = true;
+            if (resendBtn) resendBtn.disabled = true;
+            
+            this.timerInterval = setInterval(() => {
+                timeLeft--;
+                this.updateTimerDisplay(timeLeft, minutesEl, secondsEl);
+                
+                if (timeLeft <= 0) {
+                    this.clearTimer();
+                    
+                    // Hide timer, show expired
+                    if (timerEl) timerEl.hidden = true;
+                    if (expiredEl) expiredEl.hidden = false;
+                    if (resendBtn) resendBtn.disabled = false;
+                }
+            }, 1000);
+        }
+        
+        updateTimerDisplay(timeLeft, minutesEl, secondsEl) {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            if (minutesEl) minutesEl.textContent = String(minutes).padStart(2, '0');
+            if (secondsEl) secondsEl.textContent = String(seconds).padStart(2, '0');
+        }
+        
+        clearTimer() {
+            if (this.timerInterval) {
+                clearInterval(this.timerInterval);
+                this.timerInterval = null;
+            }
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // MODAL OPEN / CLOSE
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        open(tab = 'login') {
+            if (!this.overlay) return;
+            
+            this.isOpen = true;
+            this.overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Switch to specified tab
+            this.switchTab(tab);
+            
+            // Focus first input
+            setTimeout(() => {
+                const firstInput = tab === 'login' 
+                    ? document.getElementById('loginIdentifier')
+                    : document.getElementById('registerIdentifier');
+                if (firstInput) firstInput.focus();
+            }, 300);
+            
+            // Dispatch event
+            document.dispatchEvent(new CustomEvent('authModalOpened', { detail: { tab } }));
+        }
+        
+        close() {
+            if (!this.overlay) return;
+            
+            this.isOpen = false;
+            this.overlay.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Clear timer
+            this.clearTimer();
+            
+            // Reset forms after animation
+            setTimeout(() => {
+                this.resetForms();
+            }, 300);
+            
+            // Dispatch event
+            document.dispatchEvent(new CustomEvent('authModalClosed'));
+        }
+        
+        resetForms() {
+            // Reset login form
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) loginForm.reset();
+            
+            const loginOtpForm = document.getElementById('loginOtpForm');
+            if (loginOtpForm) loginOtpForm.reset();
+            
+            // Reset register form
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) registerForm.reset();
+            
+            const registerOtpForm = document.getElementById('registerOtpForm');
+            if (registerOtpForm) registerOtpForm.reset();
+            
+            // Clear OTP inputs
+            this.clearOtpInputs('loginOtpInputs');
+            this.clearOtpInputs('registerOtpInputs');
+            
+            // Clear input statuses
+            this.updateInputStatus('loginInputStatus', false, '');
+            this.updateInputStatus('registerInputStatus', false, '');
+            
+            // Clear errors
+            const errorEls = document.querySelectorAll('.auth-input-error, .auth-otp-error');
+            errorEls.forEach(el => el.textContent = '');
+            
+            // Reset to step 1
+            this.goToStep('login', 1);
+            this.goToStep('register', 1);
+            
+            // Reset submit buttons
+            const submitBtns = document.querySelectorAll('.auth-submit-btn');
+            submitBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('loading');
+            });
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // API HANDLERS - LOGIN
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        async handleLoginSubmit() {
+            const identifier = document.getElementById('loginIdentifier');
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            const errorEl = document.getElementById('loginIdentifierError');
+            const destinationEl = document.getElementById('loginOtpDestination');
+            
+            if (!identifier || !submitBtn) return;
+            
+            const value = identifier.value.trim();
+            
+            // Validate
+            if (!this.validateIdentifier(value)) {
+                if (errorEl) errorEl.textContent = 'لطفاً شماره موبایل یا ایمیل معتبر وارد کنید';
+                return;
+            }
+            
+            // Clear error
+            if (errorEl) errorEl.textContent = '';
+            
+            // Set loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await this.sendOtp(value, 'login');
+                
+                if (response.success) {
+                    // Update destination display
+                    if (destinationEl) {
+                        destinationEl.textContent = this.formatIdentifier(value);
+                    }
+                    
+                    // Store identifier for verification
+                    this.currentIdentifier = value;
+                    this.currentIdentifierType = this.getIdentifierType(value);
+                    
+                    // Go to OTP step
+                    this.goToStep('login', 2);
+                    
+                    // Start timer
+                    this.startTimer('login', response.expires_in || 120);
+                    
+                    // Focus first OTP input
+                    setTimeout(() => {
+                        const firstOtpInput = document.querySelector('#loginOtpInputs .auth-otp-input');
+                        if (firstOtpInput) firstOtpInput.focus();
+                    }, 300);
+                    
+                    // Show success toast
+                    if (window.showToast) {
+                        window.showToast('کد تأیید ارسال شد', 'success');
+                    }
+                } else {
+                    if (errorEl) errorEl.textContent = response.message || 'خطا در ارسال کد تأیید';
+                }
+            } catch (error) {
+                console.error('Login submit error:', error);
+                if (errorEl) errorEl.textContent = 'خطا در برقراری ارتباط با سرور';
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        }
+        
+        async handleLoginOtpVerify() {
+            const submitBtn = document.getElementById('loginOtpSubmitBtn');
+            const errorEl = document.getElementById('loginOtpError');
+            
+            if (!submitBtn) return;
+            
+            const otp = this.getOtpValue('loginOtpInputs');
+            
+            // Validate OTP length
+            if (otp.length !== 6) {
+                if (errorEl) errorEl.textContent = 'لطفاً کد ۶ رقمی را کامل وارد کنید';
+                return;
+            }
+            
+            // Clear error
+            if (errorEl) errorEl.textContent = '';
+            
+            // Set loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await this.verifyOtp(this.currentIdentifier, otp, 'login');
+                
+                if (response.success) {
+                    // Clear timer
+                    this.clearTimer();
+                    
+                    // Go to success step
+                    this.goToStep('login', 3);
+                    
+                    // Show success toast
+                    if (window.showToast) {
+                        window.showToast('ورود موفقیت‌آمیز!', 'success');
+                    }
+                    
+                    // Redirect after delay
+                    setTimeout(() => {
+                        const redirectUrl = response.redirect_url || '/dashboard/';
+                        window.location.href = redirectUrl;
+                    }, 2000);
+                } else {
+                    if (errorEl) errorEl.textContent = response.message || 'کد وارد شده صحیح نیست';
+                    
+                    // Shake OTP inputs
+                    const otpContainer = document.getElementById('loginOtpInputs');
+                    if (otpContainer) {
+                        otpContainer.classList.add('shake');
+                        setTimeout(() => otpContainer.classList.remove('shake'), 500);
+                    }
+                }
+            } catch (error) {
+                console.error('Login OTP verify error:', error);
+                if (errorEl) errorEl.textContent = 'خطا در برقراری ارتباط با سرور';
+            } finally {
+                submitBtn.classList.remove('loading');
+                // Keep disabled if OTP was wrong - user can edit and re-enable
+                const otp = this.getOtpValue('loginOtpInputs');
+                submitBtn.disabled = otp.length !== 6;
+            }
+        }
+        
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // API HANDLERS - REGISTER
+        // ───────────────────────────────────────────────────────────────────────────────────
+        
+        async handleRegisterSubmit() {
+            const identifier = document.getElementById('registerIdentifier');
+            const terms = document.getElementById('registerTerms');
+            const submitBtn = document.getElementById('registerSubmitBtn');
+            const errorEl = document.getElementById('registerIdentifierError');
+            const destinationEl = document.getElementById('registerOtpDestination');
+            
+            if (!identifier || !submitBtn) return;
+            
+            const value = identifier.value.trim();
+            
+            // Validate
+            if (!this.validateIdentifier(value)) {
+                if (errorEl) errorEl.textContent = 'لطفاً شماره موبایل یا ایمیل معتبر وارد کنید';
+                return;
+            }
+            
+            // Check terms
+            if (terms && !terms.checked) {
+                if (errorEl) errorEl.textContent = 'لطفاً قوانین و مقررات را بپذیرید';
+                return;
+            }
+            
+            // Clear error
+            if (errorEl) errorEl.textContent = '';
+            
+            // Set loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await this.sendOtp(value, 'register');
+                
+                if (response.success) {
+                    // Update destination display
+                    if (destinationEl) {
+                        destinationEl.textContent = this.formatIdentifier(value);
+                    }
+                    
+                    // Store identifier for verification
+                    this.currentIdentifier = value;
+                    this.currentIdentifierType = this.getIdentifierType(value);
+                    
+                    // Go to OTP step
+                    this.goToStep('register', 2);
+                    
+                    // Start timer
+                    this.startTimer('register', response.expires_in || 120);
+                    
+                    // Focus first OTP input
+                    setTimeout(() => {
+                        const firstOtpInput = document.querySelector('#registerOtpInputs .auth-otp-input');
+                        if (firstOtpInput) firstOtpInput.focus();
+                    }, 300);
+                    
+                    // Show success toast
+                    if (window.showToast) {
+                        window.showToast('کد تأیید ارسال شد', 'success');
+                    }
+                } else {
+                    if (errorEl) errorEl.textContent = response.message || 'خطا در ارسال کد تأیید';
+                }
+            } catch (error) {
+                console.error('Register submit error:', error);
+                if (errorEl) errorEl.textContent = 'خطا در برقراری ارتباط با سرور';
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        }
+        
+        async handleRegisterOtpVerify() {
+            const submitBtn = document.getElementById('registerOtpSubmitBtn');
+            const errorEl = document.getElementById('registerOtpError');
+            
+            if (!submitBtn) return;
+            
+            const otp = this.getOtpValue('registerOtpInputs');
+            
+            // Validate OTP length
+            if (otp.length !== 6) {
+                if (errorEl) errorEl.textContent = 'لطفاً کد ۶ رقمی را کامل وارد کنید';
+                return;
+            }
+            
+            // Clear error
+            if (errorEl) errorEl.textContent = '';
+            
+            // Set loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await this.verifyOtp(this.currentIdentifier, otp, 'register');
+                
+                if (response.success) {
+                    // Clear timer
+                    this.clearTimer();
+                    
+                    // Go to success step
+                    this.goToStep('register', 3);
+                    
+                    // Show success toast
+                    if (window.showToast) {
+                        window.showToast('ثبت‌نام موفقیت‌آمیز!', 'success');
+                    }
+                    
+                    // Redirect after delay
+                    setTimeout(() => {
+                        const redirectUrl = response.redirect_url || '/dashboard/';
+                        window.location.href = redirectUrl;
+                    }, 2000);
+                } else {
+                    if (errorEl) errorEl.textContent = response.message || 'کد وارد شده صحیح نیست';
+                    
+                    // Shake OTP inputs
+                    const otpContainer = document.getElementById('registerOtpInputs');
+                    if (otpContainer) {
+                        otpContainer.classList.add('shake');
+                        setTimeout(() => otpContainer.classList.remove('shake'), 500);
+                    }
+                }
+            } catch (error) {
+                console.error('Register OTP verify error:', error);
+                if (errorEl) errorEl.textContent = 'خطا در برقراری ارتباط با سرور';
+            } finally {
+                submitBtn.classList.remove('loading');
+                const otp = this.getOtpValue('registerOtpInputs');
+                submitBtn.disabled = otp.length !== 6;
+            }
+        }
+
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // API REQUEST HELPERS
+        // ───────────────────────────────────────────────────────────────────────────────────
+
+        async sendOtp(identifier, action) {
+            try {
+                const response = await fetch('/api/auth/send-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': this.getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        identifier: identifier,
+                        action: action
+                    })
+                });
+
+                return await response.json();
+            } catch (error) {
+                console.error('Send OTP error:', error);
+                return { success: false, message: 'خطای ارتباط با سرور' };
+            }
+        }
+
+        async verifyOtp(identifier, otp, action) {
+            try {
+                const response = await fetch('/api/auth/verify-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': this.getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        identifier: identifier,
+                        otp: otp,
+                        action: action
+                    })
+                });
+
+                return await response.json();
+            } catch (error) {
+                console.error('Verify OTP error:', error);
+                return { success: false, message: 'خطای ارتباط با سرور' };
+            }
+        }
+
+        // ───────────────────────────────────────────────────────────────────────────────────
+        // HELPERS
+        // ───────────────────────────────────────────────────────────────────────────────────
+
+        getCsrfToken() {
+            const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            return cookie ? cookie.split('=')[1] : '';
+        }
+
+        validateIdentifier(value) {
+            if (!value) return false;
+
+            const phoneRegex = /^09[0-9]{9}$/;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            return phoneRegex.test(value) || emailRegex.test(value);
+        }
+
+        getIdentifierType(value) {
+            const phoneRegex = /^09[0-9]{9}$/;
+            return phoneRegex.test(value) ? 'phone' : 'email';
+        }
+
+        formatIdentifier(value) {
+            if (value.startsWith('09')) {
+                return '+98 ' + value.substring(1, 4) + ' ' + value.substring(4, 7) + ' ' + value.substring(7);
+            }
+            return value;
+        }
+    }
+
+    // ───────────────────────────────────────────────────────────────────────────────
+    // INITIALIZE GLOBAL INSTANCE
+    // ───────────────────────────────────────────────────────────────────────────────
+
+    window.AuthModal = new AuthModal();
+
+    // Optional: open modal by clicking elements with [data-auth-modal]
+    document.querySelectorAll('[data-auth-modal]').forEach(el => {
+        el.addEventListener('click', e => {
+            e.preventDefault();
+            const tab = el.dataset.authModal === 'register' ? 'register' : 'login';
+            window.AuthModal.open(tab);
+        });
+    });
+
+})();

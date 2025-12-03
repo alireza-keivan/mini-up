@@ -264,7 +264,7 @@
     .service-card {
         @apply relative rounded-2xl p-6 text-center;
         @apply transition-all duration-300;
-        @apply group cursor-pointer;
+        @apply cursor-pointer;
         background: rgba(15, 15, 22, 0.4);
         border: 1px solid var(--border-subtle);
     }

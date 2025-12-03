@@ -32,6 +32,14 @@ def mini_game(request):
     return render(request, 'core/mini_game.html', {'title': 'مینی گیم'})
 
 
+def contact(request):
+    """تماس با ما"""
+    return render(request, 'core/contact.html', {'title': 'تماس با ما'})
+
+def accounts(request):
+    """تماس با ما"""
+    return render(request, 'core/accounts.html', {'title': 'حساب کاربری'})
+
 def consulting(request):
     """صفحه مشاوره"""
     return render(request, 'core/consulting.html', {'title': 'مشاوره'})
@@ -52,7 +60,10 @@ def login_view(request):
         'title': 'ورود',
         'active_tab': 'login'
     })
-
+    
+def faq(request):
+    """صفحه سوالات متداول"""
+    return render(request, 'core/faq.html', {'title': 'سوالات متداول'})
 
 def register_view(request):
     """صفحه ثبت نام - به همان صفحه login می‌رود با تب register فعال"""
