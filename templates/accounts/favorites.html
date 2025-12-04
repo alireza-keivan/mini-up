@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} | Mini-up{% endblock %}
+
+{% block content %}
+<div class="account-page-container">
+    
+    <!-- Sidebar -->
+    {% include "accounts/_sidebar.html" %}
+    
+    <!-- Main Content -->
+    <div class="account-content">
+        <div class="account-header">
+            <h1 class="account-title">
+                <i class="fas fa-heart"></i>
+                {{ page_title }}
+            </h1>
+        </div>
+        
+        <div class="favorites-grid">
+            {% if favorites %}
+                {% for item in favorites %}
+                <div class="favorite-card">
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    <h3>{{ item.product.name }}</h3>
+                    <p class="price">{{ item.product.price|intcomma }} تومان</p>
+                    <div class="favorite-actions">
+                        <a href="#" class="btn-add-cart">افزودن به سبد</a>
+                        <button class="btn-remove-favorite">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-heart-broken"></i>
+                    <p>هنوز محصولی به علاقه‌مندی‌ها اضافه نکرده‌اید</p>
+                    <a href="{% url 'products:list' %}" class="btn-primary">مشاهده محصولات</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

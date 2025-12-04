@@ -1,12 +1,75 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}تنظیمات حساب{% endblock %}
+{% block title %}{{ page_title }} | Mini-up{% endblock %}
 
 {% block content %}
-<div class="container mx-auto py-10 max-w-md">
-    <h1 class="text-xl font-bold mb-6">تنظیمات حساب</h1>
-
-    <p>این بخش بعداً تکمیل می‌شود.</p>
+<div class="account-page-container">
+    
+    <!-- Sidebar -->
+    {% include "accounts/_sidebar.html" %}
+    
+    <!-- Main Content -->
+    <div class="account-content">
+        <div class="account-header">
+            <h1 class="account-title">
+                <i class="fas fa-cog"></i>
+                {{ page_title }}
+            </h1>
+        </div>
+        
+        <!-- Notifications Settings -->
+        <div class="settings-section">
+            <h2 class="settings-section-title">
+                <i class="fas fa-bell"></i>
+                اعلان‌ها
+            </h2>
+            <div class="settings-options">
+                <label class="settings-toggle">
+                    <span>اعلان پیامکی</span>
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <label class="settings-toggle">
+                    <span>اعلان ایمیلی</span>
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                </label>
+                <label class="settings-toggle">
+                    <span>اعلان تخفیف‌ها</span>
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Security Settings -->
+        <div class="settings-section">
+            <h2 class="settings-section-title">
+                <i class="fas fa-shield-alt"></i>
+                امنیت
+            </h2>
+            <div class="settings-options">
+                <label class="settings-toggle">
+                    <span>ورود دو مرحله‌ای</span>
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Danger Zone -->
+        <div class="settings-section settings-danger">
+            <h2 class="settings-section-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                منطقه خطر
+            </h2>
+            <button class="btn-danger">
+                <i class="fas fa-trash"></i>
+                حذف حساب کاربری
+            </button>
+        </div>
+        
+    </div>
 </div>
 {% endblock %}

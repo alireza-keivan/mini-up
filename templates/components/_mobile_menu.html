@@ -1,10 +1,5 @@
-{# ================================================================================
-   MOBILE MENU COMPONENT
-   File: templates/components/_mobile_menu.html
-   -------------------------------------------------------------------------------
-   Full-screen mobile navigation with accordion submenus
-   ================================================================================ #}
 
+{% load humanize %}
 <div class="mobile-menu-overlay" id="mobileMenuOverlay" aria-hidden="true" data-close-menu></div>
 
 <aside class="mobile-menu" id="mobileMenu" aria-label="منوی موبایل" aria-hidden="true">
@@ -51,7 +46,7 @@
             <div class="mobile-menu-wallet-balance">
                 {{ user.wallet_balance|default:"0"|intcomma }} <span>تومان</span>
             </div>
-            <a href="{% url 'accounts:wallet_deposit' %}" class="mobile-menu-wallet-add">
+            <a href="{% url 'wallet:deposit' %}" class="mobile-menu-wallet-add">
                 <i class="fas fa-plus-circle"></i> افزایش موجودی
             </a>
         </div>
@@ -187,6 +182,3 @@
     {% endif %}
 
 </aside>
-{# ─────────────────────────────────────────────────────────────────────────
-   END OF MOBILE MENU COMPONENT
-   ───────────────────────────────────────────────────────────────────────── #}

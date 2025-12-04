@@ -1,0 +1,185 @@
+{# MOBILE MENU COMPONENT - templates/components/_mobile_menu.html #}
+{% load humanize %}
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" aria-hidden="true" data-close-menu></div>
+
+<aside class="mobile-menu" id="mobileMenu" aria-label="منوی موبایل" aria-hidden="true">
+
+    <!-- ========================= HEADER ========================= -->
+    <header class="mobile-menu-header">
+        <a href="{% url 'core:home' %}" class="mobile-menu-logo">
+            <div class="mobile-menu-logo-icon"><i class="fas fa-gamepad"></i></div>
+            <div class="mobile-menu-logo-text">
+                <span class="mobile-menu-logo-name">{{ SITE_NAME|default:"Mini-up" }}</span>
+                <span class="mobile-menu-logo-tagline">گیمینگ و خدمات مجازی</span>
+            </div>
+        </a>
+
+        <button type="button" class="mobile-menu-close" id="mobileMenuClose" aria-label="بستن" data-close-menu>
+            <i class="fas fa-times"></i>
+        </button>
+    </header>
+
+    <!-- ========================= USER (AUTHENTICATED ONLY) ========================= -->
+    {% if user.is_authenticated %}
+    <div class="mobile-menu-user">
+
+        <a href="{% url 'accounts:dashboard' %}" class="mobile-menu-user-info">
+            <div class="mobile-menu-user-avatar">
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_display_name }}">
+                {% else %}
+                    <i class="fas fa-user"></i>
+                {% endif %}
+            </div>
+            <div>
+                <div class="mobile-menu-user-name">{{ user.get_display_name }}</div>
+                <div class="mobile-menu-user-phone">{{ user.phone }}</div>
+            </div>
+            <i class="fas fa-chevron-left mobile-menu-user-arrow"></i>
+        </a>
+
+        <div class="mobile-menu-wallet">
+            <div class="mobile-menu-wallet-header">
+                <i class="fas fa-wallet"></i>
+                <span>موجودی کیف پول</span>
+            </div>
+            <div class="mobile-menu-wallet-balance">
+                {{ user.wallet_balance|default:"0"|intcomma }} <span>تومان</span>
+            </div>
+            <a href="{% url 'wallet:deposit' %}" class="mobile-menu-wallet-add">
+                <i class="fas fa-plus-circle"></i> افزایش موجودی
+            </a>
+        </div>
+
+        <div class="mobile-menu-stats">
+            <a href="{% url 'accounts:orders' %}" class="mobile-menu-stat-item">
+                <div class="mobile-menu-stat-value">{{ user_orders_count|default:"0" }}</div>
+                <div class="mobile-menu-stat-label">سفارش</div>
+            </a>
+            <a href="{% url 'accounts:favorites' %}" class="mobile-menu-stat-item">
+                <div class="mobile-menu-stat-value">{{ user_favorites_count|default:"0" }}</div>
+                <div class="mobile-menu-stat-label">علاقه‌مندی</div>
+            </a>
+            <a href="{% url 'accounts:notifications' %}" class="mobile-menu-stat-item">
+                <div class="mobile-menu-stat-value">{{ unread_notifications_count|default:"0" }}</div>
+                <div class="mobile-menu-stat-label">اعلان</div>
+            </a>
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- ========================= SEARCH ========================= -->
+    <div class="mobile-menu-search">
+        <form action="{% url 'core:search' %}" method="GET">
+            <input type="text" name="q" placeholder="جستجو..." autocomplete="off">
+            <button><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+
+    <!-- ========================= MAIN NAVIGATION ========================= -->
+    <nav class="mobile-menu-nav">
+
+        <!-- HOME -->
+        <a href="{% url 'core:home' %}" class="mobile-menu-item">
+            <i class="fas fa-home"></i> <span>خانه</span>
+        </a>
+
+        <!-- VIRTUAL SERVICES (ACCORDION) -->
+        <div class="mobile-menu-accordion">
+            <button type="button" class="mobile-menu-item has-submenu" data-accordion-toggle>
+                <i class="fas fa-cloud"></i> <span>خدمات مجازی</span>
+                <i class="fas fa-chevron-down mobile-menu-item-arrow"></i>
+            </button>
+
+            <div class="mobile-menu-submenu" data-accordion-content>
+
+                <a href="{% url 'core:virtual_services' %}" class="mobile-menu-submenu-viewall">
+                    <i class="fas fa-th-large"></i> همه خدمات
+                </a>
+
+                <div class="mobile-menu-submenu-category-title">پیام‌رسان‌ها</div>
+                <a href="#" class="mobile-menu-submenu-item"><i class="fab fa-telegram"></i> پرمیوم تلگرام</a>
+                <a href="#" class="mobile-menu-submenu-item"><i class="fas fa-users"></i> ممبر تلگرام</a>
+
+                <div class="mobile-menu-submenu-category-title">شبکه اجتماعی</div>
+                <a href="#" class="mobile-menu-submenu-item"><i class="fab fa-instagram"></i> فالوور اینستاگرام</a>
+
+                <div class="mobile-menu-submenu-category-title">اشتراک‌ها</div>
+                <a href="#" class="mobile-menu-submenu-item"><i class="fab fa-spotify"></i> اسپاتیفای</a>
+                <a href="#" class="mobile-menu-submenu-item"><i class="fab fa-apple"></i> اپل موزیک</a>
+
+                <div class="mobile-menu-submenu-category-title">VPN</div>
+                <a href="#" class="mobile-menu-submenu-item"><i class="fas fa-lock"></i> وایرگارد</a>
+                <a href="#" class="mobile-menu-submenu-item"><i class="fas fa-server"></i> V2ray</a>
+            </div>
+        </div>
+
+        <!-- GAMING PRODUCTS (ACCORDION) -->
+        <div class="mobile-menu-accordion">
+            <button type="button" class="mobile-menu-item has-submenu" data-accordion-toggle>
+                <i class="fas fa-gamepad"></i> <span>محصولات گیمینگ</span>
+                <i class="fas fa-chevron-down mobile-menu-item-arrow"></i>
+            </button>
+
+            <div class="mobile-menu-submenu" data-accordion-content>
+                <a href="{% url 'core:gaming_products' %}" class="mobile-menu-submenu-viewall">
+                    <i class="fas fa-th-large"></i> همه محصولات
+                </a>
+                <a href="#" class="mobile-menu-submenu-item">فن</a>
+                <a href="#" class="mobile-menu-submenu-item">انگشتی</a>
+            </div>
+        </div>
+
+        <!-- BUY PRODUCTS -->
+        <div class="mobile-menu-accordion">
+            <button type="button" class="mobile-menu-item has-submenu" data-accordion-toggle>
+                <i class="fas fa-shopping-bag"></i> <span>خرید محصولات</span>
+                <i class="fas fa-chevron-down mobile-menu-item-arrow"></i>
+            </button>
+
+            <div class="mobile-menu-submenu" data-accordion-content>
+                <a href="#" class="mobile-menu-submenu-item">گارد</a>
+                <a href="#" class="mobile-menu-submenu-item">گلس</a>
+            </div>
+        </div>
+
+        <!-- MINI GAME -->
+        <div class="mobile-menu-accordion">
+            <button type="button" class="mobile-menu-item has-submenu" data-accordion-toggle>
+                <i class="fas fa-coins"></i> <span>مینی گیم</span>
+                <i class="fas fa-chevron-down mobile-menu-item-arrow"></i>
+            </button>
+
+            <div class="mobile-menu-submenu" data-accordion-content>
+                <a href="#" class="mobile-menu-submenu-item">یوسی پابجی</a>
+                <a href="#" class="mobile-menu-submenu-item">جم فری فایر</a>
+            </div>
+        </div>
+
+        <!-- ABOUT -->
+        <a href="{% url 'core:about' %}" class="mobile-menu-item">
+            <i class="fas fa-info-circle"></i> <span>درباره ما</span>
+        </a>
+
+        <!-- CONSULTATION -->
+        <a href="{% url 'core:consulting' %}" class="mobile-menu-item">
+            <i class="fas fa-headset"></i> <span>مشاوره رایگان</span>
+        </a>
+
+    </nav>
+
+    <!-- ========================= AUTH (GUEST USERS) ========================= -->
+    {% if not user.is_authenticated %}
+    <div class="mobile-menu-auth">
+        <button class="mobile-menu-auth-btn login" data-modal-target="authModal" data-auth-tab="login">
+            ورود
+        </button>
+        <button class="mobile-menu-auth-btn register" data-modal-target="authModal" data-auth-tab="register">
+            ثبت نام
+        </button>
+    </div>
+    {% endif %}
+
+</aside>
+{# END OF MOBILE MENU COMPONENT #}

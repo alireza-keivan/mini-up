@@ -345,3 +345,75 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'داشبورد'
         return context
+
+
+class OrdersView(LoginRequiredMixin, TemplateView):
+    """
+    نمایش لیست سفارشات کاربر
+    """
+    template_name = 'accounts/orders.html'
+    login_url = '/accounts/login/'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'سفارشات من'
+        context['orders'] = []  # بعداً: Order.objects.filter(user=self.request.user)
+        return context
+
+
+@login_required
+def transactions_view(request):
+    """
+    نمایش تراکنش‌های کاربر
+    """
+    context = {
+        'page_title': 'تراکنش‌ها',
+        'transactions': [],  # TODO: Transaction.objects.filter(user=request.user)
+    }
+    return render(request, 'accounts/transactions.html', context)
+
+
+@login_required
+def tickets_view(request):
+    """
+    نمایش تیکت‌های پشتیبانی کاربر
+    """
+    context = {
+        'page_title': 'تیکت‌های پشتیبانی',
+        'tickets': [],  # TODO: Ticket.objects.filter(user=request.user)
+    }
+    return render(request, 'accounts/tickets.html', context)
+
+@login_required
+def favorites_view(request):
+    """
+    نمایش لیست علاقه‌مندی‌های کاربر
+    """
+    context = {
+        'page_title': 'علاقه‌مندی‌ها',
+        'favorites': [],  # TODO: Favorite.objects.filter(user=request.user)
+    }
+    return render(request, 'accounts/favorites.html', context)
+
+@login_required
+def settings_view(request):
+    """
+    تنظیمات حساب کاربری
+    """
+    context = {
+        'page_title': 'تنظیمات',
+    }
+    return render(request, 'accounts/settings.html', context)
+
+def notifications_view(request):
+    """
+    لیست اعلان‌های کاربر
+    """
+    # TODO: بعداً از مدل Notification استفاده می‌شود
+    notifications = []
+    
+    context = {
+        'page_title': 'اعلان‌ها',
+        'notifications': notifications,
+    }
+    return render(request, 'accounts/notifications.html', context)

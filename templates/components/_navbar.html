@@ -1,89 +1,10 @@
-{# ═══════════════════════════════════════════════════════════════════════════════
-   NAVBAR COMPONENT - Mini-up Gaming Platform
-   ═══════════════════════════════════════════════════════════════════════════════
-   
-   Structure:
-   1. Topbar (contact info strip)
-   2. Main Navbar
-      - Logo
-      - Desktop Menu (with dropdowns & mega menu)
-      - Action Buttons (search, cart, notifications, user)
-      - Mobile hamburger trigger
-   
-   Dependencies:
-   - _mobile_menu.html (triggered by hamburger)
-   - _search_modal.html (triggered by search button)
-   - _cart_sidebar.html (triggered by cart button)
-   
-   Required Context:
-   - request.user (Django auth)
-   - notifications (from context processor)
-   - cart_count (from context processor)
-   
-   ═══════════════════════════════════════════════════════════════════════════════ #}
 
-{# ─────────────────────────────────────────────────────────────────────────────────
-   SECTION 1: TOP BAR
-   ───────────────────────────────────────────────────────────────────────────────── #}
 {% load humanize %}
-   <div class="topbar">
-    <div class="topbar-container">
-        
-        {# Right Side - Contact Info #}
-        <div class="topbar-right">
-            <a href="tel:02112345678" class="topbar-item">
-                <i class="fas fa-phone-alt"></i>
-                <span>۰۲۱-۱۲۳۴-۵۶۷۸</span>
-            </a>
-            
-            <div class="topbar-divider"></div>
-            
-            <a href="mailto:info@mini-up.ir" class="topbar-item">
-                <i class="fas fa-envelope"></i>
-                <span>info@mini-up.ir</span>
-            </a>
-            
-            <div class="topbar-divider"></div>
-            
-            <span class="topbar-item">
-                <i class="fas fa-clock"></i>
-                <span>پشتیبانی ۲۴/۷</span>
-            </span>
-        </div>
-        
-        {# Left Side - Social Links #}
-        <div class="topbar-left">
-            <div class="topbar-social">
-                <a href="#" class="topbar-social-link" title="تلگرام" aria-label="کانال تلگرام">
-                    <i class="fab fa-telegram-plane"></i>
-                </a>
-                <a href="#" class="topbar-social-link" title="اینستاگرام" aria-label="صفحه اینستاگرام">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="#" class="topbar-social-link" title="واتساپ" aria-label="واتساپ پشتیبانی">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-            </div>
-            
-            <div class="topbar-divider"></div>
-            
-            <a href="{% url 'core:faq' %}" class="topbar-link">سوالات متداول</a>
-            <a href="{% url 'core:contact' %}" class="topbar-link">تماس با ما</a>
-        </div>
-        
-    </div>
-</div>
 
-
-{# ─────────────────────────────────────────────────────────────────────────────────
-   SECTION 2: MAIN NAVBAR
-   ───────────────────────────────────────────────────────────────────────────────── #}
 <nav class="navbar has-topbar" id="mainNavbar" role="navigation" aria-label="ناوبری اصلی">
     <div class="navbar-container">
         
-        {# ═══════════════════════════════════════════════════════════════════════════
-           2.1 LOGO
-           ═══════════════════════════════════════════════════════════════════════════ #}
+        
         <a href="{% url 'core:home' %}" class="navbar-logo">
             <div class="navbar-logo-icon">
                 <i class="fas fa-gamepad"></i>
@@ -95,14 +16,10 @@
         </a>
         
         
-        {# ═══════════════════════════════════════════════════════════════════════════
-           2.2 DESKTOP MENU
-           ═══════════════════════════════════════════════════════════════════════════ #}
+        
         <div class="navbar-menu">
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Menu Item: خانه (No Dropdown)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <div class="navbar-menu-item">
                 <a href="{% url 'core:home' %}" 
                    class="navbar-menu-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
@@ -112,9 +29,7 @@
             </div>
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Menu Item: خدمات مجازی (MEGA MENU)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <div class="navbar-menu-item">
                 <a href="{% url 'core:virtual_services' %}" class="navbar-menu-link">
                     <i class="fas fa-cloud"></i>
@@ -122,11 +37,11 @@
                     <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
                 
-                {# Mega Menu Dropdown #}
+                
                 <div class="mega-menu">
                     <div class="mega-menu-container">
                         
-                        {# Mega Menu Header #}
+                        
                         <div class="mega-menu-header">
                             <span class="mega-menu-title">
                                 <i class="fas fa-cloud"></i>
@@ -138,13 +53,13 @@
                             </a>
                         </div>
                         
-                        {# Mega Menu Body #}
+                        
                         <div class="mega-menu-body">
                             
-                            {# Services Grid #}
+                            
                             <div class="mega-menu-grid">
                                 
-                                {# Telegram Premium #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=telegram" class="mega-menu-item">
                                     <div class="mega-menu-item-icon cyan">
                                         <i class="fab fa-telegram-plane"></i>
@@ -155,7 +70,7 @@
                                     </div>
                                 </a>
                                 
-                                {# Instagram Followers #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=instagram" class="mega-menu-item">
                                     <div class="mega-menu-item-icon pink">
                                         <i class="fab fa-instagram"></i>
@@ -166,7 +81,7 @@
                                     </div>
                                 </a>
                                 
-                                {# Telegram Members #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=telegram-member" class="mega-menu-item">
                                     <div class="mega-menu-item-icon cyan">
                                         <i class="fas fa-users"></i>
@@ -177,7 +92,7 @@
                                     </div>
                                 </a>
                                 
-                                {# Apple ID #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=apple-id" class="mega-menu-item">
                                     <div class="mega-menu-item-icon white">
                                         <i class="fab fa-apple"></i>
@@ -188,7 +103,7 @@
                                     </div>
                                 </a>
                                 
-                                {# Spotify #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=spotify" class="mega-menu-item">
                                     <div class="mega-menu-item-icon green">
                                         <i class="fab fa-spotify"></i>
@@ -199,7 +114,7 @@
                                     </div>
                                 </a>
                                 
-                                {# SoundCloud #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=soundcloud" class="mega-menu-item">
                                     <div class="mega-menu-item-icon orange">
                                         <i class="fab fa-soundcloud"></i>
@@ -210,7 +125,7 @@
                                     </div>
                                 </a>
                                 
-                                {# Apple Music #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=apple-music" class="mega-menu-item">
                                     <div class="mega-menu-item-icon pink">
                                         <i class="fas fa-music"></i>
@@ -221,7 +136,7 @@
                                     </div>
                                 </a>
                                 
-                                {# iCloud #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=icloud" class="mega-menu-item">
                                     <div class="mega-menu-item-icon cyan">
                                         <i class="fas fa-cloud"></i>
@@ -232,7 +147,7 @@
                                     </div>
                                 </a>
                                 
-                                {# WireGuard VPN #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=wireguard" class="mega-menu-item">
                                     <div class="mega-menu-item-icon yellow">
                                         <i class="fas fa-shield-alt"></i>
@@ -243,7 +158,7 @@
                                     </div>
                                 </a>
                                 
-                                {# V2Ray #}
+                                
                                 <a href="{% url 'core:virtual_services' %}?category=v2ray" class="mega-menu-item">
                                     <div class="mega-menu-item-icon purple">
                                         <i class="fas fa-network-wired"></i>
@@ -256,7 +171,7 @@
                                 
                             </div>
                             
-                            {# Featured Offers #}
+                            
                             <div class="mega-menu-featured">
                                 <div class="mega-menu-featured-title">
                                     <i class="fas fa-fire"></i>
@@ -286,9 +201,7 @@
             </div>
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Menu Item: محصولات گیمینگ (Simple Dropdown)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <div class="navbar-menu-item">
                 <a href="{% url 'core:gaming_products' %}" class="navbar-menu-link">
                     <i class="fas fa-gamepad"></i>
@@ -296,7 +209,7 @@
                                         <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
                 
-                {# Simple Dropdown #}
+                
                 <div class="navbar-dropdown">
                     <div class="navbar-dropdown-menu">
                         <div class="navbar-dropdown-header">
@@ -321,9 +234,7 @@
             </div>
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Menu Item: خرید محصولات (Simple Dropdown)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <div class="navbar-menu-item">
                 <a href="{% url 'core:buy_products' %}" class="navbar-menu-link">
                     <i class="fas fa-shopping-bag"></i>
@@ -355,9 +266,7 @@
             </div>
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Menu Item: مینی گیم (Simple Dropdown)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <div class="navbar-menu-item">
                 <a href="{% url 'core:mini_game' %}" class="navbar-menu-link">
                     <i class="fas fa-dice"></i>
@@ -394,9 +303,7 @@
             </div>
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Menu Item: درباره ما (No Dropdown)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <div class="navbar-menu-item">
                 <a href="{% url 'core:about' %}" 
                    class="navbar-menu-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
@@ -406,9 +313,7 @@
             </div>
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Menu Item: مشاوره رایگان (CTA Button Style)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <div class="navbar-menu-item navbar-menu-item-cta">
                 <a href="{% url 'core:consulting' %}" class="navbar-menu-link cta">
                     <i class="fas fa-headset"></i>
@@ -417,17 +322,13 @@
             </div>
             
         </div>
-        {# End .navbar-menu #}
         
         
-        {# ═══════════════════════════════════════════════════════════════════════════
-           2.3 ACTION BUTTONS (Right Side)
-           ═══════════════════════════════════════════════════════════════════════════ #}
+        
+        
         <div class="navbar-actions">
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Search Button (Opens Search Modal)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <button type="button" 
                     class="navbar-action-btn" 
                     id="searchToggle"
@@ -438,9 +339,7 @@
             </button>
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Cart Button (Opens Cart Sidebar)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <button type="button" 
                     class="navbar-action-btn" 
                     id="cartToggle"
@@ -454,9 +353,7 @@
             </button>
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Notifications Button (Dropdown)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             {% if user.is_authenticated %}
             <div class="navbar-action-dropdown">
                 <button type="button" 
@@ -472,7 +369,7 @@
                     {% endif %}
                 </button>
                 
-                {# Notifications Dropdown #}
+                
                 <div class="navbar-notification-dropdown" id="notificationDropdown">
                     <div class="navbar-notification-header">
                         <span class="navbar-notification-title">
@@ -537,11 +434,9 @@
             {% endif %}
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               User Menu (Authenticated) / Auth Buttons (Guest)
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             {% if user.is_authenticated %}
-                {# Authenticated User Menu #}
+                
                 <div class="navbar-action-dropdown">
                     <button type="button" 
                             class="navbar-user-btn" 
@@ -560,10 +455,10 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     
-                    {# User Dropdown Menu #}
+                    
                     <div class="navbar-user-dropdown" id="userMenuDropdown">
                         
-                        {# User Info Header #}
+                        
                         <div class="navbar-user-dropdown-header">
                             <div class="navbar-user-dropdown-avatar">
                                 {% if user.profile.avatar %}
@@ -578,7 +473,7 @@
                             </div>
                         </div>
                         
-                        {# Wallet Balance #}
+                        
                         <div class="navbar-user-dropdown-wallet">
                             <div class="navbar-user-dropdown-wallet-label">
                                 <i class="fas fa-wallet"></i>
@@ -593,7 +488,7 @@
                             </a>
                         </div>
                         
-                        {# Menu Items #}
+                        
                         <div class="navbar-user-dropdown-menu">
                             <a href="{% url 'accounts:dashboard' %}" class="navbar-user-dropdown-item">
                                 <i class="fas fa-tachometer-alt"></i>
@@ -651,17 +546,15 @@
                                 <span>خروج از حساب</span>
                             </button>
                         </div>
-                        {# End .navbar-user-dropdown-menu #}
+                        
                         
                     </div>
-                    {# End .navbar-user-dropdown #}
+                    
                 </div>
-                {# End .navbar-action-dropdown (User) #}
+                
                 
             {% else %}
-                {# ─────────────────────────────────────────────────────────────────────
-                   Guest User: Auth Buttons
-                   ───────────────────────────────────────────────────────────────────── #}
+                
                 <div class="navbar-auth-buttons">
                     <button type="button" 
                             class="navbar-auth-btn login"
@@ -681,9 +574,7 @@
             {% endif %}
             
             
-            {# ─────────────────────────────────────────────────────────────────────────
-               Mobile Menu Toggle Button
-               ───────────────────────────────────────────────────────────────────────── #}
+            
             <button type="button" 
                     class="navbar-mobile-toggle"
                     id="mobileMenuToggle"
@@ -696,69 +587,22 @@
             </button>
             
         </div>
-        {# End .navbar-actions #}
+        
         
     </div>
-    {# End .navbar-container #}
+    
     
 </nav>
-{# ═══════════════════════════════════════════════════════════════════════════════════
-   END MAIN NAVBAR
-   ═══════════════════════════════════════════════════════════════════════════════════ #}
 
-
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   ███████████████████████████████████████████████████████████████████████████████████████
-   █                                                                                     █
-   █   SECTION 3: INCLUDED COMPONENTS                                                   █
-   █   ─────────────────────────────────────────────────────────────────────────────    █
-   █   These are separate template files that are included for modularity               █
-   █                                                                                     █
-   ███████████████████████████████████████████████████████████████████████████████████████
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
-
-{# ─────────────────────────────────────────────────────────────────────────────────────────
-   3.1 MOBILE MENU
-   Full-screen mobile navigation menu with accordion submenus
-   ───────────────────────────────────────────────────────────────────────────────────────── #}
 {% include 'components/_mobile_menu.html' %}
 
-
-{# ─────────────────────────────────────────────────────────────────────────────────────────
-   3.2 SEARCH MODAL
-   Full-screen search overlay with live search functionality
-   ───────────────────────────────────────────────────────────────────────────────────────── #}
 {% include 'components/_search_modal.html' %}
 
-
-{# ─────────────────────────────────────────────────────────────────────────────────────────
-   3.3 CART SIDEBAR
-   Slide-in cart sidebar showing cart items and checkout options
-   ───────────────────────────────────────────────────────────────────────────────────────── #}
 {% include 'components/_cart_sidebar.html' %}
 
-
-{# ─────────────────────────────────────────────────────────────────────────────────────────
-   3.4 AUTH MODAL (For Guest Users)
-   Login/Register modal with OTP verification
-   ───────────────────────────────────────────────────────────────────────────────────────── #}
 {% if not user.is_authenticated %}
     {% include 'components/_auth_modal.html' %}
 {% endif %}
 
-
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   ███████████████████████████████████████████████████████████████████████████████████████
-   █                                                                                     █
-   █   SECTION 4: NAVBAR SPACER                                                         █
-   █   ─────────────────────────────────────────────────────────────────────────────    █
-   █   Adds spacing below fixed navbar to prevent content overlap                       █
-   █                                                                                     █
-   ███████████████████████████████████████████████████████████████████████████████████████
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
 <div class="navbar-spacer"></div>
 
-
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   END _navbar.html
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}

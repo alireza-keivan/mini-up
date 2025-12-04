@@ -1,42 +1,11 @@
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   ███████████████████████████████████████████████████████████████████████████████████████
-   █                                                                                     █
-   █   SEARCH MODAL COMPONENT                                                           █
-   █   ─────────────────────────────────────────────────────────────────────────────    █
-   █   File: templates/components/_search_modal.html                                    █
-   █   Project: Mini-up - Gaming & Virtual Services Platform                            █
-   █   Author: Mini-up Development Team                                                 █
-   █   Created: 1404/09                                                                 █
-   █   ─────────────────────────────────────────────────────────────────────────────    █
-   █   Full-screen search overlay with live search functionality                        █
-   █   Features: Live search, recent searches, popular searches, category filter        █
-   █   ─────────────────────────────────────────────────────────────────────────────    █
-   █   Dependencies:                                                                    █
-   █   - CSS: static/css/components/_search_modal.css                                   █
-   █   - JS: static/js/components/search-modal.js                                       █
-   █   - API: /api/search/live/ (for live search results)                               █
-   █                                                                                     █
-   ███████████████████████████████████████████████████████████████████████████████████████
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
 
 
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   SEARCH MODAL OVERLAY (Backdrop)
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
 <div class="search-modal-overlay" 
      id="searchModalOverlay"
      aria-hidden="true"
      data-search-close>
 </div>
 
-
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   ███████████████████████████████████████████████████████████████████████████████████████
-   █                                                                                     █
-   █   MAIN SEARCH MODAL CONTAINER                                                      █
-   █                                                                                     █
-   ███████████████████████████████████████████████████████████████████████████████████████
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
 <div class="search-modal" 
      id="searchModal"
      role="dialog"
@@ -44,24 +13,22 @@
      aria-label="جستجو"
      aria-hidden="true">
     
-    {# ═══════════════════════════════════════════════════════════════════════════════════
-       SECTION 1: SEARCH MODAL HEADER
-       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    
     <header class="search-modal-header">
         
-        {# Search Form #}
+        
         <form action="{% url 'core:search' %}" 
               method="GET" 
               class="search-modal-form"
               id="searchModalForm"
               role="search">
             
-            {# Search Icon #}
+            
             <div class="search-modal-icon">
                 <i class="fas fa-search"></i>
             </div>
             
-            {# Search Input #}
+            
             <input type="text" 
                    name="q"
                    id="searchModalInput"
@@ -73,7 +40,7 @@
                    aria-label="عبارت جستجو"
                    data-search-input>
             
-            {# Clear Button (Hidden by default) #}
+            
             <button type="button" 
                     class="search-modal-clear"
                     id="searchModalClear"
@@ -83,7 +50,7 @@
                 <i class="fas fa-times-circle"></i>
             </button>
             
-            {# Loading Spinner (Hidden by default) #}
+            
             <div class="search-modal-loading" 
                  id="searchModalLoading"
                  aria-hidden="true"
@@ -91,14 +58,14 @@
                 <i class="fas fa-spinner fa-spin"></i>
             </div>
             
-            {# Keyboard Shortcut Hint #}
+            
             <div class="search-modal-shortcut">
                 <kbd>ESC</kbd>
             </div>
             
         </form>
         
-        {# Close Button #}
+        
         <button type="button" 
                 class="search-modal-close"
                 id="searchModalClose"
@@ -110,9 +77,7 @@
     </header>
     
     
-    {# ═══════════════════════════════════════════════════════════════════════════════════
-       SECTION 2: CATEGORY FILTER TABS
-       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    
     <div class="search-modal-categories">
         <button type="button" 
                 class="search-modal-category active"
@@ -147,17 +112,13 @@
     </div>
     
     
-    {# ═══════════════════════════════════════════════════════════════════════════════════
-       SECTION 3: SEARCH MODAL BODY (Content Area)
-       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    
     <div class="search-modal-body" id="searchModalBody">
         
-        {# ─────────────────────────────────────────────────────────────────────────────
-           3.1 DEFAULT STATE: Recent & Popular Searches
-           ───────────────────────────────────────────────────────────────────────────── #}
+        
         <div class="search-modal-default" id="searchModalDefault">
             
-            {# Recent Searches #}
+            
             <div class="search-modal-section" id="recentSearchesSection">
                 <div class="search-modal-section-header">
                     <h3 class="search-modal-section-title">
@@ -173,7 +134,7 @@
                     </button>
                 </div>
                 <div class="search-modal-recent-list" id="recentSearchesList">
-                    {# Will be populated by JavaScript from localStorage #}
+                    
                     <div class="search-modal-empty-state small">
                         <i class="fas fa-search"></i>
                         <span>هنوز جستجویی انجام نداده‌اید</span>
@@ -181,7 +142,7 @@
                 </div>
             </div>
             
-            {# Popular Searches #}
+            
             <div class="search-modal-section">
                 <div class="search-modal-section-header">
                     <h3 class="search-modal-section-title">
@@ -231,7 +192,7 @@
                 </div>
             </div>
             
-            {# Quick Categories #}
+            
             <div class="search-modal-section">
                 <div class="search-modal-section-header">
                     <h3 class="search-modal-section-title">
@@ -288,12 +249,10 @@
         </div>
         
         
-        {# ─────────────────────────────────────────────────────────────────────────────
-           3.2 LIVE SEARCH RESULTS (Hidden by default)
-           ───────────────────────────────────────────────────────────────────────────── #}
+        
         <div class="search-modal-results" id="searchModalResults" hidden>
             
-            {# Results Header #}
+            
             <div class="search-modal-results-header" id="searchResultsHeader">
                 <span class="search-modal-results-count">
                     <span id="searchResultsCount">0</span> نتیجه برای
@@ -307,17 +266,15 @@
                 </a>
             </div>
             
-            {# Results List #}
+            
             <div class="search-modal-results-list" id="searchResultsList">
-                {# Results will be populated by JavaScript #}
+                
             </div>
             
         </div>
         
         
-        {# ─────────────────────────────────────────────────────────────────────────────
-           3.3 NO RESULTS STATE (Hidden by default)
-           ───────────────────────────────────────────────────────────────────────────── #}
+        
         <div class="search-modal-no-results" id="searchModalNoResults" hidden>
             <div class="search-modal-empty-state">
                 <div class="search-modal-empty-icon">
@@ -345,20 +302,18 @@
                     </li>
                 </ul>
                 
-                {# Suggested Alternatives #}
+                
                 <div class="search-modal-alternatives">
                     <span class="search-modal-alternatives-label">شاید منظور شما این بود:</span>
                     <div class="search-modal-alternatives-list" id="searchAlternatives">
-                        {# Will be populated by JavaScript if available #}
+                        
                     </div>
                 </div>
             </div>
         </div>
         
         
-        {# ─────────────────────────────────────────────────────────────────────────────
-           3.4 ERROR STATE (Hidden by default)
-           ───────────────────────────────────────────────────────────────────────────── #}
+        
         <div class="search-modal-error" id="searchModalError" hidden>
             <div class="search-modal-empty-state error">
                 <div class="search-modal-empty-icon">
@@ -381,9 +336,7 @@
         </div>
         
         
-        {# ─────────────────────────────────────────────────────────────────────────────
-           3.5 LOADING STATE (Hidden by default)
-           ───────────────────────────────────────────────────────────────────────────── #}
+        
         <div class="search-modal-loading-state" id="searchModalLoadingState" hidden>
             <div class="search-modal-skeleton">
                 <div class="search-modal-skeleton-item">
@@ -414,15 +367,13 @@
         </div>
         
     </div>
-    {# End of search-modal-body #}
     
     
-    {# ═══════════════════════════════════════════════════════════════════════════════════
-       SECTION 4: SEARCH MODAL FOOTER
-       ═══════════════════════════════════════════════════════════════════════════════════ #}
+    
+    
     <footer class="search-modal-footer">
         
-        {# Keyboard Shortcuts Guide #}
+        
         <div class="search-modal-shortcuts">
             <div class="search-modal-shortcut-item">
                 <kbd>↵</kbd>
@@ -444,7 +395,7 @@
             </div>
         </div>
         
-        {# Powered By #}
+        
         <div class="search-modal-powered">
             <i class="fas fa-bolt"></i>
             <span>جستجوی هوشمند Mini-up</span>
@@ -453,26 +404,17 @@
     </footer>
     
 </div>
-{# End of search-modal #}
 
-
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   ███████████████████████████████████████████████████████████████████████████████████████
-   █                                                                                     █
-   █   SEARCH RESULT ITEM TEMPLATE (Hidden - Used by JavaScript)                        █
-   █                                                                                     █
-   ███████████████████████████████████████████████████████████████████████████████████████
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
 <template id="searchResultItemTemplate">
     <a href="" class="search-result-item" data-result-item>
         
-        {# Result Image #}
+        
         <div class="search-result-image">
             <img src="" alt="" loading="lazy">
             <span class="search-result-badge"></span>
         </div>
         
-        {# Result Content #}
+        
         <div class="search-result-content">
             <div class="search-result-category">
                 <i class=""></i>
@@ -492,7 +434,7 @@
             </div>
         </div>
         
-        {# Result Arrow #}
+        
         <div class="search-result-arrow">
             <i class="fas fa-chevron-left"></i>
         </div>
@@ -500,10 +442,6 @@
     </a>
 </template>
 
-
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   RECENT SEARCH ITEM TEMPLATE (Hidden - Used by JavaScript)
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
 <template id="recentSearchItemTemplate">
     <div class="search-recent-item" data-recent-item>
         <button type="button" 
@@ -521,10 +459,6 @@
     </div>
 </template>
 
-
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   SEARCH CATEGORY GROUP TEMPLATE (Hidden - Used by JavaScript)
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
 <template id="searchCategoryGroupTemplate">
     <div class="search-results-group" data-result-group>
         <div class="search-results-group-header">
@@ -538,20 +472,11 @@
             </a>
         </div>
         <div class="search-results-group-items">
-            {# Items will be inserted here #}
+            
         </div>
     </div>
 </template>
 
-
-{# ═══════════════════════════════════════════════════════════════════════════════════════
-   ███████████████████████████████████████████████████████████████████████████████████████
-   █                                                                                     █
-   █   INLINE INITIALIZATION SCRIPT                                                     █
-   █   Note: Main logic should be in static/js/components/search-modal.js               █
-   █                                                                                     █
-   ███████████████████████████████████████████████████████████████████████████████████████
-   ═══════════════════════════════════════════════════════════════════════════════════════ #}
 <script>
     // Initialize search modal when DOM is ready 
     document.addEventListener('DOMContentLoaded', function() {

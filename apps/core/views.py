@@ -99,3 +99,63 @@ def custom_404(request, exception):
 def custom_500(request):
     """Custom 500 error handler"""
     return render(request, 'errors/500.html', status=500)
+
+def search_view(request):
+    """
+    صفحه جستجو
+    """
+    query = request.GET.get('q', '')
+    results = []
+    
+    # TODO: پیاده‌سازی جستجو در محصولات و خدمات
+    
+    context = {
+        'page_title': f'جستجو: {query}' if query else 'جستجو',
+        'query': query,
+        'results': results,
+    }
+    return render(request, 'core/search.html', context)
+
+
+from django.http import JsonResponse
+
+def search_api_view(request):
+    """
+    API جستجو برای autocomplete و AJAX
+    GET /search/api/?q=...
+    """
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse({'success': True, 'results': []})
+    
+    results = []
+    
+    # TODO: جستجو در محصولات
+    # از apps.products.models import Product
+    # products = Product.objects.filter(name__icontains=query)[:5]
+    # for p in products:
+    #     results.append({
+    #         'type': 'product',
+    #         'title': p.name,
+    #         'url': p.get_absolute_url(),
+    #         'image': p.image.url if p.image else None,
+    #     })
+    
+    return JsonResponse({
+        'success': True,
+        'query': query,
+        'results': results,
+    })
+
+def category_view(request, slug):
+    """
+    صفحه دسته‌بندی محصولات
+    """
+    # TODO: پیاده‌سازی کامل با مدل Category
+    context = {
+        'page_title': f'دسته‌بندی: {slug}',
+        'category_slug': slug,
+        'products': [],
+    }
+    return render(request, 'core/category.html', context)

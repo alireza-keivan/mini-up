@@ -27,6 +27,9 @@ urlpatterns = [
     
     # Category detail (products in category)
     path('category/<slug:slug>/', views.CategoryDetailView.as_view(), name='category_detail'),
+    # Backwards-compatible alias: some templates reference 'products:category'
+    # so expose a short name 'category' that maps to the same view.
+    path('category/<slug:slug>/', views.CategoryDetailView.as_view(), name='category'),
     path('category/<int:pk>/', views.CategoryDetailView.as_view(), name='category_detail_by_id'),
     
     # ═══════════════════════════════════════════════════════════════════════════
@@ -56,4 +59,5 @@ urlpatterns = [
     # ═══════════════════════════════════════════════════════════════════════════
     
     path('compare/', views.CompareView.as_view(), name='compare'),
+   # path('category/<slug:slug>/', views.category_view, name='category'),  # ✅ اضافه کن
 ]

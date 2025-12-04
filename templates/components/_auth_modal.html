@@ -1,29 +1,6 @@
-{# ═══════════════════════════════════════════════════════════════════════════════════════════
-   COMPONENT: Authentication Modal (_auth_modal.html)
-   ═══════════════════════════════════════════════════════════════════════════════════════════
-   
-   PURPOSE:
-   - Handles user login and registration via OTP
-   - Multi-step flow: Input → OTP Verification → Success
-   - Supports both mobile number and email
-   
-   DEPENDENCIES:
-   - CSS: static/css/components/_auth_modal.css
-   - JS: Handled via inline script or main.js AuthModal class
-   
-   USAGE:
-   {% include 'components/_auth_modal.html' %}
-   
-   JAVASCRIPT API:
-   - window.AuthModal.open('login')   // Open login tab
-   - window.AuthModal.open('register') // Open register tab
-   - window.AuthModal.close()          // Close modal
-   
-   ═══════════════════════════════════════════════════════════════════════════════════════════ #}
 
-{# ═══════════════════════════════════════════════════════════════════════════════════════════
-   SECTION 1: MODAL OVERLAY & CONTAINER
-   ═══════════════════════════════════════════════════════════════════════════════════════════ #}
+
+{% load static %}
 
 <div class="auth-modal-overlay" id="authModalOverlay" aria-hidden="true">
     <div class="auth-modal-container" 
@@ -32,13 +9,11 @@
          aria-modal="true" 
          aria-labelledby="authModalTitle">
         
-        {# ═══════════════════════════════════════════════════════════════════════════════════
-           SECTION 2: MODAL HEADER
-           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
         
         <div class="auth-modal-header">
             
-            {# Logo #}
+            
             <a href="{% url 'core:home' %}" class="auth-modal-logo">
                 <img src="{% static 'images/logo.svg' %}" 
                      alt="Mini-up" 
@@ -46,7 +21,7 @@
                 <span class="auth-modal-logo-text">Mini-up</span>
             </a>
             
-            {# Close Button #}
+            
             <button type="button" 
                     class="auth-modal-close" 
                     id="authModalClose"
@@ -56,9 +31,7 @@
             
         </div>
         
-        {# ═══════════════════════════════════════════════════════════════════════════════════
-           SECTION 3: MODAL TITLE & DESCRIPTION
-           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
         
         <div class="auth-modal-title-section">
             <h2 class="auth-modal-title" id="authModalTitle">
@@ -69,9 +42,7 @@
             </p>
         </div>
         
-        {# ═══════════════════════════════════════════════════════════════════════════════════
-           SECTION 4: TAB SWITCHER (Login / Register)
-           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
         
         <div class="auth-modal-tabs" role="tablist">
             
@@ -97,29 +68,25 @@
                 <span>ثبت نام</span>
             </button>
             
-            {# Tab Indicator (sliding underline) #}
+            
             <div class="auth-modal-tab-indicator" id="tabIndicator"></div>
             
         </div>
         
-        {# ═══════════════════════════════════════════════════════════════════════════════════
-           SECTION 5: LOGIN PANEL
-           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
         
         <div class="auth-modal-panel is-active" 
              id="loginPanel" 
              role="tabpanel" 
              aria-labelledby="loginTab">
             
-            {# ───────────────────────────────────────────────────────────────────────────────
-               STEP 1: Input (Phone/Email)
-               ─────────────────────────────────────────────────────────────────────────────── #}
+            
             
             <div class="auth-step is-active" id="loginStep1" data-step="1">
                 
                 <form class="auth-form" id="loginForm" novalidate>
                     
-                    {# Input Field #}
+                    
                     <div class="auth-input-group">
                         <label class="auth-input-label" for="loginIdentifier">
                             شماره موبایل یا ایمیل
@@ -145,7 +112,7 @@
                         <span class="auth-input-error" id="loginIdentifierError"></span>
                     </div>
                     
-                    {# Submit Button #}
+                    
                     <button type="submit" 
                             class="auth-submit-btn" 
                             id="loginSubmitBtn"
@@ -162,13 +129,11 @@
                 
             </div>
             
-            {# ───────────────────────────────────────────────────────────────────────────────
-               STEP 2: OTP Verification
-               ─────────────────────────────────────────────────────────────────────────────── #}
+            
             
             <div class="auth-step" id="loginStep2" data-step="2">
                 
-                {# Back Button #}
+                
                 <button type="button" 
                         class="auth-back-btn" 
                         id="loginBackBtn"
@@ -177,7 +142,7 @@
                     <span>بازگشت</span>
                 </button>
                 
-                {# OTP Info #}
+                
                 <div class="auth-otp-info">
                     <div class="auth-otp-icon">
                         <i class="fas fa-envelope-open-text"></i>
@@ -186,7 +151,7 @@
                         کد تأیید ارسال شد به:
                     </p>
                     <p class="auth-otp-destination" id="loginOtpDestination">
-                        {# Filled by JavaScript #}
+                        
                     </p>
                     <button type="button" 
                             class="auth-change-destination" 
@@ -196,7 +161,7 @@
                     </button>
                 </div>
                 
-                {# OTP Input #}
+                
                 <form class="auth-otp-form" id="loginOtpForm" novalidate>
                     
                     <label class="auth-otp-label">کد ۶ رقمی را وارد کنید</label>
@@ -250,7 +215,7 @@
                     
                     <span class="auth-otp-error" id="loginOtpError"></span>
                     
-                    {# Timer #}
+                    
                     <div class="auth-otp-timer" id="loginOtpTimer">
                         <span class="auth-timer-label">مدت زمان باقی‌مانده:</span>
                         <div class="auth-timer-display">
@@ -260,13 +225,13 @@
                         </div>
                     </div>
                     
-                    {# Timer Expired #}
+                    
                     <div class="auth-otp-expired" id="loginOtpExpired" hidden>
                         <i class="fas fa-clock"></i>
                         <span>کد تأیید منقضی شده است</span>
                     </div>
                     
-                    {# Resend Button #}
+                    
                     <button type="button" 
                             class="auth-resend-btn" 
                             id="loginResendBtn"
@@ -275,7 +240,7 @@
                         <span>ارسال مجدد کد</span>
                     </button>
                     
-                    {# Submit OTP #}
+                    
                     <button type="submit" 
                             class="auth-submit-btn" 
                             id="loginOtpSubmitBtn"
@@ -292,9 +257,7 @@
                 
             </div>
             
-            {# ───────────────────────────────────────────────────────────────────────────────
-               STEP 3: Success
-               ─────────────────────────────────────────────────────────────────────────────── #}
+            
             
             <div class="auth-step" id="loginStep3" data-step="3">
                 
@@ -316,9 +279,7 @@
             
         </div>
         
-        {# ═══════════════════════════════════════════════════════════════════════════════════
-           SECTION 6: REGISTER PANEL
-           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
         
         <div class="auth-modal-panel" 
              id="registerPanel" 
@@ -326,15 +287,13 @@
              aria-labelledby="registerTab"
              hidden>
             
-            {# ───────────────────────────────────────────────────────────────────────────────
-               STEP 1: Input (Phone/Email)
-               ─────────────────────────────────────────────────────────────────────────────── #}
+            
             
             <div class="auth-step is-active" id="registerStep1" data-step="1">
                 
                 <form class="auth-form" id="registerForm" novalidate>
                     
-                    {# Input Field #}
+                    
                     <div class="auth-input-group">
                         <label class="auth-input-label" for="registerIdentifier">
                             شماره موبایل یا ایمیل
@@ -360,7 +319,7 @@
                         <span class="auth-input-error" id="registerIdentifierError"></span>
                     </div>
                     
-                    {# Terms Agreement #}
+                    
                     <div class="auth-terms">
                         <label class="auth-checkbox-wrapper">
                             <input type="checkbox" 
@@ -378,7 +337,7 @@
                         </label>
                     </div>
                     
-                    {# Submit Button #}
+                    
                     <button type="submit" 
                             class="auth-submit-btn" 
                             id="registerSubmitBtn"
@@ -395,13 +354,11 @@
                 
             </div>
             
-            {# ───────────────────────────────────────────────────────────────────────────────
-               STEP 2: OTP Verification
-               ─────────────────────────────────────────────────────────────────────────────── #}
+            
             
             <div class="auth-step" id="registerStep2" data-step="2">
                 
-                {# Back Button #}
+                
                 <button type="button" 
                         class="auth-back-btn" 
                         id="registerBackBtn"
@@ -410,7 +367,7 @@
                     <span>بازگشت</span>
                 </button>
                 
-                {# OTP Info #}
+                
                 <div class="auth-otp-info">
                     <div class="auth-otp-icon">
                         <i class="fas fa-envelope-open-text"></i>
@@ -419,7 +376,7 @@
                         کد تأیید ارسال شد به:
                     </p>
                     <p class="auth-otp-destination" id="registerOtpDestination">
-                        {# Filled by JavaScript #}
+                        
                     </p>
                     <button type="button" 
                             class="auth-change-destination" 
@@ -429,7 +386,7 @@
                     </button>
                 </div>
                 
-                {# OTP Input Form #}
+                
                 <form class="auth-otp-form" id="registerOtpForm" novalidate>
                     
                     <label class="auth-otp-label">کد ۶ رقمی را وارد کنید</label>
@@ -483,7 +440,7 @@
                     
                     <span class="auth-otp-error" id="registerOtpError"></span>
                     
-                    {# Timer #}
+                    
                     <div class="auth-otp-timer" id="registerOtpTimer">
                         <span class="auth-timer-label">زمان باقی‌مانده برای وارد کردن کد:</span>
                         <div class="auth-timer-display">
@@ -493,13 +450,13 @@
                         </div>
                     </div>
                     
-                    {# Timer Expired #}
+                    
                     <div class="auth-otp-expired" id="registerOtpExpired" hidden>
                         <i class="fas fa-exclamation-circle"></i>
                         <span>کد منقضی شده است</span>
                     </div>
                     
-                    {# Resend Button #}
+                    
                     <button type="button" 
                             class="auth-resend-btn" 
                             id="registerResendBtn"
@@ -508,7 +465,7 @@
                         <span>ارسال مجدد کد</span>
                     </button>
                     
-                    {# Submit OTP #}
+                    
                     <button type="submit" 
                             class="auth-submit-btn" 
                             id="registerOtpSubmitBtn"
@@ -525,9 +482,7 @@
                 
             </div>
             
-            {# ───────────────────────────────────────────────────────────────────────────────
-               STEP 3: Success
-               ─────────────────────────────────────────────────────────────────────────────── #}
+            
             
             <div class="auth-step" id="registerStep3" data-step="3">
                 
@@ -549,9 +504,7 @@
             
         </div>
         
-        {# ═══════════════════════════════════════════════════════════════════════════════════
-           SECTION 7: SOCIAL LOGIN OPTIONS (Optional)
-           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
         
         <div class="auth-social-section" id="authSocialSection">
             
@@ -577,9 +530,7 @@
             
         </div>
         
-        {# ═══════════════════════════════════════════════════════════════════════════════════
-           SECTION 8: MODAL FOOTER
-           ═══════════════════════════════════════════════════════════════════════════════════ #}
+        
         
         <div class="auth-modal-footer">
             <a href="{% url 'core:terms' %}" class="auth-footer-link">
@@ -594,17 +545,13 @@
     </div>
 </div>
 
-{# ═══════════════════════════════════════════════════════════════════════════════════════════
-   SECTION 9: INLINE INITIALIZATION SCRIPT
-   ═══════════════════════════════════════════════════════════════════════════════════════════ #}
-
 <script>
 (function() {
     'use strict';
     
-    // ═══════════════════════════════════════════════════════════════════════════════════════
+    // =======================================================================================
     // AUTH MODAL CLASS
-    // ═══════════════════════════════════════════════════════════════════════════════════════
+    // =======================================================================================
     
     class AuthModal {
         constructor() {
@@ -639,16 +586,13 @@
             
             // Initialize
             this.init();
-        }
-        
-        init() {
             this.bindEvents();
             this.initTabIndicator();
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // EVENT BINDING
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         bindEvents() {
             // Close modal
@@ -690,9 +634,9 @@
             this.bindSocialEvents();
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // LOGIN EVENTS
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         bindLoginEvents() {
             const loginForm = document.getElementById('loginForm');
@@ -767,9 +711,9 @@
             }
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // REGISTER EVENTS
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         bindRegisterEvents() {
             const registerForm = document.getElementById('registerForm');
@@ -855,9 +799,9 @@
             }
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // SOCIAL LOGIN EVENTS
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         bindSocialEvents() {
             const googleLoginBtn = document.getElementById('googleLoginBtn');
@@ -869,9 +813,9 @@
             }
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // OTP INPUT BINDING
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         bindOtpInputs(containerId, submitBtnId) {
             const container = document.getElementById(containerId);
@@ -956,9 +900,9 @@
             });
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // VALIDATION HELPERS
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         validateIdentifier(value) {
             if (!value) return false;
@@ -1086,9 +1030,9 @@
             }
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // MODAL OPEN / CLOSE
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         open(tab = 'login') {
             if (!this.overlay) return;
@@ -1170,9 +1114,9 @@
             });
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // API HANDLERS - LOGIN
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         async handleLoginSubmit() {
             const identifier = document.getElementById('loginIdentifier');
@@ -1300,9 +1244,9 @@
             }
         }
         
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // API HANDLERS - REGISTER
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         
         async handleRegisterSubmit() {
             const identifier = document.getElementById('registerIdentifier');
@@ -1436,9 +1380,9 @@
             }
         }
 
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // API REQUEST HELPERS
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
 
         async sendOtp(identifier, action) {
             try {
@@ -1483,9 +1427,9 @@
             }
         }
 
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
         // HELPERS
-        // ───────────────────────────────────────────────────────────────────────────────────
+        // -----------------------------------------------------------------------------------
 
         getCsrfToken() {
             const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
@@ -1514,9 +1458,9 @@
         }
     }
 
-    // ───────────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------------
     // INITIALIZE GLOBAL INSTANCE
-    // ───────────────────────────────────────────────────────────────────────────────
+    // -------------------------------------------------------------------------------
 
     window.AuthModal = new AuthModal();
 

@@ -38,6 +38,7 @@ urlpatterns = [
     
     # لیست سفارشات کاربر
     path('', api_views.OrderListAPIView.as_view(), name='order_list'),
+    path('history/', api_views.OrderListAPIView.as_view(), name='history'),
     
     # جزئیات سفارش
     path('<int:order_id>/', api_views.OrderDetailAPIView.as_view(), name='order_detail'),

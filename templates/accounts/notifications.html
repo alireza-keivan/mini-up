@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} | Mini-up{% endblock %}
+
+{% block content %}
+<div class="account-page-container">
+    
+    {% include "accounts/_sidebar.html" %}
+    
+    <div class="account-content">
+        <div class="account-header">
+            <h1 class="account-title">
+                <i class="fas fa-bell"></i>
+                {{ page_title }}
+            </h1>
+        </div>
+        
+        {% if notifications %}
+            <div class="notifications-list">
+                {% for notif in notifications %}
+                <div class="notification-item {% if not notif.is_read %}unread{% endif %}">
+                    <div class="notification-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="notification-content">
+                        <p class="notification-text">{{ notif.message }}</p>
+                        <span class="notification-time">{{ notif.created_at }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-bell-slash"></i>
+                <p>اعلانی وجود ندارد</p>
+            </div>
+        {% endif %}
+        
+    </div>
+</div>
+{% endblock %}

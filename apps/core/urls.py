@@ -26,4 +26,8 @@ urlpatterns = [
     path('term-conditions/', views.terms, name='term_conditions'),  # alias
     path('privacy/', views.privacy, name='privacy'),
     path('contact/', views.contact, name='contact'),
+    path('search/', views.search_view, name='search'),
+    path('search/api/', views.search_api_view, name='search_api'),
+    path('category/<slug:slug>/', views.category_view, name='category'),
+
 ]
