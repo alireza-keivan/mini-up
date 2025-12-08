@@ -579,127 +579,71 @@
             {% endif %}
             
             
-            
             {% if user.is_authenticated %}
-                
-                <div class="navbar-action-dropdown">
+                <!-- User Dropdown -->
+                <div class="navbar-user" data-user-dropdown>
                     <button type="button" 
-                            class="navbar-user-btn" 
-                            id="userMenuToggle"
+                            class="navbar-user-trigger" 
+                            data-ud-trigger
                             aria-label="منوی کاربری"
                             aria-expanded="false"
                             aria-haspopup="true">
                         <div class="navbar-user-avatar">
-                            {% if user.profile.avatar %}
-                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_display_name }}">
+                            {% if user.profile and user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:'کاربر' }}">
                             {% else %}
                                 <i class="fas fa-user"></i>
                             {% endif %}
                         </div>
-                        <span class="navbar-user-name">{{ user.get_display_name|default:user.phone }}</span>
-                        <i class="fas fa-chevron-down"></i>
+                        <span class="navbar-user-name">{{ user.get_full_name|default:user.phone }}</span>
+                        <i class="fas fa-chevron-down" data-ud-arrow></i>
                     </button>
                     
-                    
-                    <div class="navbar-user-dropdown" id="userMenuDropdown">
-                        
-                        
-                        <div class="navbar-user-dropdown-header">
-                            <div class="navbar-user-dropdown-avatar">
-                                {% if user.profile.avatar %}
-                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_display_name }}">
-                                {% else %}
-                                    <i class="fas fa-user"></i>
-                                {% endif %}
+                    <div class="navbar-user-dropdown" data-ud-dropdown>
+                        <div class="navbar-user-dropdown-container">
+                            <!-- Header -->
+                            <div class="navbar-user-dropdown-header">
+                                <div class="navbar-user-dropdown-header-avatar">
+                                    {% if user.profile and user.profile.avatar %}
+                                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:'کاربر' }}">
+                                    {% else %}
+                                        <i class="fas fa-user"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="navbar-user-dropdown-header-info">
+                                    <div class="navbar-user-dropdown-header-name">{{ user.get_full_name|default:"کاربر" }}</div>
+                                    <div class="navbar-user-dropdown-header-email">{{ user.phone }}</div>
+                                </div>
                             </div>
-                            <div class="navbar-user-dropdown-info">
-                                <div class="navbar-user-dropdown-name">{{ user.get_display_name|default:"کاربر" }}</div>
-                                <div class="navbar-user-dropdown-phone">{{ user.phone }}</div>
-                            </div>
-                        </div>
-                        
-                        
-                        <div class="navbar-user-dropdown-wallet">
-                            <div class="navbar-user-dropdown-wallet-label">
-                                <i class="fas fa-wallet"></i>
-                                موجودی کیف پول
-                            </div>
-                            <div class="navbar-user-dropdown-wallet-amount">
-                                {{ wallet_total_balance|intcomma }} تومان
-                            </div>
-                            <a href="{% url 'wallet:deposit' %}" class="navbar-user-dropdown-wallet-add">
-                                <i class="fas fa-plus"></i>
-                                افزایش موجودی
-                            </a>
-                        </div>
-                        
-                        
-                        <div class="navbar-user-dropdown-menu">
-                            <a href="{% url 'accounts:dashboard' %}" class="navbar-user-dropdown-item">
-                                <i class="fas fa-tachometer-alt"></i>
-                                <span>داشبورد</span>
-                            </a>
+                            
+                            <!-- Menu links -->
                             <a href="{% url 'accounts:orders' %}" class="navbar-user-dropdown-item">
                                 <i class="fas fa-shopping-bag"></i>
-                                <span>سفارش‌های من</span>
-                                {% if pending_orders_count %}
-                                    <span class="navbar-user-dropdown-item-badge">{{ pending_orders_count }}</span>
-                                {% endif %}
-                            </a>
-                            <a href="{% url 'accounts:transactions' %}" class="navbar-user-dropdown-item">
-                                <i class="fas fa-exchange-alt"></i>
-                                <span>تراکنش‌ها</span>
+                                <span>سفارش‌ها</span>
                             </a>
                             <a href="{% url 'accounts:tickets' %}" class="navbar-user-dropdown-item">
                                 <i class="fas fa-headset"></i>
                                 <span>تیکت‌های پشتیبانی</span>
-                                {% if open_tickets_count %}
-                                    <span class="navbar-user-dropdown-item-badge">{{ open_tickets_count }}</span>
-                                {% endif %}
                             </a>
-                            <a href="{% url 'accounts:favorites' %}" class="navbar-user-dropdown-item">
-                                <i class="fas fa-heart"></i>
-                                <span>علاقه‌مندی‌ها</span>
+                            <a href="{% url 'wallet:dashboard' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-wallet"></i>
+                                <span>کیف پول</span>
                             </a>
-                            
-                            <div class="navbar-user-dropdown-divider"></div>
-                            
                             <a href="{% url 'accounts:profile' %}" class="navbar-user-dropdown-item">
                                 <i class="fas fa-user-edit"></i>
-                                <span>ویرایش پروفایل</span>
+                                <span>پروفایل</span>
                             </a>
-                            <a href="{% url 'accounts:settings' %}" class="navbar-user-dropdown-item">
-                                <i class="fas fa-cog"></i>
-                                <span>تنظیمات حساب</span>
-                            </a>
-                            
-                            {% if user.is_staff %}
-                                <div class="navbar-user-dropdown-divider"></div>
-                                <a href="{% url 'admin:index' %}" class="navbar-user-dropdown-item admin">
-                                    <i class="fas fa-shield-alt"></i>
-                                    <span>پنل مدیریت</span>
-                                </a>
-                            {% endif %}
                             
                             <div class="navbar-user-dropdown-divider"></div>
                             
-                            <button type="button" 
-                                    class="navbar-user-dropdown-item logout"
-                                    data-action="logout"
-                                    data-logout-url="{% url 'accounts:logout' %}">
+                            <a href="{% url 'accounts:logout' %}" class="navbar-user-dropdown-item navbar-user-logout">
                                 <i class="fas fa-sign-out-alt"></i>
-                                <span>خروج از حساب</span>
-                            </button>
+                                <span>خروج</span>
+                            </a>
                         </div>
-                        
-                        
                     </div>
-                    
                 </div>
-                
-                
             {% else %}
-                
                 <div class="navbar-auth-buttons">
                     <a href="{% url 'accounts:login' %}" class="navbar-auth-btn login">
                         <i class="fas fa-sign-in-alt"></i>
@@ -707,7 +651,6 @@
                     </a>
                 </div>
             {% endif %}
-            
             
             
             <button type="button" 
@@ -728,16 +671,6 @@
     
     
 </nav>
-
-{% include 'components/_mobile_menu.html' %}
-
-{% include 'components/_search_modal.html' %}
-
-{% include 'components/_cart_sidebar.html' %}
-
-{% if not user.is_authenticated %}
-    {% include 'components/_auth_modal.html' %}
-{% endif %}
 
 <div class="navbar-spacer"></div>
 
