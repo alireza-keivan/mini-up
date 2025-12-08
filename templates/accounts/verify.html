@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تایید کد ورود | مینی‌آپ{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .verify-container {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .verify-card {
+        background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 20, 40, 0.95));
+        border-radius: 24px;
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        padding: 40px 30px;
+        box-shadow: 0 20px 60px rgba(255, 0, 85, 0.15);
+        backdrop-filter: blur(20px);
+    }
+
+    .verify-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .verify-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 12px;
+    }
+
+    .verify-header p {
+        color: #999;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .phone-display {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #ff0055;
+        font-weight: 600;
+        direction: ltr;
+    }
+
+    .otp-inputs {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin: 30px 0;
+        direction: ltr;
+    }
+
+    .otp-input {
+        width: 56px;
+        height: 64px;
+        text-align: center;
+        font-size: 28px;
+        font-weight: 700;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .otp-input:focus {
+        outline: none;
+        border-color: #ff0055;
+        background: rgba(255, 0, 85, 0.1);
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
+    }
+
+    .otp-input.filled {
+        border-color: #00f5ff;
+        background: rgba(0, 245, 255, 0.05);
+    }
+
+    .timer-section {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .timer {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        color: #999;
+        font-family: monospace;
+    }
+
+    .timer.warning {
+        color: #ff0055;
+    }
+
+    .resend-section {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .resend-btn {
+        background: none;
+        border: none;
+        color: #00f5ff;
+        font-size: 15px;
+        cursor: pointer;
+        text-decoration: underline;
+        transition: all 0.3s ease;
+    }
+
+    .resend-btn:hover:not(:disabled) {
+        color: #ff0055;
+    }
+
+    .resend-btn:disabled {
+        color: #555;
+        cursor: not-allowed;
+        text-decoration: none;
+    }
+
+    .verify-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+
+    .verify-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(255, 0, 85, 0.4);
+    }
+
+    .verify-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .verify-btn.loading {
+        position: relative;
+        color: transparent;
+    }
+
+    .verify-btn.loading::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+        background: rgba(255, 0, 85, 0.1);
+        border: 1px solid rgba(255, 0, 85, 0.3);
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: #ff0055;
+        font-size: 14px;
+        text-align: center;
+        margin-top: 16px;
+        display: none;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    .success-message {
+        background: rgba(0, 245, 255, 0.1);
+        border: 1px solid rgba(0, 245, 255, 0.3);
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: #00f5ff;
+        font-size: 14px;
+        text-align: center;
+        margin-top: 16px;
+        display: none;
+    }
+
+    .success-message.show {
+        display: block;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #999;
+        font-size: 14px;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+        color: #00f5ff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verify-container">
+    <div class="verify-card">
+        <div class="verify-header">
+            <h1>کد تایید را وارد کنید</h1>
+            <p>
+                کد ۵ رقمی ارسال شده به شماره
+                <span class="phone-display">
+                    <i class="fas fa-mobile-alt"></i>
+                    {{ phone }}
+                </span>
+                را وارد نمایید
+            </p>
+        </div>
+
+        <form id="verifyForm">
+            {% csrf_token %}
+            <input type="hidden" name="phone" value="{{ phone_full }}">
+            
+            <div class="otp-inputs">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" data-index="0">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" data-index="1">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" data-index="2">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" data-index="3">
+                <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="off" data-index="4">
+            </div>
+
+            <div class="timer-section">
+                <div class="timer" id="timer">
+                    <i class="fas fa-clock"></i>
+                    <span id="timeLeft">{{ remaining_time }}</span>
+                    ثانیه مانده
+                </div>
+            </div>
+
+            <div class="resend-section">
+                <button type="button" class="resend-btn" id="resendBtn" disabled>
+                    ارسال مجدد کد
+                </button>
+            </div>
+
+            <button type="submit" class="verify-btn" id="verifyBtn">
+                تایید و ورود
+            </button>
+
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+        </form>
+
+        <a href="{% url 'accounts:login' %}" class="back-link">
+            <i class="fas fa-arrow-right"></i>
+            بازگشت به صفحه ورود
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('verifyForm');
+    const inputs = document.querySelectorAll('.otp-input');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const timerDisplay = document.getElementById('timer');
+    const timeLeftSpan = document.getElementById('timeLeft');
+    // @ts-ignore
+    let timeLeft = {{ remaining_time|default:120 }};
+    let timerInterval;
+
+    // Auto-focus first input
+    inputs[0].focus();
+
+    // Timer countdown
+    function startTimer() {
+        timerInterval = setInterval(function() {
+            timeLeft--;
+            timeLeftSpan.textContent = timeLeft;
+
+            if (timeLeft <= 30) {
+                timerDisplay.classList.add('warning');
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                resendBtn.disabled = false;
+                timeLeftSpan.textContent = '0';
+            }
+        }, 1000);
+    }
+
+    startTimer();
+
+    // OTP input handling
+    inputs.forEach((input, index) => {
+        // Move to next input on digit entry
+        input.addEventListener('input', function(e) {
+            const value = e.target.value;
+            
+            if (value.length === 1 && /^\d$/.test(value)) {
+                e.target.classList.add('filled');
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                
+                // Auto-submit if all filled
+                if (index === inputs.length - 1) {
+                    const allFilled = Array.from(inputs).every(inp => inp.value.length === 1);
+                    if (allFilled) {
+                        form.dispatchEvent(new Event('submit', { cancelable: true }));
+                    }
+                }
+            } else if (value.length === 0) {
+                e.target.classList.remove('filled');
+            }
+        });
+
+        // Handle backspace
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                inputs[index - 1].focus();
+                inputs[index - 1].value = '';
+                inputs[index - 1].classList.remove('filled');
+            }
+        });
+
+        // Handle paste
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pasteData = e.clipboardData.getData('text').trim();
+            
+            if (/^\d{5}$/.test(pasteData)) {
+                pasteData.split('').forEach((char, i) => {
+                    if (inputs[i]) {
+                        inputs[i].value = char;
+                        inputs[i].classList.add('filled');
+                    }
+                });
+                inputs[4].focus();
+                
+                // Auto-submit after paste
+                setTimeout(() => {
+                    form.dispatchEvent(new Event('submit', { cancelable: true }));
+                }, 300);
+            }
+        });
+    });
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const code = Array.from(inputs).map(input => input.value).join('');
+        
+        if (code.length !== 5) {
+            showError('لطفا تمام ارقام را وارد کنید');
+            return;
+        }
+
+        if (!/^\d{5}$/.test(code)) {
+            showError('کد باید عددی باشد');
+            return;
+        }
+
+        verifyBtn.disabled = true;
+        verifyBtn.classList.add('loading');
+        errorMessage.classList.remove('show');
+
+        fetch('{% url "accounts:verify" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess('ورود موفقیت‌آمیز! در حال انتقال...');
+                setTimeout(() => {
+                    window.location.href = data.redirect_url || '/';
+                }, 1000);
+            } else {
+                showError(data.message || 'کد نامعتبر است');
+                verifyBtn.disabled = false;
+                verifyBtn.classList.remove('loading');
+                
+                // Clear inputs on error
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+                inputs[0].focus();
+            }
+        })
+        .catch(error => {
+            showError('خطا در برقراری ارتباط');
+            verifyBtn.disabled = false;
+            verifyBtn.classList.remove('loading');
+        });
+    });
+
+    // Resend OTP
+    resendBtn.addEventListener('click', function() {
+        resendBtn.disabled = true;
+        
+        fetch('{% url "accounts:resend_otp" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess('کد جدید ارسال شد');
+                timeLeft = data.expires_in || 120;
+                timeLeftSpan.textContent = timeLeft;
+                timerDisplay.classList.remove('warning');
+                clearInterval(timerInterval);
+                startTimer();
+            } else {
+                showError(data.message || 'خطا در ارسال کد');
+                resendBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            showError('خطا در برقراری ارتباط');
+            resendBtn.disabled = false;
+        });
+    });
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.add('show');
+        successMessage.classList.remove('show');
+    }
+
+    function showSuccess(message) {
+        successMessage.textContent = message;
+        successMessage.classList.add('show');
+        errorMessage.classList.remove('show');
+    }
+});
+</script>
+{% endblock %}

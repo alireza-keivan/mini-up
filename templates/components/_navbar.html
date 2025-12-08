@@ -206,29 +206,78 @@
                 <a href="{% url 'core:gaming_products' %}" class="navbar-menu-link">
                     <i class="fas fa-gamepad"></i>
                     <span>محصولات گیمینگ</span>
-                                        <i class="fas fa-chevron-down nav-arrow"></i>
+                    <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
-                
-                
-                <div class="navbar-dropdown">
-                    <div class="navbar-dropdown-menu">
-                        <div class="navbar-dropdown-header">
-                            <i class="fas fa-gamepad"></i>
-                            دسته‌بندی محصولات
+
+                <div class="mega-menu mega-menu--compact">
+                    <div class="mega-menu-container mega-menu-container--compact">
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">
+                                <i class="fas fa-gamepad"></i>
+                                محصولات گیمینگ
+                            </span>
+                            <a href="{% url 'core:gaming_products' %}" class="mega-menu-link">
+                                مشاهده همه محصولات
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
                         </div>
-                        <a href="{% url 'core:gaming_products' %}?category_detail=fan" class="navbar-dropdown-item">
-                            <i class="fas fa-wind"></i>
-                            <span>فن گیمینگ</span>
-                        </a>
-                        <a href="{% url 'core:gaming_products' %}?category_detail=finger" class="navbar-dropdown-item">
-                            <i class="fas fa-hand-pointer"></i>
-                            <span>دستکش انگشتی</span>
-                        </a>
-                        <div class="navbar-dropdown-divider"></div>
-                        <a href="{% url 'core:gaming_products' %}" class="navbar-dropdown-item">
-                            <i class="fas fa-th-large"></i>
-                            <span>مشاهده همه محصولات</span>
-                        </a>
+
+                        <div class="mega-menu-body">
+                            <div class="mega-menu-grid mega-menu-grid--compact">
+                                <a href="{% url 'core:gaming_products' %}?category_detail=fan" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon purple">
+                                        <i class="fas fa-wind"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">فن گیمینگ</div>
+                                        <div class="mega-menu-item-desc">خنک‌کننده حرفه‌ای برای بازی طولانی</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'core:gaming_products' %}?category_detail=finger" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon cyan">
+                                        <i class="fas fa-hand-pointer"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">دستکش انگشتی</div>
+                                        <div class="mega-menu-item-desc">کنترل لمسی دقیق بدون تعریق</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'core:gaming_products' %}?category_detail=trigger" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon pink">
+                                        <i class="fas fa-bullseye"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">تریگر و کنترلر</div>
+                                        <div class="mega-menu-item-desc">شلیک سریع و واکنش دقیق در بازی</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'core:gaming_products' %}?category_detail=headset" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon yellow">
+                                        <i class="fas fa-headset"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">هدست و میکروفون</div>
+                                        <div class="mega-menu-item-desc">صدای فراگیر و ارتباط شفاف با تیم</div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="mega-menu-featured mega-menu-featured--single">
+                                <div class="mega-menu-featured-title">
+                                    <i class="fas fa-fire"></i>
+                                    پیشنهاد ویژه
+                                </div>
+                                <div class="mega-menu-featured-items">
+                                    <a href="{% url 'core:gaming_products' %}?bundle=mobile-pro" class="mega-menu-featured-card">
+                                        <span class="mega-menu-featured-card-badge">پکیج</span>
+                                        <div class="mega-menu-featured-card-content">
+                                            <div class="mega-menu-featured-card-title">ست کامل گیمینگ موبایل</div>
+                                            <div class="mega-menu-featured-card-desc">فن + تریگر + دستکش با ۱۵٪ تخفیف</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -241,26 +290,76 @@
                     <span>خرید محصولات</span>
                     <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
-                
-                <div class="navbar-dropdown">
-                    <div class="navbar-dropdown-menu">
-                        <div class="navbar-dropdown-header">
-                            <i class="fas fa-mobile-alt"></i>
-                            لوازم جانبی موبایل
+
+                <div class="mega-menu mega-menu--compact">
+                    <div class="mega-menu-container mega-menu-container--compact">
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">
+                                <i class="fas fa-mobile-alt"></i>
+                                لوازم جانبی موبایل
+                            </span>
+                            <a href="{% url 'core:buy_products' %}" class="mega-menu-link">
+                                مشاهده همه محصولات
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
                         </div>
-                        <a href="{% url 'core:buy_products' %}?category=guard" class="navbar-dropdown-item">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>گارد موبایل</span>
-                        </a>
-                        <a href="{% url 'core:buy_products' %}?category=glass" class="navbar-dropdown-item">
-                            <i class="fas fa-mobile-alt"></i>
-                            <span>گلس محافظ</span>
-                        </a>
-                        <div class="navbar-dropdown-divider"></div>
-                        <a href="{% url 'core:buy_products' %}" class="navbar-dropdown-item">
-                            <i class="fas fa-th-large"></i>
-                            <span>همه محصولات</span>
-                        </a>
+
+                        <div class="mega-menu-body">
+                            <div class="mega-menu-grid mega-menu-grid--compact">
+                                <a href="{% url 'core:buy_products' %}?category=guard" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon pink">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">گارد و کاور</div>
+                                        <div class="mega-menu-item-desc">محافظت کامل با طراحی نئونی و مدرن</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'core:buy_products' %}?category=glass" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon cyan">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">گلس و محافظ صفحه</div>
+                                        <div class="mega-menu-item-desc">شیشه‌های ضدخش و فول‌فیس برای تمام مدل‌ها</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'core:buy_products' %}?category=cable" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon yellow">
+                                        <i class="fas fa-bolt"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">کابل و شارژر</div>
+                                        <div class="mega-menu-item-desc">فست شارژ و اورجینال برای هر دستگاه</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'core:buy_products' %}?category=audio" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon green">
+                                        <i class="fas fa-headphones"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">هدفون و اسپیکر</div>
+                                        <div class="mega-menu-item-desc">صدایی شفاف برای موسیقی و بازی</div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="mega-menu-featured mega-menu-featured--single">
+                                <div class="mega-menu-featured-title">
+                                    <i class="fas fa-gift"></i>
+                                    پیشنهاد محدود
+                                </div>
+                                <div class="mega-menu-featured-items">
+                                    <a href="{% url 'core:buy_products' %}?bundle=protection" class="mega-menu-featured-card">
+                                        <span class="mega-menu-featured-card-badge">۲۰٪ تخفیف</span>
+                                        <div class="mega-menu-featured-card-content">
+                                            <div class="mega-menu-featured-card-title">باندل محافظت کامل</div>
+                                            <div class="mega-menu-featured-card-desc">گلس فول + کاور ضدضربه + محافظ لنز</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -273,31 +372,77 @@
                     <span>مینی گیم</span>
                     <i class="fas fa-chevron-down nav-arrow"></i>
                 </a>
-                
-                <div class="navbar-dropdown">
-                    <div class="navbar-dropdown-menu">
-                        <div class="navbar-dropdown-header">
-                            <i class="fas fa-coins"></i>
-                            خرید ارز بازی
+
+                <div class="mega-menu mega-menu--compact">
+                    <div class="mega-menu-container mega-menu-container--compact">
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">
+                                <i class="fas fa-coins"></i>
+                                خرید ارز بازی
+                            </span>
+                            <a href="{% url 'core:mini_game' %}" class="mega-menu-link">
+                                همه بازی‌ها
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
                         </div>
-                        <a href="{% url 'core:mini_game' %}?game=pubg" class="navbar-dropdown-item">
-                            <i class="fas fa-crosshairs"></i>
-                            <span>یوسی پابجی</span>
-                            <span class="navbar-dropdown-item-badge">پرفروش</span>
-                        </a>
-                        <a href="{% url 'core:mini_game' %}?game=freefire" class="navbar-dropdown-item">
-                            <i class="fas fa-fire"></i>
-                            <span>جم فری فایر</span>
-                        </a>
-                        <a href="{% url 'core:mini_game' %}?game=clash" class="navbar-dropdown-item">
-                            <i class="fas fa-gem"></i>
-                            <span>جم کلش</span>
-                        </a>
-                        <div class="navbar-dropdown-divider"></div>
-                        <a href="{% url 'core:mini_game' %}" class="navbar-dropdown-item">
-                            <i class="fas fa-gamepad"></i>
-                            <span>همه بازی‌ها</span>
-                        </a>
+
+                        <div class="mega-menu-body">
+                            <div class="mega-menu-grid mega-menu-grid--compact">
+                                <a href="{% url 'core:mini_game' %}?game=pubg" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon yellow">
+                                        <i class="fas fa-crosshairs"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">یوسی پابجی</div>
+                                        <div class="mega-menu-item-desc">تحویل لحظه‌ای + بونوس ویژه فصل جدید</div>
+                                    </div>
+                                    <span class="mega-menu-badge">پرفروش</span>
+                                </a>
+                                <a href="{% url 'core:mini_game' %}?game=freefire" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon orange">
+                                        <i class="fas fa-fire"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">جم فری فایر</div>
+                                        <div class="mega-menu-item-desc">قیمت رقابتی با گارانتی شارژ</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'core:mini_game' %}?game=clash" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon purple">
+                                        <i class="fas fa-gem"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">جم کلش</div>
+                                        <div class="mega-menu-item-desc">شارژ تضمینی دهکده و سوپرسل ایدی</div>
+                                    </div>
+                                </a>
+                                <a href="{% url 'core:mini_game' %}?game=valorant" class="mega-menu-item">
+                                    <div class="mega-menu-item-icon cyan">
+                                        <i class="fas fa-bullseye"></i>
+                                    </div>
+                                    <div class="mega-menu-item-info">
+                                        <div class="mega-menu-item-title">پوینت ولورانت</div>
+                                        <div class="mega-menu-item-desc">شارژ مستقیم با اکانت‌های ریجن ترکیه</div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="mega-menu-featured mega-menu-featured--single">
+                                <div class="mega-menu-featured-title">
+                                    <i class="fas fa-star"></i>
+                                    ویژه گیمرها
+                                </div>
+                                <div class="mega-menu-featured-items">
+                                    <a href="{% url 'core:mini_game' %}?bundle=season-pass" class="mega-menu-featured-card">
+                                        <span class="mega-menu-featured-card-badge">۳ ماهه</span>
+                                        <div class="mega-menu-featured-card-content">
+                                            <div class="mega-menu-featured-card-title">Season Pass پلاس</div>
+                                            <div class="mega-menu-featured-card-desc">همراه با ۱۰٪ هدیه شارژ کیف پول</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -556,20 +701,10 @@
             {% else %}
                 
                 <div class="navbar-auth-buttons">
-                    <button type="button" 
-                            class="navbar-auth-btn login"
-                            data-modal-target="authModal"
-                            data-auth-tab="login">
+                    <a href="{% url 'accounts:login' %}" class="navbar-auth-btn login">
                         <i class="fas fa-sign-in-alt"></i>
-                        <span>ورود</span>
-                    </button>
-                    <button type="button" 
-                            class="navbar-auth-btn register"
-                            data-modal-target="authModal"
-                            data-auth-tab="register">
-                        <i class="fas fa-user-plus"></i>
-                        <span>ثبت نام</span>
-                    </button>
+                        <span>ورود / ثبت نام</span>
+                    </a>
                 </div>
             {% endif %}
             

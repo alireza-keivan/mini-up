@@ -1,0 +1,602 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}مینی گیم | Mini-up{% endblock %}
+
+{% block content %}
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     MINI-GAME PAGE
+     Dark Neon Gaming Theme | RTL | Fully Dynamic
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Hero Section -->
+<section class="mg-hero relative overflow-hidden py-16 md:py-24">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="mg-orb mg-orb-1"></div>
+        <div class="mg-orb mg-orb-2"></div>
+        <div class="mg-orb mg-orb-3"></div>
+        <div class="mg-grid-overlay"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="text-center max-w-3xl mx-auto">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 mb-6">
+                <i class="fas fa-gamepad text-yellow-400 animate-pulse"></i>
+                <span class="text-yellow-300 text-sm font-medium">مارکت‌پلیس گیمینگ</span>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
+                <span class="mg-title-gradient">مینی گیم</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-gray-400 text-lg md:text-xl leading-relaxed mb-8">
+                خرید آیتم‌های درون بازی با بهترین قیمت و تحویل فوری
+            </p>
+            
+            <!-- Stats Row -->
+            <div class="flex flex-wrap justify-center gap-6 md:gap-10">
+                <div class="mg-stat-item flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                        <i class="fas fa-bolt text-yellow-400 text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-xl font-bold text-white">فوری</span>
+                        <span class="text-gray-500 text-sm">تحویل آنی</span>
+                    </div>
+                </div>
+                <div class="mg-stat-item flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                        <i class="fas fa-shield-halved text-emerald-400 text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-xl font-bold text-white">۱۰۰٪</span>
+                        <span class="text-gray-500 text-sm">تضمین اصالت</span>
+                    </div>
+                </div>
+                <div class="mg-stat-item flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
+                        <i class="fas fa-headset text-pink-400 text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-xl font-bold text-white">۲۴/۷</span>
+                        <span class="text-gray-500 text-sm">پشتیبانی</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     MAIN CONTENT - DYNAMIC CATEGORIES
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<main class="mg-main pb-20">
+    <div class="container mx-auto px-4">
+        
+        <!-- Categories Container -->
+        <div id="mg-categories-container" class="space-y-16">
+            
+            {% if categories %}
+                {% for category in categories %}
+                <!-- ═══════════════════════════════════════════════════════════
+                     CATEGORY SECTION (Dynamic)
+                     ═══════════════════════════════════════════════════════════ -->
+                <section class="mg-category-section" 
+                         data-category-id="{{ category.id }}" 
+                         data-category-slug="{{ category.slug }}">
+                    
+                    <!-- Category Header -->
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                        <div class="flex items-center gap-4">
+                            <!-- Category Icon -->
+                            <div class="mg-category-icon w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
+                                 style="background: linear-gradient(135deg, {{ category.color|default:'#f59e0b' }}20, {{ category.color|default:'#f59e0b' }}10); 
+                                        color: {{ category.color|default:'#f59e0b' }};
+                                        box-shadow: 0 0 20px {{ category.color|default:'#f59e0b' }}30;">
+                                <i class="{{ category.icon|default:'fas fa-gamepad' }}"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ category.name }}</h2>
+                                {% if category.description %}
+                                <p class="text-gray-500 text-sm mt-1">{{ category.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Plans Count -->
+                        <div class="flex items-center gap-3">
+                            <span class="text-gray-500 text-sm">
+                                <i class="fas fa-box-open ml-1"></i>
+                                {{ category.plans.count }} پلن
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Horizontal Scroll Widget -->
+                    <div class="mg-scroll-wrapper group relative">
+                        <!-- Navigation Arrows -->
+                        <button class="mg-nav-btn mg-nav-right absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-gray-900/90 border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gray-800 hover:border-white/20 -mr-5"
+                                aria-label="قبلی">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <button class="mg-nav-btn mg-nav-left absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-gray-900/90 border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gray-800 hover:border-white/20 -ml-5"
+                                aria-label="بعدی">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        
+                        <!-- Scroll Container -->
+                        <div class="mg-scroll-container flex gap-5 overflow-x-auto pb-4 scroll-smooth"
+                             style="scrollbar-width: none; -ms-overflow-style: none;">
+                            
+                            {% for plan in category.plans.all %}
+                            <!-- ═══════════════════════════════════════════════
+                                 PLAN CARD (Dynamic Content)
+                                 ═══════════════════════════════════════════════ -->
+                            <article class="mg-plan-card group/card flex-shrink-0 w-[280px] md:w-[300px] relative"
+                                     data-plan-id="{{ plan.id }}">
+                                
+                                <!-- Glow Effect -->
+                                <div class="mg-card-glow absolute inset-0 rounded-2xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none"
+                                     style="background: radial-gradient(circle at center, {{ category.color|default:'#f59e0b' }}20, transparent 70%);"></div>
+                                
+                                <!-- Card Content -->
+                                <div class="mg-card-inner relative z-10 p-5 rounded-2xl bg-gradient-to-br from-gray-900/90 to-gray-950/90 border border-white/10 backdrop-blur-sm transition-all duration-300 group-hover/card:border-white/20 group-hover/card:translate-y-[-4px]"
+                                     style="--card-accent: {{ category.color|default:'#f59e0b' }};">
+                                    
+                                    <!-- Top Row: Badge & Popular -->
+                                    <div class="flex items-start justify-between mb-4">
+                                        {% if plan.badge %}
+                                        <span class="px-3 py-1 rounded-lg text-xs font-bold"
+                                              style="background: {{ category.color|default:'#f59e0b' }}20; 
+                                                     color: {{ category.color|default:'#f59e0b' }};">
+                                            {{ plan.badge }}
+                                        </span>
+                                        {% endif %}
+                                        
+                                        {% if plan.is_popular %}
+                                        <span class="flex items-center gap-1 px-2 py-1 rounded-lg bg-rose-500/20 text-rose-400 text-xs font-medium">
+                                            <i class="fas fa-fire text-[10px]"></i>
+                                            پرفروش
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Icon/Image -->
+                                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
+                                         style="background: linear-gradient(135deg, {{ category.color|default:'#f59e0b' }}30, {{ category.color|default:'#f59e0b' }}10);">
+                                        {% if plan.image %}
+                                        <img src="{{ plan.image.url }}" alt="{{ plan.name }}" class="w-10 h-10 object-contain">
+                                        {% else %}
+                                        <i class="{{ category.icon|default:'fas fa-coins' }} text-2xl" style="color: {{ category.color|default:'#f59e0b' }};"></i>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Plan Name -->
+                                    <h3 class="text-lg font-bold text-white text-center mb-2">{{ plan.name }}</h3>
+                                    
+                                    <!-- Amount -->
+                                    {% if plan.amount %}
+                                    <div class="text-center mb-3">
+                                        <span class="text-3xl font-black" style="color: {{ category.color|default:'#f59e0b' }};">{{ plan.amount }}</span>
+                                        <span class="text-sm text-gray-500 mr-1">{{ plan.unit|default:'عدد' }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Features -->
+                                    {% if plan.features_list %}
+                                    <ul class="space-y-2 mb-4">
+                                        {% for feature in plan.features_list %}
+                                        <li class="flex items-center gap-2 text-gray-400 text-sm">
+                                            <i class="fas fa-check text-emerald-500 text-xs"></i>
+                                            <span>{{ feature }}</span>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                    
+                                    <!-- Price -->
+                                    <div class="pt-4 border-t border-white/10">
+                                        {% if plan.original_price and plan.original_price > plan.price %}
+                                        <div class="flex items-center justify-center gap-2 mb-1">
+                                            <span class="text-gray-500 line-through text-sm">{{ plan.original_price|intcomma }}</span>
+                                            <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 text-xs font-bold">
+                                                {{ plan.discount_percent }}٪
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                        <div class="text-center">
+                                            <span class="text-2xl font-bold text-white">{{ plan.price|intcomma }}</span>
+                                            <span class="text-sm text-gray-500 mr-1">تومان</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Buy Button -->
+                                    <button class="mg-buy-btn w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm transition-all duration-300"
+                                            data-plan-id="{{ plan.id }}"
+                                            data-plan-name="{{ plan.name }}"
+                                            data-plan-price="{{ plan.price }}"
+                                            style="background: linear-gradient(135deg, {{ category.color|default:'#f59e0b' }}, {{ category.color|default:'#f59e0b' }}cc);
+                                                   color: #000;">
+                                        <i class="fas fa-shopping-cart ml-2"></i>
+                                        خرید
+                                    </button>
+                                </div>
+                            </article>
+                            {% empty %}
+                            <!-- Empty State for Category -->
+                            <div class="flex-shrink-0 w-full py-16 text-center">
+                                <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
+                                    <i class="fas fa-box-open text-3xl text-gray-600"></i>
+                                </div>
+                                <p class="text-gray-500">پلنی در این دسته‌بندی ثبت نشده است</p>
+                            </div>
+                            {% endfor %}
+                            
+                        </div>
+                        
+                        <!-- Scroll Progress -->
+                        <div class="mg-scroll-progress h-1 mt-4 rounded-full bg-gray-800 overflow-hidden">
+                            <div class="mg-scroll-progress-bar h-full rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-150" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </section>
+                {% endfor %}
+                
+            {% else %}
+            <!-- ═══════════════════════════════════════════════════════════════
+                 EMPTY STATE - No Categories
+                 ═══════════════════════════════════════════════════════════════ -->
+            <section class="mg-empty-state py-20">
+                <div class="text-center max-w-md mx-auto">
+                    <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                        <i class="fas fa-gamepad text-4xl text-gray-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">محصولی یافت نشد</h3>
+                    <p class="text-gray-500 mb-6">در حال حاضر محصولی برای نمایش وجود ندارد. به زودی آیتم‌های جدید اضافه می‌شوند.</p>
+                    <a href="{% url 'core:home' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/20">
+                        <i class="fas fa-home"></i>
+                        بازگشت به خانه
+                    </a>
+                </div>
+            </section>
+            {% endif %}
+            
+        </div>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════
+             HOW IT WORKS SECTION
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="mg-how-it-works mt-20 py-16 rounded-3xl bg-gradient-to-br from-gray-900/50 to-gray-950/50 border border-white/5">
+            <div class="px-6 md:px-12">
+                <div class="text-center mb-12">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">
+                        <i class="fas fa-question-circle text-yellow-400 ml-2"></i>
+                        چگونه خرید کنیم؟
+                    </h2>
+                    <p class="text-gray-500">در چند قدم ساده آیتم خود را دریافت کنید</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Step 1 -->
+                    <div class="mg-step-card relative p-6 rounded-2xl bg-gray-900/50 border border-white/5 text-center group hover:border-yellow-500/30 transition-all duration-300">
+                        <div class="absolute -top-3 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-yellow-500 text-black font-bold flex items-center justify-center text-sm">۱</div>
+                        <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors">
+                            <i class="fas fa-mouse-pointer text-xl text-yellow-400"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">انتخاب پلن</h4>
+                        <p class="text-gray-500 text-sm">پلن مورد نظر خود را انتخاب کنید</p>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="mg-step-card relative p-6 rounded-2xl bg-gray-900/50 border border-white/5 text-center group hover:border-emerald-500/30 transition-all duration-300">
+                        <div class="absolute -top-3 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-emerald-500 text-black font-bold flex items-center justify-center text-sm">۲</div>
+                        <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                            <i class="fas fa-id-card text-xl text-emerald-400"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">وارد کردن اطلاعات</h4>
+                        <p class="text-gray-500 text-sm">آیدی بازی خود را وارد کنید</p>
+                    </div>
+                    
+                    <!-- Step 3 -->
+                    <div class="mg-step-card relative p-6 rounded-2xl bg-gray-900/50 border border-white/5 text-center group hover:border-blue-500/30 transition-all duration-300">
+                        <div class="absolute -top-3 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-blue-500 text-black font-bold flex items-center justify-center text-sm">۳</div>
+                        <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                            <i class="fas fa-credit-card text-xl text-blue-400"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">پرداخت امن</h4>
+                        <p class="text-gray-500 text-sm">از درگاه امن پرداخت کنید</p>
+                    </div>
+                    
+                    <!-- Step 4 -->
+                    <div class="mg-step-card relative p-6 rounded-2xl bg-gray-900/50 border border-white/5 text-center group hover:border-pink-500/30 transition-all duration-300">
+                        <div class="absolute -top-3 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-pink-500 text-black font-bold flex items-center justify-center text-sm">۴</div>
+                        <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-pink-500/10 flex items-center justify-center group-hover:bg-pink-500/20 transition-colors">
+                            <i class="fas fa-check-circle text-xl text-pink-400"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">دریافت آیتم</h4>
+                        <p class="text-gray-500 text-sm">آیتم فوری به اکانت اضافه می‌شود</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════
+             FAQ SECTION
+             ═══════════════════════════════════════════════════════════════════ -->
+        <section class="mg-faq mt-16">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">
+                    <i class="fas fa-comments text-yellow-400 ml-2"></i>
+                    سوالات متداول
+                </h2>
+            </div>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                {% if faqs %}
+                    {% for faq in faqs %}
+                    <div class="mg-faq-item rounded-2xl bg-gray-900/50 border border-white/5 overflow-hidden">
+                        <button class="mg-faq-toggle w-full flex items-center justify-between p-5 text-right">
+                            <span class="font-bold text-white">{{ faq.question }}</span>
+                            <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                        </button>
+                        <div class="mg-faq-answer hidden px-5 pb-5">
+                            <p class="text-gray-400 leading-relaxed">{{ faq.answer }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <!-- Default FAQs (Placeholder) -->
+                <div class="mg-faq-item rounded-2xl bg-gray-900/50 border border-white/5 overflow-hidden">
+                    <button class="mg-faq-toggle w-full flex items-center justify-between p-5 text-right">
+                        <span class="font-bold text-white">آیا خرید از این سایت امن است؟</span>
+                        <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                    </button>
+                    <div class="mg-faq-answer hidden px-5 pb-5">
+                        <p class="text-gray-400 leading-relaxed">بله، تمامی تراکنش‌ها از طریق درگاه‌های پرداخت معتبر انجام می‌شود و اطلاعات شما کاملاً محفوظ است.</p>
+                    </div>
+                </div>
+                <div class="mg-faq-item rounded-2xl bg-gray-900/50 border border-white/5 overflow-hidden">
+                    <button class="mg-faq-toggle w-full flex items-center justify-between p-5 text-right">
+                        <span class="font-bold text-white">زمان تحویل چقدر است؟</span>
+                        <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                    </button>
+                    <div class="mg-faq-answer hidden px-5 pb-5">
+                        <p class="text-gray-400 leading-relaxed">اکثر سفارشات بلافاصله پس از پرداخت تحویل داده می‌شوند. حداکثر زمان تحویل ۱۵ دقیقه است.</p>
+                    </div>
+                </div>
+                <div class="mg-faq-item rounded-2xl bg-gray-900/50 border border-white/5 overflow-hidden">
+                    <button class="mg-faq-toggle w-full flex items-center justify-between p-5 text-right">
+                        <span class="font-bold text-white">اگر آیتم دریافت نشد چه کنم؟</span>
+                        <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                    </button>
+                    <div class="mg-faq-answer hidden px-5 pb-5">
+                        <p class="text-gray-400 leading-relaxed">پشتیبانی ۲۴ ساعته ما آماده کمک به شماست. از طریق چت آنلاین یا تیکت با ما در ارتباط باشید.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        
+    </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PURCHASE MODAL (Dynamic)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div id="mg-purchase-modal" class="fixed inset-0 z-50 hidden">
+    <!-- Backdrop -->
+    <div class="mg-modal-backdrop absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+    
+    <!-- Modal Content -->
+    <div class="mg-modal-container relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div class="mg-modal-content w-full max-w-md rounded-3xl bg-gradient-to-br from-gray-900 to-gray-950 border border-white/10 overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            
+            <!-- Modal Header -->
+            <div class="mg-modal-header p-6 border-b border-white/10">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-white">تکمیل خرید</h3>
+                    <button class="mg-modal-close w-10 h-10 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="mg-modal-body p-6">
+                <!-- Selected Plan Info -->
+                <div class="mg-selected-plan p-4 rounded-2xl bg-gray-800/50 border border-white/5 mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="mg-plan-icon w-14 h-14 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                            <i class="fas fa-coins text-2xl text-yellow-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-white mg-plan-name">نام پلن</h4>
+                            <p class="text-sm text-gray-500 mg-plan-category">دسته‌بندی</p>
+                        </div>
+                        <div class="text-left">
+                            <span class="text-xl font-bold text-yellow-400 mg-plan-price">۰</span>
+                            <span class="text-sm text-gray-500">تومان</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form -->
+                <form id="mg-purchase-form" class="space-y-4">
+                    <input type="hidden" name="plan_id" id="mg-plan-id">
+                    
+                                        <!-- Game ID Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-id-badge ml-1 text-yellow-400"></i>
+                            آیدی بازی
+                        </label>
+                        <input type="text" 
+                               name="game_id" 
+                               id="mg-game-id"
+                               class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-white/10 text-white placeholder-gray-500 focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none transition-all duration-300"
+                               placeholder="آیدی پلیر خود را وارد کنید"
+                               required>
+                        <p class="mt-2 text-xs text-gray-500">
+                            <i class="fas fa-info-circle ml-1"></i>
+                            آیدی را از بخش پروفایل بازی کپی کنید
+                        </p>
+                    </div>
+                    
+                    <!-- Server/Zone Selection (Optional - Dynamic) -->
+                    <div class="mg-server-section hidden">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-server ml-1 text-emerald-400"></i>
+                            انتخاب سرور
+                        </label>
+                        <select name="server" 
+                                id="mg-server"
+                                class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-white/10 text-white focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none transition-all duration-300 appearance-none cursor-pointer">
+                            <option value="">انتخاب کنید...</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Email for Receipt -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-envelope ml-1 text-blue-400"></i>
+                            ایمیل (اختیاری)
+                        </label>
+                        <input type="email" 
+                               name="email" 
+                               id="mg-email"
+                               class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-white/10 text-white placeholder-gray-500 focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none transition-all duration-300"
+                               placeholder="برای دریافت رسید">
+                    </div>
+                    
+                    <!-- Promo Code -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">
+                            <i class="fas fa-ticket ml-1 text-pink-400"></i>
+                            کد تخفیف
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" 
+                                   name="promo_code" 
+                                   id="mg-promo-code"
+                                   class="flex-1 px-4 py-3 rounded-xl bg-gray-800 border border-white/10 text-white placeholder-gray-500 focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none transition-all duration-300"
+                                   placeholder="کد تخفیف دارید؟">
+                            <button type="button" 
+                                    id="mg-apply-promo"
+                                    class="px-4 py-3 rounded-xl bg-gray-700 text-white font-medium hover:bg-gray-600 transition-colors">
+                                اعمال
+                            </button>
+                        </div>
+                        <p class="mg-promo-message mt-2 text-xs hidden"></p>
+                    </div>
+                    
+                    <!-- Price Summary -->
+                    <div class="mg-price-summary p-4 rounded-2xl bg-gray-800/50 border border-white/5 space-y-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-400">قیمت پلن:</span>
+                            <span class="text-white mg-base-price">۰ تومان</span>
+                        </div>
+                        <div class="mg-discount-row flex items-center justify-between text-sm hidden">
+                            <span class="text-gray-400">تخفیف:</span>
+                            <span class="text-emerald-400 mg-discount-amount">- ۰ تومان</span>
+                        </div>
+                        <div class="border-t border-white/10 pt-3 flex items-center justify-between">
+                            <span class="font-bold text-white">مبلغ قابل پرداخت:</span>
+                            <span class="text-xl font-bold text-yellow-400 mg-final-price">۰ تومان</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms Checkbox -->
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox" 
+                               id="mg-terms" 
+                               name="terms"
+                               class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-gray-800 text-yellow-500 focus:ring-yellow-500/20 cursor-pointer"
+                               required>
+                        <label for="mg-terms" class="text-sm text-gray-400 cursor-pointer">
+                            <a href="{% url 'core:terms' %}" target="_blank" class="text-yellow-400 hover:text-yellow-300">قوانین و مقررات</a>
+                            را مطالعه کرده و می‌پذیرم.
+                        </label>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="mg-modal-footer p-6 border-t border-white/10 bg-gray-900/50">
+                <div class="flex gap-3">
+                    <button type="button" 
+                            class="mg-modal-cancel flex-1 py-3 px-4 rounded-xl bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors">
+                        انصراف
+                    </button>
+                    <button type="submit" 
+                            form="mg-purchase-form"
+                            class="mg-submit-btn flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span class="mg-btn-text">
+                            <i class="fas fa-lock ml-2"></i>
+                            پرداخت امن
+                        </span>
+                        <span class="mg-btn-loading hidden">
+                            <i class="fas fa-spinner fa-spin ml-2"></i>
+                            در حال پردازش...
+                        </span>
+                    </button>
+                </div>
+                
+                <!-- Security Badge -->
+                <div class="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-white/5">
+                    <span class="flex items-center gap-1 text-xs text-gray-500">
+                        <i class="fas fa-shield-halved text-emerald-500"></i>
+                        پرداخت امن
+                    </span>
+                    <span class="flex items-center gap-1 text-xs text-gray-500">
+                        <i class="fas fa-lock text-blue-500"></i>
+                        رمزگذاری SSL
+                    </span>
+                    <span class="flex items-center gap-1 text-xs text-gray-500">
+                        <i class="fas fa-check-circle text-yellow-500"></i>
+                        تضمین بازگشت
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     TOAST NOTIFICATION (For Mini-Game Page)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div id="mg-toast" class="fixed bottom-6 left-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="flex items-center gap-3 px-5 py-4 rounded-2xl bg-gray-900 border border-white/10 shadow-2xl">
+        <div class="mg-toast-icon w-10 h-10 rounded-full flex items-center justify-center">
+            <i class="fas fa-check"></i>
+        </div>
+        <div>
+            <p class="mg-toast-title font-bold text-white">عنوان</p>
+            <p class="mg-toast-message text-sm text-gray-400">پیام</p>
+        </div>
+        <button class="mg-toast-close mr-2 text-gray-500 hover:text-white transition-colors">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/mini_game.js' %}"></script>
+{% endblock %}
+
+{% block inline_js %}
+<script>
+    // Initialize Mini-Game Page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mini-game page functionality will be automatically initialized
+        // The JavaScript file handles its own initialization
+        console.log('Mini-game page loaded');
+    });
+</script>
+{% endblock %}

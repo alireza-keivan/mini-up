@@ -1,6 +1,7 @@
 # apps/core/views.py
 
 from django.shortcuts import render
+from .models import ServiceDescription
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -9,7 +10,13 @@ from django.shortcuts import render
 
 def home(request):
     """صفحه اصلی"""
-    return render(request, 'core/home.html', {'title': 'صفحه اصلی'})
+    # دریافت توضیحات خدمات فعال
+    service_descriptions = ServiceDescription.objects.filter(is_active=True).order_by('service_type')
+    
+    return render(request, 'core/home.html', {
+        'title': 'صفحه اصلی',
+        'service_descriptions': service_descriptions
+    })
 
 
 def virtual_services(request):
@@ -18,13 +25,73 @@ def virtual_services(request):
 
 
 def gaming_products(request):
-    """صفحه محصولات گیمینگ"""
-    return render(request, 'core/gaming_products.html', {'title': 'محصولات گیمینگ'})
+    """
+    صفحه محصولات گیمینگ
+    Displays gaming product categories with their products in horizontal scrollable carousels.
+    """
+    from apps.products.models import Category, Brand
+    
+    # Get active gaming categories with their active products
+    # Filter by category_type = 'gaming'
+    categories = Category.objects.filter(
+        is_active=True,
+        category_type='gaming',
+        products__is_active=True
+    ).prefetch_related(
+        'products__brand',
+        'products__images',
+        'products__variants'
+    ).select_related(
+        'parent'
+    ).distinct().order_by('sort_order', 'name')
+    
+    # Get total counts for stats
+    total_products = sum(cat.get_active_products_count() for cat in categories)
+    total_brands = Brand.objects.filter(
+        products__category__category_type='gaming',
+        products__is_active=True
+    ).distinct().count()
+    
+    context = {
+        'title': 'محصولات گیمینگ',
+        'categories': categories,
+        'total_products': total_products,
+        'total_categories': categories.count(),
+        'total_brands': total_brands,
+    }
+    
+    return render(request, 'core/gaming_products.html', context)
 
 
 def buy_products(request):
-    """صفحه خرید محصولات"""
-    return render(request, 'core/buy_products.html', {'title': 'خرید محصولات'})
+    """
+    صفحه خرید محصولات
+    Displays product categories with their products in horizontal scrollable carousels.
+    """
+    from apps.products.models import Category
+    
+    # Get active categories with their active products
+    # Using select_related and prefetch_related for optimal performance
+    categories = Category.objects.filter(
+        is_active=True,
+        products__is_active=True  # Only categories that have active products
+    ).prefetch_related(
+        'products__brand',  # Prefetch brand for each product
+        'products__images',  # Prefetch product images
+    ).select_related(
+        'parent'  # If you want to show parent category info
+    ).distinct().order_by('sort_order', 'name')
+    
+    # Filter products per category to only show active ones
+    # This is already handled by the template with category.products.all
+    # but we're ensuring the queryset is optimized
+    
+    context = {
+        'title': 'خرید محصولات',
+        'categories': categories,
+    }
+    
+    return render(request, 'core/buy_products.html', context)
 
 
 def mini_game(request):

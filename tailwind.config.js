@@ -9,6 +9,10 @@ module.exports = {
     './templates/**/*.html',
     './static/**/*.js',
   ],
+  safelist: [
+    { pattern: /^vs-/ }, // Preserve all virtual-services classes
+    { pattern: /^mg-/ }, // Preserve all mini-game classes
+  ],
   darkMode: 'class',
   theme: {
     extend: {

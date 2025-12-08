@@ -1,0 +1,500 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   BUY PRODUCTS PAGE — MINI-UP.IR
+   RTL Horizontal Scroll Carousel | Neon Dark Theme
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PAGE CONTAINER
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-page {
+    min-height: 100vh;
+    background: linear-gradient(180deg, var(--dark-900) 0%, var(--dark-950) 100%);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Background Decoration */
+.bp-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 1200px;
+    height: 600px;
+    background: radial-gradient(ellipse at center top, 
+                                rgba(255, 0, 85, 0.08) 0%, 
+                                rgba(191, 0, 255, 0.04) 40%,
+                                transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bp-page > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PAGE HEADER
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-header {
+    padding-top: 2rem;
+}
+
+.bp-header h1 {
+    text-shadow: 0 0 40px rgba(255, 0, 85, 0.3);
+}
+
+/* Category Navigation Pills */
+.bp-nav-pill {
+    position: relative;
+    overflow: hidden;
+}
+
+.bp-nav-pill::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.bp-nav-pill:hover::before {
+    opacity: 0.1;
+}
+
+.bp-nav-pill.active {
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    border-color: transparent;
+    color: white;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CATEGORY SECTIONS
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-category-section {
+    scroll-margin-top: 100px;
+}
+
+.bp-accent-line {
+    box-shadow: 0 0 20px var(--neon-pink-glow);
+}
+
+.bp-count-badge {
+    transition: all 0.3s ease;
+}
+
+.bp-category-section:hover .bp-count-badge {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCROLL CONTAINER & NAVIGATION
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-scroll-container {
+    position: relative;
+}
+
+/* Hide default scrollbar but keep functionality */
+.bp-scroll-wrapper {
+    scrollbar-width: thin;
+    scrollbar-color: var(--dark-600) transparent;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+}
+
+.bp-scroll-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.bp-scroll-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.bp-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: var(--dark-600);
+    border-radius: 3px;
+}
+
+.bp-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-pink);
+}
+
+/* Navigation Arrows */
+.bp-scroll-btn {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.bp-scroll-btn:hover {
+    box-shadow: var(--shadow-neon-pink);
+}
+
+.bp-scroll-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Scroll Progress Dots */
+.bp-scroll-progress {
+    min-height: 12px;
+}
+
+.bp-progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--dark-600);
+    transition: all 0.3s ease;
+}
+
+.bp-progress-dot.active {
+    width: 24px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 0 10px var(--neon-pink-glow);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PRODUCT CARDS
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-product-card {
+    scroll-snap-align: start;
+    position: relative;
+}
+
+/* Card Hover State */
+.bp-product-card:hover {
+    transform: translateY(-8px);
+}
+
+/* Card Image Effects */
+.bp-card-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, 
+                                transparent 0%, 
+                                rgba(255, 0, 85, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.bp-product-card:hover .bp-card-image::after {
+    opacity: 1;
+}
+
+/* Badges */
+.bp-badge {
+    animation: badgePulse 2s ease infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Quick Action Buttons */
+.bp-quick-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bp-quick-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Wishlist Active State */
+.bp-wishlist-btn.active {
+    background: var(--neon-pink);
+    border-color: var(--neon-pink);
+    color: white;
+}
+
+.bp-wishlist-btn.active svg {
+    fill: currentColor;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD CONTENT STYLING
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-product-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Price Styling */
+.bp-current-price {
+    background: linear-gradient(135deg, #fff, var(--neon-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bp-old-price {
+    position: relative;
+}
+
+.bp-old-price::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    background: var(--neon-pink);
+    transform: rotate(-5deg);
+}
+
+/* Add to Cart Button */
+.bp-add-to-cart {
+    position: relative;
+    overflow: hidden;
+}
+
+.bp-add-to-cart::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+                                transparent, 
+                                rgba(255, 255, 255, 0.2), 
+                                transparent);
+    transition: left 0.5s ease;
+}
+
+.bp-add-to-cart:hover::before {
+    left: 100%;
+}
+
+/* Loading State for Add to Cart */
+.bp-add-to-cart.loading {
+    pointer-events: none;
+}
+
+.bp-add-to-cart.loading span {
+    opacity: 0;
+}
+
+.bp-add-to-cart.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top-color: white;
+    border-radius: 50%;
+    animation: buttonSpin 0.8s linear infinite;
+}
+
+@keyframes buttonSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Card Neon Glow */
+.bp-card-glow {
+    transform: scale(1.1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DRAGGING STATE
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-scroll-wrapper.is-dragging {
+    cursor: grabbing;
+    scroll-behavior: auto;
+    user-select: none;
+}
+
+.bp-scroll-wrapper.is-dragging .bp-product-card {
+    pointer-events: none;
+    transform: scale(0.98);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   QUICK VIEW MODAL
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-modal {
+    display: none;
+}
+
+.bp-modal.active {
+    display: flex;
+}
+
+.bp-modal.active .bp-modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.bp-modal-backdrop {
+    transition: opacity 0.3s ease;
+}
+
+/* Modal Product Layout */
+.bp-modal-image {
+    flex: 0 0 45%;
+    max-height: 500px;
+    overflow: hidden;
+}
+
+.bp-modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bp-modal-details {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    max-height: 90vh;
+}
+
+/* Modal Spinner */
+.bp-spinner {
+    border-color: var(--dark-600);
+    border-top-color: var(--neon-pink);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CART TOAST NOTIFICATION
+   ───────────────────────────────────────────────────────────────────────────── */
+#bp-cart-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   EMPTY STATES
+   ───────────────────────────────────────────────────────────────────────────── */
+.bp-empty-category,
+.bp-no-categories {
+    background: linear-gradient(135deg, var(--dark-800), var(--dark-900));
+    border-radius: 1rem;
+    border: 1px dashed var(--dark-600);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE ADJUSTMENTS
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .bp-scroll-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .bp-scroll-btn.bp-scroll-prev {
+        right: -8px;
+    }
+    
+    .bp-scroll-btn.bp-scroll-next {
+        left: -8px;
+    }
+    
+    .bp-product-card {
+        width: 280px;
+    }
+    
+    .bp-modal-content {
+        max-height: 95vh;
+    }
+    
+    .bp-modal-image {
+        flex: 0 0 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .bp-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .bp-product-card {
+        width: 260px;
+    }
+    
+    .bp-category-nav {
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+    }
+    
+    .bp-nav-pill {
+        flex-shrink: 0;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ANIMATION KEYFRAMES
+   ───────────────────────────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Skeleton Loading */
+.bp-skeleton {
+    background: linear-gradient(90deg, 
+                                var(--dark-700) 25%, 
+                                var(--dark-600) 50%, 
+                                var(--dark-700) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ACCESSIBILITY
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .bp-product-card,
+    .bp-scroll-wrapper,
+    .bp-modal-content,
+    .bp-quick-btn,
+    .bp-add-to-cart::before {
+        transition: none;
+        animation: none;
+    }
+    
+    .bp-scroll-wrapper {
+        scroll-behavior: auto;
+    }
+}
+
+/* Focus Styles for Keyboard Navigation */
+.bp-product-card:focus-within {
+    outline: 2px solid var(--neon-cyan);
+    outline-offset: 4px;
+}
+
+.bp-add-to-cart:focus,
+.bp-view-btn:focus,
+.bp-quick-btn:focus {
+    outline: 2px solid var(--neon-cyan);
+    outline-offset: 2px;
+}

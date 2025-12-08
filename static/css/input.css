@@ -36,6 +36,11 @@
 /* @import './pages/_dashboard.css'; */
 @import './pages/_products.css';
 @import './pages/_accounts.css';  
+@import './pages/_virtual_services.css';
+@import './pages/_mini_game.css';
+@import './pages/buy_products.css';
+@import './pages/gaming_products.css';
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
    UTILITIES IMPORTS

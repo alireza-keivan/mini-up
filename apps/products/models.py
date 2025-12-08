@@ -63,6 +63,11 @@ class Category(models.Model):
         verbose_name = 'دسته‌بندی'
         verbose_name_plural = 'دسته‌بندی‌ها'
         ordering = ['sort_order', 'name']
+        indexes = [
+            models.Index(fields=['slug']),
+            models.Index(fields=['is_active', 'sort_order']),
+            models.Index(fields=['parent', 'is_active']),
+        ]
     
     def __str__(self):
         if self.parent:
@@ -87,6 +92,14 @@ class Category(models.Model):
         for child in self.children.filter(is_active=True):
             children.extend(child.get_all_children())
         return children
+    
+    def get_active_products_count(self):
+        """Get count of active products in this category."""
+        return self.products.filter(is_active=True).count()
+    
+    def get_active_products(self):
+        """Get all active products for this category."""
+        return self.products.filter(is_active=True).select_related('brand').prefetch_related('images')
 
 
 class Brand(models.Model):
@@ -241,10 +254,44 @@ class Product(models.Model):
             models.Index(fields=['product_type']),
             models.Index(fields=['is_active', 'is_featured']),
             models.Index(fields=['-created_at']),
+            models.Index(fields=['category', 'is_active']),
         ]
     
     def __str__(self):
         return self.name
+    
+    # Template compatibility properties
+    @property
+    def image(self):
+        """Alias for main_image to match template expectations."""
+        return self.main_image
+    
+    @property
+    def compare_price(self):
+        """Alias for original_price to match template expectations."""
+        return self.original_price
+    
+    @property
+    def average_rating(self):
+        """Calculate average rating from reviews."""
+        from django.db.models import Avg
+        result = self.reviews.filter(is_approved=True).aggregate(Avg('rating'))
+        return result['rating__avg'] or 0
+    
+    @property
+    def primary_image(self):
+        """Alias for main_image for gaming_products template."""
+        return self.main_image
+    
+    @property
+    def discount_percent(self):
+        """Alias for discount_percentage for gaming_products template."""
+        return self.discount_percentage
+    
+    @property
+    def final_price(self):
+        """Return the final price after discount."""
+        return self.price
     
     def save(self, *args, **kwargs):
         if not self.slug:

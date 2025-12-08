@@ -293,6 +293,14 @@
         transform: translateY(0);
     }
 
+    .mega-menu--compact .mega-menu-header {
+        @apply px-5 py-3;
+    }
+
+    .mega-menu--compact .mega-menu-body {
+        @apply p-5;
+    }
+
     .mega-menu-container {
         @apply rounded-2xl overflow-hidden;
         @apply min-w-[600px];
@@ -372,6 +380,10 @@
         border-color: rgba(255, 0, 85, 0.3);
     }
 
+    .mega-menu-container--compact {
+        @apply min-w-[440px];
+    }
+
     /* Icon Colors */
     .mega-menu-item-icon.pink {
         @apply text-pink-400;
@@ -393,6 +405,10 @@
         @apply text-green-400;
     }
 
+    .mega-menu-item-icon.orange {
+        @apply text-orange-400;
+    }
+
     .mega-menu-item-info {
         @apply flex-1 min-w-0;
     }
@@ -407,10 +423,31 @@
         @apply line-clamp-2;
     }
 
+    .mega-menu-grid--compact {
+        @apply grid-cols-1 sm:grid-cols-2;
+        @apply gap-3;
+    }
+
+    .mega-menu-badge {
+        margin-inline-start: auto;
+        @apply px-2 py-0.5 rounded-full;
+        @apply text-[10px] font-bold text-white;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        box-shadow: 0 0 15px rgba(255, 0, 85, 0.35);
+    }
+
     /* Mega Menu Featured */
     .mega-menu-featured {
         @apply mt-4 pt-4;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .mega-menu-featured--single .mega-menu-featured-items {
+        @apply grid gap-3;
+    }
+
+    .mega-menu-featured--single .mega-menu-featured-card {
+        @apply p-5;
     }
 
     .mega-menu-featured-title {
@@ -576,6 +613,51 @@
             transform: scale(1.1);
             box-shadow: 0 2px 15px rgba(255, 0, 85, 0.7);
         }
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       AUTH BUTTONS - Login/Register
+       ───────────────────────────────────────────────────────────────────────── */
+    .navbar-auth-buttons {
+        @apply flex items-center gap-3;
+    }
+
+    .navbar-auth-btn {
+        @apply relative px-6 py-2.5 rounded-xl;
+        @apply flex items-center gap-2;
+        @apply text-sm font-semibold;
+        @apply transition-all duration-300;
+        background: linear-gradient(135deg, rgba(255, 0, 85, 0.1), rgba(138, 43, 226, 0.1));
+        border: 1px solid rgba(255, 0, 85, 0.3);
+        color: #fff;
+        overflow: hidden;
+    }
+
+    .navbar-auth-btn::before {
+        content: '';
+        @apply absolute inset-0;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .navbar-auth-btn:hover::before {
+        opacity: 1;
+    }
+
+    .navbar-auth-btn i,
+    .navbar-auth-btn span {
+        @apply relative z-10;
+    }
+
+    .navbar-auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 0, 85, 0.4);
+        border-color: rgba(255, 0, 85, 0.6);
+    }
+
+    .navbar-auth-btn i {
+        @apply text-base;
     }
 
     /* ─────────────────────────────────────────────────────────────────────────

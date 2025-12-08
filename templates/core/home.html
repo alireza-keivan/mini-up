@@ -380,4 +380,81 @@
     </div>
 </section>
 
+<!-- ===============================================================================
+     SERVICE DESCRIPTIONS WIDGET
+     =============================================================================== -->
+{% if service_descriptions %}
+<section class="service-descriptions-section py-16 bg-dark-800/30">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for item in service_descriptions %}
+            <div class="description-card group">
+                <div class="card-content">
+                    {% if item.icon %}
+                    <div class="card-icon-wrapper mb-4">
+                        <img src="{{ item.icon.url }}" 
+                             class="card-icon mx-auto w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300" 
+                             alt="{{ item.title }}">
+                    </div>
+                    {% else %}
+                    <div class="card-icon-wrapper mb-4">
+                        <div class="card-icon-placeholder mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <h3 class="card-title text-lg font-bold text-white mb-3 text-center">
+                        {{ item.title }}
+                    </h3>
+                    <p class="card-description text-gray-400 text-sm leading-relaxed text-center">
+                        {{ item.description }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<style>
+    .description-card {
+        background: linear-gradient(135deg, rgba(30, 30, 45, 0.6), rgba(40, 40, 60, 0.6));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 2rem 1.5rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .description-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(255, 0, 85, 0.4);
+        box-shadow: 0 20px 40px rgba(255, 0, 85, 0.2);
+    }
+    
+    .description-card .card-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .description-card .card-title {
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .description-card:hover .card-title {
+        background: linear-gradient(135deg, #8a2be2, #00f5ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
+{% endif %}
+
 {% endblock %}

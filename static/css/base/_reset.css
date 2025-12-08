@@ -31,7 +31,7 @@
 
     body {
         font-family: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        background: var(--gradient-dark);
+        background: linear-gradient(180deg, #050a15 0%, #020308 100%);
         background-attachment: fixed;
         color: var(--text-primary);
         line-height: 1.7;

@@ -1,24 +1,376 @@
 {% extends 'base.html' %}
+{% load static %}
+{# 
+    OTP Login Page - Updated 2025-12-06
+    Changes: Removed register option, phone-only input, enhanced styling
+    CACHE BUST: v1.0.1
+#}
+
+{% block title %}ورود به مینی‌آپ{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Force browser to recognize this is a new version */
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);
+        min-height: 100vh;
+    }
+
+    .otp-login-container {
+        min-height: calc(100vh - 140px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+    }
+    
+    .otp-login-card {
+        background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 20, 40, 0.95));
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 0, 85, 0.3);
+        border-radius: 1.5rem;
+        padding: 3rem 2rem;
+        max-width: 450px;
+        width: 100%;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 60px rgba(255, 0, 85, 0.2);
+        animation: cardFadeIn 0.5s ease-out;
+    }
+    
+    @keyframes cardFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .otp-login-logo {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .otp-login-logo i {
+        font-size: 4rem;
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: logoPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes logoPulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+    
+    .otp-login-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        color: white;
+    }
+    
+    .otp-login-subtitle {
+        text-align: center;
+        color: #9ca3af;
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+    }
+    
+    .otp-form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .otp-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #d1d5db;
+        margin-bottom: 0.5rem;
+    }
+    
+    .otp-input-wrapper {
+        position: relative;
+    }
+    
+    .otp-input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 0, 85, 0.7);
+        z-index: 1;
+    }
+    
+    .otp-input {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 0.75rem;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.2s;
+        direction: ltr;
+        text-align: right;
+    }
+    
+    .otp-input:focus {
+        outline: none;
+        border-color: rgba(255, 0, 85, 0.5);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 0 3px rgba(255, 0, 85, 0.1);
+    }
+    
+    .otp-input::placeholder {
+        color: #6b7280;
+    }
+    
+    .otp-helper-text {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .otp-helper-text i {
+        color: rgba(255, 0, 85, 0.7);
+    }
+    
+    .otp-submit-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        border: none;
+        border-radius: 0.75rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .otp-submit-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .otp-submit-btn:hover::before {
+        left: 100%;
+    }
+    
+    .otp-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(255, 0, 85, 0.5);
+    }
+    
+    .otp-submit-btn:active {
+        transform: translateY(0);
+    }
+    
+    .otp-submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .otp-submit-btn .spinner {
+        display: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid white;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+    
+    .otp-submit-btn.loading .spinner {
+        display: block;
+    }
+    
+    .otp-submit-btn.loading .btn-text {
+        display: none;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .otp-error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 0.75rem;
+        padding: 0.875rem 1rem;
+        margin-bottom: 1.5rem;
+        color: #fca5a5;
+        font-size: 0.9rem;
+        display: none;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .otp-error.show {
+        display: flex;
+    }
+    
+    .otp-error i {
+        color: #f87171;
+        flex-shrink: 0;
+    }
+    
+    .otp-features {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .otp-feature-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        color: #9ca3af;
+        font-size: 0.85rem;
+    }
+    
+    .otp-feature-item i {
+        color: rgba(0, 245, 255, 0.7);
+        font-size: 1rem;
+    }
+    
+    .back-to-home {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    .back-to-home a {
+        color: #9ca3af;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .back-to-home a:hover {
+        color: #00f5ff;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+        .otp-login-card {
+            padding: 2rem 1.5rem;
+        }
+        
+        .otp-login-logo i {
+            font-size: 3rem;
+        }
+        
+        .otp-login-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-16">
-    <div class="max-w-md mx-auto bg-dark-card rounded-lg p-8">
-        <h1 class="text-2xl font-bold text-center mb-6">ورود به حساب</h1>
-        <form method="post">
+<div class="otp-login-container">
+    <div class="otp-login-card">
+        <div class="otp-login-logo">
+            <i class="fas fa-mobile-alt"></i>
+        </div>
+        
+        <h1 class="otp-login-title">ورود به مینی‌آپ</h1>
+        <p class="otp-login-subtitle">شماره موبایل خود را وارد کنید</p>
+        
+        <div class="otp-error" id="errorMessage">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="errorText"></span>
+        </div>
+        
+        <form id="loginForm" novalidate>
             {% csrf_token %}
-            <div class="mb-4">
-                <label class="block text-gray-400 mb-2">ایمیل یا شماره موبایل</label>
-                <input type="text" name="username" class="w-full px-4 py-2 bg-dark-bg border border-gray-700 rounded-lg text-white">
+            
+            <div class="otp-form-group">
+                <label class="otp-label" for="phone">شماره موبایل</label>
+                <div class="otp-input-wrapper">
+                    <span class="otp-input-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </span>
+                    <input 
+                        type="tel" 
+                        class="otp-input" 
+                        id="phone" 
+                        name="phone"
+                        placeholder="09123456789"
+                        maxlength="11"
+                        autocomplete="tel"
+                        required
+                        autofocus>
+                </div>
+                <div class="otp-helper-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span>کد تایید به این شماره ارسال خواهد شد</span>
+                </div>
             </div>
-            <div class="mb-6">
-                <label class="block text-gray-400 mb-2">رمز عبور</label>
-                <input type="password" name="password" class="w-full px-4 py-2 bg-dark-bg border border-gray-700 rounded-lg text-white">
-            </div>
-            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg">ورود</button>
+            
+            <button type="submit" class="otp-submit-btn" id="submitBtn">
+                <span class="spinner"></span>
+                <span class="btn-text">
+                    <i class="fas fa-paper-plane"></i>
+                    دریافت کد تایید
+                </span>
+            </button>
         </form>
-        <p class="text-center text-gray-400 mt-4">
-            حساب ندارید؟ <a href="{% url 'accounts:register' %}" class="text-primary-500">ثبت نام</a>
-        </p>
+        
+        <div class="otp-features">
+            <div class="otp-feature-item">
+                <i class="fas fa-shield-check"></i>
+                <span>ورود امن با کد یکبار مصرف</span>
+            </div>
+            <div class="otp-feature-item">
+                <i class="fas fa-clock"></i>
+                <span>کد تایید تا ۲ دقیقه معتبر است</span>
+            </div>
+            <div class="otp-feature-item">
+                <i class="fas fa-bolt"></i>
+                <span>دسترسی سریع به حساب کاربری</span>
+            </div>
+        </div>
+        
+        <div class="back-to-home">
+            <a href="{% url 'core:home' %}">
+                <i class="fas fa-arrow-right"></i>
+                بازگشت به صفحه اصلی
+            </a>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/auth-login.js' %}"></script>
 {% endblock %}
