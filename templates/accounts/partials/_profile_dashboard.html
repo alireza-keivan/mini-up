@@ -1,0 +1,353 @@
+{% load humanize %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PROFILE DASHBOARD SECTION
+     Main dashboard showing user statistics, orders, and quick access cards
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<section id="profileDashboard" class="mb-8">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         STATISTICS CARDS ROW
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        
+        <!-- Card 1: Wallet Balance -->
+        <a href="{% url 'wallet:dashboard' %}" 
+           class="card-glass rounded-2xl p-5 group 
+                  hover:border-primary-500/30 
+                  transition-all duration-300 hover:scale-[1.02]
+                  cursor-pointer">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-xl 
+                            bg-gradient-to-br from-primary-500/20 to-primary-600/10
+                            border border-primary-500/20
+                            flex items-center justify-center
+                            group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary-500/20
+                            transition-all duration-300">
+                    <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                </div>
+                <svg class="w-5 h-5 text-dark-500 group-hover:text-primary-400 
+                            group-hover:translate-x-1 transition-all duration-300" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M15 19l-7-7 7-7"/>
+                </svg>
+            </div>
+            <div>
+                <p class="text-dark-400 text-xs font-medium mb-1">موجودی کیف پول</p>
+                <p class="text-xl font-bold text-dark-100 group-hover:text-primary-400 transition-colors">
+                    {% if wallet %}
+                        {{ wallet.balance|intcomma }}
+                    {% else %}
+                        0
+                    {% endif %}
+                    <span class="text-sm font-normal text-dark-400">تومان</span>
+                </p>
+            </div>
+        </a>
+        
+        <!-- Card 2: Total Orders -->
+        <a href="{% url 'accounts:orders' %}" 
+           class="card-glass rounded-2xl p-5 group 
+                  hover:border-secondary-500/30 
+                  transition-all duration-300 hover:scale-[1.02]
+                  cursor-pointer">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-xl 
+                            bg-gradient-to-br from-secondary-500/20 to-secondary-600/10
+                            border border-secondary-500/20
+                            flex items-center justify-center
+                            group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-secondary-500/20
+                            transition-all duration-300">
+                    <svg class="w-6 h-6 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                </div>
+                <svg class="w-5 h-5 text-dark-500 group-hover:text-secondary-400 
+                            group-hover:translate-x-1 transition-all duration-300" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M15 19l-7-7 7-7"/>
+                </svg>
+            </div>
+            <div>
+                <p class="text-dark-400 text-xs font-medium mb-1">کل سفارش‌ها</p>
+                <p class="text-xl font-bold text-dark-100 group-hover:text-secondary-400 transition-colors">
+                    {{ orders_count|default:0 }}
+                    <span class="text-sm font-normal text-dark-400">سفارش</span>
+                </p>
+            </div>
+        </a>
+        
+        <!-- Card 3: Security Score -->
+        <div class="card-glass rounded-2xl p-5 group 
+                    hover:border-accent-500/30 
+                    transition-all duration-300 hover:scale-[1.02]
+                    cursor-pointer"
+             onclick="switchTab('tabSecurity')">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-xl 
+                            bg-gradient-to-br from-accent-500/20 to-accent-600/10
+                            border border-accent-500/20
+                            flex items-center justify-center
+                            group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-accent-500/20
+                            transition-all duration-300">
+                    <svg class="w-6 h-6 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <!-- Security Level Indicator -->
+                <div class="flex items-center gap-1">
+                    {% with security_score|default:0 as score %}
+                    <span class="w-2 h-2 rounded-full {% if score >= 25 %}bg-emerald-500{% else %}bg-dark-600{% endif %}"></span>
+                    <span class="w-2 h-2 rounded-full {% if score >= 50 %}bg-emerald-500{% else %}bg-dark-600{% endif %}"></span>
+                    <span class="w-2 h-2 rounded-full {% if score >= 75 %}bg-emerald-500{% else %}bg-dark-600{% endif %}"></span>
+                    <span class="w-2 h-2 rounded-full {% if score >= 100 %}bg-emerald-500{% else %}bg-dark-600{% endif %}"></span>
+                    {% endwith %}
+                </div>
+            </div>
+            <div>
+                <p class="text-dark-400 text-xs font-medium mb-1">امتیاز امنیت</p>
+                <p class="text-xl font-bold transition-colors
+                          {% if security_score >= 80 %}
+                          text-emerald-400 group-hover:text-emerald-300
+                          {% elif security_score >= 50 %}
+                          text-amber-400 group-hover:text-amber-300
+                          {% else %}
+                          text-red-400 group-hover:text-red-300
+                          {% endif %}">
+                    {{ security_score|default:0 }}%
+                </p>
+            </div>
+        </div>
+        
+        <!-- Card 4: Membership Duration -->
+        <div class="card-glass rounded-2xl p-5 group 
+                    hover:border-emerald-500/30 
+                    transition-all duration-300 hover:scale-[1.02]">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-xl 
+                            bg-gradient-to-br from-emerald-500/20 to-emerald-600/10
+                            border border-emerald-500/20
+                            flex items-center justify-center
+                            group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-emerald-500/20
+                            transition-all duration-300">
+                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <!-- Status Badge -->
+                <span class="px-2 py-1 rounded-full text-xs font-medium
+                             bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    فعال
+                </span>
+            </div>
+            <div>
+                <p class="text-dark-400 text-xs font-medium mb-1">مدت عضویت</p>
+                <p class="text-xl font-bold text-dark-100 group-hover:text-emerald-400 transition-colors">
+                    {{ user.date_joined|timesince }}
+                </p>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         MAIN CONTENT GRID
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- ═══════════════════════════════════════════════════════════════════
+             ONGOING ORDERS TABLE (2/3 width on large screens)
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="lg:col-span-2 card-glass rounded-2xl overflow-hidden">
+            
+            <!-- Header -->
+            <div class="flex items-center justify-between p-5 border-b border-dark-700/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl 
+                                bg-gradient-to-br from-amber-500/20 to-orange-500/10
+                                border border-amber-500/20
+                                flex items-center justify-center">
+                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-dark-100">سفارش‌های جاری</h3>
+                        <p class="text-xs text-dark-400">سفارش‌های در حال پردازش</p>
+                    </div>
+                </div>
+                <a href="{% url 'accounts:orders' %}" 
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 
+                          rounded-lg text-xs font-medium
+                          bg-dark-700/50 hover:bg-dark-600/50
+                          text-primary-400 hover:text-primary-300
+                          border border-dark-600/50 hover:border-primary-500/30
+                          transition-all duration-200">
+                    مشاهده همه
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </a>
+            </div>
+            
+            <!-- Content -->
+            {% if ongoing_orders %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-dark-800/50">
+                            <th class="px-5 py-3 text-right text-xs font-medium text-dark-400 uppercase tracking-wider">
+                                شماره سفارش
+                            </th>
+                            <th class="px-5 py-3 text-right text-xs font-medium text-dark-400 uppercase tracking-wider">
+                                تاریخ
+                            </th>
+                            <th class="px-5 py-3 text-right text-xs font-medium text-dark-400 uppercase tracking-wider">
+                                مبلغ
+                            </th>
+                            <th class="px-5 py-3 text-right text-xs font-medium text-dark-400 uppercase tracking-wider">
+                                وضعیت
+                            </th>
+                            <th class="px-5 py-3 text-center text-xs font-medium text-dark-400 uppercase tracking-wider">
+                                عملیات
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-dark-700/30">
+                        {% for order in ongoing_orders %}
+                        <tr class="hover:bg-dark-800/30 transition-colors duration-200">
+                            <td class="px-5 py-4">
+                                <span class="font-mono text-sm text-dark-100 font-medium">
+                                    #{{ order.order_number|default:order.id }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-4">
+                                <span class="text-sm text-dark-300">
+                                    {{ order.created_at|date:"Y/m/d" }}
+                                </span>
+                                <span class="block text-xs text-dark-500">
+                                    {{ order.created_at|time:"H:i" }}
+                                </span>
+                                                        </td>
+                            <td class="px-5 py-4">
+                                <span class="text-sm text-dark-100 font-semibold">
+                                    {{ order.total_price|intcomma }} <span class="text-dark-400 text-xs">تومان</span>
+                                </span>
+                            </td>
+                            <td class="px-5 py-4">
+                                {% if order.status == 'pending' %}
+                                    <span class="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                        در انتظار
+                                    </span>
+                                {% elif order.status == 'processing' %}
+                                    <span class="text-xs px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                        در حال انجام
+                                    </span>
+                                {% elif order.status == 'completed' %}
+                                    <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                        تکمیل‌شده
+                                    </span>
+                                {% else %}
+                                    <span class="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                                        لغوشده
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-4 text-center">
+                                <a href="{% url 'accounts:order_detail' order.id %}" 
+                                   class="px-3 py-1.5 text-xs rounded-md
+                                          bg-dark-700/40 border border-dark-600/50 
+                                          hover:border-primary-500/30 hover:text-primary-400 
+                                          transition-all duration-200">
+                                    جزئیات
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-10 text-center text-dark-400 text-sm">
+                هیچ سفارش فعالی وجود ندارد.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════
+             PAYMENT SUMMARY / WALLET ACTIVITY (Sidebar)
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="card-glass rounded-2xl overflow-hidden">
+            <div class="flex items-center justify-between p-5 border-b border-dark-700/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl 
+                                bg-gradient-to-br from-primary-500/20 to-primary-600/10
+                                border border-primary-500/20
+                                flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M12 8c-1.657 0-3 1.119-3 2.5S10.343 13 12 13s3-1.119 3-2.5S13.657 8 12 8z M19 13.5c0 4.136-3.582 7.5-8 7.5s-8-3.364-8-7.5"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-dark-100">تراکنش‌های اخیر</h3>
+                        <p class="text-xs text-dark-400">آخرین تغییرات مالی کیف پول</p>
+                    </div>
+                </div>
+                <a href="{% url 'wallet:dashboard' %}" 
+                   class="text-xs text-primary-400 hover:text-primary-300 transition-colors">
+                    مشاهده
+                </a>
+            </div>
+
+            {% if recent_transactions %}
+            <div class="divide-y divide-dark-700/40">
+                {% for txn in recent_transactions|slice:":5" %}
+                <div class="flex items-center justify-between px-5 py-4 hover:bg-dark-800/30 transition-colors">
+                    <div class="flex items-center gap-3">
+                        {% if txn.amount > 0 %}
+                        <div class="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </div>
+                        {% else %}
+                        <div class="w-8 h-8 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <p class="text-sm font-medium text-dark-100">
+                                {{ txn.description|truncatechars:40 }}
+                            </p>
+                            <p class="text-xs text-dark-400">{{ txn.created_at|date:"Y/m/d H:i" }}</p>
+                        </div>
+                    </div>
+                    <span class="font-mono text-sm 
+                                 {% if txn.amount > 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
+                        {% if txn.amount > 0 %}+{% endif %}{{ txn.amount|intcomma }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="p-8 text-center text-dark-400 text-sm">
+                هنوز تراکنشی انجام نشده است.
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>

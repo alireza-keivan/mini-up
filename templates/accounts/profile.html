@@ -1,22 +1,210 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load humanize %}
 {% load static %}
 
-{% block title %}پروفایل{% endblock %}
+{% block title %}پروفایل کاربری | Mini-up{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Profile Page Custom Animations */
+    .profile-tab-content {
+        display: none;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .profile-tab-content.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .bottom-nav-item.active {
+        background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(139, 92, 246, 0.2));
+        border-color: rgba(14, 165, 233, 0.5);
+    }
+    
+    .bottom-nav-item.active .nav-icon {
+        color: #0ea5e9;
+        filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.6));
+    }
+    
+    .bottom-nav-item.active .nav-label {
+        color: #0ea5e9;
+    }
+    
+    /* Card Number Formatting */
+    .card-number-display {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.15em;
+        direction: ltr;
+    }
+    
+    /* Secure Blur Effect */
+    .secure-blur {
+        filter: blur(4px);
+        transition: filter 0.3s ease;
+    }
+    
+    .secure-blur:hover {
+        filter: blur(0);
+    }
+    
+    /* Bottom Nav Safe Area */
+    .main-content-area {
+        padding-bottom: 100px;
+    }
+    
+    @media (min-width: 768px) {
+        .main-content-area {
+            padding-bottom: 120px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mx-auto py-10 max-w-md">
-    <h1 class="text-xl font-bold mb-6">پروفایل کاربری</h1>
+<main id="main-content" class="main-content-area min-h-screen pt-24 pb-8">
+    <div class="container mx-auto px-4 max-w-7xl">
+        
+        <!-- ═══════════════════════════════════════════════════════════════
+             PROFILE HEADER
+             ═══════════════════════════════════════════════════════════════ -->
+        {% include 'accounts/partials/_profile_header.html' %}
+        
+        <!-- ═══════════════════════════════════════════════════════════════
+             MAIN DASHBOARD
+             ═══════════════════════════════════════════════════════════════ -->
+        {% include 'accounts/partials/_profile_dashboard.html' %}
+        
+        <!-- ═══════════════════════════════════════════════════════════════
+             TAB CONTENTS
+             ═══════════════════════════════════════════════════════════════ -->
+        <div id="profileTabContents" class="mt-8">
+            
+            <!-- Tab 1: Identity Info -->
+            <div id="tabIdentity" class="profile-tab-content active">
+                {% include 'accounts/partials/_profile_identity.html' %}
+            </div>
+            
+            <!-- Tab 2: Bank Info -->
+            <div id="tabBank" class="profile-tab-content">
+                {% include 'accounts/partials/_profile_bank.html' %}
+            </div>
+            
+            <!-- Tab 3: Security -->
+            <div id="tabSecurity" class="profile-tab-content">
+                {% include 'accounts/partials/_profile_security.html' %}
+            </div>
+            
+            <!-- Tab 4: Addresses -->
+            <div id="tabAddresses" class="profile-tab-content">
+                {% include 'accounts/partials/_profile_addresses.html' %}
+            </div>
+            
+        </div>
+        
+    </div>
+</main>
 
-    <form method="post">
-        {% csrf_token %}
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     BOTTOM NAVIGATION
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<nav id="profileBottomNav" 
+     class="fixed bottom-0 left-0 right-0 z-50
+            bg-dark-900/95 backdrop-blur-xl
+            border-t border-dark-700/50
+            safe-area-inset-bottom">
+    
+    <div class="container mx-auto px-2 max-w-lg">
+        <div class="flex items-center justify-around py-2">
+            
+            <!-- Tab 1: Identity -->
+            <button type="button"
+                    class="bottom-nav-item active flex flex-col items-center gap-1 
+                           px-4 py-3 rounded-2xl border border-transparent
+                           transition-all duration-300"
+                    data-tab="tabIdentity"
+                    aria-selected="true"
+                    role="tab">
+                <svg class="nav-icon w-6 h-6 text-dark-400 transition-colors" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                <span class="nav-label text-xs font-medium text-dark-400 transition-colors">
+                    اطلاعات هویتی
+                </span>
+            </button>
+            
+            <!-- Tab 2: Bank -->
+            <button type="button"
+                    class="bottom-nav-item flex flex-col items-center gap-1 
+                           px-4 py-3 rounded-2xl border border-transparent
+                           transition-all duration-300"
+                    data-tab="tabBank"
+                    aria-selected="false"
+                    role="tab">
+                <svg class="nav-icon w-6 h-6 text-dark-400 transition-colors" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+                <span class="nav-label text-xs font-medium text-dark-400 transition-colors">
+                    اطلاعات بانکی
+                </span>
+            </button>
+            
+            <!-- Tab 3: Security -->
+            <button type="button"
+                    class="bottom-nav-item flex flex-col items-center gap-1 
+                           px-4 py-3 rounded-2xl border border-transparent
+                           transition-all duration-300"
+                    data-tab="tabSecurity"
+                    aria-selected="false"
+                    role="tab">
+                <svg class="nav-icon w-6 h-6 text-dark-400 transition-colors" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                <span class="nav-label text-xs font-medium text-dark-400 transition-colors">
+                    امنیت
+                </span>
+            </button>
+            
+            <!-- Tab 4: Addresses -->
+            <button type="button"
+                    class="bottom-nav-item flex flex-col items-center gap-1 
+                           px-4 py-3 rounded-2xl border border-transparent
+                           transition-all duration-300"
+                    data-tab="tabAddresses"
+                    aria-selected="false"
+                    role="tab">
+                <svg class="nav-icon w-6 h-6 text-dark-400 transition-colors" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="nav-label text-xs font-medium text-dark-400 transition-colors">
+                    آدرس‌ها
+                </span>
+            </button>
+            
+        </div>
+    </div>
+</nav>
 
-        <label class="block mb-2">نام</label>
-        <input type="text" name="first_name" value="{{ user.first_name }}" class="w-full border p-2 mb-4">
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     MODALS
+     ═══════════════════════════════════════════════════════════════════════════ -->
+{% include 'accounts/partials/_profile_modals.html' %}
 
-        <label class="block mb-2">نام خانوادگی</label>
-        <input type="text" name="last_name" value="{{ user.last_name }}" class="w-full border p-2 mb-4">
+{% endblock %}
 
-        <button class="w-full bg-blue-600 text-white py-2 rounded">ذخیره</button>
-    </form>
-</div>
+{% block extra_js %}
+<script src="{% static 'js/pages/profile.js' %}"></script>
 {% endblock %}

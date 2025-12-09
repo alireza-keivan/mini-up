@@ -1,0 +1,197 @@
+{% load humanize %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PROFILE HEADER SECTION
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<section class="relative mb-8">
+    
+    <!-- Background Glow -->
+    <div class="absolute inset-0 -z-10">
+        <div class="absolute top-0 right-1/4 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-0 left-1/4 w-64 h-64 bg-secondary-500/10 rounded-full blur-3xl"></div>
+    </div>
+    
+    <!-- Header Card -->
+    <div class="card-glass rounded-3xl p-6 md:p-8">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+            
+            <!-- Avatar Section -->
+            <div class="relative">
+                <!-- Avatar Container -->
+                <div class="relative w-24 h-24 md:w-32 md:h-32">
+                    <!-- Animated Ring -->
+                    <div class="absolute inset-0 rounded-full 
+                                bg-gradient-to-r from-primary-500 via-secondary-500 to-accent-500
+                                animate-spin-slow opacity-50 blur-sm"></div>
+                    
+                    <!-- Avatar -->
+                    <div class="absolute inset-1 rounded-full 
+                                bg-gradient-to-br from-dark-800 to-dark-900
+                                border-2 border-dark-700/50
+                                flex items-center justify-center overflow-hidden">
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" 
+                                 alt="{{ user.get_full_name|default:user.username }}"
+                                 class="w-full h-full object-cover">
+                        {% else %}
+                            <span class="text-3xl md:text-4xl font-bold 
+                                         bg-gradient-to-r from-primary-400 to-secondary-400 
+                                         bg-clip-text text-transparent">
+                                {{ user.first_name|default:user.username|slice:":1"|upper }}
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Edit Avatar Button -->
+                    <button type="button"
+                            onclick="openModal('avatarModal')"
+                            class="absolute bottom-0 right-0 
+                                   w-8 h-8 rounded-full
+                                   bg-primary-500 hover:bg-primary-400
+                                   border-2 border-dark-900
+                                   flex items-center justify-center
+                                   shadow-lg shadow-primary-500/30
+                                   transition-all duration-200
+                                   hover:scale-110"
+                            aria-label="تغییر عکس پروفایل">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Verification Badge -->
+                {% if user.profile.is_verified %}
+                <div class="absolute -top-1 -right-1 
+                            w-7 h-7 rounded-full
+                            bg-gradient-to-r from-emerald-500 to-green-500
+                            flex items-center justify-center
+                            shadow-lg shadow-emerald-500/30
+                            border-2 border-dark-900">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" 
+                              d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                {% else %}
+                <div class="absolute -top-1 -right-1 
+                            w-7 h-7 rounded-full
+                            bg-gradient-to-r from-amber-500 to-orange-500
+                            flex items-center justify-center
+                            shadow-lg shadow-amber-500/30
+                            border-2 border-dark-900
+                            animate-pulse">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- User Info -->
+            <div class="flex-1 text-center md:text-right">
+                <!-- Name & Username -->
+                <div class="mb-3">
+                    <h1 class="text-2xl md:text-3xl font-bold text-dark-100 mb-1">
+                        {% if user.get_full_name %}
+                            {{ user.get_full_name }}
+                        {% else %}
+                            کاربر Mini-up
+                        {% endif %}
+                    </h1>
+                    <p class="text-dark-400 text-sm font-mono" dir="ltr">
+                        {{ user.phone|default:user.email }}
+                    </p>
+                </div>
+                
+                <!-- Verification Status -->
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-4">
+                    {% if user.profile.is_verified %}
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 
+                                 rounded-full text-xs font-medium
+                                 bg-emerald-500/10 text-emerald-400 
+                                 border border-emerald-500/20">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" 
+                                  d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" 
+                                  clip-rule="evenodd"/>
+                        </svg>
+                        هویت تأیید شده
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 
+                                 rounded-full text-xs font-medium
+                                 bg-amber-500/10 text-amber-400 
+                                 border border-amber-500/20">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        در انتظار تأیید هویت
+                    </span>
+                    {% endif %}
+                    
+                    <!-- Member Since -->
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 
+                                 rounded-full text-xs font-medium
+                                 bg-dark-700/50 text-dark-300 
+                                 border border-dark-600/30">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        عضویت از {{ user.date_joined|date:"Y/m/d" }}
+                    </span>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                    <a href="{% url 'wallet:dashboard' %}" 
+                       class="inline-flex items-center gap-2 px-4 py-2 
+                              rounded-xl text-sm font-medium
+                              bg-gradient-to-r from-primary-600 to-primary-500
+                              hover:from-primary-500 hover:to-primary-400
+                              text-white shadow-lg shadow-primary-500/25
+                              transition-all duration-200 hover:scale-105">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                        کیف پول
+                    </a>
+                    
+                    <a href="{% url 'accounts:orders' %}" 
+                       class="inline-flex items-center gap-2 px-4 py-2 
+                              rounded-xl text-sm font-medium
+                              bg-dark-700/50 hover:bg-dark-600/50
+                              text-dark-200 border border-dark-600/50
+                              transition-all duration-200 hover:border-dark-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        سفارش‌ها
+                    </a>
+                    
+                    <button type="button"
+                            onclick="openModal('editProfileModal')"
+                            class="inline-flex items-center gap-2 px-4 py-2 
+                                   rounded-xl text-sm font-medium
+                                   bg-dark-700/50 hover:bg-dark-600/50
+                                   text-dark-200 border border-dark-600/50
+                                   transition-all duration-200 hover:border-dark-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        ویرایش پروفایل
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

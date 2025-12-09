@@ -1,0 +1,245 @@
+{% load humanize %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     WALLET TOP-UP COMPONENT
+     Handles amount input, presets, gateway selection, and payment submission
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+
+<section class="relative" id="wallet-topup">
+    
+    <!-- Top-Up Card -->
+    <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl 
+                bg-gradient-to-br from-dark-800/80 via-dark-800/60 to-dark-900/80
+                border border-dark-600/50 backdrop-blur-xl
+                shadow-xl hover:shadow-neon-green/10 transition-all duration-500">
+        
+        <!-- Background Decorations -->
+        <div class="absolute inset-0 opacity-20 pointer-events-none">
+            <div class="absolute top-0 left-0 w-64 h-64 bg-neon-green/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 right-0 w-48 h-48 bg-neon-cyan/10 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="relative p-6 sm:p-8">
+            
+            <!-- Section Header -->
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl 
+                            bg-gradient-to-br from-neon-green/20 to-neon-cyan/20
+                            flex items-center justify-center
+                            border border-neon-green/30
+                            shadow-lg shadow-neon-green/20">
+                    <svg class="w-6 h-6 text-neon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white">شارژ کیف پول</h2>
+                    <p class="text-dark-400 text-xs sm:text-sm">افزایش موجودی با درگاه امن بانکی</p>
+                </div>
+            </div>
+            
+            <!-- Top-Up Form -->
+            <form id="topup-form" 
+                  action="{{ topup_url|default:'#' }}" 
+                  method="POST"
+                  class="space-y-6">
+                
+                {% csrf_token %}
+                
+                <!-- Amount Input Section -->
+                <div class="space-y-4">
+                    
+                    <!-- Amount Label -->
+                    <label for="topup-amount" class="block text-sm font-medium text-dark-300">
+                        مبلغ شارژ را وارد کنید
+                        {% if min_topup_amount %}
+                        <span class="text-dark-500 font-normal">
+                            (حداقل {{ min_topup_amount|intcomma }} {{ currency_label|default:"تومان" }})
+                        </span>
+                        {% endif %}
+                    </label>
+                    
+                    <!-- Amount Input Field -->
+                    <div class="relative group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-neon-green/20 via-neon-cyan/20 to-neon-green/20 
+                                    rounded-xl blur opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
+                        
+                        <div class="relative flex items-center">
+                            <input type="text" 
+                                   id="topup-amount"
+                                   name="amount"
+                                   inputmode="numeric"
+                                   autocomplete="off"
+                                   placeholder="مثال: ۱۰۰,۰۰۰"
+                                   class="w-full px-5 py-4 sm:py-5
+                                          bg-dark-700/50 
+                                          border-2 border-dark-600/50 
+                                          focus:border-neon-green/50 focus:bg-dark-700/70
+                                          rounded-xl
+                                          text-white text-xl sm:text-2xl font-bold text-center
+                                          placeholder:text-dark-500 placeholder:font-normal placeholder:text-lg
+                                          transition-all duration-300
+                                          focus:outline-none focus:ring-0"
+                                   data-min="{{ min_topup_amount|default:10000 }}"
+                                   data-max="{{ max_topup_amount|default:50000000 }}">
+                            
+                            <!-- Currency Badge -->
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 
+                                         px-3 py-1.5 rounded-lg
+                                         bg-dark-600/50 text-dark-300 text-sm font-medium
+                                         border border-dark-500/30">
+                                {{ currency_label|default:"تومان" }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Validation Message -->
+                    <p id="amount-validation-msg" 
+                       class="text-xs text-red-400 hidden"
+                       role="alert">
+                        <!-- Populated by JavaScript -->
+                    </p>
+                    
+                    <!-- Amount in Words -->
+                    <p id="amount-in-words" 
+                       class="text-sm text-dark-400 text-center min-h-[20px]">
+                        <!-- Populated by JavaScript -->
+                    </p>
+                    
+                </div>
+                
+                <!-- Preset Amounts -->
+                {% if preset_amounts %}
+                <div class="space-y-3">
+                    <p class="text-sm text-dark-400">شارژ سریع:</p>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+                        {% for amount in preset_amounts %}
+                        <button type="button"
+                                class="preset-amount-btn
+                                       px-3 py-2.5 sm:py-3
+                                       bg-dark-700/50 hover:bg-dark-600/50
+                                       border border-dark-600/50 hover:border-neon-cyan/50
+                                       rounded-xl
+                                       text-dark-300 hover:text-neon-cyan text-sm sm:text-base font-medium
+                                       transition-all duration-300
+                                       focus:outline-none focus:ring-2 focus:ring-neon-cyan/50
+                                       active:scale-95"
+                                data-amount="{{ amount }}">
+                            {{ amount|intcomma }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <!-- Fallback Static Presets (if backend doesn't provide) -->
+                <div class="space-y-3">
+                    <p class="text-sm text-dark-400">شارژ سریع:</p>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3">
+                        {% for amount in "50000,100000,200000,500000,1000000,2000000"|make_list %}
+                        <!-- This will need actual amounts from context -->
+                        {% empty %}
+                        <p class="col-span-full text-center text-dark-500 text-sm py-4">
+                            مبالغ پیش‌فرض در دسترس نیست
+                        </p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Payment Gateway Selection -->
+                <div class="space-y-3">
+                    <p class="text-sm font-medium text-dark-300">انتخاب درگاه پرداخت:</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="gateway-selector">
+                        {% for gateway in gateways %}
+                        <label class="gateway-option relative cursor-pointer group/gateway">
+                            <input type="radio" 
+                                   name="gateway" 
+                                   value="{{ gateway.id }}"
+                                   class="sr-only peer"
+                                   {% if gateway.is_default %}checked{% endif %}>
+
+                            <!-- Outer Wrapper -->
+                            <div class="p-4 rounded-xl border-2
+                                        bg-dark-700/40 backdrop-blur
+                                        border-dark-600/50
+                                        peer-checked:border-neon-green
+                                        peer-checked:bg-dark-700/70
+                                        transition-all duration-300
+                                        hover:border-neon-cyan/50">
+
+                                <!-- Gateway Content -->
+                                <div class="flex items-center gap-3">
+                                    
+                                    <!-- Logo -->
+                                    {% if gateway.logo %}
+                                    <img src="{{ gateway.logo.url }}" 
+                                         class="w-10 h-10 rounded-lg object-contain"
+                                         alt="{{ gateway.title }}">
+                                    {% else %}
+                                    <div class="w-10 h-10 rounded-lg bg-dark-600 flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-dark-400" fill="none" stroke="currentColor">
+                                            <path stroke-width="2" 
+                                                  stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M3 10h18M7 15h1m4 0h5m-9 4h8a4 4 0 004-4V9a4 4 0 00-4-4H7a4 4 0 00-4 4v6a4 4 0 004 4z"/>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Title & Metadata -->
+                                    <div class="flex flex-col">
+                                        <span class="text-white font-bold text-sm">
+                                            {{ gateway.title }}
+                                        </span>
+
+                                        {% if gateway.description %}
+                                        <span class="text-dark-400 text-xs">
+                                            {{ gateway.description }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Validation Message -->
+                    <p id="gateway-validation-msg"
+                       class="text-xs text-red-400 hidden"
+                       role="alert">
+                        لطفا یکی از درگاه‌ها را انتخاب کنید.
+                    </p>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-2">
+                    <button type="submit"
+                            id="topup-submit-btn"
+                            class="w-full py-4 rounded-xl
+                                   bg-gradient-to-r from-neon-green to-neon-cyan
+                                   text-dark-900 font-bold text-lg
+                                   shadow-lg shadow-neon-green/30
+                                   hover:shadow-neon-cyan/40
+                                   hover:brightness-110
+                                   transition-all duration-300
+                                   disabled:opacity-40 disabled:cursor-not-allowed
+                                   btn-ripple">
+                        
+                        <span id="submit-text">پرداخت و شارژ کیف پول</span>
+
+                        <!-- Loading Spinner -->
+                        <span id="submit-loading" class="hidden">
+                            <svg class="w-6 h-6 animate-spin mx-auto text-dark-900" fill="none" stroke="currentColor">
+                                <circle cx="12" cy="12" r="10" stroke-width="3" class="opacity-20"/>
+                                <path stroke-width="3" d="M12 2a10 10 0 0110 10"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
