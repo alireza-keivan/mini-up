@@ -1,0 +1,263 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PROFILE BANK CARDS TAB
+     تب کارت‌های بانکی - نسخه ساده
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<div id="tab-bank" class="profile-tab-content hidden">
+    
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-credit-card text-pink-500"></i>
+                کارت‌های بانکی
+            </h2>
+            <p class="text-sm text-gray-400 mt-1">کارت‌های بانکی ثبت شده برای برداشت وجه</p>
+        </div>
+        
+        <button onclick="openAddCardModal()" 
+                class="btn-neon text-sm px-4 py-2.5 rounded-xl">
+            <i class="fas fa-plus ml-2"></i>
+            افزودن کارت جدید
+        </button>
+    </div>
+
+    <!-- Cards List -->
+    <div class="space-y-4">
+        
+        {% if bank_cards %}
+            {% for card in bank_cards %}
+            <!-- Card Item -->
+            <div class="card-glass rounded-2xl p-5 border border-white/5 
+                        hover:border-pink-500/30 transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    
+                    <!-- Card Info -->
+                    <div class="flex items-center gap-4">
+                        <!-- Bank Logo -->
+                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 
+                                    flex items-center justify-center border border-white/10">
+                            <i class="fas fa-university text-2xl text-pink-400"></i>
+                        </div>
+                        
+                        <!-- Card Details -->
+                        <div>
+                            <p class="text-white font-bold text-lg tracking-wider font-mono" dir="ltr">
+                                {{ card.masked_number }}
+                            </p>
+                            <p class="text-gray-400 text-sm mt-1">
+                                {{ card.bank_name|default:"بانک نامشخص" }}
+                            </p>
+                            {% if card.is_default %}
+                            <span class="inline-flex items-center gap-1 text-xs text-green-400 mt-1">
+                                <i class="fas fa-check-circle"></i>
+                                کارت پیش‌فرض
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex items-center gap-2">
+                        {% if not card.is_default %}
+                        <button onclick="setDefaultCard({{ card.id }})"
+                                class="p-2.5 rounded-lg bg-white/5 text-gray-400 
+                                       hover:bg-green-500/20 hover:text-green-400 transition-all"
+                                title="تنظیم به عنوان پیش‌فرض">
+                            <i class="fas fa-star"></i>
+                        </button>
+                        {% endif %}
+                        
+                        <button onclick="deleteCard({{ card.id }})"
+                                class="p-2.5 rounded-lg bg-white/5 text-gray-400 
+                                       hover:bg-red-500/20 hover:text-red-400 transition-all"
+                                title="حذف کارت">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+        {% else %}
+            <!-- Empty State -->
+            <div class="card-glass rounded-2xl p-12 text-center border border-dashed border-white/10">
+                <div class="w-20 h-20 mx-auto rounded-full bg-white/5 
+                            flex items-center justify-center mb-4">
+                    <i class="fas fa-credit-card text-3xl text-gray-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">کارت بانکی ثبت نشده</h3>
+                <p class="text-gray-400 text-sm mb-6">
+                    برای برداشت وجه از کیف پول، یک کارت بانکی اضافه کنید
+                </p>
+                <button onclick="openAddCardModal()" 
+                        class="btn-neon text-sm px-6 py-2.5 rounded-xl">
+                    <i class="fas fa-plus ml-2"></i>
+                    افزودن اولین کارت
+                </button>
+            </div>
+        {% endif %}
+        
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+        <div class="flex gap-3">
+            <i class="fas fa-info-circle text-blue-400 mt-0.5"></i>
+            <div class="text-sm text-gray-300">
+                <p class="font-medium text-blue-400 mb-1">توجه مهم</p>
+                <p>کارت بانکی باید به نام صاحب حساب کاربری باشد. برداشت وجه فقط به کارت‌های تأیید شده امکان‌پذیر است.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ADD CARD MODAL
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<div id="addCardModal" class="fixed inset-0 z-50 hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeAddCardModal()"></div>
+    
+    <!-- Modal Content -->
+    <div class="relative flex items-center justify-center min-h-screen p-4">
+        <div class="bg-dark-800 rounded-2xl w-full max-w-md p-6 border border-white/10 
+                    shadow-2xl transform transition-all">
+            
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-credit-card text-pink-500"></i>
+                    افزودن کارت بانکی
+                </h3>
+                <button onclick="closeAddCardModal()" 
+                        class="w-8 h-8 rounded-lg bg-white/5 text-gray-400 
+                               hover:bg-white/10 hover:text-white transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Form -->
+            <form id="addCardForm" method="POST" action="{% url 'accounts:add_bank_card' %}">
+                {% csrf_token %}
+                
+                <!-- Card Number -->
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-300 mb-2">شماره کارت</label>
+                    <input type="text" 
+                           name="card_number" 
+                           id="cardNumberInput"
+                           maxlength="19"
+                           placeholder="xxxx - xxxx - xxxx - xxxx"
+                           dir="ltr"
+                           class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 
+                                  text-white text-center font-mono text-lg tracking-widest
+                                  focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 
+                                  outline-none transition-all"
+                           required>
+                    <p id="bankNameDisplay" class="text-xs text-gray-500 mt-2 text-center"></p>
+                </div>
+                
+                <!-- Shaba (Optional) -->
+                <div class="mb-6">
+                    <label class="block text-sm text-gray-300 mb-2">
+                        شماره شبا
+                        <span class="text-gray-500">(اختیاری)</span>
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-500 text-sm">IR</span>
+                        <input type="text" 
+                               name="shaba" 
+                               maxlength="24"
+                               placeholder="xxxxxxxxxxxxxxxxxxxxxxxx"
+                               dir="ltr"
+                               class="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 
+                                      text-white font-mono tracking-wider
+                                      focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 
+                                      outline-none transition-all">
+                    </div>
+                </div>
+                
+                <!-- Submit -->
+                <button type="submit" 
+                        class="w-full btn-neon py-3 rounded-xl text-sm font-bold">
+                    <i class="fas fa-check ml-2"></i>
+                    ثبت کارت بانکی
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Card Number Formatting Script -->
+<script>
+// Format card number input
+document.getElementById('cardNumberInput')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.substring(0, 16);
+    value = value.replace(/(\d{4})(?=\d)/g, '$1 - ');
+    e.target.value = value;
+    
+    // Simple bank detection based on first 6 digits
+    const digits = value.replace(/\D/g, '');
+    if (digits.length >= 6) {
+        const bankName = detectBank(digits.substring(0, 6));
+        document.getElementById('bankNameDisplay').textContent = bankName;
+    } else {
+        document.getElementById('bankNameDisplay').textContent = '';
+    }
+});
+
+function detectBank(bin) {
+    const banks = {
+        '603799': 'بانک ملی ایران',
+        '589210': 'بانک سپه',
+        '627648': 'بانک توسعه صادرات',
+        '627961': 'بانک صنعت و معدن',
+        '603770': 'بانک کشاورزی',
+        '628023': 'بانک مسکن',
+        '627760': 'پست بانک ایران',
+        '502908': 'بانک توسعه تعاون',
+        '627412': 'بانک اقتصاد نوین',
+        '622106': 'بانک پارسیان',
+        '502229': 'بانک پاسارگاد',
+        '627488': 'بانک کارآفرین',
+        '621986': 'بانک سامان',
+        '639346': 'بانک سینا',
+        '639607': 'بانک سرمایه',
+        '502806': 'بانک شهر',
+        '502938': 'بانک دی',
+        '603769': 'بانک صادرات',
+        '610433': 'بانک ملت',
+        '627353': 'بانک تجارت',
+        '589463': 'بانک رفاه',
+        '627381': 'بانک انصار',
+        '639370': 'بانک مهر اقتصاد',
+        '639599': 'بانک قوامین',
+    };
+    return banks[bin] || 'بانک نامشخص';
+}
+
+function openAddCardModal() {
+    document.getElementById('addCardModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAddCardModal() {
+    document.getElementById('addCardModal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function setDefaultCard(cardId) {
+    if (confirm('این کارت به عنوان کارت پیش‌فرض تنظیم شود؟')) {
+        window.location.href = `{% url 'accounts:profile' %}?set_default_card=${cardId}`;
+    }
+}
+
+function deleteCard(cardId) {
+    if (confirm('آیا از حذف این کارت اطمینان دارید؟')) {
+        window.location.href = `{% url 'accounts:profile' %}?delete_card=${cardId}`;
+    }
+}
+</script>

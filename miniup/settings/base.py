@@ -22,7 +22,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='django-insecure-change-me-in-production')
 
-# Application definition
+# ═══════════════════════════════════════════════════════════════════════════════
+# APPLICATION DEFINITION
+# ═══════════════════════════════════════════════════════════════════════════════
+
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,14 +34,18 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'django_extensions',
+    'django.contrib.sites',  # ✅ Required for allauth
 ]
 
 THIRD_PARTY_APPS = [
     'compressor',
     'rest_framework',
+    # Allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
-
 
 LOCAL_APPS = [
     'apps.core',
@@ -54,6 +61,10 @@ LOCAL_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# MIDDLEWARE
+# ═══════════════════════════════════════════════════════════════════════════════
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -64,9 +75,73 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # ✅ Required for allauth
 ]
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# AUTHENTICATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+AUTH_USER_MODEL = 'accounts.User'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Site ID for django.contrib.sites
+SITE_ID = 1
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ALLAUTH SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Account settings
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # 'mandatory', 'optional', 'none'
+
+# Social account settings
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Google Provider settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+    }
+}
+
+# Custom adapters (create these files later)
+# ACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomAccountAdapter'
+# SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomSocialAccountAdapter'
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# URL CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
 ROOT_URLCONF = 'miniup.urls'
+WSGI_APPLICATION = 'miniup.wsgi.application'
+
+# Login/Logout redirects
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TEMPLATES
+# ═══════════════════════════════════════════════════════════════════════════════
 
 TEMPLATES = [
     {
@@ -76,21 +151,21 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',  # Required by allauth
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.core.context_processors.site_settings',
                 'apps.core.context_processors.site_context',
                 'apps.wallet.context_processors.wallet_context',
-                
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'miniup.wsgi.application'
+# ═══════════════════════════════════════════════════════════════════════════════
+# PASSWORD VALIDATION
+# ═══════════════════════════════════════════════════════════════════════════════
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -106,14 +181,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
+# ═══════════════════════════════════════════════════════════════════════════════
+# INTERNATIONALIZATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
 LANGUAGE_CODE = 'fa-ir'
 TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Languages
 LANGUAGES = [
     ('fa', 'Persian'),
     ('en', 'English'),
@@ -123,67 +200,69 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
-# Static files (CSS, JavaScript, Images)
+# ═══════════════════════════════════════════════════════════════════════════════
+# STATIC & MEDIA FILES
+# ═══════════════════════════════════════════════════════════════════════════════
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# WhiteNoise configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Django Compressor
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder',
 ]
 
+# Django Compressor
 COMPRESS_ENABLED = True
 COMPRESS_CSS_FILTERS = [
     'compressor.filters.css_default.CssAbsoluteFilter',
     'compressor.filters.cssmin.rCSSMinFilter',
 ]
 
-# Default primary key field type
+# ═══════════════════════════════════════════════════════════════════════════════
+# DEFAULT SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Site Settings
+# ═══════════════════════════════════════════════════════════════════════════════
+# SITE SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
 SITE_NAME = 'مینی‌آپ'
 SITE_DESCRIPTION = 'فروشگاه آنلاین بازی و خدمات مجازی'
 
-LOCAL_APPS = [
-    'apps.core',
-    'apps.accounts',
-    'apps.products',
-    'apps.orders',
-    'apps.payments',
-    'apps.wallet',
-    'apps.coupons',
-    'apps.consulting',
-    'apps.content',
-]
+# ═══════════════════════════════════════════════════════════════════════════════
+# OTP SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
 
-# Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
-
-# OTP Settings
 OTP_EXPIRE_SECONDS = 120  # 2 minutes
 OTP_LENGTH = 5
 
-# Wallet Settings
+# ═══════════════════════════════════════════════════════════════════════════════
+# WALLET SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
 MIN_WALLET_TOPUP = 10000  # Minimum 10,000 Toman
 MAX_WALLET_TOPUP = 10000000  # Maximum 10,000,000 Toman
 
-# Shipping
+# ═══════════════════════════════════════════════════════════════════════════════
+# SHIPPING
+# ═══════════════════════════════════════════════════════════════════════════════
+
 FLAT_SHIPPING_RATE = 50000  # 50,000 Toman
 FREE_SHIPPING_THRESHOLD = 500000  # Free above 500,000 Toman
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# REST FRAMEWORK
+# ═══════════════════════════════════════════════════════════════════════════════
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -197,31 +276,12 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
-    # برای محیط توسعه، Browsable API را هم فعال کن:
-    # 'rest_framework.renderers.BrowsableAPIRenderer',
 }
-
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # EMAIL CONFIGURATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# For development (console backend)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# For production (SMTP)
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'  # or your SMTP server
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
-# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
-
-DEFAULT_FROM_EMAIL = 'noreply@yoursite.com'
-SERVER_EMAIL = 'server@yoursite.com'
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# FIREBASE (Optional - for mobile push)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# FIREBASE_
+DEFAULT_FROM_EMAIL = 'noreply@mini-up.ir'
+SERVER_EMAIL = 'server@mini-up.ir'

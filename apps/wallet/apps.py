@@ -7,4 +7,5 @@ class WalletConfig(AppConfig):
     label = 'wallet'    
     verbose_name = 'کیف پول'
     def ready(self):
-        import apps.wallet.signals  # noqa
+        #import apps.wallet.signals  # noqa
+        pass

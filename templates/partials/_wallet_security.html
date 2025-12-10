@@ -113,24 +113,6 @@
                     </span>
                     {% endif %}
                     
-                    {% if user.profile.email_verified %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg
-                                 bg-green-500/15 text-green-400 text-xs border border-green-500/30">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        ایمیل
-                    </span>
-                    {% else %}
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg
-                                 bg-dark-600/50 text-dark-400 text-xs border border-dark-500/30">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                        ایمیل
-                    </span>
-                    {% endif %}
-                    
                     {% if wallet.has_pin %}
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg
                                  bg-green-500/15 text-green-400 text-xs border border-green-500/30">

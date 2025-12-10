@@ -1,0 +1,544 @@
+{% load humanize %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PROFILE ORDERS TAB
+     Shows user's order history with filtering and status tracking
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<div class="space-y-6">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ORDERS HEADER & FILTERS
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="card-glass rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            
+            <!-- Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl 
+                            bg-gradient-to-br from-primary-500/20 to-secondary-500/10
+                            border border-primary-500/20
+                            flex items-center justify-center">
+                    <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-dark-100">سفارش‌های من</h2>
+                    <p class="text-sm text-dark-400">مدیریت و پیگیری سفارش‌ها</p>
+                </div>
+            </div>
+            
+            <!-- Filter Tabs -->
+            <div class="flex items-center gap-2 p-1 bg-dark-800/50 rounded-xl">
+                <button type="button" 
+                        class="order-filter-btn active px-4 py-2 text-sm font-medium rounded-lg transition-all"
+                        data-filter="all">
+                    همه
+                    <span class="mr-1 px-1.5 py-0.5 text-xs rounded-full bg-dark-700">
+                        {{ orders_count|default:0 }}
+                    </span>
+                </button>
+                <button type="button" 
+                        class="order-filter-btn px-4 py-2 text-sm font-medium rounded-lg transition-all"
+                        data-filter="active">
+                    فعال
+                    {% if active_orders_count %}
+                    <span class="mr-1 px-1.5 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-400">
+                        {{ active_orders_count }}
+                    </span>
+                    {% endif %}
+                </button>
+                <button type="button" 
+                        class="order-filter-btn px-4 py-2 text-sm font-medium rounded-lg transition-all"
+                        data-filter="completed">
+                    تکمیل شده
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ACTIVE ORDERS (Highlighted Section)
+         ═══════════════════════════════════════════════════════════════════════ -->
+    {% if active_orders %}
+    <div class="card-glass rounded-2xl overflow-hidden border border-amber-500/20">
+        
+        <!-- Section Header -->
+        <div class="px-6 py-4 bg-gradient-to-r from-amber-500/10 to-transparent border-b border-amber-500/20">
+            <div class="flex items-center gap-2">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                </span>
+                <h3 class="text-base font-semibold text-amber-400">سفارش‌های در حال پردازش</h3>
+                <span class="text-xs text-dark-400">({{ active_orders|length }} سفارش)</span>
+            </div>
+        </div>
+        
+        <!-- Active Orders List -->
+        <div class="divide-y divide-dark-700/30">
+            {% for order in active_orders %}
+            <div class="p-6 hover:bg-dark-800/30 transition-colors duration-200 order-item"
+                 data-status="active">
+                
+                <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+                    
+                    <!-- Order Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="font-mono text-sm text-primary-400 font-medium">
+                                #{{ order.order_number|default:order.id }}
+                            </span>
+                            
+                            <!-- Status Badge -->
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
+                                        {% if order.status == 'pending' %}
+                                        bg-amber-500/15 text-amber-400 border border-amber-500/30
+                                        {% elif order.status == 'processing' %}
+                                        bg-blue-500/15 text-blue-400 border border-blue-500/30
+                                        {% elif order.status == 'shipped' %}
+                                        bg-purple-500/15 text-purple-400 border border-purple-500/30
+                                        {% endif %}">
+                                <span class="w-1.5 h-1.5 rounded-full 
+                                            {% if order.status == 'pending' %}bg-amber-400
+                                            {% elif order.status == 'processing' %}bg-blue-400
+                                            {% elif order.status == 'shipped' %}bg-purple-400
+                                            {% endif %}"></span>
+                                {{ order.get_status_display }}
+                            </span>
+                        </div>
+                        
+                        <!-- Order Items Preview -->
+                        <div class="flex items-center gap-2 mb-2">
+                            {% for item in order.items.all|slice:":3" %}
+                            <div class="w-10 h-10 rounded-lg bg-dark-700/50 border border-dark-600/50 
+                                        flex items-center justify-center overflow-hidden">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" 
+                                     alt="{{ item.product.name }}"
+                                     class="w-full h-full object-cover">
+                                {% else %}
+                                <svg class="w-5 h-5 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% if order.items.count > 3 %}
+                            <div class="w-10 h-10 rounded-lg bg-dark-700/50 border border-dark-600/50 
+                                        flex items-center justify-center">
+                                <span class="text-xs text-dark-400">+{{ order.items.count|add:"-3" }}</span>
+                            </div>
+                            {% endif %}
+                            <span class="text-sm text-dark-400 mr-2">
+                                {{ order.items.count }} محصول
+                            </span>
+                        </div>
+                        
+                        <!-- Order Date -->
+                        <div class="flex items-center gap-4 text-xs text-dark-500">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                {{ order.created_at|date:"Y/m/d" }}
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                {{ order.created_at|time:"H:i" }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Amount & Actions -->
+                    <div class="flex items-center gap-4">
+                        
+                        <!-- Amount -->
+                        <div class="text-left">
+                            <p class="text-xs text-dark-500 mb-1">مبلغ کل</p>
+                            <p class="text-lg font-bold text-dark-100">
+                                {{ order.total_amount|intcomma }}
+                                <span class="text-xs text-dark-400 font-normal">تومان</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Action Button -->
+                        <a href="{% url 'orders:detail' order.id %}" 
+                           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
+                                  bg-primary-500/10 hover:bg-primary-500/20
+                                  text-primary-400 hover:text-primary-300
+                                  border border-primary-500/20 hover:border-primary-500/30
+                                  transition-all duration-200 text-sm font-medium">
+                            <span>جزئیات</span>
+                            <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar (for shipped orders) -->
+                {% if order.status == 'shipped' %}
+                <div class="mt-4 pt-4 border-t border-dark-700/30">
+                    <div class="flex items-center justify-between text-xs text-dark-400 mb-2">
+                        <span>ارسال شده</span>
+                        <span>در حال تحویل</span>
+                        <span>تحویل داده شده</span>
+                    </div>
+                    <div class="h-2 bg-dark-700/50 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full w-2/3 
+                                    transition-all duration-500"></div>
+                    </div>
+                </div>
+                {% endif %}
+                
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         ALL ORDERS TABLE
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="card-glass rounded-2xl overflow-hidden">
+        
+        <!-- Table Header -->
+        <div class="px-6 py-4 border-b border-dark-700/50">
+            <h3 class="text-base font-semibold text-dark-200">تاریخچه سفارش‌ها</h3>
+        </div>
+        
+        {% if orders %}
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-dark-800/30">
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
+                            شماره سفارش
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
+                            تاریخ
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
+                            تعداد
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
+                            مبلغ
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
+                            وضعیت
+                        </th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-dark-400 uppercase tracking-wider">
+                            عملیات
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-dark-700/30">
+                    {% for order in orders %}
+                    <tr class="hover:bg-dark-800/20 transition-colors duration-150 order-item"
+                        data-status="{% if order.status == 'completed' %}completed{% elif order.status == 'cancelled' %}cancelled{% else %}active{% endif %}">
+                        
+                        <!-- Order Number -->
+                        <td class="px-6 py-4">
+                            <span class="font-mono text-sm text-primary-400 font-medium">
+                                #{{ order.order_number|default:order.id }}
+                            </span>
+                        </td>
+                        
+                        <!-- Date -->
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-dark-200">{{ order.created_at|date:"Y/m/d" }}</div>
+                            <div class="text-xs text-dark-500">{{ order.created_at|time:"H:i" }}</div>
+                        </td>
+                        
+                        <!-- Items Count -->
+                        <td class="px-6 py-4">
+                            <span class="text-sm text-dark-300">{{ order.items.count }} محصول</span>
+                        </td>
+                        
+                        <!-- Amount -->
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-semibold text-dark-100">
+                                {{ order.total_amount|intcomma }}
+                            </span>
+                            <span class="text-xs text-dark-400 mr-1">تومان</span>
+                        </td>
+                        
+                        <!-- Status -->
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+                                        {% if order.status == 'completed' %}
+                                        bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                                        {% elif order.status == 'cancelled' %}
+                                        bg-rose-500/10 text-rose-400 border border-rose-500/20
+                                        {% elif order.status == 'pending' %}
+                                        bg-amber-500/10 text-amber-400 border border-amber-500/20
+                                        {% elif order.status == 'processing' %}
+                                        bg-blue-500/10 text-blue-400 border border-blue-500/20
+                                        {% elif order.status == 'shipped' %}
+                                        bg-purple-500/10 text-purple-400 border border-purple-500/20
+                                        {% else %}
+                                        bg-dark-600/50 text-dark-300 border border-dark-500/20
+                                        {% endif %}">
+                                <span class="w-1.5 h-1.5 rounded-full
+                                            {% if order.status == 'completed' %}bg-emerald-400
+                                            {% elif order.status == 'cancelled' %}bg-rose-400
+                                            {% elif order.status == 'pending' %}bg-amber-400
+                                            {% elif order.status == 'processing' %}bg-blue-400
+                                            {% elif order.status == 'shipped' %}bg-purple-400
+                                            {% else %}bg-dark-400
+                                            {% endif %}"></span>
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                        
+                        <!-- Actions -->
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <!-- View Details -->
+                                <a href="{% url 'orders:detail' order.id %}" 
+                                   class="p-2 rounded-lg text-primary-400 hover:text-primary-300 
+                                          hover:bg-primary-500/10 transition-all duration-200"
+                                   title="مشاهده جزئیات">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </a>
+                                
+                                <!-- Reorder (only for completed) -->
+                                {% if order.status == 'completed' %}
+                                <button type="button" 
+                                        class="p-2 rounded-lg text-secondary-400 hover:text-secondary-300 
+                                               hover:bg-secondary-500/10 transition-all duration-200"
+                                        title="سفارش مجدد"
+                                        onclick="reorderItems('{{ order.id }}')">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                </button>
+                                {% endif %}
+                                
+                                <!-- Download Invoice (only for completed) -->
+                                {% if order.status == 'completed' %}
+                                <a href="{% url 'orders:invoice' order.id %}" 
+                                   class="p-2 rounded-lg text-dark-400 hover:text-dark-200 
+                                          hover:bg-dark-700/50 transition-all duration-200"
+                                   title="دانلود فاکتور">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════
+             MOBILE CARDS VIEW
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="md:hidden divide-y divide-dark-700/30">
+            {% for order in orders %}
+            <div class="p-5 hover:bg-dark-800/20 transition-colors duration-150 order-item"
+                 data-status="{% if order.status == 'completed' %}completed{% elif order.status == 'cancelled' %}cancelled{% else %}active{% endif %}">
+                
+                <!-- Order Header -->
+                <div class="flex items-center justify-between mb-3">
+                    <span class="font-mono text-sm text-primary-400 font-medium">
+                        #{{ order.order_number|default:order.id }}
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
+                                {% if order.status == 'completed' %}
+                                bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                                {% elif order.status == 'cancelled' %}
+                                bg-rose-500/10 text-rose-400 border border-rose-500/20
+                                {% elif order.status == 'pending' %}
+                                bg-amber-500/10 text-amber-400 border border-amber-500/20
+                                {% elif order.status == 'processing' %}
+                                bg-blue-500/10 text-blue-400 border border-blue-500/20
+                                {% elif order.status == 'shipped' %}
+                                bg-purple-500/10 text-purple-400 border border-purple-500/20
+                                {% else %}
+                                bg-dark-600/50 text-dark-300 border border-dark-500/20
+                                {% endif %}">
+                        <span class="w-1.5 h-1.5 rounded-full
+                                    {% if order.status == 'completed' %}bg-emerald-400
+                                    {% elif order.status == 'cancelled' %}bg-rose-400
+                                    {% elif order.status == 'pending' %}bg-amber-400
+                                    {% elif order.status == 'processing' %}bg-blue-400
+                                    {% elif order.status == 'shipped' %}bg-purple-400
+                                    {% else %}bg-dark-400
+                                    {% endif %}"></span>
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+                
+                <!-- Order Items Preview (Mobile) -->
+                <div class="flex items-center gap-2 mb-3">
+                    {% for item in order.items.all|slice:":4" %}
+                    <div class="w-12 h-12 rounded-lg bg-dark-700/50 border border-dark-600/50 
+                                flex items-center justify-center overflow-hidden">
+                        {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" 
+                             alt="{{ item.product.name }}"
+                             class="w-full h-full object-cover">
+                        {% else %}
+                        <svg class="w-6 h-6 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    {% if order.items.count > 4 %}
+                    <div class="w-12 h-12 rounded-lg bg-dark-700/50 border border-dark-600/50 
+                                flex items-center justify-center">
+                        <span class="text-xs text-dark-400 font-medium">+{{ order.items.count|add:"-4" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Order Info -->
+                <div class="flex items-center justify-between text-sm mb-3">
+                    <div class="flex items-center gap-3 text-dark-400">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            {{ order.created_at|date:"Y/m/d" }}
+                        </span>
+                        <span>{{ order.items.count }} محصول</span>
+                    </div>
+                    <div class="text-left">
+                        <span class="font-bold text-dark-100">{{ order.total_amount|intcomma }}</span>
+                        <span class="text-xs text-dark-400 mr-1">تومان</span>
+                    </div>
+                </div>
+                
+                <!-- Action Button -->
+                <a href="{% url 'orders:detail' order.id %}" 
+                   class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl
+                          bg-dark-700/50 hover:bg-dark-700 
+                          text-dark-200 hover:text-dark-100
+                          border border-dark-600/50 hover:border-dark-500/50
+                          transition-all duration-200 text-sm font-medium">
+                    <span>مشاهده جزئیات</span>
+                    <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% else %}
+        <!-- ═══════════════════════════════════════════════════════════════════
+             EMPTY STATE
+             ═══════════════════════════════════════════════════════════════════ -->
+        <div class="p-12 text-center">
+            <div class="w-20 h-20 mx-auto mb-6 rounded-2xl 
+                        bg-gradient-to-br from-dark-700/50 to-dark-800/50
+                        border border-dark-600/30
+                        flex items-center justify-center">
+                <svg class="w-10 h-10 text-dark-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+            </div>
+            <h4 class="text-lg font-semibold text-dark-200 mb-2">هنوز سفارشی ثبت نکرده‌اید</h4>
+            <p class="text-sm text-dark-400 mb-6 max-w-sm mx-auto">
+                با خرید از فروشگاه ما، سفارش‌های شما در این قسمت نمایش داده می‌شود.
+            </p>
+            <a href="{% url 'core:home' %}" 
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-xl
+                      bg-gradient-to-r from-primary-600 to-primary-500
+                      hover:from-primary-500 hover:to-primary-400
+                      text-white font-medium text-sm
+                      shadow-lg shadow-primary-500/25
+                      transition-all duration-300 hover:scale-105">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                شروع خرید
+            </a>
+        </div>
+        {% endif %}
+        
+        <!-- ═══════════════════════════════════════════════════════════════════
+             PAGINATION
+             ═══════════════════════════════════════════════════════════════════ -->
+        {% if orders.has_other_pages %}
+        <nav class="flex justify-center items-center mt-8 select-none space-x-1 space-x-reverse" aria-label="Pagination">
+            <!-- Previous -->
+            {% if orders.has_previous %}
+            <a href="?page={{ orders.previous_page_number }}"
+               class="px-3 py-1.5 rounded-lg bg-dark-700/50 hover:bg-dark-600
+                      text-dark-300 hover:text-dark-100 font-medium text-sm
+                      border border-dark-600/50 hover:border-dark-500/50
+                      transition-all duration-200">
+                قبلی
+            </a>
+            {% else %}
+            <span class="px-3 py-1.5 rounded-lg bg-dark-800 text-dark-600 text-sm font-medium cursor-not-allowed">
+                قبلی
+            </span>
+            {% endif %}
+
+            <!-- Page Numbers -->
+            {% for p in orders.paginator.page_range %}
+                {% if p == orders.number %}
+                    <span class="px-3 py-1.5 rounded-lg bg-primary-500 text-white font-semibold text-sm shadow-primary-500/40 shadow-md">
+                        {{ p }}
+                    </span>
+                {% elif p > orders.number|add:'-3' and p < orders.number|add:'3' %}
+                    <a href="?page={{ p }}"
+                       class="px-3 py-1.5 rounded-lg bg-dark-700/50 hover:bg-dark-600 text-dark-300 hover:text-dark-100 font-medium text-sm transition-all duration-200">
+                        {{ p }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            <!-- Next -->
+            {% if orders.has_next %}
+            <a href="?page={{ orders.next_page_number }}"
+               class="px-3 py-1.5 rounded-lg bg-dark-700/50 hover:bg-dark-600
+                      text-dark-300 hover:text-dark-100 font-medium text-sm
+                      border border-dark-600/50 hover:border-dark-500/50
+                      transition-all duration-200">
+                بعدی
+            </a>
+            {% else %}
+            <span class="px-3 py-1.5 rounded-lg bg-dark-800 text-dark-600 text-sm font-medium cursor-not-allowed">
+                بعدی
+            </span>
+            {% endif %}
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function reorderItems(orderId) {
+    // نمونه تابع جاوااسکریپت برای سفارش مجدد
+    alert('در حال آماده‌سازی سفارش مجدد شماره ' + orderId);
+    // TODO: افزودن منطق درخواست AJAX برای افزودن اقلام این سفارش به سبد خرید
+}
+</script>

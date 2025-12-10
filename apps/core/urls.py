@@ -15,7 +15,7 @@ urlpatterns = [
     path('consulting/', views.consulting, name='consulting'),
     path('about/', views.about, name='about'),
     path('faq/', views.faq, name='faq'), 
-    path('accounts/', views.accounts, name='accounts'),
+    # REMOVED: path('accounts/', views.accounts, name='accounts'),  # This conflicts with apps/accounts/
     
     # ===== صفحات احراز هویت =====
     path('login/', views.login_view, name='login'),

@@ -89,25 +89,25 @@
                     
                     <div class="auth-input-group">
                         <label class="auth-input-label" for="loginIdentifier">
-                            شماره موبایل یا ایمیل
+                            شماره موبایل
                         </label>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon">
-                                <i class="fas fa-user"></i>
+                                <i class="fas fa-mobile-alt"></i>
                             </span>
                             <input type="text" 
                                    class="auth-input" 
                                    id="loginIdentifier"
                                    name="identifier"
-                                   placeholder="۰۹۱۲۳۴۵۶۷۸۹ یا example@email.com"
-                                   autocomplete="username"
-                                   inputmode="text"
+                                   placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                                   autocomplete="tel"
+                                   inputmode="tel"
                                    dir="ltr"
                                    required>
                             <span class="auth-input-status" id="loginInputStatus"></span>
                         </div>
                         <span class="auth-input-hint">
-                            شماره موبایل با ۰۹ شروع شود یا ایمیل معتبر وارد کنید
+                            شماره موبایل باید با ۰۹ شروع شود
                         </span>
                         <span class="auth-input-error" id="loginIdentifierError"></span>
                     </div>
@@ -296,25 +296,25 @@
                     
                     <div class="auth-input-group">
                         <label class="auth-input-label" for="registerIdentifier">
-                            شماره موبایل یا ایمیل
+                            شماره موبایل
                         </label>
                         <div class="auth-input-wrapper">
                             <span class="auth-input-icon">
-                                                                <i class="fas fa-user-plus"></i>
+                                                                <i class="fas fa-mobile-alt"></i>
                             </span>
                             <input type="text" 
                                    class="auth-input" 
                                    id="registerIdentifier"
                                    name="identifier"
-                                   placeholder="۰۹۱۲۳۴۵۶۷۸۹ یا example@email.com"
-                                   autocomplete="username"
-                                   inputmode="text"
+                                   placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                                   autocomplete="tel"
+                                   inputmode="tel"
                                    dir="ltr"
                                    required>
                             <span class="auth-input-status" id="registerInputStatus"></span>
                         </div>
                         <span class="auth-input-hint">
-                            با شماره موبایل یا ایمیل ثبت نام کنید
+                            با شماره موبایل ثبت نام کنید
                         </span>
                         <span class="auth-input-error" id="registerIdentifierError"></span>
                     </div>
@@ -912,17 +912,14 @@
             // Iranian mobile number: 09XXXXXXXXX (11 digits)
             const phoneRegex = /^09[0-9]{9}$/;
             
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            
-            return phoneRegex.test(trimmed) || emailRegex.test(trimmed);
+            return phoneRegex.test(trimmed);
         }
         
         getIdentifierType(value) {
             const trimmed = value.trim();
             const phoneRegex = /^09[0-9]{9}$/;
             
-            return phoneRegex.test(trimmed) ? 'phone' : 'email';
+            return phoneRegex.test(trimmed) ? 'phone' : 'invalid';
         }
         
         formatIdentifier(value) {
@@ -1130,7 +1127,7 @@
             
             // Validate
             if (!this.validateIdentifier(value)) {
-                if (errorEl) errorEl.textContent = 'لطفاً شماره موبایل یا ایمیل معتبر وارد کنید';
+                if (errorEl) errorEl.textContent = 'لطفاً شماره موبایل معتبر وارد کنید (مثال: ۰۹۱۲۳۴۵۶۷۸۹)';
                 return;
             }
             
@@ -1261,7 +1258,7 @@
             
             // Validate
             if (!this.validateIdentifier(value)) {
-                if (errorEl) errorEl.textContent = 'لطفاً شماره موبایل یا ایمیل معتبر وارد کنید';
+                if (errorEl) errorEl.textContent = 'لطفاً شماره موبایل معتبر وارد کنید (مثال: ۰۹۱۲۳۴۵۶۷۸۹)';
                 return;
             }
             

@@ -85,7 +85,7 @@
             
             <!-- Tab 1: Identity Info -->
             <div id="tabIdentity" class="profile-tab-content active">
-                {% include 'accounts/partials/_profile_identity.html' %}
+                {% include 'accounts/partials/_profile_info.html' %}
             </div>
             
             <!-- Tab 2: Bank Info -->
@@ -206,5 +206,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/pages/profile.js' %}"></script>
+<script src="{% static 'js/profile.js' %}"></script>
 {% endblock %}

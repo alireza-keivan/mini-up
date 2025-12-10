@@ -1,0 +1,372 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PROFILE SECURITY TAB - _profile_security.html
+     Security settings with PIN change, 2FA SMS, and Active Sessions
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<section x-data="securityTab()" class="space-y-6">
+    
+    <!-- ─────────────────────────────────────────────────────────────────────────
+         SECURITY SCORE WIDGET
+         ───────────────────────────────────────────────────────────────────────── -->
+    <div class="glass-card p-6 rounded-2xl border border-white/10">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+            
+            <!-- Circular Progress -->
+            <div class="relative w-32 h-32 flex-shrink-0">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <!-- Background Circle -->
+                    <circle cx="50" cy="50" r="42" fill="none" 
+                            stroke="currentColor" 
+                            class="text-white/10" 
+                            stroke-width="8"/>
+                    <!-- Progress Circle -->
+                    <circle cx="50" cy="50" r="42" fill="none"
+                            stroke="url(#securityGradient)"
+                            stroke-width="8"
+                            stroke-linecap="round"
+                            :stroke-dasharray="264"
+                            :stroke-dashoffset="264 - (264 * securityScore / 100)"
+                            class="transition-all duration-1000 ease-out"/>
+                    <!-- Gradient Definition -->
+                    <defs>
+                        <linearGradient id="securityGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#22c55e"/>
+                            <stop offset="50%" stop-color="#eab308"/>
+                            <stop offset="100%" stop-color="#ef4444"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <!-- Score Text -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-3xl font-bold"
+                          :class="{
+                              'text-green-400': securityScore >= 75,
+                              'text-yellow-400': securityScore >= 50 && securityScore < 75,
+                              'text-orange-400': securityScore >= 25 && securityScore < 50,
+                              'text-red-400': securityScore < 25
+                          }"
+                          x-text="securityScore + '%'"></span>
+                    <span class="text-xs text-slate-400">امتیاز امنیت</span>
+                </div>
+            </div>
+            
+            <!-- Security Checklist -->
+            <div class="flex-1 w-full">
+                <h3 class="text-lg font-semibold text-white mb-4">وضعیت امنیتی حساب</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    
+                    <!-- PIN Set -->
+                    <div class="flex items-center gap-3 p-3 rounded-xl"
+                         :class="hasPIN ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                             :class="hasPIN ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'">
+                            <svg x-show="hasPIN" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <svg x-show="!hasPIN" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium" :class="hasPIN ? 'text-green-400' : 'text-red-400'">
+                                رمز PIN
+                            </p>
+                            <p class="text-xs text-slate-500" x-text="hasPIN ? 'تنظیم شده' : 'تنظیم نشده'"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone Verified -->
+                    <div class="flex items-center gap-3 p-3 rounded-xl"
+                         :class="phoneVerified ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                             :class="phoneVerified ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'">
+                            <svg x-show="phoneVerified" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <svg x-show="!phoneVerified" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium" :class="phoneVerified ? 'text-green-400' : 'text-red-400'">
+                                موبایل
+                            </p>
+                            <p class="text-xs text-slate-500" x-text="phoneVerified ? 'تأیید شده' : 'تأیید نشده'"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- 2FA Status -->
+                    <div class="flex items-center gap-3 p-3 rounded-xl"
+                         :class="twoFactorEnabled ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                             :class="twoFactorEnabled ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'">
+                            <svg x-show="twoFactorEnabled" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <svg x-show="!twoFactorEnabled" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium" :class="twoFactorEnabled ? 'text-green-400' : 'text-red-400'">
+                                ورود دو مرحله‌ای
+                            </p>
+                            <p class="text-xs text-slate-500" x-text="twoFactorEnabled ? 'فعال' : 'غیرفعال'"></p>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- ─────────────────────────────────────────────────────────────────────────
+         PIN MANAGEMENT SECTION
+         ───────────────────────────────────────────────────────────────────────── -->
+    <div class="glass-card p-6 rounded-2xl border border-white/10">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-600/20 
+                            flex items-center justify-center border border-primary-500/20">
+                    <svg class="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white">رمز PIN</h3>
+                    <p class="text-sm text-slate-400">رمز ۴ رقمی برای تأیید عملیات حساس</p>
+                </div>
+            </div>
+            
+            <!-- Status Badge -->
+            <span class="px-3 py-1 rounded-full text-xs font-medium"
+                  :class="hasPIN ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'">
+                <span x-text="hasPIN ? 'فعال' : 'تنظیم نشده'"></span>
+            </span>
+        </div>
+        
+        <!-- PIN Form -->
+        <form @submit.prevent="handlePINSubmit()" class="space-y-4">
+            
+            <!-- Current PIN (only if has PIN) -->
+            <div x-show="hasPIN" x-collapse class="space-y-2">
+                <label class="block text-sm font-medium text-slate-300">
+                    رمز PIN فعلی
+                </label>
+                <div class="flex justify-center gap-3" dir="ltr">
+                    <template x-for="(digit, index) in 4" :key="'current-' + index">
+                        <input type="password"
+                               maxlength="1"
+                               inputmode="numeric"
+                               pattern="[0-9]"
+                               x-model="currentPIN[index]"
+                               @input="handlePINInput($event, index, 'current')"
+                               @keydown.backspace="handlePINBackspace($event, index, 'current')"
+                               @paste="handlePINPaste($event, 'current')"
+                               :data-pin-current="index"
+                               class="w-12 h-14 text-center text-xl font-bold rounded-xl
+                                      bg-slate-800/50 border-2 border-white/10
+                                      focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
+                                      text-white placeholder-slate-500
+                                      transition-all duration-200"
+                               placeholder="•"/>
+                    </template>
+                </div>
+            </div>
+            
+            <!-- New PIN -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-slate-300">
+                    <span x-text="hasPIN ? 'رمز PIN جدید' : 'رمز PIN'"></span>
+                </label>
+                <div class="flex justify-center gap-3" dir="ltr">
+                    <template x-for="(digit, index) in 4" :key="'new-' + index">
+                        <input type="password"
+                               maxlength="1"
+                               inputmode="numeric"
+                               pattern="[0-9]"
+                               x-model="newPIN[index]"
+                               @input="handlePINInput($event, index, 'new')"
+                               @keydown.backspace="handlePINBackspace($event, index, 'new')"
+                               @paste="handlePINPaste($event, 'new')"
+                               :data-pin-new="index"
+                                class="w-12 h-14 text-center text-xl font-bold rounded-xl
+                                      bg-slate-800/50 border-2 border-white/10
+                                      focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
+                                      text-white transition-all duration-200"
+                               placeholder="•" />
+                    </template>
+                </div>
+            </div>
+
+            <!-- Confirm New PIN -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-slate-300">تأیید رمز جدید</label>
+                <div class="flex justify-center gap-3" dir="ltr">
+                    <template x-for="(digit, index) in 4" :key="'confirm-' + index">
+                        <input type="password"
+                               maxlength="1"
+                               inputmode="numeric"
+                               pattern="[0-9]"
+                               x-model="confirmPIN[index]"
+                               @input="handlePINInput($event, index, 'confirm')"
+                               @keydown.backspace="handlePINBackspace($event, index, 'confirm')"
+                               @paste="handlePINPaste($event, 'confirm')"
+                               :data-pin-confirm="index"
+                               class="w-12 h-14 text-center text-xl font-bold rounded-xl
+                                      bg-slate-800/50 border-2 border-white/10
+                                      focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
+                                      text-white transition-all duration-200"
+                               placeholder="•" />
+                    </template>
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="btn-primary mt-4 px-6 py-3 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 
+                           text-white font-semibold hover:from-primary-500 hover:to-primary-400 
+                           transition-all duration-200 flex items-center gap-2">
+                <svg x-show="!pinLoading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M5 13l4 4L19 7" />
+                </svg>
+                <svg x-show="pinLoading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
+                    <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.371 0 0 5.373 0 12h4z" />
+                </svg>
+                <span>ذخیره</span>
+            </button>
+        </form>
+    </div>
+
+
+    <!-- ─────────────────────────────────────────────────────────────────────────
+         2FA SMS SECTION
+         ───────────────────────────────────────────────────────────────────────── -->
+    <div class="glass-card p-6 rounded-2xl border border-white/10">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 
+                            flex items-center justify-center border border-blue-500/20">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 8v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h14a2 2 0 012 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M21 8l-9 6-9-6"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white">احراز هویت دو مرحله‌ای (SMS)</h3>
+                    <p class="text-sm text-slate-400">ارسال کد تأیید به شماره موبایل هنگام ورود</p>
+                </div>
+            </div>
+
+            <span x-text="twoFactorEnabled ? 'فعال' : 'غیرفعال'"
+                  :class="twoFactorEnabled ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'"
+                  class="px-3 py-1 rounded-full text-xs font-medium"></span>
+        </div>
+
+        <div class="flex gap-4">
+            <button x-show="!twoFactorEnabled"
+                    @click="enable2FA()"
+                    class="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-500 
+                           hover:from-green-500 hover:to-green-400 text-white font-semibold transition-all duration-200">
+                فعال‌سازی 2FA با SMS
+            </button>
+
+            <button x-show="twoFactorEnabled"
+                    @click="disable2FA()"
+                    class="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-500 
+                           hover:from-red-500 hover:to-red-400 text-white font-semibold transition-all duration-200">
+                غیرفعال‌سازی 2FA
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ─────────────────────────────────────────────────────────────────────────
+         ACTIVE SESSIONS
+         ───────────────────────────────────────────────────────────────────────── -->
+    <div class="glass-card p-6 rounded-2xl border border-white/10">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-white">جلسات فعال</h3>
+            <button class="px-4 py-2 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"
+                    @click="logoutAllSessions()">
+                خروج از همه دستگاه‌ها
+            </button>
+        </div>
+        <div class="divide-y divide-white/5">
+            <template x-for="session in sessions" :key="session.id">
+                <div class="flex items-center justify-between py-3">
+                    <div class="flex items-center gap-3">
+                        <svg x-show="session.device === 'mobile'" class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M7 4h10a1 1 0 011 1v14a1 1 0 01-1 1H7a1 1 0 01-1-1V5a1 1 0 011-1z"/>
+                        </svg>
+                        <svg x-show="session.device === 'desktop'" class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9.75 17h4.5m-7.5 0A2.25 2.25 0 014.5 14.75V6A2.25 2.25 0 016.75 3.75h10.5A2.25 2.25 0 0119.5 6v8.75A2.25 2.25 0 0117.25 17m-7.5 0h7.5M9.75 17v2.25m4.5-2.25v2.25"/>
+                        </svg>
+                        <div>
+                            <p class="text-sm text-white font-medium" x-text="session.location"></p>
+                            <p class="text-xs text-slate-400" x-text="'آخرین فعالیت: ' + session.lastActive + ' • ' + session.device"></p>
+                        </div>
+                    </div>
+                    <button @click="logoutSession(session.id)"
+                            class="text-sm text-red-400 hover:text-red-300 transition">خروج</button>
+                </div>
+            </template>
+        </div>
+    </div>
+
+</section>
+
+<script>
+function securityTab() {
+    return {
+        securityScore: 70,
+        hasPIN: true,
+        phoneVerified: true,
+        twoFactorEnabled: false,
+        pinLoading: false,
+        currentPIN: ['', '', '', ''],
+        newPIN: ['', '', '', ''],
+        confirmPIN: ['', '', '', ''],
+        sessions: [
+            { id: 1, device: 'desktop', location: 'تهران، ایران', lastActive: '۵ دقیقه پیش' },
+            { id: 2, device: 'mobile', location: 'شیراز، ایران', lastActive: '۲ ساعت پیش' },
+        ],
+
+        handlePINInput(e, index, type) { /* handle single digit input focus */ },
+        handlePINBackspace(e, index, type) { /* handle backspace */ },
+        handlePINPaste(e, type) { /* handle 4-digit paste */ },
+
+        async handlePINSubmit() {
+            this.pinLoading = true;
+            // call backend API
+            setTimeout(() => { this.pinLoading = false; alert('PIN تغییر کرد!'); }, 1000);
+        },
+
+        enable2FA() {
+            this.twoFactorEnabled = true;
+            alert('احراز هویت دو مرحله‌ای فعال شد. کد از طریق SMS ارسال می‌شود.');
+        },
+
+        disable2FA() {
+            this.twoFactorEnabled = false;
+            alert('احراز هویت دو مرحله‌ای غیرفعال شد.');
+        },
+
+        logoutSession(id) {
+            this.sessions = this.sessions.filter(s => s.id !== id);
+        },
+
+        logoutAllSessions() {
+            this.sessions = [];
+            alert('از همه دستگاه‌ها خارج شدید.');
+        }
+    };
+}
+</script>
