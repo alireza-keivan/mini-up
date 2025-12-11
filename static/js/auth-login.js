@@ -76,18 +76,49 @@ document.addEventListener('DOMContentLoaded', function() {
         phoneInput.disabled = true;
         
         try {
-            // Get CSRF token
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            // Get CSRF token from cookie
+            const csrfToken = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1] || '';
+
+            if (!csrfToken) {
+                console.error('❌ CSRF token not found in cookies!');
+                showError('خطای امنیتی - لطفاً صفحه را رفرش کنید');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+                phoneInput.disabled = false;
+                return;
+            }
+
+            console.log('✅ Using CSRF Token:', csrfToken.substring(0, 10) + '...');
             
-            // Send OTP request
+            // Send OTP request with correct CSRF header
             const response = await fetch(form.action || window.location.href, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
+                    'X-CSRFToken': csrfToken,  // Django accepts this
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify({ phone: phone })
             });
+            
+            // Check if response is actually JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                console.error('Response is not JSON:', await response.text());
+                if (response.status === 403) {
+                    showError('خطای CSRF - لطفاً صفحه را رفرش کنید');
+                } else {
+                    showError('خطای سرور - لطفاً دوباره تلاش کنید');
+                }
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('loading');
+                phoneInput.disabled = false;
+                return;
+            }
             
             const data = await response.json();
             
@@ -132,9 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Allow Enter key to submit
-    phoneInput.addEventListener('keypress', function(e) {
+    phoneInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-            form.dispatchEvent(new Event('submit'));
+            e.preventDefault();
+            submitBtn.click(); // Simulate button click - most reliable
         }
     });
 });

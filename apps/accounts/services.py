@@ -446,15 +446,37 @@ class AuthService:
     @classmethod
     def logout_user(cls, request):
         """خروج کاربر"""
+        from django.contrib.auth import logout
+        from apps.accounts.models import UserActivity
+        
         user = request.user
-        logout(request)
-
+        
         if user.is_authenticated:
-            UserActivity.objects.create(
-                user=user,
-                action=UserActivity.Action.LOGOUT,
-                description="خروج کاربر"
-            )
-
+            try:
+                # ثبت فعالیت خروج
+                UserActivity.objects.create(
+                    user=user,
+                    activity_type=UserActivity.ActivityType.LOGOUT,  # ✅ استفاده صحیح از Enum
+                    ip_address=cls._get_client_ip(request),
+                    user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+                    description='خروج از سیستم'
+                )
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Could not log user activity: {e}")
+            
+            # خروج کاربر
+            logout(request)
+        
         return {'success': True, 'message': 'خارج شدید'}
     
+    @staticmethod
+    def _get_client_ip(request):
+        """دریافت IP کاربر"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0].strip()
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip

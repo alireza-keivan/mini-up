@@ -14,6 +14,7 @@ urlpatterns = [
     # Accounts - باید قبل از core باشد
     path('accounts/', include('apps.accounts.urls', namespace='accounts')),
     path('accounts/api/v1/', include('apps.accounts.urls_api', namespace='accounts_api')),
+    path('accounts/', include('allauth.urls')),
     
     # Products
     path('products/', include('apps.products.urls', namespace='products')),

@@ -296,7 +296,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const successMessage = document.getElementById('successMessage');
     const timerDisplay = document.getElementById('timer');
     const timeLeftSpan = document.getElementById('timeLeft');
-    // @ts-ignore
+    
+// ═══════════════════════════════════════════════════════════════════════════
+// CSRF TOKEN - دریافت همیشه از Cookie (Fresh)
+// ═══════════════════════════════════════════════════════════════════════════
+function getCSRFToken() {
+    const name = 'csrftoken';
+    let cookieValue = null;
+    
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    
+    if (cookieValue) {
+        console.log('✅ CSRF from cookie:', cookieValue.substring(0, 15) + '...');
+        return cookieValue;
+    }
+    
+    console.error('❌ CSRF Token NOT FOUND in cookies!');
+    return '';
+}
+    
     let timeLeft = {{ remaining_time|default:120 }};
     let timerInterval;
 
@@ -325,7 +352,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // OTP input handling
     inputs.forEach((input, index) => {
-        // Move to next input on digit entry
         input.addEventListener('input', function(e) {
             const value = e.target.value;
             
@@ -335,7 +361,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     inputs[index + 1].focus();
                 }
                 
-                // Auto-submit if all filled
                 if (index === inputs.length - 1) {
                     const allFilled = Array.from(inputs).every(inp => inp.value.length === 1);
                     if (allFilled) {
@@ -347,7 +372,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Handle backspace
         input.addEventListener('keydown', function(e) {
             if (e.key === 'Backspace' && !e.target.value && index > 0) {
                 inputs[index - 1].focus();
@@ -356,7 +380,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Handle paste
         input.addEventListener('paste', function(e) {
             e.preventDefault();
             const pasteData = e.clipboardData.getData('text').trim();
@@ -370,7 +393,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 inputs[4].focus();
                 
-                // Auto-submit after paste
                 setTimeout(() => {
                     form.dispatchEvent(new Event('submit', { cancelable: true }));
                 }, 300);
@@ -378,7 +400,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Form submission
+    // ═══════════════════════════════════════════════════════════════════════════
+    // FORM SUBMISSION
+    // ═══════════════════════════════════════════════════════════════════════════
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -394,19 +418,40 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // ✨ دریافت CSRF Token تازه در زمان ارسال (نه در زمان بارگذاری صفحه)
+        const freshCSRFToken = getCSRFToken();
+        
+        if (!freshCSRFToken) {
+            showError('خطای امنیتی - لطفاً صفحه را رفرش کنید');
+            return;
+        }
+
         verifyBtn.disabled = true;
         verifyBtn.classList.add('loading');
         errorMessage.classList.remove('show');
+
+        console.log('Submitting with FRESH CSRF token:', freshCSRFToken.substring(0, 10) + '...');
 
         fetch('{% url "accounts:verify" %}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': freshCSRFToken,
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({ code: code })
+            body: JSON.stringify({ code: code }),
+            credentials: 'same-origin'
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (response.status === 403) {
+                return response.text().then(text => {
+                    console.error('403 Response:', text);
+                    throw new Error('CSRF verification failed - please refresh');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 showSuccess('ورود موفقیت‌آمیز! در حال انتقال...');
@@ -418,7 +463,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 verifyBtn.disabled = false;
                 verifyBtn.classList.remove('loading');
                 
-                // Clear inputs on error
                 inputs.forEach(input => {
                     input.value = '';
                     input.classList.remove('filled');
@@ -427,22 +471,36 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            showError('خطا در برقراری ارتباط');
+            console.error('Verify error:', error);
+            showError(error.message || 'خطا در برقراری ارتباط');
             verifyBtn.disabled = false;
             verifyBtn.classList.remove('loading');
         });
     });
 
-    // Resend OTP
+    // ═══════════════════════════════════════════════════════════════════════════
+    // RESEND OTP
+    // ═══════════════════════════════════════════════════════════════════════════
     resendBtn.addEventListener('click', function() {
         resendBtn.disabled = true;
+        
+        // ✨ دریافت CSRF Token تازه
+        const freshCSRFToken = getCSRFToken();
+        
+        if (!freshCSRFToken) {
+            showError('خطای امنیتی - لطفاً صفحه را رفرش کنید');
+            resendBtn.disabled = false;
+            return;
+        }
         
         fetch('{% url "accounts:resend_otp" %}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            }
+                'X-CSRFToken': freshCSRFToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
         })
         .then(response => response.json())
         .then(data => {

@@ -90,24 +90,38 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Site ID for django.contrib.sites
-SITE_ID = 1
+SITE_ID = 2
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # ALLAUTH SETTINGS
 # ═══════════════════════════════════════════════════════════════════════════════
-
-# Account settings
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_REQUIRED = False
-ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# Login methods - فقط با ایمیل
+ACCOUNT_LOGIN_METHODS = {'email'}
+
+# Email settings
+ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # 'mandatory', 'optional', 'none'
 
-# Social account settings
+# Signup fields (replaces ACCOUNT_EMAIL_REQUIRED and ACCOUNT_USERNAME_REQUIRED)
+ACCOUNT_SIGNUP_FIELDS = [
+    'email*',
+    'password1*',
+    'password2*',
+]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SOCIAL ACCOUNT SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# ⭐ مهم: برای Social Login نیازی به username نیست
+SOCIALACCOUNT_QUERY_EMAIL = True
 
 # Google Provider settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -115,17 +129,18 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'profile',
             'email',
+            'openid',
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
         },
         'OAUTH_PKCE_ENABLED': True,
+        'FETCH_USERINFO': True,
     }
 }
-
 # Custom adapters (create these files later)
-# ACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomAccountAdapter'
-# SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomSocialAccountAdapter'
+ACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'apps.accounts.adapters.CustomSocialAccountAdapter'
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # URL CONFIGURATION
@@ -138,6 +153,7 @@ WSGI_APPLICATION = 'miniup.wsgi.application'
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # TEMPLATES
@@ -285,3 +301,30 @@ REST_FRAMEWORK = {
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@mini-up.ir'
 SERVER_EMAIL = 'server@mini-up.ir'
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CSRF SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+CSRF_COOKIE_HTTPONLY = False  # مهم! باید False باشد تا JavaScript بتواند token را بخواند
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+
+# برای development - در production این را حذف یا True کنید
+CSRF_COOKIE_SECURE = False
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SESSION SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = False  # در production: True
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'

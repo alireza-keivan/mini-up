@@ -4,7 +4,7 @@
 Authentication Views for Mini-up
 OTP-Only Authentication System
 """
-
+from django.views.decorators.csrf import ensure_csrf_cookie
 import json
 import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -104,6 +104,7 @@ class AccountsIndexView(View):
 class LoginView(View):
     template_name = 'accounts/login.html'
    
+    @method_decorator(ensure_csrf_cookie)
     def get(self, request):
         if request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL or '/')
@@ -112,6 +113,7 @@ class LoginView(View):
             'page_title': 'ورود به مینی‌آپ',
             'google_oauth_enabled': getattr(settings, 'GOOGLE_OAUTH_ENABLED', False),
         })
+    
     def post(self, request):
         # Parse JSON or form data
         if request.content_type == 'application/json':
@@ -329,10 +331,11 @@ class GoogleCallbackView(View):
 # ============================================================================
 # VERIFY VIEW
 # ============================================================================
-
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class VerifyView(View):
     template_name = 'accounts/verify.html'
 
+    @method_decorator(ensure_csrf_cookie)
     def get(self, request):
         if request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL or '/')
