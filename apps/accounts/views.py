@@ -532,7 +532,9 @@ class ProfileView(View):
             data = request.POST
 
         updated = []
+        profile_updated = []
 
+        # Update user fields
         if 'first_name' in data:
             user.first_name = data['first_name'].strip()[:30]
             updated.append('first_name')
@@ -543,7 +545,35 @@ class ProfileView(View):
 
         if updated:
             user.save(update_fields=updated)
-            return JsonResponse({'success': True, 'message': 'پروفایل ذخیره شد'})
+
+        # Update profile fields
+        if 'national_code' in data:
+            from .models import Profile
+            profile, _ = Profile.objects.get_or_create(user=user)
+            national_code = data['national_code'].strip()
+            if national_code:
+                # Basic validation: 10 digits
+                if national_code.isdigit() and len(national_code) == 10:
+                    profile.national_code = national_code
+                    profile_updated.append('national_code')
+                else:
+                    return JsonResponse({'success': False, 'message': 'کد ملی باید ۱۰ رقم باشد'}, status=400)
+            else:
+                profile.national_code = None
+                profile_updated.append('national_code')
+            
+            if profile_updated:
+                profile.save(update_fields=profile_updated)
+
+        if updated or profile_updated:
+            return JsonResponse({
+                'success': True, 
+                'message': 'پروفایل با موفقیت ذخیره شد',
+                'user': {
+                    'first_name': user.first_name,
+                    'last_name': user.last_name
+                }
+            })
 
         return JsonResponse({'success': False, 'message': 'تغییری صورت نگرفت'}, status=400)
 
@@ -613,13 +643,131 @@ def mask_phone(phone: str) -> str:
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    """داشبورد کاربر"""
+    """داشبورد کاربر - با تب‌های مختلف"""
     template_name = 'accounts/dashboard.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # ═══════════════════════════════════════════════════════════════
+        # USER INFO
+        # ═══════════════════════════════════════════════════════════════
+        profile = user.profile if hasattr(user, 'profile') else None
+        context['user'] = user
+        context['profile'] = profile
+        
+        # ═══════════════════════════════════════════════════════════════
+        # WALLET DATA
+        # ═══════════════════════════════════════════════════════════════
+        try:
+            from apps.wallet.models import Wallet, WalletTransaction
+            wallet, created = Wallet.objects.get_or_create(user=user)
+            recent_transactions = WalletTransaction.objects.filter(
+                wallet=wallet
+            ).order_by('-created_at')[:10]
+            
+            context['wallet'] = wallet
+            context['wallet_transactions'] = recent_transactions
+        except Exception as e:
+            context['wallet'] = None
+            context['wallet_transactions'] = []
+            logger.warning(f"Wallet data error: {e}")
+        
+        # ═══════════════════════════════════════════════════════════════
+        # ORDERS DATA
+        # ═══════════════════════════════════════════════════════════════
+        try:
+            from apps.orders.models import Order
+            orders = Order.objects.filter(user=user).order_by('-created_at')[:10]
+            context['orders'] = orders
+            context['orders_count'] = Order.objects.filter(user=user).count()
+        except Exception as e:
+            context['orders'] = []
+            context['orders_count'] = 0
+            logger.warning(f"Orders data error: {e}")
+        
         context['title'] = 'داشبورد'
+        context['page_title'] = 'داشبورد کاربری'
+        
         return context
+    
+    def post(self, request):
+        """Handle POST requests for wallet operations"""
+        user = request.user
+        
+        try:
+            data = json.loads(request.body)
+            action = data.get('action')
+            
+            # ═══════════════════════════════════════════════════════════
+            # WALLET DEPOSIT
+            # ═══════════════════════════════════════════════════════════
+            if action == 'wallet_deposit':
+                amount = int(data.get('amount', 0))
+                gateway = data.get('gateway', 'zarinpal')
+                
+                # Validate amount
+                from django.conf import settings
+                min_amount = getattr(settings, 'MIN_WALLET_TOPUP', 10000)
+                max_amount = getattr(settings, 'MAX_WALLET_TOPUP', 50000000)
+                
+                if amount < min_amount:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'حداقل مبلغ شارژ {min_amount:,} تومان است'
+                    }, status=400)
+                
+                if amount > max_amount:
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'حداکثر مبلغ شارژ {max_amount:,} تومان است'
+                    }, status=400)
+                
+                # Create wallet deposit request
+                from apps.wallet.models import Wallet, WalletDepositRequest
+                wallet, _ = Wallet.objects.get_or_create(user=user)
+                
+                deposit_request = WalletDepositRequest.objects.create(
+                    wallet=wallet,
+                    amount=amount,
+                    gateway=gateway,
+                    status='pending'
+                )
+                
+                # Generate payment URL (simplified - you should integrate with actual payment gateway)
+                # For now, return a mock payment URL
+                # In production, you'd call the payment gateway API here
+                from django.urls import reverse
+                payment_url = request.build_absolute_uri(
+                    reverse('wallet:deposit_verify')
+                ) + f'?token={deposit_request.id}'
+                
+                logger.info(f"Wallet deposit request created: {deposit_request.id} for user {user.phone}")
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': 'درخواست شارژ ایجاد شد',
+                    'payment_url': payment_url,
+                    'deposit_id': deposit_request.id
+                })
+            
+            return JsonResponse({
+                'success': False,
+                'message': 'عملیات نامعتبر'
+            }, status=400)
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'message': 'داده‌های ارسالی نامعتبر است'
+            }, status=400)
+        except Exception as e:
+            logger.error(f"Dashboard POST error: {e}")
+            return JsonResponse({
+                'success': False,
+                'message': 'خطایی رخ داد. لطفا دوباره تلاش کنید'
+            }, status=500)
 
 
 class OrdersView(LoginRequiredMixin, TemplateView):

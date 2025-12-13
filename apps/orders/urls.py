@@ -1,6 +1,7 @@
 # apps/orders/urls.py
 
 from django.urls import path
+from django.views.generic import RedirectView
 from . import api_views
 
 app_name = 'orders'
@@ -36,11 +37,11 @@ urlpatterns = [
     # ORDER URLs
     # ═══════════════════════════════════════════════════════════════════════════
     
-    # لیست سفارشات کاربر
-    path('', api_views.OrderListAPIView.as_view(), name='order_list'),
-    path('history/', api_views.OrderListAPIView.as_view(), name='history'),
+    # لیست سفارشات کاربر - redirect to dashboard
+    path('', RedirectView.as_view(pattern_name='accounts:dashboard', permanent=False), name='order_list'),
+    path('history/', RedirectView.as_view(pattern_name='accounts:dashboard', permanent=False), name='history'),
     
-    # جزئیات سفارش
+    # جزئیات سفارش - keep for order details page
     path('<int:order_id>/', api_views.OrderDetailAPIView.as_view(), name='order_detail'),
     
     # ═══════════════════════════════════════════════════════════════════════════

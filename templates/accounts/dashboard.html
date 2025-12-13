@@ -1,29 +1,712 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
 
 {% block title %}داشبورد | مینی‌آپ{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);
+        padding: 2rem 0;
+    }
+
+    .dashboard-card {
+        background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 20, 40, 0.95));
+        border-radius: 24px;
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(255, 0, 85, 0.15);
+        backdrop-filter: blur(20px);
+    }
+
+    /* Tab Navigation */
+    .tab-nav {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .tab-button {
+        padding: 0.75rem 1.5rem;
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: #999;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .tab-button:hover {
+        border-color: rgba(255, 0, 85, 0.5);
+        color: #fff;
+    }
+
+    .tab-button.active {
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .info-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.25rem;
+    }
+
+    .info-label {
+        color: #999;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        color: #fff;
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .info-input {
+        width: 100%;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    .info-input:focus {
+        outline: none;
+        border-color: #ff0055;
+        background: rgba(255, 0, 85, 0.1);
+    }
+
+    /* Wallet Balance */
+    .wallet-balance {
+        background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(138, 43, 226, 0.1));
+        border: 2px solid rgba(0, 245, 255, 0.3);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .balance-amount {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #00f5ff;
+        margin: 1rem 0;
+    }
+
+    /* Wallet Deposit Form */
+    .deposit-form {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .amount-input {
+        width: 100%;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 1.125rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .amount-input:focus {
+        outline: none;
+        border-color: #00f5ff;
+        background: rgba(0, 245, 255, 0.1);
+    }
+
+    .quick-amounts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .quick-amount-btn {
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+
+    .quick-amount-btn:hover {
+        background: rgba(0, 245, 255, 0.1);
+        border-color: #00f5ff;
+    }
+
+    .quick-amount-btn.active {
+        background: rgba(0, 245, 255, 0.2);
+        border-color: #00f5ff;
+    }
+
+    .deposit-button {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #00f5ff, #00d4ff);
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .deposit-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 245, 255, 0.4);
+    }
+
+    .deposit-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Transaction List */
+    .transaction-list {
+        margin-top: 1.5rem;
+    }
+
+    .transaction-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .transaction-amount.positive {
+        color: #00ff88;
+    }
+
+    .transaction-amount.negative {
+        color: #ff0055;
+    }
+
+    /* Orders List */
+    .orders-list {
+        margin-top: 1.5rem;
+    }
+
+    .order-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .order-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .order-status.pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .order-status.completed {
+        background: rgba(0, 255, 136, 0.2);
+        color: #00ff88;
+    }
+
+    /* Save Button */
+    .save-button {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .save-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(255, 0, 85, 0.4);
+    }
+
+    .save-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #999;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">داشبورد</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- کارت پروفایل -->
-        <a href="{% url 'accounts:profile' %}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-            <h3 class="font-semibold text-lg mb-2">پروفایل</h3>
-            <p class="text-gray-600">مشاهده و ویرایش اطلاعات شخصی</p>
-        </a>
+<div class="dashboard-container">
+    <div class="container mx-auto px-4 max-w-6xl">
         
-        <!-- کارت سفارشات -->
-        <a href="{% url 'orders:history' %}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-            <h3 class="font-semibold text-lg mb-2">سفارشات</h3>
-            <p class="text-gray-600">مشاهده تاریخچه سفارشات</p>
-        </a>
-        
-        <!-- کارت کیف پول -->
-        <a href="{% url 'wallet:dashboard' %}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-            <h3 class="font-semibold text-lg mb-2">کیف پول</h3>
-            <p class="text-gray-600">مدیریت موجودی کیف پول</p>
-        </a>
+        <!-- Dashboard Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">داشبورد کاربری</h1>
+            <p class="text-gray-400">مدیریت اطلاعات، کیف پول و سفارشات</p>
+        </div>
+
+        <!-- Dashboard Card -->
+        <div class="dashboard-card" x-data="dashboard()">
+            
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button 
+                    class="tab-button"
+                    :class="{ 'active': activeTab === 'info' }"
+                    @click="activeTab = 'info'"
+                    type="button">
+                    <i class="fas fa-user"></i>
+                    اطلاعات کاربری
+                </button>
+                
+                <button 
+                    class="tab-button"
+                    :class="{ 'active': activeTab === 'wallet' }"
+                    @click="activeTab = 'wallet'"
+                    type="button">
+                    <i class="fas fa-wallet"></i>
+                    کیف پول
+                </button>
+                
+                <button 
+                    class="tab-button"
+                    :class="{ 'active': activeTab === 'orders' }"
+                    @click="activeTab = 'orders'"
+                    type="button">
+                    <i class="fas fa-shopping-bag"></i>
+                    سفارشات
+                </button>
+            </div>
+
+            <!-- Tab Content Container -->
+            <div>
+                
+                <!-- ═══════════════════════════════════════════════════════
+                     TAB 1: USER INFO
+                     ═══════════════════════════════════════════════════════ -->
+                <div x-show="activeTab === 'info'" x-transition:enter="transition ease-out duration-200">
+                    <h2 class="text-xl font-bold text-white mb-4">اطلاعات شخصی</h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">نام</div>
+                            <input 
+                                type="text" 
+                                class="info-input" 
+                                x-model="userData.first_name"
+                                placeholder="نام خود را وارد کنید">
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">نام خانوادگی</div>
+                            <input 
+                                type="text" 
+                                class="info-input" 
+                                x-model="userData.last_name"
+                                placeholder="نام خانوادگی">
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">شماره موبایل</div>
+                            <div class="info-value" dir="ltr">{{ user.phone }}</div>
+                        </div>
+                        
+                        {% if user.google_id %}
+                        <div class="info-item">
+                            <div class="info-label">حساب Google</div>
+                            <div class="info-value flex items-center gap-2">
+                                <i class="fab fa-google text-red-500"></i>
+                                متصل شده
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile %}
+                        <div class="info-item">
+                            <div class="info-label">کد ملی</div>
+                            <input 
+                                type="text" 
+                                class="info-input" 
+                                x-model="userData.national_code"
+                                placeholder="کد ملی (اختیاری)"
+                                maxlength="10"
+                                dir="ltr">
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Save Button (Only on User Info tab) -->
+                    <button 
+                        type="button"
+                        class="save-button"
+                        @click="saveUserData()"
+                        :disabled="saving">
+                        <span x-show="!saving">
+                            <i class="fas fa-save"></i> ذخیره تغییرات
+                        </span>
+                        <span x-show="saving">
+                            <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
+                        </span>
+                    </button>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════
+                     TAB 2: WALLET
+                     ═══════════════════════════════════════════════════════ -->
+                <div x-show="activeTab === 'wallet'" x-transition:enter="transition ease-out duration-200">
+                    <h2 class="text-xl font-bold text-white mb-4">کیف پول</h2>
+                    
+                    {% if wallet %}
+                    <!-- Wallet Balance -->
+                    <div class="wallet-balance">
+                        <div class="text-gray-400">موجودی کیف پول</div>
+                        <div class="balance-amount" x-text="formatCurrency(walletData.balance)">
+                            {{ wallet.total_balance|floatformat:0|intcomma }} تومان
+                        </div>
+                        <div class="text-sm text-gray-400 mt-2">
+                            موجودی هدیه: <span class="text-purple-400" x-text="formatCurrency(walletData.gift_balance)">{{ wallet.gift_balance|floatformat:0|intcomma }}</span> تومان
+                        </div>
+                    </div>
+
+                    <!-- Deposit Form -->
+                    <div class="deposit-form">
+                        <h3 class="text-lg font-semibold text-white mb-4">شارژ کیف پول</h3>
+                        
+                        <input 
+                            type="number" 
+                            class="amount-input" 
+                            x-model="depositData.amount"
+                            placeholder="مبلغ مورد نظر را وارد کنید (تومان)"
+                            min="10000"
+                            max="50000000">
+                        
+                        <!-- Quick Amount Buttons -->
+                        <div class="quick-amounts">
+                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(50000)">
+                                ۵۰,۰۰۰
+                            </button>
+                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(100000)">
+                                ۱۰۰,۰۰۰
+                            </button>
+                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(200000)">
+                                ۲۰۰,۰۰۰
+                            </button>
+                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(500000)">
+                                ۵۰۰,۰۰۰
+                            </button>
+                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(1000000)">
+                                ۱,۰۰۰,۰۰۰
+                            </button>
+                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(2000000)">
+                                ۲,۰۰۰,۰۰۰
+                            </button>
+                        </div>
+
+                        <button 
+                            type="button"
+                            class="deposit-button"
+                            @click="processDeposit()"
+                            :disabled="depositProcessing || !depositData.amount || depositData.amount < 10000">
+                            <span x-show="!depositProcessing">
+                                <i class="fas fa-credit-card"></i> پرداخت و شارژ
+                            </span>
+                            <span x-show="depositProcessing">
+                                <i class="fas fa-spinner fa-spin"></i> در حال انتقال به درگاه...
+                            </span>
+                        </button>
+
+                        <div class="text-xs text-gray-400 text-center mt-2">
+                            حداقل مبلغ شارژ: ۱۰,۰۰۰ تومان | حداکثر: ۵۰,۰۰۰,۰۰۰ تومان
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <h3 class="text-lg font-semibold text-white mb-3">آخرین تراکنش‌ها</h3>
+                    {% if wallet_transactions %}
+                    <div class="transaction-list">
+                        {% for transaction in wallet_transactions %}
+                        <div class="transaction-item">
+                            <div>
+                                <div class="text-white font-medium">{{ transaction.description }}</div>
+                                <div class="text-sm text-gray-400">{{ transaction.created_at|date:"Y/m/d H:i" }}</div>
+                            </div>
+                            <div class="transaction-amount {% if transaction.transaction_type == 'deposit' or transaction.transaction_type == 'refund' %}positive{% else %}negative{% endif %}">
+                                {% if transaction.transaction_type == 'deposit' or transaction.transaction_type == 'refund' %}+{% else %}-{% endif %}
+                                {{ transaction.amount|floatformat:0|intcomma }} تومان
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <p>هنوز تراکنشی ثبت نشده است</p>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-wallet"></i>
+                        <p>کیف پول در حال بارگذاری...</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════
+                     TAB 3: ORDERS
+                     ═══════════════════════════════════════════════════════ -->
+                <div x-show="activeTab === 'orders'" x-transition:enter="transition ease-out duration-200">
+                    <h2 class="text-xl font-bold text-white mb-4">سفارشات من</h2>
+                    
+                    <div class="mb-4">
+                        <span class="text-gray-400">تعداد کل سفارشات:</span>
+                        <span class="text-white font-semibold">{{ orders_count|default:0 }}</span>
+                    </div>
+
+                    {% if orders %}
+                    <div class="orders-list">
+                        {% for order in orders %}
+                        <div class="order-item">
+                            <div class="order-header">
+                                <div>
+                                    <div class="text-white font-semibold">سفارش #{{ order.id }}</div>
+                                    <div class="text-sm text-gray-400">{{ order.created_at|date:"Y/m/d H:i" }}</div>
+                                </div>
+                                <div class="order-status {{ order.status }}">
+                                    {{ order.get_status_display }}
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <div class="text-gray-400">مبلغ:</div>
+                                <div class="text-white font-semibold">
+                                    {{ order.total_amount|floatformat:0|intcomma }} تومان
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-shopping-bag"></i>
+                        <p>هنوز سفارشی ثبت نکرده‌اید</p>
+                        <a href="/" class="inline-block mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition">
+                            شروع خرید
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function dashboard() {
+    return {
+        activeTab: 'info',
+        saving: false,
+        depositProcessing: false,
+        
+        // User Data
+        userData: {
+            first_name: '{{ user.first_name|default:"" }}',
+            last_name: '{{ user.last_name|default:"" }}',
+            national_code: '{% if profile %}{{ profile.national_code|default:"" }}{% endif %}'
+        },
+
+        // Wallet Data
+        walletData: {
+            balance: {{ wallet.total_balance|default:0 }},
+            gift_balance: {{ wallet.gift_balance|default:0 }}
+        },
+
+        // Deposit Data
+        depositData: {
+            amount: null,
+            gateway: 'zarinpal'
+        },
+
+        // Format currency helper
+        formatCurrency(amount) {
+            return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
+        },
+
+        // Set deposit amount from quick buttons
+        setDepositAmount(amount) {
+            this.depositData.amount = amount;
+        },
+
+        // Save user data
+        async saveUserData() {
+            this.saving = true;
+
+            try {
+                const csrfToken = this.getCSRFToken();
+
+                const response = await fetch('{% url "accounts:profile" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(this.userData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.showNotification('✅ تغییرات با موفقیت ذخیره شد', 'success');
+                    
+                    // Update displayed values
+                    if (data.user) {
+                        this.userData.first_name = data.user.first_name;
+                        this.userData.last_name = data.user.last_name;
+                    }
+                } else {
+                    this.showNotification('❌ ' + (data.message || 'خطا در ذخیره اطلاعات'), 'error');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
+            } finally {
+                this.saving = false;
+            }
+        },
+
+        // Process wallet deposit
+        async processDeposit() {
+            const amount = parseInt(this.depositData.amount);
+
+            // Validation
+            if (!amount || amount < 10000) {
+                this.showNotification('❌ حداقل مبلغ شارژ ۱۰,۰۰۰ تومان است', 'error');
+                return;
+            }
+
+            if (amount > 50000000) {
+                this.showNotification('❌ حداکثر مبلغ شارژ ۵۰,۰۰۰,۰۰۰ تومان است', 'error');
+                return;
+            }
+
+            this.depositProcessing = true;
+
+            try {
+                const csrfToken = this.getCSRFToken();
+
+                const response = await fetch('{% url "accounts:dashboard" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        action: 'wallet_deposit',
+                        amount: amount,
+                        gateway: this.depositData.gateway
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.payment_url) {
+                    this.showNotification('✅ در حال انتقال به درگاه پرداخت...', 'success');
+                    // Redirect to payment gateway
+                    setTimeout(() => {
+                        window.location.href = data.payment_url;
+                    }, 1000);
+                } else {
+                    this.showNotification('❌ ' + (data.message || 'خطا در ایجاد درخواست پرداخت'), 'error');
+                    this.depositProcessing = false;
+                }
+            } catch (error) {
+                console.error('Deposit error:', error);
+                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
+                this.depositProcessing = false;
+            }
+        },
+
+        // Get CSRF token
+        getCSRFToken() {
+            return document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1] || '';
+        },
+
+        // Show notification
+        showNotification(message, type) {
+            // Simple notification - enhance with toast library if needed
+            alert(message);
+        }
+    };
+}
+</script>
 {% endblock %}
