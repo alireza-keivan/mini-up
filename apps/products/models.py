@@ -147,6 +147,14 @@ class Product(models.Model):
         PHYSICAL = 'physical', 'محصول فیزیکی'
         GAME_CURRENCY = 'game_currency', 'ارز بازی'
     
+    class ProductSubType(models.TextChoices):
+        # Physical sub-types
+        ACCESSORY = 'accessory', 'محصولات جانبی'
+        GAMING = 'gaming', 'محصولات گیمینگ'
+        # Virtual sub-types
+        VIRTUAL_SERVICE = 'virtual_service', 'خدمات مجازی'
+        MINI_APP = 'mini_app', 'مینی اپ'
+    
     class DeliveryType(models.TextChoices):
         INSTANT = 'instant', 'تحویل فوری (خودکار)'
         MANUAL = 'manual', 'تحویل دستی'
@@ -158,7 +166,13 @@ class Product(models.Model):
     
     name = models.CharField(max_length=200, verbose_name='نام محصول')
     name_en = models.CharField(max_length=200, blank=True, verbose_name='نام انگلیسی')
-    slug = models.SlugField(max_length=220, unique=True, allow_unicode=True, verbose_name='اسلاگ')
+    slug = models.SlugField(
+        max_length=220,
+        unique=True,
+        allow_unicode=True,
+        verbose_name='اسلاگ',
+        help_text='شناسه یکتا و قابل خواندن برای URL؛ معمولاً از نام انگلیسی تولید می‌شود. از حروف، اعداد و خط تیره استفاده کنید.'
+    )
     
     # Classification
     category = models.ForeignKey(
@@ -182,6 +196,15 @@ class Product(models.Model):
         default=ProductType.VIRTUAL,
         verbose_name='نوع محصول'
     )
+    # Sub-type to distinguish the two flavors within virtual/physical groups
+    sub_type = models.CharField(
+        max_length=30,
+        choices=ProductSubType.choices,
+        null=True,
+        blank=True,
+        verbose_name='نوع',
+        help_text='زیرنوع محصول را مشخص کنید تا در صفحات مجموعه‌بندی شود (مثال: محصولات جانبی، محصولات گیمینگ، خدمات مجازی، مینی اپ)'
+    )
     delivery_type = models.CharField(
         max_length=20,
         choices=DeliveryType.choices,
@@ -193,7 +216,11 @@ class Product(models.Model):
     short_description = models.CharField(max_length=500, blank=True, verbose_name='توضیح کوتاه')
     description = models.TextField(blank=True, verbose_name='توضیحات')
     specifications = models.JSONField(default=dict, blank=True, verbose_name='مشخصات فنی')
-    
+    # attach help_text after field definition to avoid changing constructor signature in a large file
+    specifications.help_text = (
+        'فرمت JSON برای مشخصات فنی. مثال: {"وزن": "200g", "رنگ": "مشکی", "cpu": "Intel i5"}. '
+        'برای محصولات مجازی می‌تواند شامل اطلاعاتی مثل {"duration": "1 ماه", "platform": "PC"} باشد.'
+    )
     # Pricing
     price = models.PositiveIntegerField(verbose_name='قیمت (تومان)')
     original_price = models.PositiveIntegerField(
@@ -369,6 +396,7 @@ class ProductImage(models.Model):
     image = models.ImageField(upload_to='products/%Y/%m/', verbose_name='تصویر')
     alt_text = models.CharField(max_length=200, blank=True, verbose_name='متن جایگزین')
     sort_order = models.PositiveSmallIntegerField(default=0, verbose_name='ترتیب')
+    is_active = models.BooleanField(default=True)
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
     

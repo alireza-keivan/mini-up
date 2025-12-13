@@ -1,8 +1,9 @@
 from django.contrib import admin
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 from .models import (
     Category, Brand, Product, ProductImage, 
-    ProductVariant, DigitalInventory, GameCurrencyRate,
-    ProductReview, RecentlyViewed
+    GameCurrencyRate, ProductReview, RecentlyViewed
 )
 
 
@@ -22,58 +23,234 @@ class BrandAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 
+# ============================================
+# Product Image Inline
+# ============================================
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
+    fields = ('image', 'alt_text', 'sort_order', 'is_active')
+    verbose_name = _('تصویر محصول')
+    verbose_name_plural = _('تصاویر محصول')
 
 
-class ProductVariantInline(admin.TabularInline):
-    model = ProductVariant
+# Inline for game currency rates (moved into Virtual products admin)
+class GameCurrencyRateInline(admin.TabularInline):
+    from .models import GameCurrencyRate
+    model = GameCurrencyRate
     extra = 1
+    fields = ('min_amount', 'max_amount', 'price_per_unit', 'unit_name', 'is_active')
+    verbose_name = _('نرخ ارز بازی')
+    verbose_name_plural = _('نرخ‌های ارز بازی')
 
 
-class DigitalInventoryInline(admin.TabularInline):
-    model = DigitalInventory
-    extra = 1
+# ============================================
+# Base Product Admin (Not Registered - used as parent)
+# ============================================
+class BaseProductAdmin(admin.ModelAdmin):
+    """Base admin class with common fields for all products"""
+    
+    list_filter = ('is_active', 'is_featured', 'is_new', 'is_bestseller', 'category')
+    search_fields = ('name', 'name_en', 'slug', 'sku')
+    prepopulated_fields = {'slug': ('name_en',)}
+    inlines = [ProductImageInline]
+    
+    # Common fields for all products
+    common_fields = (
+        'sku',
+        'name',
+        'name_en',
+        'slug',
+        'short_description',
+        'specifications',
+        'price',
+        'original_price',
+        'main_image',
+        'meta_title',
+        'meta_description',
+        'is_active',
+        'is_featured',
+        'is_new',
+        'is_bestseller',
+    )
+    
+    readonly_fields = ('view_count', 'sales_count', 'created_at', 'updated_at')
+    
+    def get_queryset(self, request):
+        """Override in child classes to filter by product_type"""
+        return super().get_queryset(request)
 
 
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'product_type', 'price', 'stock', 'is_active', 'is_featured')
-    list_filter = ('product_type', 'delivery_type', 'is_active', 'is_featured', 'category')
-    search_fields = ('name', 'slug', 'sku')
-    prepopulated_fields = {'slug': ('name',)}
-    inlines = [ProductImageInline, ProductVariantInline, DigitalInventoryInline]
+# ============================================
+# Virtual Product Admin (خدمات مجازی)
+# ============================================
+class VirtualProductProxy(Product):
+    """Proxy model for virtual products"""
+    class Meta:
+        proxy = True
+        verbose_name = 'محصول مجازی'
+        verbose_name_plural = 'محصولات مجازی'
 
 
-@admin.register(ProductVariant)
-class ProductVariantAdmin(admin.ModelAdmin):
-    list_display = ('product', 'name', 'price', 'stock', 'is_active')
-    list_filter = ('is_active', 'product')
-    search_fields = ('name', 'product__name')
+@admin.register(VirtualProductProxy)
+class VirtualProductAdmin(BaseProductAdmin):
+    """Admin for virtual products (mini-games and virtual services)"""
+    
+    list_display = ('name', 'category', 'price', 'is_active', 'is_featured', 'sales_count')
+    list_filter = ('is_active', 'is_featured', 'is_new', 'category')
+    inlines = [ProductImageInline, GameCurrencyRateInline]
+    
+    fieldsets = (
+        (_('اطلاعات پایه'), {
+            'fields': ('sku', 'name', 'name_en', 'slug', 'category', 'sub_type')
+        }),
+        (_('توضیحات'), {
+            'fields': ('short_description', 'description', 'specifications')
+        }),
+        (_('قیمت‌گذاری'), {
+            'fields': ('price', 'original_price')
+        }),
+        (_('تصاویر'), {
+            'fields': ('main_image',)
+        }),
+        (_('سئو'), {
+            'fields': ('meta_title', 'meta_description'),
+            'classes': ('collapse',)
+        }),
+        (_('وضعیت'), {
+            'fields': ('is_active', 'is_featured', 'is_new', 'is_bestseller')
+        }),
+        (_('آمار'), {
+            'fields': ('view_count', 'sales_count', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        """Only show virtual products"""
+        return super().get_queryset(request).filter(product_type=Product.ProductType.VIRTUAL)
+    
+    def save_model(self, request, obj, form, change):
+        """Ensure product_type is set to virtual"""
+        obj.product_type = Product.ProductType.VIRTUAL
+        # Virtual products don't track stock
+        obj.track_stock = False
+        obj.stock = 999999  # Unlimited
+        # Ensure sub_type is valid for virtual products
+        if obj.sub_type not in (Product.ProductSubType.VIRTUAL_SERVICE, Product.ProductSubType.MINI_APP):
+            obj.sub_type = None
+        super().save_model(request, obj, form, change)
 
 
-@admin.register(DigitalInventory)
-class DigitalInventoryAdmin(admin.ModelAdmin):
-    list_display = ('product', 'created_at')
-    list_filter = ('product',)
-    search_fields = ('product__name',)
+# ============================================
+# Physical Product Admin (محصولات فیزیکی)
+# ============================================
+class PhysicalProductProxy(Product):
+    """Proxy model for physical products"""
+    class Meta:
+        proxy = True
+        verbose_name = 'محصول فیزیکی'
+        verbose_name_plural = 'محصولات فیزیکی'
 
 
-@admin.register(GameCurrencyRate)
-class GameCurrencyRateAdmin(admin.ModelAdmin):
-    list_display = ('product', 'is_active')
-    list_filter = ('is_active', 'product')
-
+@admin.register(PhysicalProductProxy)
+class PhysicalProductAdmin(BaseProductAdmin):
+    """Admin for physical products (gaming products and accessories)"""
+    
+    list_display = ('name', 'category', 'brand', 'price', 'stock', 'stock_status', 'is_active', 'sales_count')
+    list_filter = ('brand', 'is_active', 'is_featured', 'is_new', 'category', 'track_stock', 'sub_type')
+    
+    fieldsets = (
+        (_('اطلاعات پایه'), {
+            'fields': ('sku', 'name', 'name_en', 'slug', 'category', 'brand', 'sub_type')
+        }),
+        (_('توضیحات'), {
+            'fields': ('short_description', 'description', 'specifications')
+        }),
+        (_('قیمت‌گذاری'), {
+            'fields': ('price', 'original_price')
+        }),
+        (_('موجودی و انبار'), {
+            'fields': ('stock', 'low_stock_threshold', 'track_stock'),
+            'description': 'مدیریت موجودی محصولات فیزیکی'
+        }),
+        (_('مشخصات فیزیکی'), {
+            'fields': ('weight', 'dimensions'),
+            'description': 'برند، وزن و ابعاد محصول'
+        }),
+        (_('تصاویر'), {
+            'fields': ('main_image',)
+        }),
+        (_('سئو'), {
+            'fields': ('meta_title', 'meta_description'),
+            'classes': ('collapse',)
+        }),
+        (_('وضعیت'), {
+            'fields': ('is_active', 'is_featured', 'is_new', 'is_bestseller')
+        }),
+        (_('آمار'), {
+            'fields': ('view_count', 'sales_count', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        """Only show physical products"""
+        return super().get_queryset(request).filter(product_type=Product.ProductType.PHYSICAL)
+    
+    def save_model(self, request, obj, form, change):
+        """Ensure product_type is set to physical"""
+        obj.product_type = Product.ProductType.PHYSICAL
+        obj.delivery_type = Product.DeliveryType.SHIPPING
+        # Ensure sub_type is valid for physical products
+        if obj.sub_type not in (Product.ProductSubType.ACCESSORY, Product.ProductSubType.GAMING):
+            obj.sub_type = None
+        super().save_model(request, obj, form, change)
+    
+    @admin.display(description=_('وضعیت موجودی'))
+    def stock_status(self, obj):
+        """Display stock status with color coding"""
+        if not obj.track_stock:
+            return format_html(
+                '<span style="color: #999;">بدون پیگیری</span>'
+            )
+        if obj.stock == 0:
+            return format_html(
+                '<span style="color: #dc3545; font-weight: bold;">ناموجود</span>'
+            )
+        elif obj.stock <= obj.low_stock_threshold:
+            return format_html(
+                '<span style="color: #ffc107; font-weight: bold;">کم موجود ({})</span>',
+                obj.stock
+            )
+        else:
+            return format_html(
+                '<span style="color: #28a745;">موجود ({})</span>',
+                obj.stock
+            )
 
 @admin.register(ProductReview)
 class ProductReviewAdmin(admin.ModelAdmin):
-    list_display = ('product', 'user', 'rating', 'is_approved', 'created_at')
+    list_display = ('product', 'user', 'rating', 'is_approved', 'submitted_at')
     list_filter = ('is_approved', 'rating')
     search_fields = ('product__name', 'user__phone', 'comment')
+
+    @admin.display(description=_('زمان ارسال نظر'))
+    def submitted_at(self, obj):
+        return obj.created_at
 
 
 @admin.register(RecentlyViewed)
 class RecentlyViewedAdmin(admin.ModelAdmin):
     list_display = ('user', 'product', 'viewed_at')
     list_filter = ('viewed_at',)
+    readonly_fields = ('user', 'product', 'viewed_at')
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

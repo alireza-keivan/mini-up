@@ -9,6 +9,7 @@ from .models import User, Profile, OTP
 class UserAdmin(BaseUserAdmin):
     list_display = (
         'id',
+        'avatar_thumb',
         'get_identifier',
         'first_name',
         'last_name',
@@ -103,18 +104,40 @@ class UserAdmin(BaseUserAdmin):
         }
         return icons.get(obj.auth_provider, obj.auth_provider)
     
-    @admin.display(description=_('پیش‌نمایش آواتار'))
-    def avatar_preview(self, obj):
-        """نمایش تصویر آواتار"""
+    @admin.display(description=_('تصویر پروفایل'))
+    def avatar_thumb(self, obj):
+        """نمایش تصویر مینیاتوری در لیست"""
         url = obj.get_avatar_url()
         if url:
             return format_html(
-                '<img src="{}" style="width: 50px; height: 50px; '
-                'border-radius: 50%; object-fit: cover;" />',
+                '<img src="{}" style="width: 40px; height: 40px; '
+                'border-radius: 50%; object-fit: cover; border: 2px solid #ddd;" />',
                 url
             )
         return format_html(
-            '<span style="color: #999;">بدون تصویر</span>'
+            '<div style="width: 40px; height: 40px; border-radius: 50%; '
+            'background: #e0e0e0; display: flex; align-items: center; '
+            'justify-content: center; color: #999; font-size: 12px;">👤</div>'
+        )
+    
+    @admin.display(description=_('پیش‌نمایش آواتار'))
+    def avatar_preview(self, obj):
+        """نمایش تصویر آواتار بزرگتر در صفحه جزئیات"""
+        url = obj.get_avatar_url()
+        if url:
+            return format_html(
+                '<div style="text-align: center;">'
+                '<img src="{}" style="width: 150px; height: 150px; '
+                'border-radius: 50%; object-fit: cover; border: 3px solid #667eea; '
+                'box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />'
+                '</div>',
+                url
+            )
+        return format_html(
+            '<div style="width: 150px; height: 150px; border-radius: 50%; '
+            'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); '
+            'display: flex; align-items: center; justify-content: center; '
+            'color: white; font-size: 48px; margin: 0 auto;">👤</div>'
         )
         
     def get_readonly_fields(self, request, obj=None):
@@ -166,7 +189,62 @@ class ProfileInline(admin.StackedInline):
         'national_id',
     )
 
-UserAdmin.inlines = [ProfileInline]
+
+# ============================================
+# Address Inline
+# ============================================
+class AddressInline(admin.TabularInline):
+    """نمایش آدرس‌های کاربر به صورت Inline"""
+    from .models import Address
+    model = Address
+    extra = 0
+    fields = (
+        'title',
+        'recipient_name',
+        'recipient_phone',
+        'city',
+        'postal_code',
+        'is_default',
+    )
+    readonly_fields = ()
+    can_delete = True
+    verbose_name = _('آدرس')
+    verbose_name_plural = _('آدرس‌های ارسال')
+
+
+# ============================================
+# BankCard Inline
+# ============================================
+class BankCardInline(admin.TabularInline):
+    """نمایش کارت‌های بانکی کاربر به صورت Inline"""
+    from .models import BankCard
+    model = BankCard
+    extra = 0
+    fields = (
+        'card_number_display',
+        'bank_name',
+        'is_default',
+        'is_verified',
+        'created_at',
+    )
+    readonly_fields = ('card_number_display', 'created_at')
+    can_delete = True
+    verbose_name = _('کارت بانکی')
+    verbose_name_plural = _('کارت‌های بانکی')
+    
+    @admin.display(description=_('شماره کارت'))
+    def card_number_display(self, obj):
+        """نمایش شماره کارت با فرمت ماسک شده"""
+        if obj and obj.card_number:
+            return format_html(
+                '<code style="background: #f0f0f0; padding: 2px 8px; '
+                'border-radius: 4px; font-family: monospace; direction: ltr; display: inline-block;">{}</code>',
+                obj.masked_number
+            )
+        return '-'
+
+
+UserAdmin.inlines = [ProfileInline, AddressInline, BankCardInline]
 
 
 @admin.register(Profile)
