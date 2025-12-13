@@ -657,6 +657,24 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['user'] = user
         context['profile'] = profile
         
+        # Get addresses
+        try:
+            from .models import Address
+            addresses = Address.objects.filter(user=user)
+            context['addresses'] = addresses
+        except Exception as e:
+            context['addresses'] = []
+            logger.warning(f"Addresses data error: {e}")
+        
+        # Get bank cards
+        try:
+            from .models import BankCard
+            bank_cards = BankCard.objects.filter(user=user)
+            context['bank_cards'] = bank_cards
+        except Exception as e:
+            context['bank_cards'] = []
+            logger.warning(f"Bank cards data error: {e}")
+        
         # ═══════════════════════════════════════════════════════════════
         # WALLET DATA
         # ═══════════════════════════════════════════════════════════════
@@ -693,9 +711,59 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return context
     
     def post(self, request):
-        """Handle POST requests for wallet operations"""
+        """Handle POST requests for wallet operations and profile updates"""
         user = request.user
         
+        # Check if it's a file upload (multipart/form-data)
+        if request.FILES:
+            action = request.POST.get('action')
+            
+            # ═══════════════════════════════════════════════════════════
+            # AVATAR UPLOAD
+            # ═══════════════════════════════════════════════════════════
+            if action == 'upload_avatar':
+                avatar_file = request.FILES.get('avatar')
+                
+                if not avatar_file:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'فایل تصویر یافت نشد'
+                    }, status=400)
+                
+                # Validate file type
+                if not avatar_file.content_type.startswith('image/'):
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'فرمت فایل نامعتبر است. لطفا یک تصویر انتخاب کنید'
+                    }, status=400)
+                
+                # Validate file size (max 5MB)
+                if avatar_file.size > 5 * 1024 * 1024:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'حجم فایل نباید بیشتر از ۵ مگابایت باشد'
+                    }, status=400)
+                
+                try:
+                    # Save avatar
+                    user.avatar = avatar_file
+                    user.save(update_fields=['avatar'])
+                    
+                    logger.info(f"Avatar updated for user {user.phone}")
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'تصویر پروفایل با موفقیت بروزرسانی شد',
+                        'avatar_url': user.avatar.url if user.avatar else None
+                    })
+                except Exception as e:
+                    logger.error(f"Avatar upload error: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'خطا در ذخیره تصویر'
+                    }, status=500)
+        
+        # Handle JSON requests
         try:
             data = json.loads(request.body)
             action = data.get('action')
@@ -751,6 +819,116 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     'payment_url': payment_url,
                     'deposit_id': deposit_request.id
                 })
+            
+            # ═══════════════════════════════════════════════════════════
+            # ADD ADDRESS
+            # ═══════════════════════════════════════════════════════════
+            elif action == 'add_address':
+                from .models import Address
+                
+                # Validate required fields
+                required_fields = ['title', 'recipient_name', 'recipient_phone', 'province', 'city', 'postal_code', 'full_address']
+                for field in required_fields:
+                    if not data.get(field):
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'فیلد {field} الزامی است'
+                        }, status=400)
+                
+                # Validate phone number
+                phone = data.get('recipient_phone', '').strip()
+                if not phone.startswith('09') or len(phone) != 11:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'شماره تماس باید با ۰۹ شروع شده و ۱۱ رقم باشد'
+                    }, status=400)
+                
+                # Validate postal code
+                postal_code = data.get('postal_code', '').strip()
+                if not postal_code.isdigit() or len(postal_code) != 10:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'کد پستی باید ۱۰ رقم باشد'
+                    }, status=400)
+                
+                try:
+                    # Create address
+                    address = Address.objects.create(
+                        user=user,
+                        title=data.get('title').strip(),
+                        recipient_name=data.get('recipient_name').strip(),
+                        recipient_phone=phone,
+                        province=data.get('province').strip(),
+                        city=data.get('city').strip(),
+                        postal_code=postal_code,
+                        full_address=data.get('full_address').strip(),
+                        is_default=data.get('is_default', False)
+                    )
+                    
+                    logger.info(f"Address created: {address.id} for user {user.phone}")
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'آدرس با موفقیت ذخیره شد',
+                        'address_id': address.id
+                    })
+                except Exception as e:
+                    logger.error(f"Address creation error: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'خطا در ذخیره آدرس'
+                    }, status=500)
+            
+            # ═══════════════════════════════════════════════════════════
+            # ADD BANK CARD
+            # ═══════════════════════════════════════════════════════════
+            elif action == 'add_bank_card':
+                from .models import BankCard
+                
+                # Validate card number
+                card_number = data.get('card_number', '').strip()
+                if not card_number.isdigit() or len(card_number) != 16:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'شماره کارت باید ۱۶ رقم باشد'
+                    }, status=400)
+                
+                # Validate bank name
+                if not data.get('bank_name'):
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'نام بانک الزامی است'
+                    }, status=400)
+                
+                # Check if card already exists
+                if BankCard.objects.filter(user=user, card_number=card_number).exists():
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'این کارت قبلا ثبت شده است'
+                    }, status=400)
+                
+                try:
+                    # Create bank card
+                    bank_card = BankCard.objects.create(
+                        user=user,
+                        card_number=card_number,
+                        bank_name=data.get('bank_name').strip(),
+                        is_default=data.get('is_default', False)
+                    )
+                    
+                    logger.info(f"Bank card created: {bank_card.id} for user {user.phone}")
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'کارت بانکی با موفقیت ذخیره شد',
+                        'card_id': bank_card.id
+                    })
+                except Exception as e:
+                    logger.error(f"Bank card creation error: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'خطا در ذخیره کارت'
+                    }, status=500)
             
             return JsonResponse({
                 'success': False,

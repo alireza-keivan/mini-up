@@ -88,7 +88,7 @@
             <!-- Menu links -->
             <nav class="py-1" dir="rtl">
 
-                <a href="{% url 'accounts:orders' %}"
+                <a href="{% url 'accounts:dashboard' %}#orders"
                    class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/5
                           hover:text-white transition-all">
                     <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
@@ -106,7 +106,7 @@
                     <span class="flex-1">تیکت‌های پشتیبانی</span>
                 </a>
 
-                <a href="{% url 'wallet:dashboard' %}"
+                <a href="{% url 'accounts:dashboard' %}#wallet"
                    class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/5
                           hover:text-white transition-all">
                     <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
@@ -115,7 +115,7 @@
                     <span class="flex-1">کیف پول</span>
                 </a>
 
-                <a href="{% url 'accounts:profile' %}"
+                <a href="{% url 'accounts:dashboard' %}#info"
                    class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-white/5
                           hover:text-white transition-all">
                     <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-amber-500/10 text-amber-400">

@@ -46,13 +46,13 @@
             <div class="mobile-menu-wallet-balance">
                 {{ user.wallet_balance|default:"0"|intcomma }} <span>تومان</span>
             </div>
-            <a href="{% url 'wallet:deposit' %}" class="mobile-menu-wallet-add">
+            <a href="{% url 'accounts:dashboard' %}#wallet" class="mobile-menu-wallet-add">
                 <i class="fas fa-plus-circle"></i> افزایش موجودی
             </a>
         </div>
 
         <div class="mobile-menu-stats">
-            <a href="{% url 'accounts:orders' %}" class="mobile-menu-stat-item">
+            <a href="{% url 'accounts:dashboard' %}#orders" class="mobile-menu-stat-item">
                 <div class="mobile-menu-stat-value">{{ user_orders_count|default:"0" }}</div>
                 <div class="mobile-menu-stat-label">سفارش</div>
             </a>
