@@ -8,11 +8,11 @@ from django.shortcuts import get_object_or_404
 
 from .models import (
     ArticleCategory, ArticleTag, Article, ArticleComment,
-    Page, FAQItem, Testimonial, SystemNotification
+    Page, FAQItem, SystemNotification
 )
 from .services import (
     ArticleService, CommentService, PageService,
-    FAQService, TestimonialService, NotificationService
+    FAQService, NotificationService
 )
 from .serializers import (
     ArticleCategoryListSerializer, ArticleCategoryDetailSerializer,
@@ -21,7 +21,6 @@ from .serializers import (
     ArticleCommentSerializer, ArticleCommentCreateSerializer,
     PageListSerializer, PageDetailSerializer,
     FAQItemSerializer, FAQGroupedSerializer,
-    TestimonialSerializer,
     SystemNotificationSerializer, NotificationMarkReadSerializer
 )
 
@@ -414,36 +413,6 @@ class FAQListAPIView(APIView):
         return Response({
             'success': True,
             'data': data
-        })
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TESTIMONIAL APIs
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class TestimonialListAPIView(APIView):
-    """
-    لیست نظرات مشتریان
-    GET /content/api/v1/testimonials/
-
-    Query Params:
-        - featured: فقط ویژه‌ها (true/false)
-    """
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        featured_only = request.query_params.get('featured', 'false').lower() == 'true'
-
-        if featured_only:
-            testimonials = TestimonialService.get_featured()
-        else:
-            testimonials = TestimonialService.list_all()
-
-        serializer = TestimonialSerializer(testimonials, many=True)
-
-        return Response({
-            'success': True,
-            'data': serializer.data
         })
 
 

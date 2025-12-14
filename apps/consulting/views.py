@@ -1,8 +1,7 @@
 # apps/consulting/views.py
 
 """
-ویوهای Template-based برای مشاوره
-(برای صفحات HTML - نه API)
+Views for ticket support system
 """
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -10,199 +9,249 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator
+from django.db.models import Q
 
-from .models import ConsultingCategory, Consultant, Appointment, TimeSlot
-from .services import ConsultingService
+from .models import ConsultingCategory, SupportTicket, TicketMessage, TicketAttachment
 
 
-def consultant_list(request):
+@login_required
+def ticket_list(request):
     """
-    صفحه لیست مشاوران
-    GET /consulting/
+    User ticket list page
+    GET /consulting/tickets/
     """
-    category_slug = request.GET.get('category')
+    tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')
     
+    # Filter by status
+    status_filter = request.GET.get('status')
+    if status_filter and status_filter in ['pending', 'in_progress', 'answered', 'closed']:
+        tickets = tickets.filter(status=status_filter)
+    
+    # Search
+    search_query = request.GET.get('q')
+    if search_query:
+        tickets = tickets.filter(
+            Q(ticket_id__icontains=search_query) |
+            Q(subject__icontains=search_query) |
+            Q(initial_message__icontains=search_query)
+        )
+    
+    # Pagination
+    paginator = Paginator(tickets, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'tickets': page_obj,
+        'status_filter': status_filter,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'consulting/ticket_list.html', context)
+
+
+@login_required
+def ticket_detail(request, ticket_id):
+    """
+    Ticket detail and chat page
+    GET /consulting/tickets/<ticket_id>/
+    """
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
+        user=request.user
+    )
+    
+    # Get messages
+    messages_qs = ticket.messages.select_related('sender').prefetch_related('attachments').order_by('created_at')
+    
+    # Mark staff messages as read
+    unread_staff_messages = messages_qs.filter(is_staff_reply=True, is_read=False)
+    for msg in unread_staff_messages:
+        msg.mark_as_read()
+    
+    context = {
+        'ticket': ticket,
+        'messages': messages_qs,
+    }
+    
+    return render(request, 'consulting/ticket_detail.html', context)
+
+
+@login_required
+def ticket_create(request):
+    """
+    Create new ticket page
+    GET/POST /consulting/tickets/create/
+    """
     categories = ConsultingCategory.objects.filter(is_active=True)
-    consultants = ConsultingService.get_active_consultants(category_slug=category_slug)
     
-    # دسته‌بندی فعلی
-    current_category = None
-    if category_slug:
-        current_category = categories.filter(slug=category_slug).first()
+    if request.method == 'POST':
+        category_id = request.POST.get('category')
+        subject = request.POST.get('subject')
+        initial_message = request.POST.get('message')
+        priority = request.POST.get('priority', 'medium')
+        
+        # Validation
+        if not all([category_id, subject, initial_message]):
+            messages.error(request, 'Please fill all required fields.')
+            return render(request, 'consulting/ticket_create.html', {'categories': categories})
+        
+        try:
+            category = ConsultingCategory.objects.get(id=category_id, is_active=True)
+        except ConsultingCategory.DoesNotExist:
+            messages.error(request, 'Invalid category selected.')
+            return render(request, 'consulting/ticket_create.html', {'categories': categories})
+        
+        # Create ticket
+        ticket = SupportTicket.objects.create(
+            user=request.user,
+            category=category,
+            subject=subject,
+            initial_message=initial_message,
+            priority=priority
+        )
+        
+        messages.success(request, f'Ticket #{ticket.ticket_id} created successfully.')
+        return redirect('consulting:ticket_detail', ticket_id=ticket.ticket_id)
     
     context = {
         'categories': categories,
-        'consultants': consultants,
-        'current_category': current_category,
     }
     
-    return render(request, 'consulting/consultant_list.html', context)
-
-
-def consultant_detail(request, consultant_id):
-    """
-    صفحه پروفایل مشاور
-    GET /consulting/<uuid:consultant_id>/
-    """
-    consultant = get_object_or_404(
-        Consultant,
-        id=consultant_id,
-        is_active=True,
-        is_verified=True
-    )
-    
-    # اسلات‌های آزاد
-    available_slots = ConsultingService.get_available_slots(consultant_id)
-    
-    # نظرات
-    reviews = ConsultingService.get_consultant_reviews(consultant_id, limit=10)
-    
-    context = {
-        'consultant': consultant,
-        'slots': available_slots,
-        'reviews': reviews,
-    }
-    
-    return render(request, 'consulting/consultant_detail.html', context)
-
-
-@login_required
-def book_appointment(request, slot_id):
-    """
-    رزرو نوبت
-    POST /consulting/book/<uuid:slot_id>/
-    """
-    if request.method != 'POST':
-        return redirect('consulting:list')
-    
-    description = request.POST.get('description', '')
-    
-    result = ConsultingService.book_appointment(
-        user=request.user,
-        slot_id=slot_id,
-        description=description
-    )
-    
-    if result['success']:
-        appointment = result['appointment']
-        messages.success(request, 'نوبت شما با موفقیت رزرو شد.')
-        return redirect('consulting:appointment_detail', appointment_id=appointment.id)
-    else:
-        messages.error(request, result['error'])
-        return redirect('consulting:list')
-
-
-@login_required
-def appointment_detail(request, appointment_id):
-    """
-    جزئیات نوبت
-    GET /consulting/appointments/<uuid:appointment_id>/
-    """
-    appointment = get_object_or_404(
-        Appointment,
-        id=appointment_id,
-        user=request.user
-    )
-    
-    context = {
-        'appointment': appointment,
-    }
-    
-    return render(request, 'consulting/appointment_detail.html', context)
-
-
-@login_required
-def my_appointments(request):
-    """
-    لیست نوبت‌های من
-    GET /consulting/my-appointments/
-    """
-    appointments = Appointment.objects.filter(
-        user=request.user
-    ).select_related('consultant', 'slot').order_by('-created_at')
-    
-    context = {
-        'appointments': appointments,
-    }
-    
-    return render(request, 'consulting/my_appointments.html', context)
+    return render(request, 'consulting/ticket_create.html', context)
 
 
 @login_required
 @require_POST
-def cancel_appointment(request, appointment_id):
+def ticket_message_create(request, ticket_id):
     """
-    لغو نوبت
-    POST /consulting/appointments/<uuid:appointment_id>/cancel/
+    Send message in ticket
+    POST /consulting/tickets/<ticket_id>/message/
     """
-    appointment = get_object_or_404(
-        Appointment,
-        id=appointment_id,
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
         user=request.user
     )
     
-    result = ConsultingService.cancel_appointment(appointment, cancelled_by='user')
+    # Check ticket status
+    if ticket.is_closed:
+        messages.error(request, 'This ticket is closed. Please reopen it to send a message.')
+        return redirect('consulting:ticket_detail', ticket_id=ticket.ticket_id)
     
-    if result['success']:
-        messages.success(request, 'نوبت شما لغو شد.')
-    else:
-        messages.error(request, result['error'])
+    message_text = request.POST.get('message')
+    if not message_text or not message_text.strip():
+        messages.error(request, 'Message cannot be empty.')
+        return redirect('consulting:ticket_detail', ticket_id=ticket.ticket_id)
     
-    return redirect('consulting:my_appointments')
+    # Create message
+    message = TicketMessage.objects.create(
+        ticket=ticket,
+        sender=request.user,
+        message=message_text.strip(),
+        is_staff_reply=False
+    )
+    
+    # Upload file if exists
+    uploaded_file = request.FILES.get('attachment')
+    if uploaded_file:
+        try:
+            TicketAttachment.objects.create(
+                message=message,
+                file=uploaded_file
+            )
+        except Exception as e:
+            messages.warning(request, f'Message sent but attachment failed: {str(e)}')
+    
+    messages.success(request, 'Message sent successfully.')
+    return redirect('consulting:ticket_detail', ticket_id=ticket.ticket_id)
 
 
 @login_required
 @require_POST
-def submit_review(request, appointment_id):
+def ticket_close(request, ticket_id):
     """
-    ثبت نظر
-    POST /consulting/appointments/<uuid:appointment_id>/review/
+    Close ticket
+    POST /consulting/tickets/<ticket_id>/close/
     """
-    rating = request.POST.get('rating')
-    comment = request.POST.get('comment', '')
-    
-    if not rating:
-        messages.error(request, 'لطفاً امتیاز را انتخاب کنید.')
-        return redirect('consulting:appointment_detail', appointment_id=appointment_id)
-    
-    result = ConsultingService.add_review(
-        user=request.user,
-        appointment_id=appointment_id,
-        rating=int(rating),
-        comment=comment
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
+        user=request.user
     )
     
-    if result['success']:
-        messages.success(request, 'نظر شما ثبت شد. با تشکر!')
+    if ticket.is_closed:
+        messages.info(request, 'This ticket is already closed.')
     else:
-        messages.error(request, result['error'])
+        ticket.close()
+        messages.success(request, 'Ticket closed successfully.')
     
-    return redirect('consulting:appointment_detail', appointment_id=appointment_id)
+    return redirect('consulting:ticket_detail', ticket_id=ticket.ticket_id)
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# AJAX ENDPOINTS (برای درخواست‌های JavaScript)
-# ═══════════════════════════════════════════════════════════════════════════════
 
 @login_required
-def get_slots_ajax(request, consultant_id):
+@require_POST
+def ticket_reopen(request, ticket_id):
     """
-    دریافت اسلات‌ها با AJAX
-    GET /consulting/ajax/slots/<uuid:consultant_id>/?date=2024-01-15
+    Reopen closed ticket
+    POST /consulting/tickets/<ticket_id>/reopen/
     """
-    date = request.GET.get('date')
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
+        user=request.user
+    )
     
-    slots = ConsultingService.get_available_slots(consultant_id, date)
+    if not ticket.is_closed:
+        messages.info(request, 'This ticket is already open.')
+    else:
+        ticket.reopen()
+        messages.success(request, 'Ticket reopened successfully.')
     
-    data = []
-    for slot in slots:
-        data.append({
-            'id': str(slot.id),
-            'date': str(slot.date),
-            'start_time': slot.start_time.strftime('%H:%M'),
-            'end_time': slot.end_time.strftime('%H:%M'),
-            'duration': slot.duration,
-            'price': slot.price,
+    return redirect('consulting:ticket_detail', ticket_id=ticket.ticket_id)
+
+
+# AJAX Views
+@login_required
+def ticket_check_new_messages(request, ticket_id):
+    """
+    Check for new ticket messages (AJAX)
+    GET /consulting/tickets/<ticket_id>/check-messages/
+    """
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
+        user=request.user
+    )
+    
+    last_message_id = request.GET.get('last_message_id')
+    
+    if last_message_id:
+        new_messages = ticket.messages.filter(id__gt=last_message_id).order_by('created_at')
+    else:
+        new_messages = ticket.messages.order_by('-created_at')[:1]
+    
+    messages_data = []
+    for msg in new_messages:
+        messages_data.append({
+            'id': msg.id,
+            'sender': msg.sender.get_full_name() or msg.sender.phone,
+            'message': msg.message,
+            'is_staff_reply': msg.is_staff_reply,
+            'created_at': msg.created_at.strftime('%Y-%m-%d %H:%M'),
+            'attachments': [
+                {
+                    'url': att.file.url,
+                    'filename': att.original_filename
+                }
+                for att in msg.attachments.all()
+            ]
         })
     
-    return JsonResponse({'success': True, 'slots': data})
+    return JsonResponse({
+        'has_new_messages': len(messages_data) > 0,
+        'messages': messages_data,
+        'ticket_status': ticket.status
+    })

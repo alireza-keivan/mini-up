@@ -2,8 +2,8 @@
 
 from django.contrib import admin
 from .models import (
-    ArticleCategory, ArticleTag, Article, ArticleComment,
-    Page, FAQItem, Testimonial, SystemNotification
+    ArticleCategory, ArticleTag, Article, ArticleImage, ArticleComment,
+    Page, FAQItem, SystemNotification
 )
 
 @admin.register(ArticleCategory)
@@ -15,9 +15,22 @@ class ArticleCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(ArticleTag)
 class ArticleTagAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug")
+    list_display = ("name", "slug", "article_count")
     search_fields = ("name", "slug")
     prepopulated_fields = {"slug": ("name",)}
+    
+    @admin.display(description='تعداد مقالات')
+    def article_count(self, obj):
+        return obj.article_count
+
+
+# Inline for article images
+class ArticleImageInline(admin.TabularInline):
+    model = ArticleImage
+    extra = 1
+    fields = ('image', 'alt_text', 'caption', 'order', 'is_active')
+    verbose_name = 'تصویر'
+    verbose_name_plural = 'تصاویر مقاله'
 
 
 @admin.register(Article)
@@ -26,7 +39,8 @@ class ArticleAdmin(admin.ModelAdmin):
     list_filter = ("status", "category", "is_featured")
     search_fields = ("title", "slug")
     prepopulated_fields = {"slug": ("title",)}
-    autocomplete_fields = ("author", "category", "tags")
+    filter_horizontal = ("tags",)
+    inlines = [ArticleImageInline]
 
 
 @admin.register(ArticleComment)
@@ -48,12 +62,6 @@ class FAQItemAdmin(admin.ModelAdmin):
     list_display = ("category", "question", "order")
     search_fields = ("question", "answer")
     list_filter = ("category",)
-
-
-@admin.register(Testimonial)
-class TestimonialAdmin(admin.ModelAdmin):
-    list_display = ("name", "role", "rating", "is_featured")
-    list_filter = ("is_featured",)
 
 
 @admin.register(SystemNotification)

@@ -10,9 +10,9 @@ from .models import (
     ArticleCategory,
     ArticleTag,
     ArticleComment,
+    ArticleImage,
     Page,
     FAQItem,
-    Testimonial,
     SystemNotification
 )
 
@@ -295,30 +295,6 @@ def clear_faq_cache_on_delete(sender, instance, **kwargs):
     
     if instance.category:
         cache.delete(f'faq_category_{instance.category}')
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TESTIMONIAL SIGNALS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-@receiver(post_save, sender=Testimonial)
-def clear_testimonial_cache(sender, instance, **kwargs):
-    """
-    Clear testimonial caches when a testimonial is saved.
-    """
-    cache.delete('testimonials_list')
-    cache.delete('testimonials_featured')
-    cache.delete('testimonials_active')
-
-
-@receiver(post_delete, sender=Testimonial)
-def clear_testimonial_cache_on_delete(sender, instance, **kwargs):
-    """
-    Clear testimonial caches when a testimonial is deleted.
-    """
-    cache.delete('testimonials_list')
-    cache.delete('testimonials_featured')
-    cache.delete('testimonials_active')
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

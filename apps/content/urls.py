@@ -63,7 +63,7 @@ api_urlpatterns = [
     path('api/v1/faq/', api_views.FAQListAPIView.as_view(), name='api_faq_list'),
     
     # ----- Testimonials -----
-    path('api/v1/testimonials/', api_views.TestimonialListAPIView.as_view(), name='api_testimonial_list'),
+    #path('api/v1/testimonials/', api_views.TestimonialListAPIView.as_view(), name='api_testimonial_list'),
     
     # ----- Notifications -----
     path('api/v1/notifications/', api_views.NotificationListAPIView.as_view(), name='api_notification_list'),

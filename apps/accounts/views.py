@@ -13,6 +13,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth import login, logout
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
@@ -979,11 +980,251 @@ def tickets_view(request):
     """
     نمایش تیکت‌های پشتیبانی کاربر
     """
+    from apps.consulting.models import SupportTicket
+    from django.core.paginator import Paginator
+    from django.db.models import Q
+    from datetime import datetime
+    
+    tickets = SupportTicket.objects.filter(user=request.user).order_by('-created_at')
+    
+    # فیلتر بر اساس وضعیت
+    status_filter = request.GET.get('status')
+    if status_filter and status_filter in ['pending', 'in_progress', 'answered', 'closed']:
+        tickets = tickets.filter(status=status_filter)
+    
+    # جستجو
+    search_query = request.GET.get('q')
+    if search_query:
+        tickets = tickets.filter(
+            Q(ticket_id__icontains=search_query) |
+            Q(subject__icontains=search_query) |
+            Q(initial_message__icontains=search_query)
+        )
+    
+    # فیلتر تاریخی
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    if date_from:
+        try:
+            date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
+            tickets = tickets.filter(created_at__gte=date_from_obj)
+        except ValueError:
+            pass
+    
+    if date_to:
+        try:
+            date_to_obj = datetime.strptime(date_to, '%Y-%m-%d')
+            # Add one day to include the entire end date
+            from datetime import timedelta
+            date_to_obj = date_to_obj + timedelta(days=1)
+            tickets = tickets.filter(created_at__lt=date_to_obj)
+        except ValueError:
+            pass
+    
+    # صفحه‌بندی
+    paginator = Paginator(tickets, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
         'page_title': 'تیکت‌های پشتیبانی',
-        'tickets': [],  # TODO: Ticket.objects.filter(user=request.user)
+        'tickets': page_obj,
+        'status_filter': status_filter,
+        'search_query': search_query,
+        'date_from': date_from,
+        'date_to': date_to,
     }
     return render(request, 'accounts/tickets.html', context)
+
+
+@login_required
+def ticket_create_view(request):
+    """
+    ایجاد تیکت جدید
+    """
+    from apps.consulting.models import ConsultingCategory, SupportTicket, TicketMessage, TicketAttachment
+    
+    if request.method == 'POST':
+        subject = request.POST.get('subject')
+        initial_message = request.POST.get('message')
+        attachment = request.FILES.get('attachment')
+        
+        # اعتبارسنجی
+        if not all([subject, initial_message]):
+            messages.error(request, 'لطفا تمام فیلدهای ضروری را پر کنید.')
+            return render(request, 'accounts/ticket_create.html', {})
+        
+        # Get or create default category
+        default_category, _ = ConsultingCategory.objects.get_or_create(
+            slug='general',
+            defaults={
+                'name': 'عمومی',
+                'icon': 'fas fa-question-circle',
+                'is_active': True,
+                'order': 0
+            }
+        )
+        
+        # ایجاد تیکت
+        ticket = SupportTicket.objects.create(
+            user=request.user,
+            category=default_category,
+            subject=subject,
+            initial_message=initial_message,
+            priority='medium'
+        )
+        
+        # Handle attachment if provided
+        if attachment:
+            try:
+                # Create a message for the attachment
+                first_message = TicketMessage.objects.create(
+                    ticket=ticket,
+                    sender=request.user,
+                    message="[تصویر ضمیمه]",
+                    is_staff_reply=False
+                )
+                TicketAttachment.objects.create(
+                    message=first_message,
+                    file=attachment
+                )
+            except Exception as e:
+                messages.warning(request, f'تیکت ثبت شد اما تصویر ضمیمه آپلود نشد: {str(e)}')
+        
+        messages.success(request, f'تیکت شما با شماره {ticket.ticket_id} ثبت شد.')
+        return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+    
+    return render(request, 'accounts/ticket_create.html', {})
+
+
+@login_required
+def ticket_detail_view(request, ticket_id):
+    """
+    جزئیات تیکت و چت
+    """
+    from apps.consulting.models import SupportTicket
+    
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
+        user=request.user
+    )
+    
+    # دریافت پیام‌ها
+    messages_qs = ticket.messages.select_related('sender').prefetch_related('attachments').order_by('created_at')
+    
+    # علامت‌گذاری پیام‌های پشتیبان به عنوان خوانده شده
+    unread_staff_messages = messages_qs.filter(is_staff_reply=True, is_read=False)
+    for msg in unread_staff_messages:
+        msg.mark_as_read()
+    
+    context = {
+        'ticket': ticket,
+        'ticket_messages': messages_qs,
+    }
+    return render(request, 'accounts/ticket_detail.html', context)
+
+
+@login_required
+def ticket_message_create_view(request, ticket_id):
+    """
+    ارسال پیام در تیکت
+    """
+    from apps.consulting.models import SupportTicket, TicketMessage, TicketAttachment
+    from django.views.decorators.http import require_POST
+    
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
+        user=request.user
+    )
+    
+    if request.method != 'POST':
+        return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+    
+    # بررسی وضعیت تیکت
+    if ticket.is_closed:
+        messages.error(request, 'این تیکت بسته شده است. برای ارسال پیام ابتدا تیکت را بازگشایی کنید.')
+        return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+    
+    message_text = request.POST.get('message')
+    if not message_text or not message_text.strip():
+        messages.error(request, 'متن پیام نمی‌تواند خالی باشد.')
+        return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+    
+    # ایجاد پیام
+    message = TicketMessage.objects.create(
+        ticket=ticket,
+        sender=request.user,
+        message=message_text.strip(),
+        is_staff_reply=False
+    )
+    
+    # آپلود فایل (در صورت وجود)
+    uploaded_file = request.FILES.get('attachment')
+    if uploaded_file:
+        try:
+            TicketAttachment.objects.create(
+                message=message,
+                file=uploaded_file
+            )
+        except Exception as e:
+            messages.warning(request, f'پیام ارسال شد اما فایل ضمیمه آپلود نشد: {str(e)}')
+    
+    messages.success(request, 'پیام شما ارسال شد.')
+    return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+
+
+@login_required
+def ticket_close_view(request, ticket_id):
+    """
+    بستن تیکت
+    """
+    from apps.consulting.models import SupportTicket
+    
+    if request.method != 'POST':
+        return redirect('accounts:ticket_detail', ticket_id=ticket_id)
+    
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
+        user=request.user
+    )
+    
+    if ticket.is_closed:
+        messages.info(request, 'این تیکت قبلا بسته شده است.')
+    else:
+        ticket.close()
+        messages.success(request, 'تیکت با موفقیت بسته شد.')
+    
+    return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+
+
+@login_required
+def ticket_reopen_view(request, ticket_id):
+    """
+    بازگشایی تیکت بسته شده
+    """
+    from apps.consulting.models import SupportTicket
+    
+    if request.method != 'POST':
+        return redirect('accounts:ticket_detail', ticket_id=ticket_id)
+    
+    ticket = get_object_or_404(
+        SupportTicket,
+        ticket_id=ticket_id,
+        user=request.user
+    )
+    
+    if not ticket.is_closed:
+        messages.info(request, 'این تیکت باز است.')
+    else:
+        ticket.reopen()
+        messages.success(request, 'تیکت بازگشایی شد.')
+    
+    return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+
 
 @login_required
 def favorites_view(request):

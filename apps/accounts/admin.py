@@ -42,6 +42,8 @@ class UserAdmin(BaseUserAdmin):
         'referral_code',
         'google_id',
         'avatar_preview',
+        'cart_items_display',
+        'wallet_transactions_display',
     )
     
     fieldsets = (
@@ -60,6 +62,14 @@ class UserAdmin(BaseUserAdmin):
         }),
         (_('سیستم معرفی'), {
             'fields': ('referral_code', 'referred_by'),
+        }),
+        (_('سبد خرید'), {
+            'fields': ('cart_items_display',),
+            'classes': ('collapse',),
+        }),
+        (_('کیف پول و تراکنش‌ها'), {
+            'fields': ('wallet_transactions_display',),
+            'classes': ('collapse',),
         }),
         (_('دسترسی‌ها'), {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
@@ -139,6 +149,122 @@ class UserAdmin(BaseUserAdmin):
             'display: flex; align-items: center; justify-content: center; '
             'color: white; font-size: 48px; margin: 0 auto;">👤</div>'
         )
+    
+    @admin.display(description=_('تراکنش‌های کیف پول'))
+    def wallet_transactions_display(self, obj):
+        """نمایش تراکنش‌های اخیر کیف پول"""
+        if not obj or not hasattr(obj, 'wallet'):
+            return format_html('<p style="color: #999;">کیف پول وجود ندارد</p>')
+        
+        try:
+            wallet = obj.wallet
+            transactions = wallet.transactions.all().order_by('-created_at')[:10]
+            
+            if not transactions:
+                return format_html('<p style="color: #999;">تراکنشی وجود ندارد</p>')
+            
+            # Build HTML table
+            html = '<div style="margin-top: 10px;">'
+            html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">'
+            html += '<thead><tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">'
+            html += '<th style="padding: 8px; text-align: right;">شناسه</th>'
+            html += '<th style="padding: 8px; text-align: right;">نوع</th>'
+            html += '<th style="padding: 8px; text-align: right;">مبلغ</th>'
+            html += '<th style="padding: 8px; text-align: right;">وضعیت</th>'
+            html += '<th style="padding: 8px; text-align: right;">تاریخ</th>'
+            html += '</tr></thead><tbody>'
+            
+            for txn in transactions:
+                # Status colors
+                status_colors = {
+                    'pending': '#ffc107',
+                    'completed': '#28a745',
+                    'failed': '#dc3545',
+                    'cancelled': '#6c757d',
+                    'reversed': '#fd7e14',
+                }
+                status_color = status_colors.get(txn.status, '#6c757d')
+                
+                # Amount color
+                amount_color = '#28a745' if txn.amount >= 0 else '#dc3545'
+                amount_sign = '+' if txn.amount >= 0 else ''
+                
+                # Format date
+                from django.utils import timezone
+                import jdatetime
+                created_jalali = jdatetime.datetime.fromgregorian(datetime=txn.created_at)
+                date_str = created_jalali.strftime('%Y/%m/%d %H:%M')
+                
+                html += '<tr style="border-bottom: 1px solid #e9ecef;">'
+                html += f'<td style="padding: 8px;"><code>{txn.transaction_id}</code></td>'
+                html += f'<td style="padding: 8px;">{txn.get_transaction_type_display()}</td>'
+                html += f'<td style="padding: 8px; font-weight: bold; color: {amount_color};">{amount_sign}{txn.amount:,} تومان</td>'
+                html += f'<td style="padding: 8px;"><span style="background: {status_color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">{txn.get_status_display()}</span></td>'
+                html += f'<td style="padding: 8px; color: #6c757d;">{date_str}</td>'
+                html += '</tr>'
+            
+            html += '</tbody></table>'
+            
+            # Add wallet balance info
+            html += '<div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">'
+            html += f'<strong>موجودی فعلی:</strong> <span style="color: #28a745; font-weight: bold;">{wallet.balance:,} تومان</span> | '
+            html += f'<strong>اعتبار هدیه:</strong> <span style="color: #8a2be2; font-weight: bold;">{wallet.gift_balance:,} تومان</span>'
+            html += '</div></div>'
+            
+            return format_html(html)
+            
+        except Exception as e:
+            return format_html('<p style="color: #dc3545;">خطا در نمایش تراکنش‌ها: {}</p>', str(e))
+    
+    @admin.display(description=_('سبد خرید'))
+    def cart_items_display(self, obj):
+        """نمایش آیتم‌های سبد خرید کاربر"""
+        if not obj or not hasattr(obj, 'cart'):
+            return format_html('<p style="color: #999;">سبد خریدی وجود ندارد</p>')
+        
+        try:
+            cart = obj.cart
+            items = cart.items.select_related('product', 'variant').all()
+            
+            if not items:
+                return format_html('<p style="color: #999;">سبد خرید خالی است</p>')
+            
+            # Build HTML table
+            html = '<div style="margin-top: 10px;">'
+            html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">'
+            html += '<thead><tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">'
+            html += '<th style="padding: 8px; text-align: right;">محصول</th>'
+            html += '<th style="padding: 8px; text-align: right;">نوع</th>'
+            html += '<th style="padding: 8px; text-align: center;">تعداد</th>'
+            html += '<th style="padding: 8px; text-align: right;">قیمت واحد</th>'
+            html += '<th style="padding: 8px; text-align: right;">جمع</th>'
+            html += '</tr></thead><tbody>'
+            
+            for item in items:
+                variant_name = item.variant.name if item.variant else '-'
+                unit_price = item.variant.final_price if item.variant else item.product.final_price
+                line_total = unit_price * item.quantity
+                
+                html += '<tr style="border-bottom: 1px solid #e9ecef;">'
+                html += f'<td style="padding: 8px;"><strong>{item.product.name}</strong></td>'
+                html += f'<td style="padding: 8px; color: #6c757d;">{variant_name}</td>'
+                html += f'<td style="padding: 8px; text-align: center;"><span style="background: #e9ecef; padding: 2px 8px; border-radius: 3px;">{item.quantity}</span></td>'
+                html += f'<td style="padding: 8px;">{unit_price:,} تومان</td>'
+                html += f'<td style="padding: 8px; font-weight: bold; color: #28a745;">{line_total:,} تومان</td>'
+                html += '</tr>'
+            
+            html += '</tbody></table>'
+            
+            # Add cart total info
+            html += '<div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px; text-align: left;">'
+            html += f'<strong>تعداد کل آیتم‌ها:</strong> <span style="color: #007bff; font-weight: bold;">{cart.total_items}</span> | '
+            html += f'<strong>جمع کل سبد:</strong> <span style="color: #28a745; font-weight: bold; font-size: 14px;">{cart.total:,} تومان</span>'
+            html += '</div></div>'
+            
+            return format_html(html)
+            
+        except Exception as e:
+            return format_html('<p style="color: #dc3545;">خطا در نمایش سبد خرید: {}</p>', str(e))
         
     def get_readonly_fields(self, request, obj=None):
         """فیلدهای فقط‌خواندنی بسته به وضعیت کاربر"""
@@ -244,7 +370,209 @@ class BankCardInline(admin.TabularInline):
         return '-'
 
 
-UserAdmin.inlines = [ProfileInline, AddressInline, BankCardInline]
+# ============================================
+# Order Inline
+# ============================================
+class OrderInline(admin.TabularInline):
+    """نمایش سفارشات کاربر به صورت Inline"""
+    from apps.orders.models import Order
+    model = Order
+    extra = 0
+    can_delete = False
+    fields = (
+        'order_number_link',
+        'status_display',
+        'total_amount_display',
+        'created_at',
+    )
+    readonly_fields = ('order_number_link', 'status_display', 'total_amount_display', 'created_at')
+    ordering = ['-created_at']
+    verbose_name = _('سفارش')
+    verbose_name_plural = _('سفارشات')
+    
+    @admin.display(description=_('شماره سفارش'))
+    def order_number_link(self, obj):
+        """لینک به صفحه سفارش"""
+        if obj and obj.pk:
+            from django.urls import reverse
+            url = reverse('admin:orders_order_change', args=[obj.pk])
+            return format_html(
+                '<a href="{}" style="font-weight: bold; color: #0066cc;">{}</a>',
+                url, obj.order_number
+            )
+        return '-'
+    
+    @admin.display(description=_('وضعیت'))
+    def status_display(self, obj):
+        """نمایش وضعیت با رنگ"""
+        if not obj:
+            return '-'
+        
+        status_colors = {
+            'pending': '#ffc107',
+            'processing': '#17a2b8',
+            'confirmed': '#28a745',
+            'preparing': '#007bff',
+            'shipped': '#6610f2',
+            'delivered': '#20c997',
+            'completed': '#28a745',
+            'cancelled': '#dc3545',
+            'refunded': '#fd7e14',
+            'failed': '#dc3545',
+        }
+        
+        color = status_colors.get(obj.status, '#6c757d')
+        return format_html(
+            '<span style="background: {}; color: white; padding: 3px 8px; '
+            'border-radius: 4px; font-size: 11px; font-weight: bold;">{}</span>',
+            color, obj.get_status_display()
+        )
+    
+    @admin.display(description=_('مبلغ کل'))
+    def total_amount_display(self, obj):
+        """نمایش مبلغ کل"""
+        if obj and obj.total:
+            return format_html(
+                '<span style="font-weight: bold; color: #28a745;">{:,} تومان</span>',
+                obj.total
+            )
+        return '-'
+
+
+# ============================================
+# CartItem Inline - Via Cart relationship
+# ============================================
+# Note: CartItem cannot be shown as inline directly since it relates to Cart, not User.
+# To display cart items, we access them through the user's cart (user.cart.items)
+
+
+# ============================================
+# SupportTicket Inline
+# ============================================
+class SupportTicketInline(admin.TabularInline):
+    """نمایش تیکت‌های پشتیبانی کاربر به صورت Inline"""
+    from apps.consulting.models import SupportTicket
+    model = SupportTicket
+    extra = 0
+    can_delete = False
+    fk_name = 'user'  # Specify which FK to use (user vs assigned_to)
+    fields = (
+        'ticket_id_link',
+        'subject',
+        'status_display',
+        'message_count',
+        'created_at',
+    )
+    readonly_fields = ('ticket_id_link', 'subject', 'status_display', 'message_count', 'created_at')
+    ordering = ['-created_at']
+    verbose_name = _('تیکت پشتیبانی')
+    verbose_name_plural = _('تیکت‌های پشتیبانی')
+    
+    @admin.display(description=_('شماره تیکت'))
+    def ticket_id_link(self, obj):
+        """لینک به صفحه تیکت"""
+        if obj and obj.pk:
+            from django.urls import reverse
+            url = reverse('admin:consulting_supportticket_change', args=[obj.pk])
+            return format_html(
+                '<a href="{}" style="font-weight: bold; color: #0066cc;">#{}</a>',
+                url, obj.ticket_id
+            )
+        return '-'
+    
+    @admin.display(description=_('وضعیت'))
+    def status_display(self, obj):
+        """نمایش وضعیت با رنگ"""
+        if not obj:
+            return '-'
+        
+        status_colors = {
+            'pending': '#ffc107',
+            'in_progress': '#00f5ff',
+            'answered': '#28a745',
+            'closed': '#6c757d',
+        }
+        
+        color = status_colors.get(obj.status, '#6c757d')
+        return format_html(
+            '<span style="background: {}; color: white; padding: 3px 8px; '
+            'border-radius: 4px; font-size: 11px; font-weight: bold;">{}</span>',
+            color, obj.get_status_display()
+        )
+
+
+# ============================================
+# WalletTransaction Inline
+# ============================================
+class WalletTransactionInline(admin.TabularInline):
+    """نمایش تراکنش‌های کیف پول کاربر به صورت Inline"""
+    from apps.wallet.models import WalletTransaction, Wallet
+    model = WalletTransaction
+    extra = 0
+    can_delete = False
+    fields = (
+        'transaction_id',
+        'transaction_type',
+        'amount_display',
+        'status_display',
+        'created_at',
+    )
+    readonly_fields = ('transaction_id', 'transaction_type', 'amount_display', 'status_display', 'created_at')
+    ordering = ['-created_at']
+    verbose_name = _('تراکنش')
+    verbose_name_plural = _('تراکنش‌های کیف پول')
+    
+    def get_queryset(self, request):
+        """دریافت تراکنش‌ها از طریق wallet کاربر"""
+        qs = super().get_queryset(request)
+        return qs.select_related('wallet__user')
+    
+    def has_add_permission(self, request, obj=None):
+        """غیرفعال کردن افزودن تراکنش از اینجا"""
+        return False
+    
+    @admin.display(description=_('مبلغ'))
+    def amount_display(self, obj):
+        """نمایش مبلغ با رنگ"""
+        if not obj:
+            return '-'
+        
+        color = '#28a745' if obj.amount >= 0 else '#dc3545'
+        sign = '+' if obj.amount >= 0 else ''
+        return format_html(
+            '<span style="font-weight: bold; color: {};">{}{:,} تومان</span>',
+            color, sign, obj.amount
+        )
+    
+    @admin.display(description=_('وضعیت'))
+    def status_display(self, obj):
+        """نمایش وضعیت با رنگ"""
+        if not obj:
+            return '-'
+        
+        status_colors = {
+            'pending': '#ffc107',
+            'completed': '#28a745',
+            'failed': '#dc3545',
+            'cancelled': '#6c757d',
+            'reversed': '#fd7e14',
+        }
+        
+        color = status_colors.get(obj.status, '#6c757d')
+        return format_html(
+            '<span style="background: {}; color: white; padding: 3px 8px; '
+            'border-radius: 4px; font-size: 11px; font-weight: bold;">{}</span>',
+            color, obj.get_status_display()
+        )
+
+
+UserAdmin.inlines = [
+    ProfileInline, 
+    AddressInline, 
+    BankCardInline,
+    OrderInline,
+    SupportTicketInline,
+]
 
 
 @admin.register(Profile)

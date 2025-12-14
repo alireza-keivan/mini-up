@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 
 from .models import (
     ArticleCategory, ArticleTag, Article, ArticleComment,
-    Page, FAQItem, Testimonial, SystemNotification
+    Page, FAQItem, SystemNotification
 )
 
 
@@ -259,33 +259,6 @@ class FAQService:
             })
 
         return result
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TESTIMONIAL SERVICE
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class TestimonialService:
-    """
-    سرویس نظرات مشتریان
-    """
-
-    @staticmethod
-    def get_featured():
-        """نظرات ویژه"""
-        cache_key = 'featured_testimonials'
-        cached = cache.get(cache_key)
-        if cached:
-            return cached
-
-        items = Testimonial.objects.filter(is_featured=True).order_by('-created_at')[:10]
-        cache.set(cache_key, list(items), 60 * 60)  # 1 hour
-        return items
-
-    @staticmethod
-    def list_all():
-        """تمام نظرات"""
-        return Testimonial.objects.order_by('-created_at')
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

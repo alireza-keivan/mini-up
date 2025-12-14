@@ -2,8 +2,8 @@
 
 from rest_framework import serializers
 from .models import (
-    ArticleCategory, ArticleTag, Article, ArticleComment,
-    Page, FAQItem, Testimonial, SystemNotification
+    ArticleCategory, ArticleTag, Article, ArticleImage, ArticleComment,
+    Page, FAQItem, SystemNotification
 )
 
 
@@ -54,6 +54,13 @@ class ArticleTagSerializer(serializers.ModelSerializer):
 # ARTICLE SERIALIZERS
 # ═══════════════════════════════════════════════════════════════════════════════
 
+class ArticleImageSerializer(serializers.ModelSerializer):
+    """سریالایزر تصاویر مقاله"""
+    class Meta:
+        model = ArticleImage
+        fields = ['id', 'image', 'alt_text', 'caption', 'order']
+
+
 class ArticleAuthorSerializer(serializers.Serializer):
     """سریالایزر نویسنده مقاله"""
     id = serializers.UUIDField()
@@ -73,7 +80,7 @@ class ArticleListSerializer(serializers.ModelSerializer):
             'id', 'title', 'slug', 'excerpt',
             'featured_image', 'featured_image_alt',
             'author', 'category', 'tags',
-            'reading_time', 'view_count', 'like_count',
+            'reading_time', 'view_count',
             'is_featured', 'is_pinned',
             'published_at', 'created_at'
         ]
@@ -84,6 +91,7 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
     author = ArticleAuthorSerializer(read_only=True)
     category = ArticleCategoryDetailSerializer(read_only=True)
     tags = ArticleTagSerializer(many=True, read_only=True)
+    images = ArticleImageSerializer(many=True, read_only=True)
     comment_count = serializers.SerializerMethodField()
     
     class Meta:
@@ -91,8 +99,9 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'slug', 'excerpt', 'content',
             'featured_image', 'featured_image_alt',
+            'images',
             'author', 'category', 'tags',
-            'reading_time', 'view_count', 'like_count',
+            'reading_time', 'view_count',
             'allow_comments', 'comment_count',
             'is_featured', 'is_pinned',
             'meta_title', 'meta_description', 'meta_keywords', 'canonical_url',
@@ -196,21 +205,6 @@ class FAQGroupedSerializer(serializers.Serializer):
     """سریالایزر FAQ گروه‌بندی شده"""
     category = serializers.CharField()
     items = FAQItemSerializer(many=True)
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TESTIMONIAL SERIALIZERS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class TestimonialSerializer(serializers.ModelSerializer):
-    """سریالایزر نظرات مشتریان"""
-    class Meta:
-        model = Testimonial
-        fields = [
-            'id', 'name', 'role', 'avatar',
-            'text', 'rating', 'is_featured',
-            'created_at'
-        ]
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

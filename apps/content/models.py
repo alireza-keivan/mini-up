@@ -69,10 +69,27 @@ class ArticleCategory(models.Model):
 class ArticleTag(models.Model):
     """
     تگ‌های مقالات
+    
+    نحوه ارتباط با مقالات:
+    - ارتباط Many-to-Many: هر مقاله می‌تواند چند تگ داشته باشد و هر تگ می‌تواند به چند مقاله متصل باشد
+    - نام تگ: برای نمایش (مثلاً "گیمینگ")
+    - نامک (slug): برای URL و جستجو (مثلاً "gaming" یا "گیمینگ")
+    - استفاده: در مقاله از طریق فیلد tags به تگ‌ها متصل می‌شود
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=50, unique=True, verbose_name='نام تگ')
-    slug = models.SlugField(max_length=60, unique=True, allow_unicode=True, verbose_name='نامک')
+    name = models.CharField(
+        max_length=50, 
+        unique=True, 
+        verbose_name='نام تگ',
+        help_text='نام نمایشی تگ که در سایت نمایش داده می‌شود'
+    )
+    slug = models.SlugField(
+        max_length=60, 
+        unique=True, 
+        allow_unicode=True, 
+        verbose_name='نامک',
+        help_text='شناسه یکتا برای URL - به صورت خودکار از نام تگ تولید می‌شود'
+    )
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
 
@@ -88,6 +105,11 @@ class ArticleTag(models.Model):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
         super().save(*args, **kwargs)
+    
+    @property
+    def article_count(self):
+        """تعداد مقالات منتشر شده با این تگ"""
+        return self.articles.filter(status='published').count()
 
 
 class Article(models.Model):
@@ -156,7 +178,8 @@ class Article(models.Model):
         ArticleTag,
         blank=True,
         related_name='articles',
-        verbose_name='تگ‌ها'
+        verbose_name='تگ‌ها',
+        help_text='تگ‌های مرتبط با این مقاله را انتخاب کنید. هر مقاله می‌تواند چند تگ داشته باشد.'
     )
     
     # Status
@@ -184,7 +207,6 @@ class Article(models.Model):
     
     # Statistics
     view_count = models.PositiveIntegerField(default=0, verbose_name='تعداد بازدید')
-    like_count = models.PositiveIntegerField(default=0, verbose_name='تعداد لایک')
     
     # Settings
     allow_comments = models.BooleanField(default=True, verbose_name='اجازه کامنت')
@@ -243,6 +265,55 @@ class Article(models.Model):
     @property
     def is_published(self):
         return self.status == self.Status.PUBLISHED
+
+
+class ArticleImage(models.Model):
+    """
+    تصاویر اضافی مقاله (گالری تصاویر)
+    هر مقاله می‌تواند چند تصویر داشته باشد
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    article = models.ForeignKey(
+        Article,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name='مقاله'
+    )
+    
+    image = models.ImageField(
+        upload_to='content/articles/gallery/',
+        verbose_name='تصویر'
+    )
+    alt_text = models.CharField(
+        max_length=150,
+        blank=True,
+        verbose_name='متن جایگزین',
+        help_text='توضیح تصویر برای SEO و دسترسی‌پذیری'
+    )
+    caption = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name='عنوان تصویر',
+        help_text='توضیح کوتاه که زیر تصویر نمایش داده می‌شود'
+    )
+    
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name='ترتیب نمایش'
+    )
+    
+    is_active = models.BooleanField(default=True, verbose_name='فعال')
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ آپلود')
+
+    class Meta:
+        verbose_name = 'تصویر مقاله'
+        verbose_name_plural = 'تصاویر مقالات'
+        ordering = ['article', 'order']
+
+    def __str__(self):
+        return f'تصویر {self.order} - {self.article.title[:30]}'
 
 
 class ArticleComment(models.Model):
@@ -416,64 +487,6 @@ class FAQItem(models.Model):
 
     def __str__(self):
         return self.question
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# TESTIMONIALS (نظرات مشتریان)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class Testimonial(models.Model):
-    """
-    نظرات مشتریان / کاربران
-    """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name='کاربر'
-    )
-
-    name = models.CharField(
-        max_length=100,
-        verbose_name='نام شخص',
-        help_text='در صورتی که کاربر وارد نشده باشد (نمایش عمومی)'
-    )
-    role = models.CharField(
-        max_length=120,
-        blank=True,
-        verbose_name='سمت / توضیح کوتاه'
-    )
-
-    avatar = models.ImageField(
-        upload_to='content/testimonials/',
-        blank=True,
-        null=True,
-        verbose_name='عکس'
-    )
-
-    text = models.TextField(max_length=1200, verbose_name='متن نظر')
-
-    rating = models.PositiveSmallIntegerField(
-        default=5,
-        verbose_name='امتیاز (۱ تا ۵)'
-    )
-
-    is_active = models.BooleanField(default=True, verbose_name='فعال')
-    is_featured = models.BooleanField(default=False, verbose_name='نمایش ویژه')
-
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ثبت')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='آخرین بروزرسانی')
-
-    class Meta:
-        verbose_name = 'نظر مشتری'
-        verbose_name_plural = 'نظرات مشتریان'
-        ordering = ['-is_featured', '-created_at']
-
-    def __str__(self):
-        return f'{self.name} - {self.rating}/5'
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

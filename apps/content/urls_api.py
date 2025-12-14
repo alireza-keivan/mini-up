@@ -33,9 +33,6 @@ urlpatterns = [
     # FAQ
     path("faq/", api_views.FAQListAPIView.as_view(), name="faq_list"),
 
-    # Testimonials
-    path("testimonials/", api_views.TestimonialListAPIView.as_view(), name="testimonials"),
-
     # Notifications
     path("notifications/", api_views.NotificationListAPIView.as_view(), name="notifications"),
     path("notifications/mark-read/", api_views.NotificationMarkReadAPIView.as_view(), name="notifications_mark_read"),

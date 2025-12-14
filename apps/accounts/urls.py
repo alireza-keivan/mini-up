@@ -21,6 +21,11 @@ urlpatterns = [
     path('orders/', views.OrdersView.as_view(), name='orders'),  
     path('transactions/', views.transactions_view, name='transactions'),
     path('tickets/', views.tickets_view, name='tickets'),
+    path('tickets/create/', views.ticket_create_view, name='ticket_create'),
+    path('tickets/<str:ticket_id>/', views.ticket_detail_view, name='ticket_detail'),
+    path('tickets/<str:ticket_id>/message/', views.ticket_message_create_view, name='ticket_message_create'),
+    path('tickets/<str:ticket_id>/close/', views.ticket_close_view, name='ticket_close'),
+    path('tickets/<str:ticket_id>/reopen/', views.ticket_reopen_view, name='ticket_reopen'),
     path('settings/', views.settings_view, name='settings'),
     # Profile
     path('profile/', views.ProfileView.as_view(), name='profile'),
