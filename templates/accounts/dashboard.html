@@ -80,7 +80,7 @@
 
     .info-value {
         color: #fff;
-        font-size: 1.125rem;
+        /* font-size: 1.125rem; */
         font-weight: 600;
     }
 
@@ -201,7 +201,7 @@
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
         padding: 1.5rem;
-        margin-bottom: 2rem;
+        /* margin-bottom: 2rem; */
         text-align: center;
     }
 
@@ -604,6 +604,28 @@
         margin-bottom: 1rem;
         opacity: 0.5;
     }
+    .quick-card {
+    min-height: 140px;
+    transition: all 0.3s ease;
+    }
+
+    .quick-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .dashboard-header {
+        direction: rtl;
+    }
+    #myorders{
+        background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 20, 40, 0.95));
+        border-radius: 24px;
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(255, 0, 85, 0.15);
+        backdrop-filter: blur(20px);
+    }
+
 </style>
 {% endblock %}
 
@@ -617,6 +639,86 @@
             <p class="text-gray-400">مدیریت اطلاعات، کیف پول و سفارشات</p>
         </div>
 
+       <!-- Dashboard Header Section -->
+<div class="dashboard-header mb-6">
+    <!-- Top Bar: User Info & Wallet -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+        
+        <!-- Right Side: User Info & Wallet -->
+        <div class="flex items-center gap-3">
+            <!-- User Info -->
+            <div class="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full">
+                <div class="text-left" dir="ltr">
+                    <p class="text-white font-bold text-sm">{{ user.phone }}</p>
+                </div>
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" class="w-10 h-10 rounded-full object-cover border-2 border-blue-500">
+                {% else %}
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                        {{ user.get_full_name.0|default:user.phone.0|default:'U' }}
+                    </div>
+                {% endif %}
+            </div>
+            <!-- Wallet Info -->
+            <div class="flex items-center justify-between gap-2 bg-gray-800 px-4 py-2 rounded-full">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-wallet text-white text-sm"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-gray-400 text-xs">جمع کیف‌پول‌ من</p>
+                        <p class="text-white font-bold text-sm">{{ wallet.total_balance|floatformat:0|intcomma|default:'۰' }} ریال</p>
+                    </div>
+                </div>
+                
+                <!-- Wallet Arrow Button (Inside) -->
+                <a 
+                    href="{% url 'wallet:dashboard' %}"
+                    class="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition flex-shrink-0">
+                    <i class="fas fa-chevron-left text-sm"></i>
+                </a>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <!-- Quick Access Cards -->
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-5" id="myorders">
+        <h3 class="text-right text-gray-400 text-sm mb-4">سفارش</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <!-- سفارش‌های جاری -->
+            <a href="{% url 'orders:order_list' %}" 
+               class="quick-card flex flex-col items-center justify-center p-4 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
+                <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-shopping-bag text-blue-400 text-lg"></i>
+                </div>
+                <span class="text-white font-medium text-sm">سفارش‌های جاری</span>
+            </a>
+            
+            <!-- سفارش‌های لغو شده -->
+            <a href="{% url 'orders:order_list' %}" 
+            class="quick-card flex flex-col items-center justify-center p-4 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
+                <div class="w-10 h-10 bg-red-600/20 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-ban text-red-500 text-lg"></i>
+                </div>
+                <span class="text-white font-medium text-sm">سفارش‌های لغو شده</span>
+            </a>
+
+            <!-- سفارش‌های تحویل داده شده -->
+            <a href="{% url 'orders:order_list' %}" 
+            class="quick-card flex flex-col items-center justify-center p-4 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
+                <div class="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center mb-2">
+                    <i class="fas fa-box-open text-green-500 text-lg"></i>
+                </div>
+                <span class="text-white font-medium text-sm">سفارش‌های تحویل داده</span>
+            </a>
+
+        </div>
+    </div>
+</div>
+
         <!-- Dashboard Card -->
         <div class="dashboard-card" x-data="dashboard()">
             
@@ -628,25 +730,34 @@
                     @click="switchTab('info')"
                     type="button">
                     <i class="fas fa-user"></i>
-                    اطلاعات کاربری
+                    اطلاعات هویتی
                 </button>
-                
+
                 <button 
                     class="tab-button"
-                    :class="{ 'active': activeTab === 'wallet' }"
-                    @click="switchTab('wallet')"
+                    :class="{ 'active': activeTab === 'bank' }"
+                    @click="switchTab('bank')"
                     type="button">
-                    <i class="fas fa-wallet"></i>
-                    کیف پول
+                    <i class="fas fa-credit-card"></i>
+                    اطلاعات بانکی
                 </button>
-                
+
                 <button 
                     class="tab-button"
-                    :class="{ 'active': activeTab === 'orders' }"
-                    @click="switchTab('orders')"
+                    :class="{ 'active': activeTab === 'security' }"
+                    @click="switchTab('security')"
                     type="button">
-                    <i class="fas fa-shopping-bag"></i>
-                    سفارشات
+                    <i class="fas fa-shield-alt"></i>
+                    امنیت حساب
+                </button>
+
+                <button 
+                    class="tab-button"
+                    :class="{ 'active': activeTab === 'addresses' }"
+                    @click="switchTab('addresses')"
+                    type="button">
+                    <i class="fas fa-map-marker-alt"></i>
+                    آدرس های من
                 </button>
             </div>
 
@@ -656,132 +767,114 @@
                 <!-- ═══════════════════════════════════════════════════════
                      TAB 1: USER INFO
                      ═══════════════════════════════════════════════════════ -->
-                <div x-show="activeTab === 'info'" x-transition:enter="transition ease-out duration-200">
-                    <h2 class="text-xl font-bold text-white mb-4">اطلاعات شخصی</h2>
-                    
-                    <!-- Profile Picture Section -->
-                    <div class="profile-picture-section">
-                        {% if user.avatar %}
-                            <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" class="profile-avatar">
-                        {% else %}
-                            <div class="profile-avatar-placeholder">
-                                {{ user.get_full_name.0|default:user.phone.0|default:'U' }}
-                            </div>
-                        {% endif %}
-                        
-                        <h3 class="text-lg font-semibold text-white mb-2">تصویر پروفایل</h3>
-                        <p class="text-sm text-gray-400 mb-4">تصویر پروفایل خود را آپلود کنید</p>
-                        
-                        <input type="file" 
-                               id="avatar-upload" 
-                               accept="image/*" 
-                               style="display: none;"
-                               @change="uploadAvatar($event)">
-                        
-                        <button type="button" 
-                                class="upload-button"
-                                @click="document.getElementById('avatar-upload').click()">
-                            <i class="fas fa-camera"></i> انتخاب تصویر
-                        </button>
+    <div x-show="activeTab === 'info'" x-transition:enter="transition ease-out duration-200">
+        <!-- <h2 class="text-xl font-bold text-white mb-4">اطلاعات شخصی</h2> -->
+        
+        <!-- Grid Container -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            
+            <!-- Profile Picture Section -->
+            <div class="profile-picture-section md:col-span-2 lg:col-span-1">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" class="profile-avatar">
+                {% else %}
+                    <div class="profile-avatar-placeholder">
+                        {{ user.get_full_name.0|default:user.phone.0|default:'U' }}
                     </div>
+                {% endif %}
+                
+                <h3 class="text-lg font-semibold text-white mb-2">تصویر پروفایل</h3>
+                <p class="text-sm text-gray-400 mb-4">تصویر پروفایل خود را آپلود کنید</p>
+                
+                <input type="file" 
+                    id="avatar-upload" 
+                    accept="image/*" 
+                    style="display: none;"
+                    @change="uploadAvatar($event)">
+                
+                <button type="button" 
+                        class="upload-button w-full"
+                        @click="document.getElementById('avatar-upload').click()">
+                    <i class="fas fa-camera"></i> انتخاب تصویر
+                </button>
+            </div>
 
-                    <!-- Personal Information -->
-                    <h3 class="section-title">
-                        <i class="fas fa-user-circle"></i>
-                        اطلاعات شخصی
-                    </h3>
-                    
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">نام</div>
-                            <input 
-                                type="text" 
-                                class="info-input" 
-                                x-model="userData.first_name"
-                                placeholder="نام خود را وارد کنید">
-                        </div>
-                        
-                        <div class="info-item">
-                            <div class="info-label">نام خانوادگی</div>
-                            <input 
-                                type="text" 
-                                class="info-input" 
-                                x-model="userData.last_name"
-                                placeholder="نام خانوادگی">
-                        </div>
-                        
-                        <div class="info-item">
-                            <div class="info-label">شماره موبایل</div>
-                            <div class="info-value" dir="ltr">{{ user.phone }}</div>
-                        </div>
-                        
-                        {% if user.google_id %}
-                        <div class="info-item">
-                            <div class="info-label">حساب Google</div>
-                            <div class="info-value flex items-center gap-2">
-                                <i class="fab fa-google text-red-500"></i>
-                                متصل شده
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        {% if profile %}
-                        <div class="info-item">
-                            <div class="info-label">کد ملی</div>
-                            <input 
-                                type="text" 
-                                class="info-input" 
-                                x-model="userData.national_code"
-                                placeholder="کد ملی (اختیاری)"
-                                maxlength="10"
-                                dir="ltr">
-                        </div>
-                        {% endif %}
+            <!-- Personal Information -->
+            <div class="md:col-span-2 lg:col-span-2">
+                <h3 class="section-title">
+                    <!-- <i class="fas fa-user-circle"></i>
+                    اطلاعات شخصی -->
+                </h3>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">نام</div>
+                        <input 
+                            type="text" 
+                            class="info-input" 
+                            x-model="userData.first_name"
+                            placeholder="نام خود را وارد کنید">
                     </div>
-
-                    <!-- Addresses Section -->
-                    <h3 class="section-title">
-                        <i class="fas fa-map-marker-alt"></i>
-                        آدرس‌های من
-                    </h3>
                     
-                    {% if addresses %}
-                        {% for address in addresses %}
-                        <div class="address-card {% if address.is_default %}default{% endif %}">
-                            {% if address.is_default %}
-                            <span class="default-badge">پیش‌فرض</span>
-                            {% endif %}
-                            
-                            <div class="flex items-start justify-between mb-2">
-                                <div>
-                                    <h4 class="text-white font-semibold mb-1">{{ address.title }}</h4>
-                                    <p class="text-sm text-gray-400">{{ address.recipient_name }} - {{ address.recipient_phone }}</p>
-                                </div>
-                            </div>
-                            
-                            <p class="text-sm text-gray-300 mb-2">
-                                {{ address.province }}، {{ address.city }}
-                            </p>
-                            <p class="text-sm text-gray-400 mb-2">
-                                {{ address.full_address }}
-                            </p>
-                            <p class="text-xs text-gray-500" dir="ltr">
-                                کد پستی: {{ address.postal_code }}
-                            </p>
+                    <div class="info-item">
+                        <div class="info-label">نام خانوادگی</div>
+                        <input 
+                            type="text" 
+                            class="info-input" 
+                            x-model="userData.last_name"
+                            placeholder="نام خانوادگی">
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">شماره موبایل</div>
+                        <div class="info-value" dir="ltr">{{ user.phone }}</div>
+                    </div>
+                    
+                    {% if user.google_id %}
+                    <div class="info-item">
+                        <div class="info-label">حساب Google</div>
+                        <div class="info-value flex items-center gap-2">
+                            <i class="fab fa-google text-red-500"></i>
+                            متصل شده
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state" style="padding: 2rem 1rem;">
-                            <i class="fas fa-map-marked-alt"></i>
-                            <p>هنوز آدرسی ثبت نکرده‌اید</p>
-                        </div>
+                    </div>
                     {% endif %}
                     
-                    <button type="button" class="add-button" @click="showAddAddressModal = true">
-                        <i class="fas fa-plus"></i>
-                        افزودن آدرس جدید
-                    </button>
+                    {% if profile %}
+                    <div class="info-item">
+                        <div class="info-label">کد ملی</div>
+                        <input 
+                            type="text" 
+                            class="info-input" 
+                            x-model="userData.national_code"
+                            placeholder="کد ملی (اختیاری)"
+                            maxlength="10"
+                            dir="ltr">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
+        <!-- دکمه ذخیره تغییرات -->
+        <button @click="savePersonalInfo()" 
+                :disabled="saving"
+                class="save-button">
+            <span x-show="!saving">
+                <i class="fas fa-save"></i> ذخیره تغییرات
+            </span>
+            <span x-show="saving">
+                <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
+            </span>
+        </button>
+    </div>
+
+                <!-- ═══════════════════════════════════════════════════════
+                     TAB 2: BANK CARDS (اطلاعات بانکی)
+                     ═══════════════════════════════════════════════════════ -->
+                <div x-show="activeTab === 'bank'" x-transition:enter="transition ease-out duration-200">
+                    <h2 class="text-xl font-bold text-white mb-4">اطلاعات بانکی</h2>
+                    
                     <!-- Bank Cards Section -->
                     <h3 class="section-title">
                         <i class="fas fa-credit-card"></i>
@@ -829,22 +922,128 @@
                         <i class="fas fa-plus"></i>
                         افزودن کارت جدید
                     </button>
-                    
-                    <!-- Save Button (Only on User Info tab) -->
-                    <button 
-                        type="button"
-                        class="save-button"
-                        @click="saveUserData()"
-                        :disabled="saving">
-                        <span x-show="!saving">
-                            <i class="fas fa-save"></i> ذخیره تغییرات
-                        </span>
-                        <span x-show="saving">
-                            <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
-                        </span>
-                    </button>
+                </div>
 
-                    <!-- Add Address Modal -->
+                <!-- ═══════════════════════════════════════════════════════
+                     TAB 3: SECURITY (امنیت حساب)
+                     ═══════════════════════════════════════════════════════ -->
+                <div x-show="activeTab === 'security'" x-transition:enter="transition ease-out duration-200">
+                    <h2 class="text-xl font-bold text-white mb-4">امنیت حساب</h2>
+                    
+                    <!-- Password Change Section -->
+                    <h3 class="section-title">
+                        <i class="fas fa-lock"></i>
+                        تغییر رمز عبور
+                    </h3>
+                    
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <form @submit.prevent="changePassword()">
+                            <div class="form-group">
+                                <label class="form-label">رمز عبور فعلی</label>
+                                <input type="password" 
+                                       class="form-input" 
+                                       x-model="securityForm.current_password"
+                                       placeholder="رمز عبور فعلی"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">رمز عبور جدید</label>
+                                <input type="password" 
+                                       class="form-input" 
+                                       x-model="securityForm.new_password"
+                                       placeholder="رمز عبور جدید"
+                                       minlength="8"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">تکرار رمز عبور جدید</label>
+                                <input type="password" 
+                                       class="form-input" 
+                                       x-model="securityForm.confirm_password"
+                                       placeholder="تکرار رمز عبور جدید"
+                                       minlength="8"
+                                       required>
+                            </div>
+
+                            <button type="submit" 
+                                    class="save-button"
+                                    :disabled="changingPassword">
+                                <span x-show="!changingPassword">
+                                    <i class="fas fa-key"></i> تغییر رمز عبور
+                                </span>
+                                <span x-show="changingPassword">
+                                    <i class="fas fa-spinner fa-spin"></i> در حال تغییر...
+                                </span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Login History -->\n                    <h3 class="section-title">
+                        <i class="fas fa-history"></i>
+                        تاریخچه ورود به سیستم
+                    </h3>
+                    
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <p>تاریخچه ورودی در حال توسعه است</p>
+                    </div>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════
+                     TAB 4: ADDRESSES (آدرس های من)
+                     ═══════════════════════════════════════════════════════ -->
+                <div x-show="activeTab === 'addresses'" x-transition:enter="transition ease-out duration-200">
+                    <h2 class="text-xl font-bold text-white mb-4">آدرس‌های من</h2>
+                    
+                    <!-- Addresses Section -->
+                    <h3 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        لیست آدرس‌ها
+                    </h3>
+                    
+                    {% if addresses %}
+                        {% for address in addresses %}
+                        <div class="address-card {% if address.is_default %}default{% endif %}">
+                            {% if address.is_default %}
+                            <span class="default-badge">پیش‌فرض</span>
+                            {% endif %}
+                            
+                            <div class="flex items-start justify-between mb-2">
+                                <div>
+                                    <h4 class="text-white font-semibold mb-1">{{ address.title }}</h4>
+                                    <p class="text-sm text-gray-400">{{ address.recipient_name }} - {{ address.recipient_phone }}</p>
+                                </div>
+                            </div>
+                            
+                            <p class="text-sm text-gray-300 mb-2">
+                                {{ address.province }}، {{ address.city }}
+                            </p>
+                            <p class="text-sm text-gray-400 mb-2">
+                                {{ address.full_address }}
+                            </p>
+                            <p class="text-xs text-gray-500" dir="ltr">
+                                کد پستی: {{ address.postal_code }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state" style="padding: 2rem 1rem;">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <p>هنوز آدرسی ثبت نکرده‌اید</p>
+                        </div>
+                    {% endif %}
+                    
+                    <button type="button" class="add-button" @click="showAddAddressModal = true">
+                        <i class="fas fa-plus"></i>
+                        افزودن آدرس جدید
+                    </button>
+                </div>
+
+                <!-- ═══════════════════════════════════════════════════════
+                     TAB 5: WALLET
+                     ═══════════════════════════════════════════════════════ -->
                     <div x-show="showAddAddressModal" 
                          class="modal-overlay" 
                          @click.self="showAddAddressModal = false"
@@ -1059,151 +1258,6 @@
 
                 </div>
 
-                <!-- ═══════════════════════════════════════════════════════
-                     TAB 2: WALLET
-                     ═══════════════════════════════════════════════════════ -->
-                <div x-show="activeTab === 'wallet'" x-transition:enter="transition ease-out duration-200">
-                    <h2 class="text-xl font-bold text-white mb-4">کیف پول</h2>
-                    
-                    {% if wallet %}
-                    <!-- Wallet Balance -->
-                    <div class="wallet-balance">
-                        <div class="text-gray-400">موجودی کیف پول</div>
-                        <div class="balance-amount" x-text="formatCurrency(walletData.balance)">
-                            {{ wallet.total_balance|floatformat:0|intcomma }} تومان
-                        </div>
-                        <div class="text-sm text-gray-400 mt-2">
-                            موجودی هدیه: <span class="text-purple-400" x-text="formatCurrency(walletData.gift_balance)">{{ wallet.gift_balance|floatformat:0|intcomma }}</span> تومان
-                        </div>
-                    </div>
-
-                    <!-- Deposit Form -->
-                    <div class="deposit-form">
-                        <h3 class="text-lg font-semibold text-white mb-4">شارژ کیف پول</h3>
-                        
-                        <input 
-                            type="number" 
-                            class="amount-input" 
-                            x-model="depositData.amount"
-                            placeholder="مبلغ مورد نظر را وارد کنید (تومان)"
-                            min="10000"
-                            max="50000000">
-                        
-                        <!-- Quick Amount Buttons -->
-                        <div class="quick-amounts">
-                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(50000)">
-                                ۵۰,۰۰۰
-                            </button>
-                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(100000)">
-                                ۱۰۰,۰۰۰
-                            </button>
-                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(200000)">
-                                ۲۰۰,۰۰۰
-                            </button>
-                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(500000)">
-                                ۵۰۰,۰۰۰
-                            </button>
-                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(1000000)">
-                                ۱,۰۰۰,۰۰۰
-                            </button>
-                            <button type="button" class="quick-amount-btn" @click="setDepositAmount(2000000)">
-                                ۲,۰۰۰,۰۰۰
-                            </button>
-                        </div>
-
-                        <button 
-                            type="button"
-                            class="deposit-button"
-                            @click="processDeposit()"
-                            :disabled="depositProcessing || !depositData.amount || depositData.amount < 10000">
-                            <span x-show="!depositProcessing">
-                                <i class="fas fa-credit-card"></i> پرداخت و شارژ
-                            </span>
-                            <span x-show="depositProcessing">
-                                <i class="fas fa-spinner fa-spin"></i> در حال انتقال به درگاه...
-                            </span>
-                        </button>
-
-                        <div class="text-xs text-gray-400 text-center mt-2">
-                            حداقل مبلغ شارژ: ۱۰,۰۰۰ تومان | حداکثر: ۵۰,۰۰۰,۰۰۰ تومان
-                        </div>
-                    </div>
-
-                    <!-- Recent Transactions -->
-                    <h3 class="text-lg font-semibold text-white mb-3">آخرین تراکنش‌ها</h3>
-                    {% if wallet_transactions %}
-                    <div class="transaction-list">
-                        {% for transaction in wallet_transactions %}
-                        <div class="transaction-item">
-                            <div>
-                                <div class="text-white font-medium">{{ transaction.description }}</div>
-                                <div class="text-sm text-gray-400">{{ transaction.created_at|date:"Y/m/d H:i" }}</div>
-                            </div>
-                            <div class="transaction-amount {% if transaction.transaction_type == 'deposit' or transaction.transaction_type == 'refund' %}positive{% else %}negative{% endif %}">
-                                {% if transaction.transaction_type == 'deposit' or transaction.transaction_type == 'refund' %}+{% else %}-{% endif %}
-                                {{ transaction.amount|floatformat:0|intcomma }} تومان
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-receipt"></i>
-                        <p>هنوز تراکنشی ثبت نشده است</p>
-                    </div>
-                    {% endif %}
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-wallet"></i>
-                        <p>کیف پول در حال بارگذاری...</p>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- ═══════════════════════════════════════════════════════
-                     TAB 3: ORDERS
-                     ═══════════════════════════════════════════════════════ -->
-                <div x-show="activeTab === 'orders'" x-transition:enter="transition ease-out duration-200">
-                    <h2 class="text-xl font-bold text-white mb-4">سفارشات من</h2>
-                    
-                    <div class="mb-4">
-                        <span class="text-gray-400">تعداد کل سفارشات:</span>
-                        <span class="text-white font-semibold">{{ orders_count|default:0 }}</span>
-                    </div>
-
-                    {% if orders %}
-                    <div class="orders-list">
-                        {% for order in orders %}
-                        <div class="order-item">
-                            <div class="order-header">
-                                <div>
-                                    <div class="text-white font-semibold">سفارش #{{ order.id }}</div>
-                                    <div class="text-sm text-gray-400">{{ order.created_at|date:"Y/m/d H:i" }}</div>
-                                </div>
-                                <div class="order-status {{ order.status }}">
-                                    {{ order.get_status_display }}
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center mt-2">
-                                <div class="text-gray-400">مبلغ:</div>
-                                <div class="text-white font-semibold">
-                                    {{ order.total_amount|floatformat:0|intcomma }} تومان
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-shopping-bag"></i>
-                        <p>هنوز سفارشی ثبت نکرده‌اید</p>
-                        <a href="/" class="inline-block mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition">
-                            شروع خرید
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-
             </div>
 
         </div>
@@ -1261,6 +1315,15 @@ function dashboard() {
             is_default: false
         },
 
+        // Security Form Data
+        securityForm: {
+            current_password: '',
+            new_password: '',
+            confirm_password: ''
+        },
+
+        changingPassword: false,
+
         // Initialize component
         init() {
             // Check URL hash and switch to appropriate tab
@@ -1275,7 +1338,7 @@ function dashboard() {
         // Check URL hash and switch tab
         checkHashAndSwitchTab() {
             const hash = window.location.hash.substring(1); // Remove #
-            const validTabs = ['info', 'wallet', 'orders'];
+            const validTabs = ['info', 'bank', 'security', 'addresses'];
             
             if (hash && validTabs.includes(hash)) {
                 this.activeTab = hash;
@@ -1571,6 +1634,59 @@ function dashboard() {
         showNotification(message, type) {
             // Simple notification - enhance with toast library if needed
             alert(message);
+        },
+
+        // Change Password
+        async changePassword() {
+            // Validate passwords match
+            if (this.securityForm.new_password !== this.securityForm.confirm_password) {
+                this.showNotification('❌ رمز عبور جدید و تکرار آن یکسان نیستند', 'error');
+                return;
+            }
+
+            // Validate password length
+            if (this.securityForm.new_password.length < 8) {
+                this.showNotification('❌ رمز عبور باید حداقل 8 کاراکتر باشد', 'error');
+                return;
+            }
+
+            this.changingPassword = true;
+
+            try {
+                const csrfToken = this.getCSRFToken();
+                const response = await fetch('{% url "accounts:dashboard" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        action: 'change_password',
+                        ...this.securityForm
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.showNotification('✅ رمز عبور با موفقیت تغییر کرد', 'success');
+                    // Reset form
+                    this.securityForm = {
+                        current_password: '',
+                        new_password: '',
+                        confirm_password: ''
+                    };
+                } else {
+                    this.showNotification('❌ ' + (data.message || 'خطا در تغییر رمز عبور'), 'error');
+                }
+            } catch (error) {
+                console.error('Change password error:', error);
+                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
+            } finally {
+                this.changingPassword = false;
+            }
         }
     };
 }

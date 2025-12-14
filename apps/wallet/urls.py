@@ -3,6 +3,9 @@
 from django.urls import path
 from django.views.generic import RedirectView
 from .views import (
+    WalletDashboardView,
+    WalletDepositView,
+    WalletTransactionsView,
     WalletDepositVerifyView,
     WalletBalanceAPIView,
 )
@@ -10,10 +13,10 @@ from .views import (
 app_name = 'wallet'
 
 urlpatterns = [
-    # Redirect old wallet pages to dashboard
-    path('', RedirectView.as_view(pattern_name='accounts:dashboard', permanent=False), name='dashboard'),
-    path('deposit/', RedirectView.as_view(pattern_name='accounts:dashboard', permanent=False), name='deposit'),
-    path('transactions/', RedirectView.as_view(pattern_name='accounts:dashboard', permanent=False), name='transactions'),
+    # صفحات اصلی کیف پول
+    path('', WalletDashboardView.as_view(), name='dashboard'),
+    path('deposit/', WalletDepositView.as_view(), name='deposit'),
+    path('transactions/', WalletTransactionsView.as_view(), name='transactions'),
     
     # پردازش شارژ - keep these for payment gateway callbacks
     path('deposit/verify/', WalletDepositVerifyView.as_view(), name='deposit_verify'),
