@@ -169,17 +169,117 @@ def custom_500(request):
 
 def search_view(request):
     """
-    صفحه جستجو
+    صفحه جستجو - جستجو در محصولات با فیلترهای پیشرفته
     """
-    query = request.GET.get('q', '')
-    results = []
+    from apps.products.models import Product, Category, Brand
+    from django.db.models import Q
+    from django.core.paginator import Paginator
     
-    # TODO: پیاده‌سازی جستجو در محصولات و خدمات
+    query = request.GET.get('q', '').strip()
+    category_slug = request.GET.get('category', '')
+    brand_slug = request.GET.get('brand', '')
+    product_type = request.GET.get('type', '')  # virtual, physical, game_currency
+    min_price = request.GET.get('min_price', '')
+    max_price = request.GET.get('max_price', '')
+    sort_by = request.GET.get('sort', 'newest')  # newest, price_low, price_high, popular, bestseller
+    page_number = request.GET.get('page', 1)
+    
+    # Start with active products
+    products = Product.objects.filter(is_active=True).select_related('category', 'brand').prefetch_related('images')
+    
+    # Search query - search in name, description, short_description
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(name_en__icontains=query) |
+            Q(short_description__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query) |
+            Q(brand__name__icontains=query)
+        )
+    
+    # Filter by category
+    selected_category = None
+    if category_slug:
+        try:
+            selected_category = Category.objects.get(slug=category_slug, is_active=True)
+            # Include products from this category and all subcategories
+            category_ids = [selected_category.id]
+            category_ids.extend([child.id for child in selected_category.get_all_children()])
+            products = products.filter(category_id__in=category_ids)
+        except Category.DoesNotExist:
+            pass
+    
+    # Filter by brand
+    selected_brand = None
+    if brand_slug:
+        try:
+            selected_brand = Brand.objects.get(slug=brand_slug, is_active=True)
+            products = products.filter(brand=selected_brand)
+        except Brand.DoesNotExist:
+            pass
+    
+    # Filter by product type
+    if product_type and product_type in ['virtual', 'physical', 'game_currency']:
+        products = products.filter(product_type=product_type)
+    
+    # Filter by price range
+    if min_price and min_price.isdigit():
+        products = products.filter(price__gte=int(min_price))
+    if max_price and max_price.isdigit():
+        products = products.filter(price__lte=int(max_price))
+    
+    # Sorting
+    if sort_by == 'price_low':
+        products = products.order_by('price')
+    elif sort_by == 'price_high':
+        products = products.order_by('-price')
+    elif sort_by == 'popular':
+        products = products.order_by('-view_count')
+    elif sort_by == 'bestseller':
+        products = products.order_by('-sales_count')
+    elif sort_by == 'name_asc':
+        products = products.order_by('name')
+    elif sort_by == 'name_desc':
+        products = products.order_by('-name')
+    else:  # newest (default)
+        products = products.order_by('-created_at')
+    
+    # Get total count before pagination
+    total_count = products.count()
+    
+    # Pagination
+    paginator = Paginator(products, 12)  # 12 products per page
+    page_obj = paginator.get_page(page_number)
+    
+    # Get filter options for sidebar
+    all_categories = Category.objects.filter(is_active=True, parent__isnull=True).prefetch_related('children')
+    all_brands = Brand.objects.filter(is_active=True, products__is_active=True).distinct().order_by('name')
+    
+    # Price range suggestions (based on all active products)
+    price_ranges = [
+        {'label': 'زیر ۱۰۰,۰۰۰ تومان', 'min': 0, 'max': 100000},
+        {'label': '۱۰۰,۰۰۰ - ۵۰۰,۰۰۰ تومان', 'min': 100000, 'max': 500000},
+        {'label': '۵۰۰,۰۰۰ - ۱,۰۰۰,۰۰۰ تومان', 'min': 500000, 'max': 1000000},
+        {'label': '۱,۰۰۰,۰۰۰ - ۵,۰۰۰,۰۰۰ تومان', 'min': 1000000, 'max': 5000000},
+        {'label': 'بالای ۵,۰۰۰,۰۰۰ تومان', 'min': 5000000, 'max': 999999999},
+    ]
     
     context = {
-        'page_title': f'جستجو: {query}' if query else 'جستجو',
+        'page_title': f'جستجو: {query}' if query else 'جستجو در محصولات',
         'query': query,
-        'results': results,
+        'products': page_obj,
+        'page_obj': page_obj,
+        'total_count': total_count,
+        'all_categories': all_categories,
+        'all_brands': all_brands,
+        'selected_category': selected_category,
+        'selected_brand': selected_brand,
+        'product_type': product_type,
+        'min_price': min_price,
+        'max_price': max_price,
+        'sort_by': sort_by,
+        'price_ranges': price_ranges,
     }
     return render(request, 'core/search.html', context)
 
@@ -190,39 +290,205 @@ def search_api_view(request):
     """
     API جستجو برای autocomplete و AJAX
     GET /search/api/?q=...
+    Returns JSON with product suggestions for autocomplete
     """
+    from apps.products.models import Product, Category
+    from django.db.models import Q
+    
     query = request.GET.get('q', '').strip()
+    limit = int(request.GET.get('limit', 10))
     
     if len(query) < 2:
-        return JsonResponse({'success': True, 'results': []})
+        return JsonResponse({'success': True, 'query': query, 'results': [], 'count': 0})
     
     results = []
     
-    # TODO: جستجو در محصولات
-    # از apps.products.models import Product
-    # products = Product.objects.filter(name__icontains=query)[:5]
-    # for p in products:
-    #     results.append({
-    #         'type': 'product',
-    #         'title': p.name,
-    #         'url': p.get_absolute_url(),
-    #         'image': p.image.url if p.image else None,
-    #     })
+    # Search in products - name, short description, category
+    products = Product.objects.filter(
+        Q(name__icontains=query) |
+        Q(name_en__icontains=query) |
+        Q(short_description__icontains=query) |
+        Q(category__name__icontains=query) |
+        Q(brand__name__icontains=query),
+        is_active=True
+    ).select_related('category', 'brand').prefetch_related('images')[:limit]
+    
+    for product in products:
+        # Get first additional image if available
+        first_image = product.images.filter(is_active=True).first()
+        
+        # Build result object
+        result = {
+            'type': 'product',
+            'id': product.id,
+            'title': product.name,
+            'slug': product.slug,
+            'url': f'/products/{product.slug}/',  # Adjust based on your URL pattern
+            'price': product.price,
+            'original_price': product.original_price,
+            'discount_percentage': product.discount_percentage,
+            'category': product.category.name if product.category else None,
+            'brand': product.brand.name if product.brand else None,
+            'product_type': product.get_product_type_display(),
+            'is_in_stock': product.is_in_stock,
+            'image': None,
+        }
+        
+        # Add image URL if available
+        if product.main_image:
+            result['image'] = product.main_image.url
+        elif first_image:
+            result['image'] = first_image.image.url
+        
+        results.append(result)
+    
+    # Also search in categories (optional - can help with navigation)
+    if len(results) < limit:
+        remaining = limit - len(results)
+        categories = Category.objects.filter(
+            Q(name__icontains=query) |
+            Q(name_en__icontains=query),
+            is_active=True
+        )[:remaining]
+        
+        for category in categories:
+            result = {
+                'type': 'category',
+                'id': category.id,
+                'title': category.name,
+                'slug': category.slug,
+                'url': f'/category/{category.slug}/',
+                'product_count': category.get_active_products_count(),
+                'image': category.image.url if category.image else None,
+            }
+            results.append(result)
     
     return JsonResponse({
         'success': True,
         'query': query,
         'results': results,
+        'count': len(results),
     })
 
 def category_view(request, slug):
     """
-    صفحه دسته‌بندی محصولات
+    صفحه دسته‌بندی محصولات - نمایش محصولات یک دسته‌بندی خاص
     """
-    # TODO: پیاده‌سازی کامل با مدل Category
+    from apps.products.models import Product, Category, Brand
+    from django.shortcuts import get_object_or_404
+    from django.core.paginator import Paginator
+    from django.db.models import Q
+    
+    # Get category or 404
+    category = get_object_or_404(Category, slug=slug, is_active=True)
+    
+    # Get filter parameters
+    brand_slug = request.GET.get('brand', '')
+    min_price = request.GET.get('min_price', '')
+    max_price = request.GET.get('max_price', '')
+    sort_by = request.GET.get('sort', 'newest')
+    page_number = request.GET.get('page', 1)
+    search_query = request.GET.get('q', '').strip()
+    
+    # Get products from this category and all subcategories
+    category_ids = [category.id]
+    category_ids.extend([child.id for child in category.get_all_children()])
+    
+    products = Product.objects.filter(
+        category_id__in=category_ids,
+        is_active=True
+    ).select_related('category', 'brand').prefetch_related('images')
+    
+    # Search within category
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(name_en__icontains=search_query) |
+            Q(short_description__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+    
+    # Filter by brand
+    selected_brand = None
+    if brand_slug:
+        try:
+            selected_brand = Brand.objects.get(slug=brand_slug, is_active=True)
+            products = products.filter(brand=selected_brand)
+        except Brand.DoesNotExist:
+            pass
+    
+    # Filter by price range
+    if min_price and min_price.isdigit():
+        products = products.filter(price__gte=int(min_price))
+    if max_price and max_price.isdigit():
+        products = products.filter(price__lte=int(max_price))
+    
+    # Sorting
+    if sort_by == 'price_low':
+        products = products.order_by('price')
+    elif sort_by == 'price_high':
+        products = products.order_by('-price')
+    elif sort_by == 'popular':
+        products = products.order_by('-view_count')
+    elif sort_by == 'bestseller':
+        products = products.order_by('-sales_count')
+    elif sort_by == 'name_asc':
+        products = products.order_by('name')
+    elif sort_by == 'name_desc':
+        products = products.order_by('-name')
+    elif sort_by == 'featured':
+        products = products.order_by('-is_featured', '-created_at')
+    else:  # newest (default)
+        products = products.order_by('-created_at')
+    
+    # Get total count
+    total_count = products.count()
+    
+    # Pagination
+    paginator = Paginator(products, 12)  # 12 products per page
+    page_obj = paginator.get_page(page_number)
+    
+    # Get subcategories for navigation
+    subcategories = category.children.filter(is_active=True).order_by('sort_order', 'name')
+    
+    # Get brands available in this category
+    available_brands = Brand.objects.filter(
+        is_active=True,
+        products__category_id__in=category_ids,
+        products__is_active=True
+    ).distinct().order_by('name')
+    
+    # Price range calculations
+    from django.db.models import Min, Max
+    price_stats = Product.objects.filter(
+        category_id__in=category_ids,
+        is_active=True
+    ).aggregate(
+        min_price=Min('price'),
+        max_price=Max('price')
+    )
+    
+    # Featured products in this category
+    featured_products = Product.objects.filter(
+        category_id__in=category_ids,
+        is_active=True,
+        is_featured=True
+    ).select_related('category', 'brand')[:4]
+    
     context = {
-        'page_title': f'دسته‌بندی: {slug}',
-        'category_slug': slug,
-        'products': [],
+        'page_title': f'{category.name}',
+        'category': category,
+        'products': page_obj,
+        'page_obj': page_obj,
+        'total_count': total_count,
+        'subcategories': subcategories,
+        'available_brands': available_brands,
+        'selected_brand': selected_brand,
+        'min_price': min_price,
+        'max_price': max_price,
+        'sort_by': sort_by,
+        'search_query': search_query,
+        'price_stats': price_stats,
+        'featured_products': featured_products,
     }
     return render(request, 'core/category.html', context)

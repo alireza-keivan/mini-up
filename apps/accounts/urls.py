@@ -17,6 +17,10 @@ urlpatterns = [
     path('verify/', views.VerifyView.as_view(), name='verify'),
     path('resend-otp/', views.ResendOTPView.as_view(), name='resend_otp'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
+    
+    # Google OAuth
+    path('login/google/', views.GoogleLoginView.as_view(), name='google_login'),
+    path('login/google/callback/', views.GoogleCallbackView.as_view(), name='google_callback'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'), 
     path('orders/', views.OrdersView.as_view(), name='orders'),  
     path('transactions/', views.transactions_view, name='transactions'),
@@ -42,8 +46,11 @@ urlpatterns = [
     path('api/notifications/delete/', api_views.delete_notification_api, name='api_notifications_delete'),
     path('bank-card/add/', views.AddBankCardView.as_view(), name='add_bank_card'),
     path('bank-card/delete/<int:card_id>/', views.DeleteBankCardView.as_view(), name='delete_bank_card'),
+    path('bank-card/set-default/<int:card_id>/', views.SetDefaultBankCardView.as_view(), name='set_default_bank_card'),
+    path('bank-card/list/', views.GetBankCardsView.as_view(), name='list_bank_cards'),
     path('address/add/', views.AddAddressView.as_view(), name='add_address'),
     path('address/delete/<int:address_id>/', views.DeleteAddressView.as_view(), name='delete_address'),
     path('address/set-default/<int:address_id>/', views.SetDefaultAddressView.as_view(), name='set_default_address'),
     path('address/edit/<int:address_id>/', views.EditAddressView.as_view(), name='edit_address'),
+    path('address/list/', views.GetAddressesView.as_view(), name='list_addresses'),
 ]

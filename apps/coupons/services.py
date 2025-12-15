@@ -119,9 +119,18 @@ class CouponService:
             Q(allowed_users__isnull=True) | Q(allowed_users=user)
         ).distinct()
         
-        # Get user's usage counts
+        # Get user's usage counts (فقط سفارشات پرداخت شده)
+        from apps.orders.models import Order
         user_usages = CouponUsage.objects.filter(
-            user=user
+            user=user,
+            order__status__in=[
+                Order.Status.PROCESSING,  # پس از پرداخت موفق
+                Order.Status.CONFIRMED,
+                Order.Status.PREPARING,
+                Order.Status.SHIPPED,
+                Order.Status.DELIVERED,
+                Order.Status.COMPLETED
+            ]
         ).values('coupon_id').annotate(
             usage_count=Count('id')
         )
@@ -202,10 +211,20 @@ class CouponService:
             if not coupon.allowed_users.filter(id=user.id).exists():
                 return False, 'این کوپن برای شما فعال نیست', None
         
-        # Check per-user usage limit
+        # Check per-user usage limit (فقط سفارشات پرداخت شده)
+        # ⚠️ مهم: فقط سفارشات پرداخت شده را حساب می‌کنیم، نه سفارشات معلق
+        from apps.orders.models import Order
         user_usage_count = CouponUsage.objects.filter(
             coupon=coupon,
-            user=user
+            user=user,
+            order__status__in=[
+                Order.Status.PROCESSING,  # پس از پرداخت موفق
+                Order.Status.CONFIRMED,
+                Order.Status.PREPARING,
+                Order.Status.SHIPPED,
+                Order.Status.DELIVERED,
+                Order.Status.COMPLETED
+            ]
         ).count()
         
         if user_usage_count >= coupon.max_uses_per_user:

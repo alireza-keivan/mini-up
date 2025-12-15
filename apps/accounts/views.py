@@ -966,11 +966,115 @@ class OrdersView(LoginRequiredMixin, TemplateView):
 @login_required
 def transactions_view(request):
     """
-    نمایش تراکنش‌های کاربر
+    نمایش تراکنش‌های کیف پول کاربر
+    Display user's wallet transactions with filtering and pagination
     """
+    from apps.wallet.models import WalletTransaction, Wallet
+    from django.core.paginator import Paginator
+    from django.db.models import Sum, Q
+    from decimal import Decimal
+    
+    # Get or create user's wallet
+    wallet, created = Wallet.objects.get_or_create(user=request.user)
+    
+    # Get all transactions for user's wallet
+    transactions = WalletTransaction.objects.filter(
+        wallet=wallet
+    ).select_related(
+        'wallet',
+        'order',
+        'payment_transaction',
+        'performed_by'
+    ).order_by('-created_at')
+    
+    # Filter by transaction type
+    transaction_type = request.GET.get('type', '')
+    if transaction_type and transaction_type in dict(WalletTransaction.TransactionType.choices):
+        transactions = transactions.filter(transaction_type=transaction_type)
+    
+    # Filter by status
+    status = request.GET.get('status', '')
+    if status and status in dict(WalletTransaction.TransactionStatus.choices):
+        transactions = transactions.filter(status=status)
+    
+    # Date range filter
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    
+    if date_from:
+        from datetime import datetime
+        try:
+            date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
+            transactions = transactions.filter(created_at__gte=date_from_obj)
+        except ValueError:
+            pass
+    
+    if date_to:
+        from datetime import datetime
+        try:
+            date_to_obj = datetime.strptime(date_to, '%Y-%m-%d')
+            transactions = transactions.filter(created_at__lte=date_to_obj)
+        except ValueError:
+            pass
+    
+    # Search by description or transaction_id
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        transactions = transactions.filter(
+            Q(description__icontains=search_query) |
+            Q(transaction_id__icontains=search_query)
+        )
+    
+    # Calculate statistics
+    total_count = transactions.count()
+    
+    # Calculate totals by status
+    completed_transactions = transactions.filter(status=WalletTransaction.TransactionStatus.COMPLETED)
+    total_deposits = completed_transactions.filter(
+        transaction_type__in=[
+            WalletTransaction.TransactionType.DEPOSIT,
+            WalletTransaction.TransactionType.REFUND,
+            WalletTransaction.TransactionType.GIFT,
+            WalletTransaction.TransactionType.CASHBACK,
+            WalletTransaction.TransactionType.TRANSFER_IN
+        ]
+    ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+    
+    total_withdrawals = completed_transactions.filter(
+        transaction_type__in=[
+            WalletTransaction.TransactionType.WITHDRAW,
+            WalletTransaction.TransactionType.PURCHASE,
+            WalletTransaction.TransactionType.TRANSFER_OUT
+        ]
+    ).aggregate(total=Sum('amount'))['total'] or Decimal('0')
+    
+    # Make withdrawals positive for display
+    total_withdrawals = abs(total_withdrawals)
+    
+    # Pagination
+    page_number = request.GET.get('page', 1)
+    paginator = Paginator(transactions, 20)  # 20 transactions per page
+    page_obj = paginator.get_page(page_number)
+    
+    # Transaction type choices for filter
+    transaction_types = WalletTransaction.TransactionType.choices
+    status_choices = WalletTransaction.TransactionStatus.choices
+    
     context = {
         'page_title': 'تراکنش‌ها',
-        'transactions': [],  # TODO: Transaction.objects.filter(user=request.user)
+        'transactions': page_obj,
+        'page_obj': page_obj,
+        'wallet': wallet,
+        'total_count': total_count,
+        'total_deposits': total_deposits,
+        'total_withdrawals': total_withdrawals,
+        'transaction_types': transaction_types,
+        'status_choices': status_choices,
+        'selected_type': transaction_type,
+        'selected_status': status,
+        'date_from': date_from,
+        'date_to': date_to,
+        'search_query': search_query,
     }
     return render(request, 'accounts/transactions.html', context)
 
@@ -1230,10 +1334,67 @@ def ticket_reopen_view(request, ticket_id):
 def favorites_view(request):
     """
     نمایش لیست علاقه‌مندی‌های کاربر
+    Display user's wishlist with product details
     """
+    from apps.products.models import Wishlist, WishlistItem
+    
+    # Get wishlist items - using both models for compatibility
+    # Check if user has wishlist items (detailed model with variants)
+    wishlist_items = WishlistItem.objects.filter(
+        wishlist__user=request.user
+    ).select_related(
+        'product',
+        'product__category',
+        'product__brand',
+        'variant'
+    ).prefetch_related(
+        'product__images'
+    ).order_by('-created_at')
+    
+    # If no wishlist items, fall back to simple Wishlist model
+    if not wishlist_items.exists():
+        simple_wishlists = Wishlist.objects.filter(
+            user=request.user
+        ).select_related(
+            'product',
+            'product__category',
+            'product__brand'
+        ).prefetch_related(
+            'product__images'
+        ).order_by('-created_at')
+        
+        # Convert to compatible format for template
+        favorites = simple_wishlists
+    else:
+        favorites = wishlist_items
+    
+    # Calculate statistics
+    total_items = favorites.count()
+    
+    # Calculate total value (sum of all wishlist product prices)
+    total_value = 0
+    out_of_stock_count = 0
+    
+    for item in favorites:
+        product = item.product
+        if hasattr(item, 'variant') and item.variant:
+            # If item has a variant, use variant price
+            total_value += item.variant.price
+            if item.variant.stock <= 0:
+                out_of_stock_count += 1
+        else:
+            # Use product price
+            total_value += product.price
+            if not product.is_in_stock:
+                out_of_stock_count += 1
+    
     context = {
         'page_title': 'علاقه‌مندی‌ها',
-        'favorites': [],  # TODO: Favorite.objects.filter(user=request.user)
+        'favorites': favorites,
+        'total_items': total_items,
+        'total_value': total_value,
+        'out_of_stock_count': out_of_stock_count,
+        'in_stock_count': total_items - out_of_stock_count,
     }
     return render(request, 'accounts/favorites.html', context)
 
@@ -1287,7 +1448,12 @@ class AddBankCardView(LoginRequiredMixin, View):
     """افزودن کارت بانکی جدید"""
     
     def post(self, request):
+        from .models import BankCard
+        from django.db import IntegrityError
+        
         card_number = request.POST.get('card_number', '').replace(' ', '').replace('-', '')
+        bank_name = request.POST.get('bank_name', '').strip()
+        is_default = request.POST.get('is_default') == 'true'
         
         # اعتبارسنجی شماره کارت
         if not card_number or len(card_number) != 16 or not card_number.isdigit():
@@ -1296,26 +1462,188 @@ class AddBankCardView(LoginRequiredMixin, View):
                 'message': 'شماره کارت نامعتبر است'
             }, status=400)
         
-        # TODO: ذخیره در دیتابیس
-        # BankCard.objects.create(user=request.user, card_number=card_number)
+        # تشخیص نام بانک از شماره کارت (6 رقم اول)
+        if not bank_name:
+            bank_name = self._detect_bank_name(card_number[:6])
         
-        return JsonResponse({
-            'success': True,
-            'message': 'کارت بانکی با موفقیت اضافه شد'
-        })
+        try:
+            # بررسی تکراری نبودن
+            if BankCard.objects.filter(user=request.user, card_number=card_number).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'این کارت قبلاً ثبت شده است'
+                }, status=400)
+            
+            # محدودیت تعداد کارت (حداکثر 5 کارت)
+            if BankCard.objects.filter(user=request.user).count() >= 5:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'حداکثر 5 کارت بانکی می‌توانید ثبت کنید'
+                }, status=400)
+            
+            # ذخیره در دیتابیس
+            card = BankCard.objects.create(
+                user=request.user,
+                card_number=card_number,
+                bank_name=bank_name,
+                is_default=is_default
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'کارت بانکی با موفقیت اضافه شد',
+                'card': {
+                    'id': card.id,
+                    'masked_number': card.masked_number,
+                    'bank_name': card.bank_name,
+                    'is_default': card.is_default
+                }
+            })
+            
+        except IntegrityError:
+            return JsonResponse({
+                'success': False,
+                'message': 'خطا در ثبت کارت بانکی'
+            }, status=500)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطای غیرمنتظره: {str(e)}'
+            }, status=500)
+    
+    def _detect_bank_name(self, bin_code):
+        """تشخیص نام بانک از BIN کارت (6 رقم اول)"""
+        bank_bins = {
+            '603799': 'بانک ملی',
+            '589210': 'بانک سپه',
+            '627648': 'بانک توسعه صادرات',
+            '627961': 'بانک صنعت و معدن',
+            '606373': 'بانک مهر ایران',
+            '639607': 'بانک صنعت و معدن',
+            '627353': 'بانک تجارت',
+            '585983': 'بانک تجارت',
+            '622106': 'بانک پارسیان',
+            '639347': 'بانک پاسارگاد',
+            '636214': 'بانک آینده',
+            '505785': 'بانک توسعه تعاون',
+            '627412': 'بانک اقتصاد نوین',
+            '639370': 'بانک مهر اقتصاد',
+            '639599': 'بانک قوامین',
+            '504862': 'بانک شهر',
+            '639347': 'بانک پاسارگاد',
+            '636949': 'بانک حکمت ایرانیان',
+            '627381': 'بانک انصار',
+            '505801': 'بانک کوثر',
+        }
+        return bank_bins.get(bin_code, 'سایر بانک‌ها')
 
 
 class DeleteBankCardView(LoginRequiredMixin, View):
     """حذف کارت بانکی"""
     
     def post(self, request, card_id):
-        # TODO: حذف از دیتابیس
-        # BankCard.objects.filter(id=card_id, user=request.user).delete()
+        from .models import BankCard
+        from django.shortcuts import get_object_or_404
         
-        return JsonResponse({
-            'success': True,
-            'message': 'کارت بانکی حذف شد'
-        })
+        try:
+            # پیدا کردن کارت متعلق به کاربر
+            card = get_object_or_404(BankCard, id=card_id, user=request.user)
+            
+            # اگر کارت پیش‌فرض است، کارت بعدی را پیش‌فرض می‌کنیم
+            if card.is_default:
+                next_card = BankCard.objects.filter(
+                    user=request.user
+                ).exclude(id=card_id).first()
+                
+                if next_card:
+                    next_card.is_default = True
+                    next_card.save(update_fields=['is_default'])
+            
+            # حذف کارت
+            card.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'کارت بانکی با موفقیت حذف شد'
+            })
+            
+        except BankCard.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'کارت بانکی یافت نشد'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در حذف کارت: {str(e)}'
+            }, status=500)
+
+
+class SetDefaultBankCardView(LoginRequiredMixin, View):
+    """تنظیم کارت بانکی پیش‌فرض"""
+    
+    def post(self, request, card_id):
+        from .models import BankCard
+        from django.shortcuts import get_object_or_404
+        
+        try:
+            # پیدا کردن کارت متعلق به کاربر
+            card = get_object_or_404(BankCard, id=card_id, user=request.user)
+            
+            # غیرفعال کردن سایر کارت‌های پیش‌فرض
+            BankCard.objects.filter(user=request.user, is_default=True).update(is_default=False)
+            
+            # تنظیم این کارت به عنوان پیش‌فرض
+            card.is_default = True
+            card.save(update_fields=['is_default'])
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'کارت پیش‌فرض با موفقیت تنظیم شد'
+            })
+            
+        except BankCard.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'کارت بانکی یافت نشد'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در تنظیم کارت: {str(e)}'
+            }, status=500)
+
+
+class GetBankCardsView(LoginRequiredMixin, View):
+    """دریافت لیست کارت‌های بانکی کاربر"""
+    
+    def get(self, request):
+        from .models import BankCard
+        
+        try:
+            cards = BankCard.objects.filter(user=request.user).order_by('-is_default', '-created_at')
+            
+            cards_data = [{
+                'id': card.id,
+                'masked_number': card.masked_number,
+                'bank_name': card.bank_name,
+                'is_default': card.is_default,
+                'is_verified': card.is_verified,
+                'created_at': card.created_at.strftime('%Y/%m/%d')
+            } for card in cards]
+            
+            return JsonResponse({
+                'success': True,
+                'cards': cards_data,
+                'count': len(cards_data)
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در دریافت کارت‌ها: {str(e)}'
+            }, status=500)
+
         
 # ==================== Address Views ====================
 
@@ -1323,80 +1651,313 @@ class AddAddressView(LoginRequiredMixin, View):
     """افزودن آدرس جدید"""
     
     def post(self, request):
-        receiver_name = request.POST.get('receiver_name', '').strip()
-        phone_number = request.POST.get('phone_number', '').strip()
+        from .models import Address
+        import re
+        
+        # دریافت داده‌ها
+        title = request.POST.get('title', 'خانه').strip()
+        recipient_name = request.POST.get('recipient_name', '').strip()
+        recipient_phone = request.POST.get('recipient_phone', '').strip()
+        province = request.POST.get('province', '').strip()
         city = request.POST.get('city', '').strip()
-        address = request.POST.get('address', '').strip()
         postal_code = request.POST.get('postal_code', '').strip()
+        full_address = request.POST.get('full_address', '').strip()
+        is_default = request.POST.get('is_default') == 'true'
         
         # اعتبارسنجی
         errors = []
-        if not receiver_name:
+        
+        if not recipient_name:
             errors.append('نام گیرنده الزامی است')
-        if not phone_number:
+        elif len(recipient_name) < 3:
+            errors.append('نام گیرنده باید حداقل 3 کاراکتر باشد')
+            
+        if not recipient_phone:
             errors.append('شماره تماس الزامی است')
-        if not address:
-            errors.append('آدرس الزامی است')
+        elif not re.match(r'^09\d{9}$', recipient_phone):
+            errors.append('شماره موبایل نامعتبر است (باید 11 رقم و با 09 شروع شود)')
+            
+        if not province:
+            errors.append('استان الزامی است')
+            
+        if not city:
+            errors.append('شهر الزامی است')
+            
+        if not full_address:
+            errors.append('آدرس کامل الزامی است')
+        elif len(full_address) < 10:
+            errors.append('آدرس باید حداقل 10 کاراکتر باشد')
+            
+        if postal_code and not re.match(r'^\d{10}$', postal_code):
+            errors.append('کد پستی باید 10 رقم باشد')
             
         if errors:
             return JsonResponse({
                 'success': False,
-                'message': '، '.join(errors)
+                'message': ' - '.join(errors)
             }, status=400)
         
-        # TODO: ذخیره در دیتابیس
-        # Address.objects.create(
-        #     user=request.user,
-        #     receiver_name=receiver_name,
-        #     phone_number=phone_number,
-        #     city=city,
-        #     address=address,
-        #     postal_code=postal_code
-        # )
-        
-        return JsonResponse({
-            'success': True,
-            'message': 'آدرس با موفقیت اضافه شد'
-        })
+        try:
+            # محدودیت تعداد آدرس (حداکثر 10 آدرس)
+            if Address.objects.filter(user=request.user).count() >= 10:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'حداکثر 10 آدرس می‌توانید ثبت کنید'
+                }, status=400)
+            
+            # ذخیره در دیتابیس
+            address = Address.objects.create(
+                user=request.user,
+                title=title,
+                recipient_name=recipient_name,
+                recipient_phone=recipient_phone,
+                province=province,
+                city=city,
+                postal_code=postal_code,
+                full_address=full_address,
+                is_default=is_default
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'آدرس با موفقیت اضافه شد',
+                'address': {
+                    'id': address.id,
+                    'title': address.title,
+                    'recipient_name': address.recipient_name,
+                    'city': address.city,
+                    'is_default': address.is_default
+                }
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در ثبت آدرس: {str(e)}'
+            }, status=500)
 
 
 class DeleteAddressView(LoginRequiredMixin, View):
     """حذف آدرس"""
     
     def post(self, request, address_id):
-        # TODO: حذف از دیتابیس
-        # Address.objects.filter(id=address_id, user=request.user).delete()
+        from .models import Address
+        from django.shortcuts import get_object_or_404
         
-        return JsonResponse({
-            'success': True,
-            'message': 'آدرس حذف شد'
-        })
+        try:
+            # پیدا کردن آدرس متعلق به کاربر
+            address = get_object_or_404(Address, id=address_id, user=request.user)
+            
+            # اگر آدرس پیش‌فرض است، آدرس بعدی را پیش‌فرض می‌کنیم
+            if address.is_default:
+                next_address = Address.objects.filter(
+                    user=request.user
+                ).exclude(id=address_id).first()
+                
+                if next_address:
+                    next_address.is_default = True
+                    next_address.save(update_fields=['is_default'])
+            
+            # حذف آدرس
+            address.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'آدرس با موفقیت حذف شد'
+            })
+            
+        except Address.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'آدرس یافت نشد'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در حذف آدرس: {str(e)}'
+            }, status=500)
 
 
 class SetDefaultAddressView(LoginRequiredMixin, View):
     """تنظیم آدرس پیش‌فرض"""
     
     def post(self, request, address_id):
-        # TODO: تنظیم پیش‌فرض
-        # Address.objects.filter(user=request.user).update(is_default=False)
-        # Address.objects.filter(id=address_id, user=request.user).update(is_default=True)
+        from .models import Address
+        from django.shortcuts import get_object_or_404
         
-        return JsonResponse({
-            'success': True,
-            'message': 'آدرس پیش‌فرض تنظیم شد'
-        })
+        try:
+            # پیدا کردن آدرس متعلق به کاربر
+            address = get_object_or_404(Address, id=address_id, user=request.user)
+            
+            # غیرفعال کردن سایر آدرس‌های پیش‌فرض
+            Address.objects.filter(user=request.user, is_default=True).update(is_default=False)
+            
+            # تنظیم این آدرس به عنوان پیش‌فرض
+            address.is_default = True
+            address.save(update_fields=['is_default'])
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'آدرس پیش‌فرض با موفقیت تنظیم شد'
+            })
+            
+        except Address.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'آدرس یافت نشد'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در تنظیم آدرس: {str(e)}'
+            }, status=500)
         
 class EditAddressView(LoginRequiredMixin, View):
     """ویرایش آدرس"""
     
     def get(self, request, address_id):
-        # TODO: نمایش فرم ویرایش
-        # address = get_object_or_404(Address, id=address_id, user=request.user)
-        return render(request, 'accounts/edit_address.html', {'address_id': address_id})
+        from .models import Address
+        from django.shortcuts import get_object_or_404
+        
+        try:
+            address = get_object_or_404(Address, id=address_id, user=request.user)
+            
+            return JsonResponse({
+                'success': True,
+                'address': {
+                    'id': address.id,
+                    'title': address.title,
+                    'recipient_name': address.recipient_name,
+                    'recipient_phone': address.recipient_phone,
+                    'province': address.province,
+                    'city': address.city,
+                    'postal_code': address.postal_code,
+                    'full_address': address.full_address,
+                    'is_default': address.is_default
+                }
+            })
+        except Address.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'آدرس یافت نشد'
+            }, status=404)
     
     def post(self, request, address_id):
-        # TODO: ویرایش آدرس
-        # address = get_object_or_404(Address, id=address_id, user=request.user)
-        # address.receiver_name = request.POST.get('receiver_name')
-        # address.save()
-        return JsonResponse({'success': True, 'message': 'آدرس ویرایش شد'})
+        from .models import Address
+        from django.shortcuts import get_object_or_404
+        import re
+        
+        try:
+            address = get_object_or_404(Address, id=address_id, user=request.user)
+            
+            # دریافت داده‌ها
+            title = request.POST.get('title', '').strip()
+            recipient_name = request.POST.get('recipient_name', '').strip()
+            recipient_phone = request.POST.get('recipient_phone', '').strip()
+            province = request.POST.get('province', '').strip()
+            city = request.POST.get('city', '').strip()
+            postal_code = request.POST.get('postal_code', '').strip()
+            full_address = request.POST.get('full_address', '').strip()
+            is_default = request.POST.get('is_default') == 'true'
+            
+            # اعتبارسنجی
+            errors = []
+            
+            if recipient_name and len(recipient_name) < 3:
+                errors.append('نام گیرنده باید حداقل 3 کاراکتر باشد')
+                
+            if recipient_phone and not re.match(r'^09\d{9}$', recipient_phone):
+                errors.append('شماره موبایل نامعتبر است')
+                
+            if full_address and len(full_address) < 10:
+                errors.append('آدرس باید حداقل 10 کاراکتر باشد')
+                
+            if postal_code and not re.match(r'^\d{10}$', postal_code):
+                errors.append('کد پستی باید 10 رقم باشد')
+                
+            if errors:
+                return JsonResponse({
+                    'success': False,
+                    'message': ' - '.join(errors)
+                }, status=400)
+            
+            # بروزرسانی فیلدها
+            if title:
+                address.title = title
+            if recipient_name:
+                address.recipient_name = recipient_name
+            if recipient_phone:
+                address.recipient_phone = recipient_phone
+            if province:
+                address.province = province
+            if city:
+                address.city = city
+            if postal_code:
+                address.postal_code = postal_code
+            if full_address:
+                address.full_address = full_address
+            
+            # مدیریت پیش‌فرض
+            if is_default and not address.is_default:
+                Address.objects.filter(user=request.user, is_default=True).update(is_default=False)
+                address.is_default = True
+            
+            address.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'آدرس با موفقیت ویرایش شد',
+                'address': {
+                    'id': address.id,
+                    'title': address.title,
+                    'recipient_name': address.recipient_name,
+                    'city': address.city,
+                    'is_default': address.is_default
+                }
+            })
+            
+        except Address.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'آدرس یافت نشد'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در ویرایش آدرس: {str(e)}'
+            }, status=500)
+
+
+class GetAddressesView(LoginRequiredMixin, View):
+    """دریافت لیست آدرس‌های کاربر"""
+    
+    def get(self, request):
+        from .models import Address
+        
+        try:
+            addresses = Address.objects.filter(user=request.user).order_by('-is_default', '-created_at')
+            
+            addresses_data = [{
+                'id': addr.id,
+                'title': addr.title,
+                'recipient_name': addr.recipient_name,
+                'recipient_phone': addr.recipient_phone,
+                'province': addr.province,
+                'city': addr.city,
+                'postal_code': addr.postal_code,
+                'full_address': addr.full_address,
+                'is_default': addr.is_default,
+                'created_at': addr.created_at.strftime('%Y/%m/%d')
+            } for addr in addresses]
+            
+            return JsonResponse({
+                'success': True,
+                'addresses': addresses_data,
+                'count': len(addresses_data)
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در دریافت آدرس‌ها: {str(e)}'
+            }, status=500)

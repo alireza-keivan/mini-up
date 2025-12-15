@@ -1,10 +1,13 @@
 # apps/orders/signals.py
 
+import logging
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
 from .models import Order, OrderStatusHistory
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(pre_save, sender=Order)
@@ -151,8 +154,12 @@ def _process_order_cancellation(order):
         except Exception:
             pass  # Log error in production
     
-    # TODO: ارسال نوتیفیکیشن لغو سفارش
-    # NotificationService.send_order_cancelled(order)
+    # ارسال نوتیفیکیشن لغو سفارش
+    try:
+        from apps.content.services import NotificationService
+        NotificationService.notify_order_status_changed(order, old_status='processing')
+    except Exception as e:
+        logger.error(f"Failed to send order cancellation notification: {e}")
 
 
 @receiver(post_save, sender=Order)

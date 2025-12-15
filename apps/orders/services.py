@@ -261,9 +261,9 @@ class OrderService:
         for cart_item in valid_items:
             OrderService._create_order_item(order, cart_item)
         
-        # علامت‌گذاری استفاده از کوپن
-        if coupon:
-            OrderService._mark_coupon_used(coupon, user, order)
+        # ⚠️ IMPORTANT: کوپن در اینجا علامت‌گذاری نمی‌شود!
+        # کوپن فقط باید پس از پرداخت موفق علامت‌گذاری شود (در confirm_payment)
+        # چون کاربر ممکن است سفارش را ایجاد کند ولی پرداخت نکند
         
         # ثبت تاریخچه وضعیت
         OrderStatusHistory.objects.create(
@@ -375,13 +375,31 @@ class OrderService:
 
     @staticmethod
     def _mark_coupon_used(coupon, user, order):
-        """ثبت استفاده از کوپن"""
+        """
+        ثبت استفاده از کوپن (فقط اگر قبلاً ثبت نشده باشد)
+        
+        این متد فقط باید پس از پرداخت موفق فراخوانی شود.
+        اگر کاربر سفارش را ایجاد کند ولی پرداخت نکند، کوپن نباید مصرف شود.
+        """
         from apps.coupons.models import CouponUsage
         
-        CouponUsage.objects.create(
+        # بررسی اینکه آیا این کوپن قبلاً برای این سفارش ثبت شده
+        existing_usage = CouponUsage.objects.filter(
             coupon=coupon,
             user=user,
             order=order
+        ).exists()
+        
+        if existing_usage:
+            # کوپن قبلاً برای این سفارش ثبت شده (احتمالاً در نسخه قدیمی کد)
+            return
+        
+        # ثبت استفاده جدید
+        CouponUsage.objects.create(
+            coupon=coupon,
+            user=user,
+            order=order,
+            discount_amount=order.coupon_discount
         )
         
         # افزایش شمارنده استفاده
@@ -410,13 +428,17 @@ class OrderService:
         now = timezone.now()
         
         # بروزرسانی سفارش
-        order.status = Order.Status.PAID
+        order.status = Order.Status.PROCESSING  # تغییر به processing بعد از پرداخت موفق
         order.paid_at = now
         order.payment_ref_id = ref_id
         order.payment_card_pan = card_pan
         order.save(update_fields=[
             'status', 'paid_at', 'payment_ref_id', 'payment_card_pan'
         ])
+        
+        # ✅ اینجا است که کوپن باید علامت‌گذاری شود (فقط پس از پرداخت موفق)
+        if order.coupon:
+            OrderService._mark_coupon_used(order.coupon, order.user, order)
         
         # کسر از کیف پول
         if order.wallet_used > 0:
@@ -431,7 +453,9 @@ class OrderService:
         
         # ثبت تاریخچه
         OrderStatusHistory.objects.create(
-            new_status=Order.Status.PAID,
+            order=order,
+            old_status=old_status,
+            new_status=Order.Status.PROCESSING,
             note='پرداخت با موفقیت انجام شد'
         )
 

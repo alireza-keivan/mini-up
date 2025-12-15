@@ -335,3 +335,11 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = False  # در production: True
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# GOOGLE OAUTH SETTINGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Get from environment or .env file
+GOOGLE_OAUTH_CLIENT_ID = env('GOOGLE_OAUTH_CLIENT_ID', default=None)
+GOOGLE_OAUTH_CLIENT_SECRET = env('GOOGLE_OAUTH_CLIENT_SECRET', default=None)
