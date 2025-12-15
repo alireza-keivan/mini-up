@@ -110,8 +110,12 @@ def _process_order_completion(order):
         profile.total_spent = (profile.total_spent or 0) + order.total_amount
         profile.save(update_fields=['total_orders', 'total_spent'])
     
-    # TODO: ارسال نوتیفیکیشن تکمیل سفارش
-    # NotificationService.send_order_completed(order)
+    # ارسال نوتیفیکیشن تکمیل سفارش
+    try:
+        from apps.content.services import NotificationService
+        NotificationService.notify_order_status_changed(order, 'completed')
+    except Exception as e:
+        print(f"Failed to send order completion notification: {e}")
     
     # TODO: ثبت کش‌بک در صورت فعال بودن
     # CashbackService.process_order_cashback(order)
@@ -180,25 +184,38 @@ def send_order_notifications(sender, instance, created, **kwargs):
 
 def _send_new_order_notification(order):
     """ارسال نوتیفیکیشن سفارش جدید"""
-    # TODO: پیاده‌سازی با سرویس نوتیفیکیشن
-    # این می‌تواند شامل SMS، ایمیل یا Push Notification باشد
-    pass
+    try:
+        from apps.content.services import NotificationService
+        NotificationService.notify_order_created(order)
+    except Exception as e:
+        print(f"Failed to send new order notification: {e}")
 
 
 def _send_payment_confirmed_notification(order):
     """ارسال نوتیفیکیشن تأیید پرداخت"""
-    pass
+    try:
+        from apps.content.services import NotificationService
+        NotificationService.notify_order_status_changed(order, 'pending')
+    except Exception as e:
+        print(f"Failed to send payment confirmed notification: {e}")
 
 
 def _send_processing_notification(order):
     """ارسال نوتیفیکیشن شروع پردازش"""
-    pass
+    try:
+        from apps.content.services import NotificationService
+        NotificationService.notify_order_status_changed(order, 'confirmed')
+    except Exception as e:
+        print(f"Failed to send processing notification: {e}")
 
 
 def _send_shipped_notification(order):
     """ارسال نوتیفیکیشن ارسال سفارش"""
-    # می‌تواند شامل کد رهگیری پستی باشد
-    pass
+    try:
+        from apps.content.services import NotificationService
+        NotificationService.notify_order_status_changed(order, 'preparing')
+    except Exception as e:
+        print(f"Failed to send shipped notification: {e}")
 
 
 def _send_delivered_notification(order):

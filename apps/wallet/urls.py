@@ -8,6 +8,11 @@ from .views import (
     WalletTransactionsView,
     WalletDepositVerifyView,
     WalletBalanceAPIView,
+    SetupPinView,
+    ChangePinView,
+    RemovePinView,
+    VerifyPinView,
+    GetPinStatusView,
 )
 
 app_name = 'wallet'
@@ -23,4 +28,11 @@ urlpatterns = [
     
     # API
     path('api/balance/', WalletBalanceAPIView.as_view(), name='api_balance'),
+    
+    # PIN Management API
+    path('api/pin/setup/', SetupPinView.as_view(), name='api_pin_setup'),
+    path('api/pin/change/', ChangePinView.as_view(), name='api_pin_change'),
+    path('api/pin/remove/', RemovePinView.as_view(), name='api_pin_remove'),
+    path('api/pin/verify/', VerifyPinView.as_view(), name='api_pin_verify'),
+    path('api/pin/status/', GetPinStatusView.as_view(), name='api_pin_status'),
 ]

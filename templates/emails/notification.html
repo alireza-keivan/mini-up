@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            direction: rtl;
+            text-align: right;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #00f5ff 0%, #8a2be2 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .notification-box {
+            background: #f8f9fa;
+            border-right: 4px solid #00f5ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .notification-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .notification-message {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer p {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .footer a {
+            color: #8a2be2;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #00f5ff 0%, #8a2be2 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 245, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>مینی‌آپ</h1>
+            <p>فروشگاه تخصصی محصولات دیجیتال</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p style="margin-bottom: 15px;">سلام {{ user.first_name|default:"کاربر گرامی" }} {{ user.last_name|default:"" }},</p>
+            
+            <div class="notification-box">
+                <div class="notification-title">{{ title }}</div>
+                <div class="notification-message">{{ message }}</div>
+            </div>
+
+            <p style="color: #666; font-size: 14px; line-height: 1.8;">
+                این اعلان به صورت خودکار ارسال شده است. 
+                برای مشاهده جزئیات بیشتر می‌توانید به پنل کاربری خود مراجعه کنید.
+            </p>
+
+            <div style="text-align: center;">
+                <a href="https://miniup.com/accounts/dashboard/" class="button">
+                    مشاهده پنل کاربری
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>این ایمیل از طرف <strong>مینی‌آپ</strong> ارسال شده است.</p>
+            <p>
+                <a href="https://miniup.com">miniup.com</a> | 
+                <a href="https://miniup.com/contact/">تماس با ما</a> | 
+                <a href="https://miniup.com/faq/">سوالات متداول</a>
+            </p>
+            <p style="margin-top: 15px; color: #aaa;">
+                © 2025 مینی‌آپ. تمامی حقوق محفوظ است.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

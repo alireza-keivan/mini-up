@@ -99,6 +99,161 @@ class Wallet(models.Model):
         return amount - payable
 
 
+class WalletPin(models.Model):
+    """
+    رمز امنیتی کیف پول (PIN)
+    برای احراز هویت قبل از تراکنش‌های مهم
+    """
+    wallet = models.OneToOneField(
+        Wallet,
+        on_delete=models.CASCADE,
+        related_name='pin',
+        verbose_name='کیف پول'
+    )
+    
+    # رمز هش شده (استفاده از Argon2)
+    pin_hash = models.CharField(
+        max_length=255,
+        verbose_name='هش رمز'
+    )
+    
+    # وضعیت فعال/غیرفعال
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='فعال'
+    )
+    
+    # تلاش‌های ناموفق
+    failed_attempts = models.PositiveIntegerField(
+        default=0,
+        verbose_name='تلاش‌های ناموفق'
+    )
+    
+    # قفل شدن موقت (پس از 5 تلاش ناموفق)
+    locked_until = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='قفل تا'
+    )
+    
+    # تاریخ‌ها
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='تاریخ ایجاد'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='آخرین بروزرسانی'
+    )
+    last_verified_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='آخرین احراز هویت'
+    )
+    
+    class Meta:
+        verbose_name = 'رمز کیف پول'
+        verbose_name_plural = 'رمزهای کیف پول'
+    
+    def __str__(self):
+        status = 'فعال' if self.is_active else 'غیرفعال'
+        return f'PIN کیف پول {self.wallet.user} ({status})'
+    
+    def set_pin(self, raw_pin):
+        """
+        تنظیم رمز جدید
+        Args:
+            raw_pin: رمز 4 رقمی (str)
+        """
+        from django.contrib.auth.hashers import make_password
+        
+        # اعتبارسنجی
+        if not raw_pin or not raw_pin.isdigit() or len(raw_pin) != 4:
+            raise ValidationError('رمز باید 4 رقم باشد')
+        
+        # هش کردن با Argon2
+        self.pin_hash = make_password(raw_pin, hasher='argon2')
+        self.failed_attempts = 0
+        self.locked_until = None
+        self.is_active = True
+        self.save()
+    
+    def verify_pin(self, raw_pin):
+        """
+        احراز هویت رمز
+        Args:
+            raw_pin: رمز ورودی کاربر
+        Returns:
+            bool: True اگر صحیح باشد
+        """
+        from django.contrib.auth.hashers import check_password
+        from django.utils import timezone
+        
+        # بررسی قفل بودن
+        if self.is_locked():
+            raise ValidationError('کیف پول به دلیل تلاش‌های ناموفق قفل شده است. لطفاً بعداً تلاش کنید.')
+        
+        # بررسی فعال بودن
+        if not self.is_active:
+            raise ValidationError('رمز کیف پول غیرفعال است')
+        
+        # بررسی صحت رمز
+        is_correct = check_password(raw_pin, self.pin_hash)
+        
+        if is_correct:
+            # رمز صحیح - ریست کردن تلاش‌ها
+            self.failed_attempts = 0
+            self.last_verified_at = timezone.now()
+            self.save(update_fields=['failed_attempts', 'last_verified_at'])
+            return True
+        else:
+            # رمز نادرست - افزایش تلاش‌های ناموفق
+            self.failed_attempts += 1
+            
+            # قفل کردن پس از 5 تلاش ناموفق (30 دقیقه)
+            if self.failed_attempts >= 5:
+                self.locked_until = timezone.now() + timezone.timedelta(minutes=30)
+            
+            self.save(update_fields=['failed_attempts', 'locked_until'])
+            
+            remaining = 5 - self.failed_attempts
+            if remaining > 0:
+                raise ValidationError(f'رمز نادرست است. {remaining} تلاش باقی مانده')
+            else:
+                raise ValidationError('کیف پول شما به مدت 30 دقیقه قفل شد')
+    
+    def is_locked(self):
+        """آیا کیف پول قفل است؟"""
+        from django.utils import timezone
+        
+        if not self.locked_until:
+            return False
+        
+        if timezone.now() < self.locked_until:
+            return True
+        
+        # زمان قفل گذشته - آزادسازی
+        self.failed_attempts = 0
+        self.locked_until = None
+        self.save(update_fields=['failed_attempts', 'locked_until'])
+        return False
+    
+    def get_lock_remaining_time(self):
+        """زمان باقی‌مانده تا باز شدن قفل (به ثانیه)"""
+        from django.utils import timezone
+        
+        if not self.is_locked():
+            return 0
+        
+        delta = self.locked_until - timezone.now()
+        return max(0, int(delta.total_seconds()))
+    
+    def disable(self):
+        """غیرفعال کردن رمز"""
+        self.is_active = False
+        self.save(update_fields=['is_active'])
+
+
 class WalletTransaction(models.Model):
     transaction_id = models.CharField(
     max_length=20,

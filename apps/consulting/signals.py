@@ -66,3 +66,44 @@ def handle_appointment_status_change(sender, instance, **kwargs):
     if instance.status == Appointment.Status.COMPLETED:
         # می‌توان اینجا نوتیفیکیشن ارسال کرد
         pass
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TICKET NOTIFICATION SIGNALS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+from .models import TicketMessage, SupportTicket
+
+
+@receiver(post_save, sender=TicketMessage)
+def notify_ticket_message(sender, instance, created, **kwargs):
+    """
+    ارسال اعلان پس از ارسال پیام در تیکت
+    """
+    if not created:
+        return
+    
+    # فقط برای پیام‌های کارمندان به کاربر اعلان ارسال شود
+    if instance.is_staff_reply:
+        try:
+            from apps.content.services import NotificationService
+            NotificationService.notify_ticket_response(instance.ticket)
+        except Exception as e:
+            print(f"Failed to send ticket response notification: {e}")
+
+
+@receiver(post_save, sender=SupportTicket)
+def notify_ticket_status_change(sender, instance, created, **kwargs):
+    """
+    ارسال اعلان هنگام تغییر وضعیت تیکت
+    """
+    if created:
+        return
+    
+    # اگر تیکت بسته شد
+    if hasattr(instance, '_old_status') and instance._old_status != 'closed' and instance.status == 'closed':
+        try:
+            from apps.content.services import NotificationService
+            NotificationService.notify_ticket_closed(instance)
+        except Exception as e:
+            print(f"Failed to send ticket closed notification: {e}")

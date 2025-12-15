@@ -280,7 +280,8 @@ class NotificationService:
     @staticmethod
     def list_all(user):
         return SystemNotification.objects.filter(
-            user=user
+            Q(user=user) | Q(send_to_all=True),
+            is_active=True
         ).order_by('-created_at')
 
     @staticmethod
@@ -289,10 +290,141 @@ class NotificationService:
         """
         اگر notification_ids خالی باشد → همه را خوانده شده علامت بزن
         """
-        queryset = SystemNotification.objects.filter(user=user, is_read=False)
+        queryset = SystemNotification.objects.filter(
+            Q(user=user) | Q(send_to_all=True),
+            is_read=False
+        )
 
         if notification_ids:
             queryset = queryset.filter(id__in=notification_ids)
 
         queryset.update(is_read=True, read_at=timezone.now())
         return queryset.count()
+    
+    @staticmethod
+    def get_unread_count(user):
+        """تعداد اعلان‌های خوانده نشده"""
+        return SystemNotification.objects.filter(
+            Q(user=user) | Q(send_to_all=True),
+            is_active=True,
+            is_read=False
+        ).count()
+    
+    @staticmethod
+    def create_notification(title, message, notification_type='info', user=None, send_to_all=False):
+        """ایجاد اعلان جدید"""
+        return SystemNotification.objects.create(
+            title=title,
+            message=message,
+            type=notification_type,
+            user=user,
+            send_to_all=send_to_all
+        )
+    
+    # ─────────────────────────────────────────────────────────────────────────
+    # NOTIFICATION CREATORS FOR EVENTS
+    # ─────────────────────────────────────────────────────────────────────────
+    
+    @staticmethod
+    def notify_order_created(order):
+        """اعلان ثبت سفارش"""
+        return NotificationService.create_notification(
+            title='سفارش با موفقیت ثبت شد',
+            message=f'سفارش شما با شماره #{order.order_number} ثبت شد و در حال پردازش است.',
+            notification_type='success',
+            user=order.user
+        )
+    
+    @staticmethod
+    def notify_order_status_changed(order, old_status):
+        """اعلان تغییر وضعیت سفارش"""
+        status_messages = {
+            'processing': 'سفارش شما در حال پردازش است.',
+            'confirmed': 'سفارش شما تایید شد.',
+            'preparing': 'سفارش شما در حال آماده‌سازی است.',
+            'shipped': 'سفارش شما ارسال شد.',
+            'delivered': 'سفارش شما تحویل داده شد.',
+            'completed': 'سفارش شما با موفقیت تکمیل شد.',
+            'cancelled': 'سفارش شما لغو شد.',
+            'refunded': 'مبلغ سفارش شما بازگردانده شد.',
+        }
+        
+        message = status_messages.get(order.status, 'وضعیت سفارش شما تغییر کرد.')
+        message = f'{message}\nشماره سفارش: #{order.order_number}'
+        
+        return NotificationService.create_notification(
+            title='تغییر وضعیت سفارش',
+            message=message,
+            notification_type='info',
+            user=order.user
+        )
+    
+    @staticmethod
+    def notify_payment_success(payment):
+        """اعلان موفقیت پرداخت"""
+        return NotificationService.create_notification(
+            title='پرداخت موفق',
+            message=f'پرداخت شما به مبلغ {payment.amount:,} تومان با موفقیت انجام شد.\nکد پیگیری: {payment.tracking_code}',
+            notification_type='success',
+            user=payment.user
+        )
+    
+    @staticmethod
+    def notify_payment_failed(payment):
+        """اعلان شکست پرداخت"""
+        return NotificationService.create_notification(
+            title='پرداخت ناموفق',
+            message=f'پرداخت شما به مبلغ {payment.amount:,} تومان ناموفق بود. لطفاً دوباره تلاش کنید.',
+            notification_type='error',
+            user=payment.user
+        )
+    
+    @staticmethod
+    def notify_wallet_deposit(transaction):
+        """اعلان شارژ کیف پول"""
+        return NotificationService.create_notification(
+            title='شارژ کیف پول',
+            message=f'کیف پول شما به مبلغ {transaction.amount:,} تومان شارژ شد.\nموجودی فعلی: {transaction.balance_after:,} تومان',
+            notification_type='success',
+            user=transaction.wallet.user
+        )
+    
+    @staticmethod
+    def notify_wallet_purchase(transaction):
+        """اعلان خرید با کیف پول"""
+        return NotificationService.create_notification(
+            title='خرید با کیف پول',
+            message=f'مبلغ {abs(transaction.amount):,} تومان از کیف پول شما کسر شد.\nموجودی فعلی: {transaction.balance_after:,} تومان',
+            notification_type='info',
+            user=transaction.wallet.user
+        )
+    
+    @staticmethod
+    def notify_ticket_response(ticket):
+        """اعلان پاسخ به تیکت"""
+        return NotificationService.create_notification(
+            title='پاسخ تیکت پشتیبانی',
+            message=f'تیکت #{ticket.ticket_id} پاسخ جدیدی دریافت کرد.\nموضوع: {ticket.subject}',
+            notification_type='info',
+            user=ticket.user
+        )
+    
+    @staticmethod
+    def notify_ticket_closed(ticket):
+        """اعلان بسته شدن تیکت"""
+        return NotificationService.create_notification(
+            title='بسته شدن تیکت',
+            message=f'تیکت #{ticket.ticket_id} بسته شد.\nموضوع: {ticket.subject}',
+            notification_type='warning',
+            user=ticket.user
+        )
+    
+    @staticmethod
+    def delete_notification(notification_id, user):
+        """حذف اعلان"""
+        try:
+            notification = SystemNotification.objects.get(id=notification_id, user=user)
+            notification.delete()
+            return True
+        except SystemNotification.DoesNotExist:
+            return False

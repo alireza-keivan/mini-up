@@ -32,7 +32,14 @@ urlpatterns = [
     path('favorites/', views.favorites_view, name='favorites'),
     # API
     path('api/check-auth/', views.check_auth_status, name='check_auth'),
+    
+    # Notifications
     path('notifications/', views.notifications_view, name='notifications'),
+    path('api/notifications/', api_views.get_notifications_api, name='api_notifications'),
+    path('api/notifications/unread-count/', api_views.get_unread_count_api, name='api_notifications_unread_count'),
+    path('api/notifications/mark-read/', api_views.mark_notification_read_api, name='api_notifications_mark_read'),
+    path('api/notifications/mark-all-read/', api_views.mark_all_notifications_read_api, name='api_notifications_mark_all_read'),
+    path('api/notifications/delete/', api_views.delete_notification_api, name='api_notifications_delete'),
     path('bank-card/add/', views.AddBankCardView.as_view(), name='add_bank_card'),
     path('bank-card/delete/<int:card_id>/', views.DeleteBankCardView.as_view(), name='delete_bank_card'),
     path('address/add/', views.AddAddressView.as_view(), name='add_address'),

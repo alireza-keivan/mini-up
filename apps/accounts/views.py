@@ -1247,16 +1247,39 @@ def settings_view(request):
     }
     return render(request, 'accounts/settings.html', context)
 
+@login_required
 def notifications_view(request):
     """
     لیست اعلان‌های کاربر
     """
-    # TODO: بعداً از مدل Notification استفاده می‌شود
-    notifications = []
+    from apps.content.services import NotificationService
+    from django.core.paginator import Paginator
+    
+    # دریافت اعلان‌ها
+    notifications = NotificationService.list_all(request.user)
+    
+    # فیلتر بر اساس نوع
+    filter_type = request.GET.get('type')
+    if filter_type in ['info', 'success', 'warning', 'error']:
+        notifications = notifications.filter(type=filter_type)
+    
+    # فیلتر خوانده نشده
+    if request.GET.get('unread') == '1':
+        notifications = notifications.filter(is_read=False)
+    
+    # صفحه‌بندی
+    paginator = Paginator(notifications, 15)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    # تعداد خوانده نشده
+    unread_count = NotificationService.get_unread_count(request.user)
     
     context = {
         'page_title': 'اعلان‌ها',
-        'notifications': notifications,
+        'notifications': page_obj,
+        'unread_count': unread_count,
+        'filter_type': filter_type,
     }
     return render(request, 'accounts/notifications.html', context)
 

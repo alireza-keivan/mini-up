@@ -8,9 +8,21 @@ DEBUG = False
 
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['mini-up.ir', 'www.mini-up.ir'])
 
-# Database
+# Database - PostgreSQL
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres://localhost/miniup')
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME', default='miniup_db'),
+        'USER': env('DB_USER', default='miniup_user'),
+        'PASSWORD': env('DB_PASSWORD', default='miniup_secure_password_2025'),
+        'HOST': env('DB_HOST', default='localhost'),
+        'PORT': env('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,
+        'OPTIONS': {
+            'connect_timeout': 10,
+            'sslmode': 'prefer',
+        }
+    }
 }
 
 # Security Settings

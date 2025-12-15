@@ -294,3 +294,288 @@ class WalletBalanceAPIView(LoginRequiredMixin, View):
                 'success': False,
                 'error': str(e)
             }, status=400)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PIN MANAGEMENT VIEWS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class SetupPinView(LoginRequiredMixin, View):
+    """
+    تنظیم رمز کیف پول برای اولین بار
+    POST /wallet/pin/setup/
+    """
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            pin = data.get('pin', '').strip()
+            confirm_pin = data.get('confirm_pin', '').strip()
+            
+            # اعتبارسنجی
+            if not pin or not confirm_pin:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'لطفاً رمز را وارد کنید'
+                }, status=400)
+            
+            if pin != confirm_pin:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'رمزها مطابقت ندارند'
+                }, status=400)
+            
+            if not pin.isdigit() or len(pin) != 4:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'رمز باید 4 رقم باشد'
+                }, status=400)
+            
+            # دریافت کیف پول
+            from .models import Wallet, WalletPin
+            wallet = Wallet.objects.get(user=request.user)
+            
+            # بررسی وجود رمز قبلی
+            if hasattr(wallet, 'pin') and wallet.pin.is_active:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'رمز قبلاً تنظیم شده است. برای تغییر از گزینه تغییر رمز استفاده کنید'
+                }, status=400)
+            
+            # ایجاد یا بروزرسانی رمز
+            wallet_pin, created = WalletPin.objects.get_or_create(wallet=wallet)
+            wallet_pin.set_pin(pin)
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'رمز کیف پول با موفقیت تنظیم شد'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=500)
+
+
+class ChangePinView(LoginRequiredMixin, View):
+    """
+    تغییر رمز کیف پول
+    POST /wallet/pin/change/
+    """
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            current_pin = data.get('current_pin', '').strip()
+            new_pin = data.get('new_pin', '').strip()
+            confirm_pin = data.get('confirm_pin', '').strip()
+            
+            # اعتبارسنجی
+            if not current_pin or not new_pin or not confirm_pin:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'لطفاً تمام فیلدها را پر کنید'
+                }, status=400)
+            
+            if new_pin != confirm_pin:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'رمز جدید و تکرار آن مطابقت ندارند'
+                }, status=400)
+            
+            if not new_pin.isdigit() or len(new_pin) != 4:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'رمز جدید باید 4 رقم باشد'
+                }, status=400)
+            
+            if current_pin == new_pin:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'رمز جدید نباید با رمز فعلی یکسان باشد'
+                }, status=400)
+            
+            # دریافت کیف پول و رمز
+            from .models import Wallet, WalletPin
+            wallet = Wallet.objects.get(user=request.user)
+            
+            if not hasattr(wallet, 'pin'):
+                return JsonResponse({
+                    'success': False,
+                    'message': 'ابتدا باید رمز را تنظیم کنید'
+                }, status=400)
+            
+            wallet_pin = wallet.pin
+            
+            # تأیید رمز فعلی
+            try:
+                wallet_pin.verify_pin(current_pin)
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'message': str(e)
+                }, status=400)
+            
+            # تنظیم رمز جدید
+            wallet_pin.set_pin(new_pin)
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'رمز کیف پول با موفقیت تغییر یافت'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=500)
+
+
+class RemovePinView(LoginRequiredMixin, View):
+    """
+    حذف/غیرفعال کردن رمز کیف پول
+    POST /wallet/pin/remove/
+    """
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            pin = data.get('pin', '').strip()
+            
+            if not pin:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'لطفاً رمز فعلی را وارد کنید'
+                }, status=400)
+            
+            # دریافت کیف پول و رمز
+            from .models import Wallet
+            wallet = Wallet.objects.get(user=request.user)
+            
+            if not hasattr(wallet, 'pin'):
+                return JsonResponse({
+                    'success': False,
+                    'message': 'رمزی تنظیم نشده است'
+                }, status=400)
+            
+            wallet_pin = wallet.pin
+            
+            # تأیید رمز
+            try:
+                wallet_pin.verify_pin(pin)
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'message': str(e)
+                }, status=400)
+            
+            # غیرفعال کردن رمز
+            wallet_pin.disable()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'رمز کیف پول با موفقیت حذف شد'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=500)
+
+
+class VerifyPinView(LoginRequiredMixin, View):
+    """
+    تأیید رمز قبل از تراکنش
+    POST /wallet/pin/verify/
+    """
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            pin = data.get('pin', '').strip()
+            
+            if not pin:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'لطفاً رمز را وارد کنید'
+                }, status=400)
+            
+            # دریافت کیف پول و رمز
+            from .models import Wallet
+            wallet = Wallet.objects.get(user=request.user)
+            
+            # بررسی وجود رمز
+            if not hasattr(wallet, 'pin') or not wallet.pin.is_active:
+                return JsonResponse({
+                    'success': True,
+                    'message': 'رمز تنظیم نشده است',
+                    'pin_required': False
+                })
+            
+            wallet_pin = wallet.pin
+            
+            # بررسی قفل بودن
+            if wallet_pin.is_locked():
+                remaining_seconds = wallet_pin.get_lock_remaining_time()
+                remaining_minutes = remaining_seconds // 60
+                return JsonResponse({
+                    'success': False,
+                    'message': f'کیف پول قفل شده است. {remaining_minutes} دقیقه دیگر تلاش کنید',
+                    'locked': True,
+                    'remaining_seconds': remaining_seconds
+                }, status=403)
+            
+            # تأیید رمز
+            try:
+                wallet_pin.verify_pin(pin)
+                return JsonResponse({
+                    'success': True,
+                    'message': 'رمز صحیح است',
+                    'verified': True
+                })
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'message': str(e),
+                    'verified': False
+                }, status=400)
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=500)
+
+
+class GetPinStatusView(LoginRequiredMixin, View):
+    """
+    دریافت وضعیت رمز کیف پول
+    GET /wallet/pin/status/
+    """
+    def get(self, request):
+        try:
+            from .models import Wallet
+            wallet = Wallet.objects.get(user=request.user)
+            
+            if not hasattr(wallet, 'pin'):
+                return JsonResponse({
+                    'success': True,
+                    'has_pin': False,
+                    'is_active': False,
+                    'is_locked': False
+                })
+            
+            wallet_pin = wallet.pin
+            
+            return JsonResponse({
+                'success': True,
+                'has_pin': True,
+                'is_active': wallet_pin.is_active,
+                'is_locked': wallet_pin.is_locked(),
+                'failed_attempts': wallet_pin.failed_attempts,
+                'remaining_seconds': wallet_pin.get_lock_remaining_time() if wallet_pin.is_locked() else 0
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=500)

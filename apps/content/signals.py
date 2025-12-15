@@ -347,11 +347,47 @@ def set_notification_read_timestamp(sender, instance, **kwargs):
 
 def _trigger_realtime_notification(notification):
     """
-    Placeholder for real-time notification delivery.
-    Could use Django Channels, Firebase, or other push services.
+    Trigger real-time notification delivery via WebSocket/Firebase.
     """
-    # TODO: Implement WebSocket push
-    # TODO: Implement Firebase Cloud Messaging
-    # TODO: Implement email for important notifications
-    pass
+    # WebSocket push (if Django Channels is configured)
+    try:
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        
+        channel_layer = get_channel_layer()
+        if channel_layer and notification.user:
+            async_to_sync(channel_layer.group_send)(
+                f'notifications_{notification.user.id}',
+                {
+                    'type': 'notification_message',
+                    'notification': {
+                        'id': str(notification.id),
+                        'title': notification.title,
+                        'message': notification.message,
+                        'type': notification.type,
+                        'created_at': notification.created_at.isoformat(),
+                    }
+                }
+            )
+    except ImportError:
+        # Django Channels not installed, skip WebSocket
+        pass
+    except Exception as e:
+        print(f"WebSocket notification failed: {e}")
+    
+    # Email notification for important types
+    if notification.type in ['error', 'warning'] and notification.user and notification.user.email:
+        try:
+            from django.core.mail import send_mail
+            from django.conf import settings
+            
+            send_mail(
+                subject=f'[مینی‌آپ] {notification.title}',
+                message=notification.message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[notification.user.email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            print(f"Email notification failed: {e}")
 # ═══════════════════════════════════════════════════════════════════════════════

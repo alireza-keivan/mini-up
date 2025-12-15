@@ -1,0 +1,1117 @@
+[
+{
+  "model": "sites.site",
+  "fields": {
+    "domain": "example.com",
+    "name": "example.com"
+  }
+},
+{
+  "model": "sites.site",
+  "fields": {
+    "domain": "localhost:8000",
+    "name": "MiniUp Local"
+  }
+},
+{
+  "model": "socialaccount.socialapp",
+  "pk": 1,
+  "fields": {
+    "provider": "google",
+    "provider_id": "",
+    "name": "Mini Up Web client 1",
+    "client_id": "212468970800-6692ke0parl5b35ttuu5abt78snf7jlj.apps.googleusercontent.com",
+    "secret": "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",
+    "key": "",
+    "settings": {},
+    "sites": [
+      [
+        "localhost:8000"
+      ]
+    ]
+  }
+},
+{
+  "model": "core.servicedescription",
+  "pk": 1,
+  "fields": {
+    "service_type": "virtual",
+    "title": "خدمات مجازی",
+    "description": "تلگرام پرمیوم، اسپاتیفای، اپل آیدی، نتفلیکس و سایر خدمات مجازی با بهترین قیمت و کیفیت. تحویل فوری و پشتیبانی ۲۴ ساعته.",
+    "icon": "",
+    "is_active": true,
+    "updated_at": "2025-12-06T08:16:03.868Z"
+  }
+},
+{
+  "model": "core.servicedescription",
+  "pk": 2,
+  "fields": {
+    "service_type": "mini_game",
+    "title": "مینی گیم",
+    "description": "خرید جم، سکه و کوین بازی‌های محبوب مثل کلش، پابجی، فری فایر با قیمت استثنایی. شارژ سریع و امن حساب بازی شما.",
+    "icon": "",
+    "is_active": true,
+    "updated_at": "2025-12-06T08:16:03.871Z"
+  }
+},
+{
+  "model": "core.servicedescription",
+  "pk": 3,
+  "fields": {
+    "service_type": "gaming_products",
+    "title": "محصولات گیمینگ",
+    "description": "گیفت کارت پلی استیشن، ایکس باکس، استیم، گوگل پلی و ایتونز با قیمت مناسب. کد دیجیتال با تحویل آنی پس از خرید.",
+    "icon": "",
+    "is_active": true,
+    "updated_at": "2025-12-06T08:16:03.875Z"
+  }
+},
+{
+  "model": "core.servicedescription",
+  "pk": 4,
+  "fields": {
+    "service_type": "accessories",
+    "title": "لوازم جانبی گیمینگ",
+    "description": "فن خنک‌کننده موبایل، دسته بازی، هدست گیمینگ و سایر لوازم جانبی با کیفیت بالا. ارسال سریع به سراسر کشور.asdsad",
+    "icon": "",
+    "is_active": true,
+    "updated_at": "2025-12-11T09:41:58.946Z"
+  }
+},
+{
+  "model": "accounts.user",
+  "fields": {
+    "password": "pbkdf2_sha256$600000$1HpfjXGZS9Ptywo0uHhnfc$amlpErivSaQiaojRtJPgCJH34cPxGxCzJAjnWSCXBTU=",
+    "is_superuser": true,
+    "phone": "09019230823",
+    "email": null,
+    "google_id": null,
+    "avatar_url": null,
+    "auth_provider": "phone",
+    "first_name": "علیرضا",
+    "last_name": "کیوان",
+    "avatar": "",
+    "date_of_birth": null,
+    "is_phone_verified": false,
+    "is_email_verified": false,
+    "is_verified": true,
+    "referral_code": "DWIT51NF",
+    "referred_by": null,
+    "is_active": true,
+    "is_staff": true,
+    "date_joined": "2025-11-27T10:46:08.356Z",
+    "last_login": "2025-12-14T06:48:39.739Z",
+    "updated_at": "2025-12-13T09:04:23.730Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.user",
+  "fields": {
+    "password": "!RIUOmJHFkGG236vp6vHCWoE5RyBzbJQlxFSoaDKu",
+    "is_superuser": false,
+    "phone": "09019230822",
+    "email": "alirezakeyvan06@gmail.com",
+    "google_id": null,
+    "avatar_url": null,
+    "auth_provider": "google",
+    "first_name": "علیرضا",
+    "last_name": "کیوان",
+    "avatar": "",
+    "date_of_birth": null,
+    "is_phone_verified": false,
+    "is_email_verified": false,
+    "is_verified": false,
+    "referral_code": "IFHG2BSM",
+    "referred_by": null,
+    "is_active": true,
+    "is_staff": false,
+    "date_joined": "2025-12-10T11:59:00.421Z",
+    "last_login": "2025-12-11T06:35:02.636Z",
+    "updated_at": "2025-12-13T09:05:42.560Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 1,
+  "fields": {
+    "phone": "09019230823",
+    "code": "65686",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-09T11:00:22.723Z",
+    "expires_at": "2025-12-09T11:02:22.723Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 2,
+  "fields": {
+    "phone": "09019230823",
+    "code": "69928",
+    "purpose": "login",
+    "is_used": true,
+    "attempts": 0,
+    "created_at": "2025-12-11T06:31:37.406Z",
+    "expires_at": "2025-12-11T06:33:37.405Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 3,
+  "fields": {
+    "phone": "09019230823",
+    "code": "85148",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T06:32:38.154Z",
+    "expires_at": "2025-12-11T06:34:38.154Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 4,
+  "fields": {
+    "phone": "09019230823",
+    "code": "97608",
+    "purpose": "login",
+    "is_used": true,
+    "attempts": 0,
+    "created_at": "2025-12-11T07:07:57.341Z",
+    "expires_at": "2025-12-11T07:09:57.341Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 5,
+  "fields": {
+    "phone": "09019230823",
+    "code": "79481",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T07:09:02.678Z",
+    "expires_at": "2025-12-11T07:11:02.677Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 6,
+  "fields": {
+    "phone": "09019230823",
+    "code": "55726",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T07:35:48.283Z",
+    "expires_at": "2025-12-11T07:37:48.283Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 7,
+  "fields": {
+    "phone": "09019230823",
+    "code": "12067",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T07:42:50.635Z",
+    "expires_at": "2025-12-11T07:44:50.635Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 8,
+  "fields": {
+    "phone": "09019230823",
+    "code": "66269",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T07:48:26.371Z",
+    "expires_at": "2025-12-11T07:50:26.371Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 9,
+  "fields": {
+    "phone": "09123333333",
+    "code": "58106",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T07:49:56.463Z",
+    "expires_at": "2025-12-11T07:51:56.463Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 10,
+  "fields": {
+    "phone": "09019230823",
+    "code": "24319",
+    "purpose": "login",
+    "is_used": true,
+    "attempts": 0,
+    "created_at": "2025-12-11T07:54:27.566Z",
+    "expires_at": "2025-12-11T07:56:27.566Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 11,
+  "fields": {
+    "phone": "09019230823",
+    "code": "99626",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T07:56:24.988Z",
+    "expires_at": "2025-12-11T07:58:24.988Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 12,
+  "fields": {
+    "phone": "09019230823",
+    "code": "49076",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T08:08:32.403Z",
+    "expires_at": "2025-12-11T08:10:32.403Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 13,
+  "fields": {
+    "phone": "09019230823",
+    "code": "30659",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T08:58:40.146Z",
+    "expires_at": "2025-12-11T09:00:40.146Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 14,
+  "fields": {
+    "phone": "09019230823",
+    "code": "71676",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T09:00:44.717Z",
+    "expires_at": "2025-12-11T09:02:44.716Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 15,
+  "fields": {
+    "phone": "09019230823",
+    "code": "99712",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T09:10:59.482Z",
+    "expires_at": "2025-12-11T09:12:59.482Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 16,
+  "fields": {
+    "phone": "09019230823",
+    "code": "41989",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-11T09:13:11.881Z",
+    "expires_at": "2025-12-11T09:15:11.881Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 17,
+  "fields": {
+    "phone": "09019230823",
+    "code": "54655",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-13T05:42:46.214Z",
+    "expires_at": "2025-12-13T05:44:46.213Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 18,
+  "fields": {
+    "phone": "09019230823",
+    "code": "11765",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-13T06:41:04.090Z",
+    "expires_at": "2025-12-13T06:43:04.090Z"
+  }
+},
+{
+  "model": "accounts.otp",
+  "pk": 19,
+  "fields": {
+    "phone": "09019230823",
+    "code": "92156",
+    "purpose": "login",
+    "is_used": false,
+    "attempts": 0,
+    "created_at": "2025-12-14T06:48:07.658Z",
+    "expires_at": "2025-12-14T06:50:07.657Z"
+  }
+},
+{
+  "model": "accounts.profile",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "is_verified": false,
+    "national_code_verified": false,
+    "national_code": "0925575208",
+    "birth_date": null,
+    "gender": "",
+    "bio": "asd",
+    "national_id": "",
+    "city": "",
+    "postal_code": "",
+    "address": "",
+    "created_at": "2025-12-09T09:10:28.578Z",
+    "updated_at": "2025-12-13T09:04:23.732Z"
+  }
+},
+{
+  "model": "accounts.profile",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "09019230822"
+    ],
+    "is_verified": false,
+    "national_code_verified": false,
+    "national_code": "",
+    "birth_date": null,
+    "gender": "",
+    "bio": "asdasdasd",
+    "national_id": "",
+    "city": "",
+    "postal_code": "",
+    "address": "",
+    "created_at": "2025-12-13T09:05:42.562Z",
+    "updated_at": "2025-12-13T09:05:42.562Z"
+  }
+},
+{
+  "model": "accounts.bankcard",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "card_number": "6104331079010311",
+    "bank_name": "",
+    "is_default": false,
+    "is_verified": true,
+    "created_at": "2025-12-13T08:59:27.430Z",
+    "updated_at": "2025-12-13T08:59:27.430Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T07:08:47.232Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T07:35:38.459Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T07:42:46.107Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T07:48:22.233Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T07:49:51.626Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T07:54:22.805Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T07:56:21.707Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 8,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T08:08:28.354Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 9,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T08:58:30.308Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 10,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T08:59:35.148Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 11,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-11T09:13:07.193Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 12,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-13T05:42:37.766Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 13,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-13T06:42:46.515Z"
+  }
+},
+{
+  "model": "accounts.useractivity",
+  "pk": 14,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "activity_type": "logout",
+    "description": "خروج از سیستم",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+    "created_at": "2025-12-13T06:45:38.348Z"
+  }
+},
+{
+  "model": "products.category",
+  "pk": 1,
+  "fields": {
+    "name": "asd",
+    "name_en": "sadfd",
+    "slug": "asd",
+    "parent": null,
+    "category_type": "game_currency",
+    "description": "sdfadfas",
+    "image": "categories/519fd2d8-8ca7-43e2-b585-9a9859f88912.png",
+    "icon": "asd",
+    "is_active": true,
+    "is_featured": false,
+    "sort_order": 0,
+    "created_at": "2025-12-07T11:51:08.619Z",
+    "updated_at": "2025-12-07T11:51:08.619Z"
+  }
+},
+{
+  "model": "products.category",
+  "pk": 2,
+  "fields": {
+    "name": "asdcx",
+    "name_en": "dsfa",
+    "slug": "asdcx",
+    "parent": null,
+    "category_type": "gaming",
+    "description": "rbhgsz",
+    "image": "categories/519fd2d8-8ca7-43e2-b585-9a9859f88912_vNKIFZR.png",
+    "icon": "er",
+    "is_active": true,
+    "is_featured": false,
+    "sort_order": 0,
+    "created_at": "2025-12-08T07:43:34.202Z",
+    "updated_at": "2025-12-08T07:43:34.202Z"
+  }
+},
+{
+  "model": "products.category",
+  "pk": 3,
+  "fields": {
+    "name": "wq",
+    "name_en": "gf",
+    "slug": "wq",
+    "parent": 2,
+    "category_type": "gaming",
+    "description": "werfd",
+    "image": "categories/789eb2c5-d0e9-4a47-8f4a-9d5a500f7eb2.png",
+    "icon": "",
+    "is_active": true,
+    "is_featured": false,
+    "sort_order": 0,
+    "created_at": "2025-12-08T07:43:50.574Z",
+    "updated_at": "2025-12-08T07:43:50.574Z"
+  }
+},
+{
+  "model": "products.product",
+  "pk": 1,
+  "fields": {
+    "uuid": "ba01fc1e-18eb-4f55-aa5d-6e923f609dbd",
+    "sku": "۲۳",
+    "name": "asgfas",
+    "name_en": "sdfds",
+    "slug": "asgfas",
+    "category": 1,
+    "brand": null,
+    "product_type": "game_currency",
+    "sub_type": null,
+    "delivery_type": "instant",
+    "short_description": "dcgvzc",
+    "description": "شسی شسی",
+    "specifications": {
+      "rwewre": 32
+    },
+    "price": 4,
+    "original_price": 5,
+    "cost_price": 4,
+    "stock": 3,
+    "low_stock_threshold": 5,
+    "track_stock": true,
+    "weight": 5,
+    "dimensions": {
+      "2": 34
+    },
+    "main_image": "products/2025/12/28397c6b-d617-4b9b-af88-bf89272f111a_1.png",
+    "meta_title": "asd",
+    "meta_description": "dfas",
+    "is_active": true,
+    "is_featured": false,
+    "is_new": true,
+    "is_bestseller": false,
+    "view_count": 0,
+    "sales_count": 0,
+    "created_at": "2025-12-07T11:54:12.744Z",
+    "updated_at": "2025-12-07T11:54:12.744Z"
+  }
+},
+{
+  "model": "products.product",
+  "pk": 2,
+  "fields": {
+    "uuid": "3a95e7a2-eafc-42d9-845b-96c5a9862b7c",
+    "sku": "asdcx",
+    "name": "wsef",
+    "name_en": "erw",
+    "slug": "wsef",
+    "category": 2,
+    "brand": null,
+    "product_type": "physical",
+    "sub_type": null,
+    "delivery_type": "instant",
+    "short_description": "eqwr",
+    "description": "dfs",
+    "specifications": {
+      "2sa": 2
+    },
+    "price": 3,
+    "original_price": 4,
+    "cost_price": 4,
+    "stock": 7,
+    "low_stock_threshold": 5,
+    "track_stock": true,
+    "weight": null,
+    "dimensions": {
+      "x": 2,
+      "y": 3
+    },
+    "main_image": "products/2025/12/519fd2d8-8ca7-43e2-b585-9a9859f88912.png",
+    "meta_title": "sd",
+    "meta_description": "gf",
+    "is_active": true,
+    "is_featured": false,
+    "is_new": true,
+    "is_bestseller": false,
+    "view_count": 0,
+    "sales_count": 2,
+    "created_at": "2025-12-08T07:45:34.914Z",
+    "updated_at": "2025-12-08T07:45:34.914Z"
+  }
+},
+{
+  "model": "products.product",
+  "pk": 3,
+  "fields": {
+    "uuid": "df0a9488-a6e3-43c7-9899-6172d54c8ff4",
+    "sku": "۱۷۰۱",
+    "name": "UC-pubgi",
+    "name_en": "UC",
+    "slug": "uc-pubgi",
+    "category": 1,
+    "brand": null,
+    "product_type": "game_currency",
+    "sub_type": null,
+    "delivery_type": "instant",
+    "short_description": "ازر برای بازی پابجی",
+    "description": "داران داران داران داران داران داران داران داران داران داران داران داران",
+    "specifications": {
+      "x": 2,
+      "y": 3
+    },
+    "price": 200000,
+    "original_price": null,
+    "cost_price": 200000,
+    "stock": 1000,
+    "low_stock_threshold": 0,
+    "track_stock": true,
+    "weight": null,
+    "dimensions": {},
+    "main_image": "products/2025/12/519fd2d8-8ca7-43e2-b585-9a9859f88912_W7CZqP6.png",
+    "meta_title": "",
+    "meta_description": "",
+    "is_active": true,
+    "is_featured": false,
+    "is_new": true,
+    "is_bestseller": false,
+    "view_count": 0,
+    "sales_count": 0,
+    "created_at": "2025-12-09T05:01:23.563Z",
+    "updated_at": "2025-12-09T05:01:23.563Z"
+  }
+},
+{
+  "model": "products.productimage",
+  "pk": 1,
+  "fields": {
+    "product": 2,
+    "image": "products/2025/12/789eb2c5-d0e9-4a47-8f4a-9d5a500f7eb2.png",
+    "alt_text": "",
+    "sort_order": 0,
+    "is_active": true,
+    "created_at": "2025-12-08T07:45:34.915Z"
+  }
+},
+{
+  "model": "products.productimage",
+  "pk": 2,
+  "fields": {
+    "product": 3,
+    "image": "products/2025/12/789eb2c5-d0e9-4a47-8f4a-9d5a500f7eb2_paZbyYL.png",
+    "alt_text": "",
+    "sort_order": 0,
+    "is_active": true,
+    "created_at": "2025-12-09T05:01:23.565Z"
+  }
+},
+{
+  "model": "products.gamecurrencyrate",
+  "pk": 1,
+  "fields": {
+    "product": 3,
+    "min_amount": 1,
+    "max_amount": 50,
+    "price_per_unit": "200000.00",
+    "unit_name": "واحد",
+    "is_active": true,
+    "created_at": "2025-12-09T05:01:48.247Z",
+    "updated_at": "2025-12-09T05:01:48.247Z"
+  }
+},
+{
+  "model": "orders.cart",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "09019230822"
+    ],
+    "session_key": null,
+    "created_at": "2025-12-14T06:04:03.549Z",
+    "updated_at": "2025-12-14T06:04:03.549Z"
+  }
+},
+{
+  "model": "payments.paymentgateway",
+  "pk": 1,
+  "fields": {
+    "name": "زرین پال",
+    "gateway_type": "zarinpal",
+    "merchant_id": "۱۲۳",
+    "api_key": "۴۳۱۲۳",
+    "is_active": true,
+    "is_sandbox": true,
+    "priority": 1,
+    "min_amount": 10000,
+    "max_amount": 50000000,
+    "total_transactions": 0,
+    "successful_transactions": 0,
+    "total_amount": 0,
+    "created_at": "2025-12-09T04:53:12.754Z",
+    "updated_at": "2025-12-09T04:53:12.754Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "09019230823"
+    ],
+    "balance": "0",
+    "gift_balance": "0",
+    "total_deposited": "0",
+    "total_spent": "0",
+    "is_locked": false,
+    "lock_reason": "",
+    "created_at": "2025-12-02T06:23:28.859Z",
+    "updated_at": "2025-12-02T06:23:28.859Z"
+  }
+},
+{
+  "model": "wallet.wallet",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "09019230822"
+    ],
+    "balance": "0",
+    "gift_balance": "0",
+    "total_deposited": "0",
+    "total_spent": "0",
+    "is_locked": false,
+    "lock_reason": "",
+    "created_at": "2025-12-10T11:59:00.560Z",
+    "updated_at": "2025-12-10T11:59:00.560Z"
+  }
+},
+{
+  "model": "content.articlecategory",
+  "pk": "577d91fd-2771-4fe9-91ce-cb1db184ab7f",
+  "fields": {
+    "name": "خوب اخبار من",
+    "slug": "ساخبار-من",
+    "description": "اخبار خوب",
+    "icon": "",
+    "image": "",
+    "parent": "c8c0993f-7544-4730-8913-c27db9c342f7",
+    "meta_title": "",
+    "meta_description": "",
+    "is_active": true,
+    "order": 0,
+    "created_at": "2025-12-14T05:55:02.929Z",
+    "updated_at": "2025-12-14T05:55:02.929Z"
+  }
+},
+{
+  "model": "content.articlecategory",
+  "pk": "6c636980-b770-439d-890f-c156b6175d93",
+  "fields": {
+    "name": "خبرها",
+    "slug": "خبرها",
+    "description": "این دسته بندی برای اخبار میباشد",
+    "icon": "",
+    "image": "content/categories/Screenshot_from_2025-12-11_10-05-29.png",
+    "parent": null,
+    "meta_title": "خبرهای من",
+    "meta_description": "",
+    "is_active": true,
+    "order": 2,
+    "created_at": "2025-12-14T05:58:54.195Z",
+    "updated_at": "2025-12-14T05:58:54.195Z"
+  }
+},
+{
+  "model": "content.articlecategory",
+  "pk": "c8c0993f-7544-4730-8913-c27db9c342f7",
+  "fields": {
+    "name": "اخبار من",
+    "slug": "اخبار-من",
+    "description": "شسی",
+    "icon": "",
+    "image": "content/categories/Screenshot_from_2025-12-11_10-34-54.png",
+    "parent": null,
+    "meta_title": "",
+    "meta_description": "",
+    "is_active": true,
+    "order": 0,
+    "created_at": "2025-12-14T05:54:46.286Z",
+    "updated_at": "2025-12-14T05:54:46.286Z"
+  }
+},
+{
+  "model": "content.articletag",
+  "pk": "7c5afbf1-c712-43ae-81aa-f344856521cc",
+  "fields": {
+    "name": "اخبار",
+    "slug": "اخبار",
+    "created_at": "2025-12-14T05:53:31.647Z"
+  }
+},
+{
+  "model": "content.articletag",
+  "pk": "8b161643-3ccf-4031-89ca-2d2f011c8aed",
+  "fields": {
+    "name": "اخبار دنیا",
+    "slug": "اخبار-دنیا",
+    "created_at": "2025-12-14T05:57:38.817Z"
+  }
+},
+{
+  "model": "content.articletag",
+  "pk": "e8430aaa-6789-44f1-8fed-0aacd83a6761",
+  "fields": {
+    "name": "خبر",
+    "slug": "خبر",
+    "created_at": "2025-12-14T05:57:22.495Z"
+  }
+},
+{
+  "model": "content.article",
+  "pk": "c0072d7b-3c5f-434f-8854-6bd79dda1bad",
+  "fields": {
+    "title": "اخبار تکنولوژی",
+    "slug": "اخبار-تکنولوژی",
+    "excerpt": "شسیسشی",
+    "content": "صق\r\nضصث\r\nضثضصثضصث\r\nضثضص\r\nث",
+    "featured_image": "content/articles/wp10424024-new-york-subway-wallpapers.jpg",
+    "featured_image_alt": "خبرکده",
+    "author": [
+      "09019230823"
+    ],
+    "category": "6c636980-b770-439d-890f-c156b6175d93",
+    "status": "pending",
+    "published_at": "2025-12-14T06:00:34Z",
+    "meta_title": "سی",
+    "meta_description": "سیسی سی",
+    "meta_keywords": "",
+    "canonical_url": "",
+    "view_count": 0,
+    "allow_comments": true,
+    "is_featured": false,
+    "is_pinned": false,
+    "reading_time": 1,
+    "created_at": "2025-12-14T06:01:00.337Z",
+    "updated_at": "2025-12-14T06:01:00.337Z",
+    "tags": [
+      "7c5afbf1-c712-43ae-81aa-f344856521cc",
+      "8b161643-3ccf-4031-89ca-2d2f011c8aed",
+      "e8430aaa-6789-44f1-8fed-0aacd83a6761"
+    ]
+  }
+},
+{
+  "model": "content.articleimage",
+  "pk": "e4cb148d-cf03-4d0f-b5ff-89c9dcbb8dbf",
+  "fields": {
+    "article": "c0072d7b-3c5f-434f-8854-6bd79dda1bad",
+    "image": "content/articles/gallery/image-1.webp",
+    "alt_text": "",
+    "caption": "",
+    "order": 0,
+    "is_active": true,
+    "created_at": "2025-12-14T06:01:00.340Z"
+  }
+},
+{
+  "model": "content.articlecomment",
+  "pk": "d11862f3-1ab8-45af-b258-50767bd1d7a7",
+  "fields": {
+    "article": "c0072d7b-3c5f-434f-8854-6bd79dda1bad",
+    "user": [
+      "09019230822"
+    ],
+    "parent": null,
+    "content": "سشیسی سی شس",
+    "status": "pending",
+    "like_count": 0,
+    "ip_address": null,
+    "created_at": "2025-12-14T06:02:23.658Z",
+    "updated_at": "2025-12-14T06:02:23.658Z"
+  }
+},
+{
+  "model": "content.systemnotification",
+  "pk": "f6c4299a-eb97-474d-8bb9-d20044a7ee2b",
+  "fields": {
+    "title": "مقاله جدید در انتظار تأیید",
+    "message": "مقاله \"اخبار تکنولوژی\" توسط 09019230823 ارسال شده و در انتظار تأیید است.",
+    "type": "info",
+    "user": [
+      "09019230823"
+    ],
+    "send_to_all": false,
+    "is_read": false,
+    "read_at": null,
+    "is_active": true,
+    "expires_at": null,
+    "created_at": "2025-12-14T06:01:00.339Z",
+    "updated_at": "2025-12-14T06:01:00.339Z"
+  }
+},
+{
+  "model": "socialaccount.socialaccount",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "09019230822"
+    ],
+    "provider": "google",
+    "uid": "117977342864453835272",
+    "last_login": "2025-12-11T06:35:02.614Z",
+    "date_joined": "2025-12-11T06:25:10.199Z",
+    "extra_data": {
+      "iss": "https://accounts.google.com",
+      "azp": "212468970800-6692ke0parl5b35ttuu5abt78snf7jlj.apps.googleusercontent.com",
+      "aud": "212468970800-6692ke0parl5b35ttuu5abt78snf7jlj.apps.googleusercontent.com",
+      "sub": "117977342864453835272",
+      "email": "alirezakeyvan06@gmail.com",
+      "email_verified": true,
+      "at_hash": "48FvdBJKHmCLBGi07kwxAA",
+      "name": "alireza keyvan",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocL7zMU2WojWOZyx2m0IlvvYmgzOCYDKB122mkGZtBUO3diuzw=s96-c",
+      "given_name": "alireza",
+      "family_name": "keyvan",
+      "iat": 1765434902,
+      "exp": 1765438502
+    }
+  }
+}
+]

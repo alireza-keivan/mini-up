@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
-from .models import Wallet, WalletTransaction, WalletDepositRequest
+from .models import Wallet, WalletTransaction, WalletDepositRequest, WalletPin
 
 
 @admin.register(Wallet)
@@ -327,3 +327,98 @@ class WalletDepositRequestAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(WalletPin)
+class WalletPinAdmin(admin.ModelAdmin):
+    """
+    پنل مدیریت رمزهای کیف پول
+    """
+    list_display = [
+        'id',
+        'wallet_user_display',
+        'is_active',
+        'failed_attempts_display',
+        'lock_status_display',
+        'last_verified_at',
+        'created_at',
+    ]
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['wallet__user__phone', 'wallet__user__first_name', 'wallet__user__last_name']
+    readonly_fields = [
+        'wallet',
+        'pin_hash',
+        'failed_attempts',
+        'locked_until',
+        'created_at',
+        'updated_at',
+        'last_verified_at',
+    ]
+    
+    fieldsets = (
+        ('کیف پول', {
+            'fields': ('wallet',)
+        }),
+        ('رمز', {
+            'fields': ('pin_hash', 'is_active'),
+            'description': 'رمز به صورت هش شده ذخیره می‌شود و قابل بازیابی نیست'
+        }),
+        ('امنیت', {
+            'fields': ('failed_attempts', 'locked_until')
+        }),
+        ('تاریخ‌ها', {
+            'fields': ('created_at', 'updated_at', 'last_verified_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def wallet_user_display(self, obj):
+        if obj and obj.wallet and obj.wallet.user:
+            user = obj.wallet.user
+            url = reverse('admin:accounts_user_change', args=[user.pk])
+            identifier = user.phone or user.email or f'User {user.id}'
+            return format_html(
+                '<a href="{}">{}</a>',
+                url, identifier
+            )
+        return '-'
+    wallet_user_display.short_description = 'کاربر'
+    
+    def failed_attempts_display(self, obj):
+        if obj.failed_attempts == 0:
+            return format_html('<span style="color: green;">0</span>')
+        elif obj.failed_attempts < 3:
+            return format_html('<span style="color: orange;">{}</span>', obj.failed_attempts)
+        else:
+            return format_html('<span style="color: red; font-weight: bold;">{}</span>', obj.failed_attempts)
+    failed_attempts_display.short_description = 'تلاش‌های ناموفق'
+    
+    def lock_status_display(self, obj):
+        if obj.is_locked():
+            remaining_minutes = obj.get_lock_remaining_time() // 60
+            return format_html(
+                '<span style="color: red; font-weight: bold;">🔒 قفل ({} دقیقه)</span>',
+                remaining_minutes
+            )
+        return format_html('<span style="color: green;">🔓 آزاد</span>')
+    lock_status_display.short_description = 'وضعیت قفل'
+    
+    def has_add_permission(self, request):
+        """رمز فقط توسط کاربر از طریق وب‌سایت تنظیم می‌شود"""
+        return False
+    
+    actions = ['unlock_pins', 'reset_failed_attempts']
+    
+    @admin.action(description='باز کردن قفل رمزهای انتخاب شده')
+    def unlock_pins(self, request, queryset):
+        for pin in queryset:
+            pin.failed_attempts = 0
+            pin.locked_until = None
+            pin.save(update_fields=['failed_attempts', 'locked_until'])
+        
+        self.message_user(request, f'{queryset.count()} رمز باز شد')
+    
+    @admin.action(description='ریست کردن تلاش‌های ناموفق')
+    def reset_failed_attempts(self, request, queryset):
+        updated = queryset.update(failed_attempts=0)
+        self.message_user(request, f'{updated} رمز ریست شد')

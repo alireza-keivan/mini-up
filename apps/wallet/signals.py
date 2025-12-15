@@ -43,3 +43,16 @@ def log_transaction(sender, instance, created, **kwargs):
             f"Amount: {instance.amount:,} | "
             f"User: {instance.wallet.user}"
         )
+        
+        # ارسال اعلان برای تراکنش‌های مهم
+        try:
+            from apps.content.services import NotificationService
+            
+            if instance.transaction_type == 'deposit' and instance.status == 'completed':
+                # شارژ کیف پول
+                NotificationService.notify_wallet_deposit(instance)
+            elif instance.transaction_type == 'purchase' and instance.status == 'completed':
+                # خرید با کیف پول
+                NotificationService.notify_wallet_purchase(instance)
+        except Exception as e:
+            logger.error(f"Failed to send wallet notification: {e}")
