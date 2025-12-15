@@ -20,19 +20,29 @@
             
             <!-- Search Box -->
             <div class="navbar-search-box">
+<<<<<<< HEAD
                 <form class="navbar-search-form" action="{% url 'core:search' %}" method="get" autocomplete="off">
+=======
+                <form class="navbar-search-form" action="{% url 'products:search' %}" method="get">
+>>>>>>> 79a8fef (Pull profile amir)
                     <button type="submit" class="navbar-search-btn">
                         <i class="fas fa-search"></i>
                     </button>
                     <input 
                         type="text" 
                         name="q"
+<<<<<<< HEAD
                         id="navbarSearchInput"
+=======
+>>>>>>> 79a8fef (Pull profile amir)
                         class="navbar-search-input" 
                         placeholder="جستجو در محصولات و خدمات..."
                         autocomplete="off"
                     >
+<<<<<<< HEAD
                     <div id="searchAutocomplete" class="search-autocomplete" style="display: none;"></div>
+=======
+>>>>>>> 79a8fef (Pull profile amir)
                 </form>
             </div>
             
@@ -693,6 +703,7 @@ window.addEventListener('scroll', function() {
         navbarBottom.style.pointerEvents = 'auto';
     }
 });
+<<<<<<< HEAD
 // Search Autocomplete
 (function() {
     const searchInput = document.getElementById('navbarSearchInput');
@@ -785,4 +796,6 @@ window.addEventListener('scroll', function() {
     }
 })();
 
+=======
+>>>>>>> 79a8fef (Pull profile amir)
 </script>
