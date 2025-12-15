@@ -1,0 +1,228 @@
+{% load humanize %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/navbar-modern.css' %}">
+
+<nav class="navbar" id="mainNavbar">
+    <!-- Row 1: Logo + Search + Actions -->
+    <div class="navbar-top">
+        <div class="navbar-container">
+            
+            <a href="{% url 'core:home' %}" class="navbar-logo">
+                <div class="navbar-logo-icon">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="navbar-logo-text">
+                    <span class="navbar-logo-brand">Mini<span>-up</span></span>
+                    <span class="navbar-logo-tagline">گیمینگ و خدمات مجازی</span>
+                </div>
+            </a>
+            
+            <!-- Search Box -->
+            <div class="navbar-search-box">
+                <form class="navbar-search-form" action="{% url 'products:search' %}" method="get">
+                    <button type="submit" class="navbar-search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <input 
+                        type="text" 
+                        name="q"
+                        class="navbar-search-input" 
+                        placeholder="جستجو در محصولات و خدمات..."
+                        autocomplete="off"
+                    >
+                </form>
+            </div>
+            
+            <!-- Actions -->
+            <div class="navbar-actions">
+                
+                <!-- Cart Button -->
+                <button type="button" 
+                        class="navbar-action-btn" 
+                        id="cartToggle"
+                        data-sidebar-target="cartSidebar"
+                        aria-label="سبد خرید"
+                        title="سبد خرید">
+                    <i class="fas fa-shopping-cart"></i>
+                    {% if cart_count and cart_count > 0 %}
+                        <span class="navbar-action-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </button>
+                
+                <!-- Notifications -->
+                {% if user.is_authenticated %}
+                <div class="navbar-action-dropdown">
+                    <button type="button" 
+                            class="navbar-action-btn" 
+                            id="notificationToggle"
+                            aria-label="اعلان‌ها"
+                            title="اعلان‌ها"
+                            aria-expanded="false"
+                            aria-haspopup="true">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_notifications_count and unread_notifications_count > 0 %}
+                            <span class="navbar-action-badge pulse">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </button>
+                    <div class="navbar-notification-header">
+                        <span class="navbar-notification-title">
+                            <i class="fas fa-bell"></i>
+                            اعلان‌ها
+                        </span>
+                        {% if unread_notifications_count and unread_notifications_count > 0 %}
+                            <button type="button" class="navbar-notification-mark-read" data-action="mark-all-read">
+                                خواندن همه
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="navbar-notification-body">
+                        {% if notifications %}
+                            {% for notification in notifications|slice:":5" %}
+                                <a href="{{ notification.url }}" 
+                                   class="navbar-notification-item {% if not notification.is_read %}unread{% endif %}"
+                                   data-notification-id="{{ notification.id }}">
+                                    <div class="navbar-notification-item-icon {{ notification.type }}">
+                                        {% if notification.type == 'order' %}
+                                            <i class="fas fa-shopping-bag"></i>
+                                        {% elif notification.type == 'wallet' %}
+                                            <i class="fas fa-wallet"></i>
+                                        {% elif notification.type == 'promo' %}
+                                            <i class="fas fa-gift"></i>
+                                        {% else %}
+                                            <i class="fas fa-info-circle"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="navbar-notification-item-content">
+                                        <div class="navbar-notification-item-title">{{ notification.title }}</div>
+                                        <div class="navbar-notification-item-desc">{{ notification.message|truncatewords:10 }}</div>
+                                        <div class="navbar-notification-item-time">
+                                            <i class="fas fa-clock"></i>
+                                            {{ notification.created_at|timesince }} پیش
+                                        </div>
+                                    </div>
+                                    {% if not notification.is_read %}
+                                        <span class="navbar-notification-item-dot"></span>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="navbar-notification-empty">
+                                <i class="fas fa-bell-slash"></i>
+                                <span>اعلان جدیدی ندارید</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if notifications %}
+                        <div class="navbar-notification-footer">
+                            <a href="{% url 'accounts:notifications' %}" class="navbar-notification-view-all">
+                                مشاهده همه اعلان‌ها
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            
+            {% if user.is_authenticated %}
+                <!-- User Dropdown -->
+                <div class="navbar-user" data-user-dropdown>
+                    <button type="button" 
+                            class="navbar-user-trigger" 
+                            data-ud-trigger
+                            aria-label="منوی کاربری"
+                            aria-expanded="false"
+                            aria-haspopup="true">
+                        <div class="navbar-user-avatar">
+                            {% if user.profile and user.profile.avatar %}
+                                <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:'کاربر' }}">
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <span class="navbar-user-name">{{ user.get_full_name|default:user.phone }}</span>
+                        <i class="fas fa-chevron-down" data-ud-arrow></i>
+                    </button>
+                    
+                    <div class="navbar-user-dropdown" data-ud-dropdown>
+                        <div class="navbar-user-dropdown-container">
+                            <!-- Header -->
+                            <div class="navbar-user-dropdown-header">
+                                <div class="navbar-user-dropdown-header-avatar">
+                                    {% if user.profile and user.profile.avatar %}
+                                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:'کاربر' }}">
+                                    {% else %}
+                                        <i class="fas fa-user"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="navbar-user-dropdown-header-info">
+                                    <div class="navbar-user-dropdown-header-name">{{ user.get_full_name|default:"کاربر" }}</div>
+                                    <div class="navbar-user-dropdown-header-email">{{ user.phone }}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Menu links -->
+                            <a href="{% url 'accounts:dashboard' %}#orders" class="navbar-user-dropdown-item">
+                                <i class="fas fa-shopping-bag"></i>
+                                <span>سفارش‌ها</span>
+                            </a>
+                            <a href="{% url 'accounts:tickets' %}" class="navbar-user-dropdown-item">
+                                <i class="fas fa-headset"></i>
+                                <span>تیکت‌های پشتیبانی</span>
+                            </a>
+                            <a href="{% url 'accounts:dashboard' %}#wallet" class="navbar-user-dropdown-item">
+                                <i class="fas fa-wallet"></i>
+                                <span>کیف پول</span>
+                            </a>
+                            <a href="{% url 'accounts:dashboard' %}#info" class="navbar-user-dropdown-item">
+                                <i class="fas fa-user-edit"></i>
+                                <span>پروفایل</span>
+                            </a>
+                            
+                            <div class="navbar-user-dropdown-divider"></div>
+                            
+                            <a href="{% url 'accounts:logout' %}" class="navbar-user-dropdown-item navbar-user-logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>خروج</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="navbar-auth-buttons">
+                    <a href="{% url 'accounts:login' %}" class="navbar-auth-btn login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>ورود / ثبت نام</span>
+                    </a>
+                </div>
+            {% endif %}
+            
+            
+            <button type="button" 
+                    class="navbar-mobile-toggle"
+                    id="mobileMenuToggle"
+                    aria-label="منوی موبایل"
+                    aria-expanded="false"
+                    aria-controls="mobileMenu">
+                <span class="navbar-mobile-toggle-bar"></span>
+                <span class="navbar-mobile-toggle-bar"></span>
+                <span class="navbar-mobile-toggle-bar"></span>
+            </button>
+            
+        </div>
+    </div>
+    
+    <!-- Row 2: Menu Items (fades on scroll) -->
+    <div class="navbar-bottom" id="navbarBottom">
+        <div class="navbar-container">
+            <div class="navbar-menu">
+    
+    
+</nav>
+
+<div class="navbar-spacer"></div>
+
