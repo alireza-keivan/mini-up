@@ -154,6 +154,13 @@
         nextBtn?.addEventListener('click', () => smoothScroll(wrapper, -CONFIG.scrollAmount));
 
         // Drag Support
+        // Track hover state for conditional wheel scroll prevention
+        let isHovering = false;
+
+        wrapper.addEventListener('mouseenter', () => {
+            isHovering = true;
+        });
+
         wrapper.addEventListener('mousedown', (e) => {
             state.isDragging = true;
             wrapper.classList.add('is-dragging');
@@ -163,6 +170,7 @@
         });
 
         wrapper.addEventListener('mouseleave', () => {
+            isHovering = false;
             state.isDragging = false;
             wrapper.classList.remove('is-dragging');
         });
@@ -198,10 +206,14 @@
             wrapper.scrollLeft = state.scrollLeft - walk;
         }, { passive: true });
 
-        // Mouse Wheel Support
+        // Mouse Wheel Support - only hijack scroll when hovering over carousel
         wrapper.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            wrapper.scrollLeft += e.deltaY * CONFIG.wheelMultiplier;
+            // Only prevent default page scroll when mouse is over the carousel
+            if (isHovering) {
+                e.preventDefault();
+                wrapper.scrollLeft += e.deltaY * CONFIG.wheelMultiplier;
+            }
+            // Otherwise, allow normal page scrolling
         }, { passive: false });
 
         // Update dots on scroll

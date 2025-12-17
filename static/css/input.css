@@ -11,6 +11,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 @import './base/_variables.css';
 @import './base/_reset.css';
+@import './base/_fonts.css'; 
 @import './base/_typography.css';
 @import './base/_scrollbar.css';
 

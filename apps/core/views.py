@@ -20,8 +20,45 @@ def home(request):
 
 
 def virtual_services(request):
-    """صفحه خدمات مجازی"""
-    return render(request, 'core/virtual_services.html', {'title': 'خدمات مجازی'})
+    """
+    صفحه خدمات مجازی - محتوای دینامیک
+    Displays virtual service categories with their products
+    All content is managed by admin through Category and Product models
+    """
+    from apps.products.models import Category, Product
+    from django.db.models import Prefetch
+    
+    # Get virtual service categories (top-level only)
+    categories = Category.objects.filter(
+        category_type=Category.CategoryType.VIRTUAL,
+        parent__isnull=True,
+        is_active=True
+    ).prefetch_related(
+        Prefetch(
+            'products',
+            queryset=Product.objects.filter(
+                is_active=True,
+                product_type=Product.ProductType.VIRTUAL
+            ).select_related('category', 'brand').prefetch_related('images').order_by('-is_featured', '-created_at')[:12],
+            to_attr='active_products'
+        )
+    ).order_by('sort_order', 'name')
+    
+    # Filter out categories with no products
+    categories_with_products = [cat for cat in categories if cat.active_products]
+    
+    # Get featured products for carousel (admin-controlled via is_featured flag)
+    carousel_products = Product.objects.filter(
+        is_active=True,
+        product_type=Product.ProductType.VIRTUAL,
+        is_featured=True  # Only featured products appear in carousel
+    ).select_related('category', 'brand').prefetch_related('images').order_by('-created_at')[:6]
+    
+    return render(request, 'core/virtual_services.html', {
+        'title': 'خدمات مجازی',
+        'categories': categories_with_products,
+        'carousel_products': carousel_products
+    })
 
 
 def gaming_products(request):
@@ -106,10 +143,6 @@ def contact(request):
 def accounts(request):
     """تماس با ما"""
     return render(request, 'core/accounts.html', {'title': 'حساب کاربری'})
-
-def consulting(request):
-    """صفحه مشاوره"""
-    return render(request, 'core/consulting.html', {'title': 'مشاوره'})
 
 
 def about(request):

@@ -13,7 +13,7 @@ package-lock.json
 .vscode/
 .idea/
 .DS_Store
-
+.bin/
 # Compiled static assets
 apps/core/static/core/css/main.css
 apps/core/static/core/js/*.min.js

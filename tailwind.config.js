@@ -64,7 +64,7 @@ module.exports = {
          ═══════════════════════════════════════════ */
       fontFamily: {
         'vazir': ['Vazirmatn', 'Tahoma', 'Arial', 'sans-serif'],
-        'estedad': ['Estedad', 'Vazirmatn', 'sans-serif'],
+        'lalezar': ['Lalezar', 'Vazirmatn', 'sans-serif'],
         'mono': ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
       fontSize: {

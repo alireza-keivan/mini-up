@@ -1,0 +1,129 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     WALLET FILTERS
+     Filters transactions by type, date range, and sorting
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+
+<section id="wallet-filters" class="mt-10">
+    
+    <div class="bg-dark-800/70 backdrop-blur-xl border border-dark-700/40 
+                rounded-2xl p-5 sm:p-6 shadow-xl">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
+            <h3 class="text-lg sm:text-xl font-bold text-white">فیلتر تراکنش‌ها</h3>
+
+            <button id="wallet-reset-filters"
+                    class="text-sm text-neon-cyan hover:text-neon-green 
+                           transition-colors duration-300">
+                بازنشانی فیلترها
+            </button>
+        </div>
+
+        <!-- Filters Form -->
+        <form id="wallet-filters-form" class="space-y-6">
+
+            <!-- Search -->
+            <div class="relative">
+                <input type="text"
+                       name="search"
+                       id="wallet-search"
+                       placeholder="جستجو در تراکنش‌ها (شماره، مبلغ، توضیحات)"
+                       class="w-full py-3 px-4 rounded-xl bg-dark-700/50 
+                              border border-dark-600/50 focus:border-neon-cyan/50
+                              text-dark-200 placeholder:text-dark-500
+                              transition duration-300 outline-none">
+                
+                <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-dark-400"
+                     fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M21 21l-4.35-4.35m1.3-5.4a6 6 0 11-12 0 6 6 0 0112 0z"/>
+                </svg>
+            </div>
+
+            <!-- Transaction Type -->
+            <div>
+                <p class="text-dark-400 text-sm mb-2">نوع تراکنش:</p>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    {% for value, label in transaction_types %}
+                    <label class="group cursor-pointer">
+                        <input type="checkbox" 
+                               name="type"
+                               value="{{ value }}"
+                               class="hidden peer">
+
+                        <div class="py-2.5 rounded-xl text-center
+                                    bg-dark-700/40 border border-dark-600/40
+                                    text-dark-300
+                                    peer-checked:bg-neon-cyan/20
+                                    peer-checked:border-neon-cyan
+                                    peer-checked:text-neon-cyan
+                                    transition-all duration-300">
+                            {{ label }}
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Date Range -->
+            <div>
+                <p class="text-dark-400 text-sm mb-2">بازه زمانی:</p>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <button type="button"
+                            class="wallet-date-btn filter-active"
+                            data-range="today">امروز</button>
+
+                    <button type="button"
+                            class="wallet-date-btn"
+                            data-range="7days">۷ روز اخیر</button>
+
+                    <button type="button"
+                            class="wallet-date-btn"
+                            data-range="month">ماه جاری</button>
+
+                    <button type="button"
+                            class="wallet-date-btn"
+                            data-range="custom">سفارشی</button>
+                </div>
+
+                <!-- Custom Range -->
+                <div id="wallet-date-custom" class="hidden mt-4 grid grid-cols-2 gap-4">
+                    
+                    <input type="date" 
+                           name="date_from"
+                           class="wallet-date-input">
+
+                    <input type="date" 
+                           name="date_to"
+                           class="wallet-date-input">
+                </div>
+            </div>
+
+            <!-- Sorting -->
+            <div>
+                <p class="text-dark-400 text-sm mb-2">مرتب‌سازی:</p>
+
+                <select name="sort"
+                        class="w-full py-3 px-4 rounded-xl bg-dark-700/50 
+                               border border-dark-600/40 text-dark-200 
+                               focus:border-neon-cyan/50 outline-none">
+                    <option value="newest">جدیدترین</option>
+                    <option value="oldest">قدیمی‌ترین</option>
+                    <option value="highest">بیشترین مبلغ</option>
+                    <option value="lowest">کمترین مبلغ</option>
+                </select>
+            </div>
+
+            <!-- Apply Filters -->
+            <button type="submit"
+                    class="w-full py-3 rounded-xl bg-neon-cyan text-dark-900 
+                           font-bold text-lg hover:brightness-110 
+                           transition-all btn-ripple">
+                اعمال فیلترها
+            </button>
+
+        </form>
+    </div>
+</section>

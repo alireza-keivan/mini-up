@@ -12,6 +12,45 @@
         @apply overflow-hidden;
     }
 
+    /* ===============================
+       HOME HERO BACKGROUND
+       ================================ */
+
+    .home-hero {
+        position: relative;
+        min-height: 100vh;
+
+        background-image: url("../../images/backgrounds/blur.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        overflow: hidden;
+    }
+
+    /* Dark overlay for readability */
+    .home-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        background:
+            radial-gradient(
+                ellipse at top,
+                rgba(0, 0, 0, 0.35),
+                rgba(5, 5, 10, 0.65)
+            );
+
+        z-index: 1;
+    }
+
+    /* Content must stay above the overlay */
+    .home-hero > * {
+        position: relative;
+        z-index: 2;
+    }
+
+
     .hero-bg {
         @apply absolute inset-0 z-0;
         background:

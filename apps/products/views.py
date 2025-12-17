@@ -90,9 +90,11 @@ class ProductListView(WishlistContextMixin, FilterMixin, ListView):
     paginate_by = 24
     
     def get_queryset(self):
-        # Start with active products
+        # Start with active products, EXCLUDE virtual products (they appear on /virtual-services/)
         queryset = Product.objects.filter(
             is_active=True
+        ).exclude(
+            product_type=Product.ProductType.VIRTUAL
         ).select_related(
             'category', 'brand'
         ).prefetch_related(

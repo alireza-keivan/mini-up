@@ -1,912 +1,530 @@
 /* ═══════════════════════════════════════════════════════════════════════════════
-   ACCOUNTS PAGES — Dashboard, Profile, Orders, Settings
-   MINI-UP.IR — Neon Dark Gaming Theme
+   PROFILE PAGE STYLES — Mini-up.ir Neon Dark Theme
+   Path: static/css/pages/_accounts.css
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   ACCOUNT LAYOUT
+   PROFILE HEADER SECTION
    ───────────────────────────────────────────────────────────────────────────── */
-.account-layout {
-    @apply min-h-screen;
-    background: var(--gradient-dark);
+
+.profile-header {
+    position: relative;
+    overflow: hidden;
 }
 
-.account-container {
-    @apply max-w-7xl mx-auto px-4 py-8;
+.profile-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse at 20% 0%, rgba(0, 255, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+    pointer-events: none;
 }
 
-.account-grid {
-    @apply grid grid-cols-1 lg:grid-cols-4 gap-6;
+/* Avatar Container */
+.profile-avatar {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.profile-avatar-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        #00ffff,
+        #8b5cf6,
+        #f472b6,
+        #00ffff
+    );
+    animation: avatar-ring-spin 8s linear infinite;
+    opacity: 0.7;
+}
+
+.profile-avatar-ring::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: #0a0a0f;
+    border-radius: 50%;
+}
+
+@keyframes avatar-ring-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.profile-avatar img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 255, 255, 0.3);
+}
+
+/* Level Badge */
+.profile-level-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(25%, 25%);
+    z-index: 2;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    border: 2px solid #0a0a0f;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    color: white;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   ACCOUNT SIDEBAR
+   TAB NAVIGATION
    ───────────────────────────────────────────────────────────────────────────── */
-.account-sidebar {
-    @apply lg:col-span-1;
+
+.profile-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 0.5rem;
 }
 
-.account-sidebar-card {
-    @apply rounded-2xl p-6 sticky top-24;
-    background: rgba(15, 15, 22, 0.8);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+.profile-tabs::-webkit-scrollbar {
+    display: none;
 }
 
-.account-user-info {
-    @apply text-center pb-6 mb-6;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.profile-tab-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #9ca3af;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
-.account-avatar {
-    @apply w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden;
-    @apply ring-4 ring-pink-500/30;
-    @apply transition-all duration-300;
-}
-
-.account-avatar:hover {
-    @apply ring-pink-500/60;
-    box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
-}
-
-.account-avatar img {
-    @apply w-full h-full object-cover;
-}
-
-.account-avatar-placeholder {
-    @apply w-full h-full flex items-center justify-center;
-    @apply text-4xl text-pink-400;
-    background: linear-gradient(135deg, var(--dark-700), var(--dark-800));
-}
-
-.account-username {
-    @apply text-xl font-bold text-white mb-1;
-}
-
-.account-email {
-    @apply text-sm text-gray-400;
-}
-
-.account-badge {
-    @apply inline-flex items-center gap-1 px-3 py-1 mt-3 rounded-full;
-    @apply text-xs font-medium;
-    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-    box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SIDEBAR NAVIGATION
-   ───────────────────────────────────────────────────────────────────────────── */
-.account-nav {
-    @apply space-y-1;
-}
-
-.account-nav-link {
-    @apply flex items-center gap-3 px-4 py-3 rounded-xl;
-    @apply text-gray-300 font-medium;
-    @apply transition-all duration-200;
-}
-
-.account-nav-link:hover {
-    @apply text-white;
+.profile-tab-btn:hover {
+    color: white;
     background: rgba(255, 255, 255, 0.05);
 }
 
-.account-nav-link.active {
-    @apply text-white;
-    background: linear-gradient(135deg, rgba(255, 0, 85, 0.2), rgba(191, 0, 255, 0.1));
-    border-right: 3px solid var(--neon-pink);
+.profile-tab-btn.active {
+    color: #00ffff;
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.3);
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.account-nav-link i {
-    @apply w-5 text-center text-pink-500;
+.profile-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
 }
 
-.account-nav-link.active i {
-    @apply text-pink-400;
+.profile-tab-btn i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
 }
 
-.account-nav-divider {
-    @apply my-4;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.account-nav-link.danger {
-    @apply text-red-400;
-}
-
-.account-nav-link.danger:hover {
-    @apply text-red-300;
-    background: rgba(239, 68, 68, 0.1);
-}
-
-.account-nav-link.danger i {
-    @apply text-red-500;
+.profile-tab-btn:hover i {
+    transform: scale(1.1);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   MAIN CONTENT AREA
+   TAB CONTENT ANIMATIONS
    ───────────────────────────────────────────────────────────────────────────── */
-.account-main {
-    @apply lg:col-span-3 space-y-6;
+
+.profile-tab-content {
+    animation: tab-fade-in 0.4s ease-out;
 }
 
-.account-card {
-    @apply rounded-2xl p-6;
-    background: rgba(15, 15, 22, 0.8);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    @apply transition-all duration-300;
+@keyframes tab-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.account-card:hover {
-    border-color: rgba(255, 0, 85, 0.2);
-}
-
-.account-card-header {
-    @apply flex items-center justify-between pb-4 mb-6;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.account-card-title {
-    @apply flex items-center gap-3 text-xl font-bold text-white;
-}
-
-.account-card-title i {
-    @apply text-pink-500;
-}
-
-.account-card-action {
-    @apply text-sm text-pink-400 hover:text-pink-300;
-    @apply transition-colors duration-200;
+.animate-fade-in {
+    animation: tab-fade-in 0.4s ease-out;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   DASHBOARD STATS
+   STAT CARDS (Dashboard)
    ───────────────────────────────────────────────────────────────────────────── */
-.dashboard-stats {
-    @apply grid grid-cols-2 md:grid-cols-4 gap-4 mb-6;
-}
 
 .stat-card {
-    @apply rounded-xl p-4 text-center;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    @apply transition-all duration-300;
+    position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--stat-color, linear-gradient(90deg, #00ffff, #8b5cf6));
+    opacity: 0.7;
 }
 
 .stat-card:hover {
-    @apply transform -translate-y-1;
-    border-color: rgba(255, 0, 85, 0.3);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
-.stat-icon {
-    @apply w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center;
-    @apply text-xl;
+.stat-card.stat-cyan::before { --stat-color: #00ffff; }
+.stat-card.stat-purple::before { --stat-color: #8b5cf6; }
+.stat-card.stat-pink::before { --stat-color: #f472b6; }
+.stat-card.stat-green::before { --stat-color: #10b981; }
+.stat-card.stat-yellow::before { --stat-color: #fbbf24; }
+
+.stat-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
 }
 
-.stat-icon.pink {
-    background: linear-gradient(135deg, rgba(255, 0, 85, 0.2), rgba(255, 0, 85, 0.1));
-    @apply text-pink-400;
+.stat-card-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.25rem;
+    font-family: 'Vazirmatn', sans-serif;
 }
 
-.stat-icon.cyan {
-    background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(0, 245, 255, 0.1));
-    @apply text-cyan-400;
-}
-
-.stat-icon.purple {
-    background: linear-gradient(135deg, rgba(191, 0, 255, 0.2), rgba(191, 0, 255, 0.1));
-    @apply text-purple-400;
-}
-
-.stat-icon.yellow {
-    background: linear-gradient(135deg, rgba(255, 204, 0, 0.2), rgba(255, 204, 0, 0.1));
-    @apply text-yellow-400;
-}
-
-.stat-value {
-    @apply text-2xl font-bold text-white mb-1;
-}
-
-.stat-label {
-    @apply text-sm text-gray-400;
+.stat-card-label {
+    font-size: 0.875rem;
+    color: #9ca3af;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   WALLET CARD (Dashboard)
+   NEON CARDS (Bank Cards, Address Cards)
    ───────────────────────────────────────────────────────────────────────────── */
-.wallet-card {
-    @apply rounded-2xl p-6 mb-6;
-    background: linear-gradient(135deg, rgba(255, 0, 85, 0.15), rgba(191, 0, 255, 0.1));
-    border: 1px solid rgba(255, 0, 85, 0.3);
+
+.neon-card {
+    position: relative;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.wallet-header {
-    @apply flex items-center justify-between mb-4;
+.neon-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(0, 255, 255, 0.03) 50%,
+        transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.wallet-title {
-    @apply flex items-center gap-2 text-lg font-bold text-white;
+.neon-card:hover::before {
+    opacity: 1;
 }
 
-.wallet-title i {
-    @apply text-pink-400;
+.neon-card:hover {
+    border-color: rgba(0, 255, 255, 0.2);
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.1),
+        0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
-.wallet-balance {
-    @apply text-3xl font-black text-white mb-1;
+/* Bank Card Specific */
+.bank-card {
+    aspect-ratio: 1.586 / 1; /* Standard credit card ratio */
+    max-width: 380px;
+    background: linear-gradient(
+        135deg,
+        rgba(20, 20, 30, 0.9) 0%,
+        rgba(30, 30, 50, 0.9) 100%
+    );
+    border-radius: 1rem;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
-.wallet-balance span {
-    @apply text-lg text-gray-400 font-normal mr-2;
+.bank-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 70%
+    );
+    pointer-events: none;
 }
 
-.wallet-actions {
-    @apply flex gap-3 mt-4;
+.bank-card-number {
+    font-family: 'Courier New', monospace;
+    font-size: 1.25rem;
+    letter-spacing: 0.15em;
+    color: white;
+    direction: ltr;
+    text-align: center;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   RECENT ACTIVITY
-   ───────────────────────────────────────────────────────────────────────────── */
-.activity-list {
-    @apply space-y-3;
+.bank-card-chip {
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(
+        135deg,
+        #ffd700 0%,
+        #b8860b 50%,
+        #ffd700 100%
+    );
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
 }
 
-.activity-item {
-    @apply flex items-center gap-4 p-4 rounded-xl;
-    background: rgba(255, 255, 255, 0.03);
-    @apply transition-all duration-200;
+.bank-card-chip::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.3) 3px,
+        rgba(0, 0, 0, 0.3) 6px
+    );
 }
 
-.activity-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.activity-icon {
-    @apply w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0;
-}
-
-.activity-icon.success {
+/* Default Badge */
+.default-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
     background: rgba(16, 185, 129, 0.2);
-    @apply text-green-400;
-}
-
-.activity-icon.pending {
-    background: rgba(255, 204, 0, 0.2);
-    @apply text-yellow-400;
-}
-
-.activity-icon.failed {
-    background: rgba(239, 68, 68, 0.2);
-    @apply text-red-400;
-}
-
-.activity-info {
-    @apply flex-1 min-w-0;
-}
-
-.activity-title {
-    @apply text-white font-medium truncate;
-}
-
-.activity-time {
-    @apply text-sm text-gray-500;
-}
-
-.activity-amount {
-    @apply text-left font-bold;
-}
-
-.activity-amount.positive {
-    @apply text-green-400;
-}
-
-.activity-amount.negative {
-    @apply text-red-400;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    color: #10b981;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   PROFILE FORM
+   ORDER CARDS
    ───────────────────────────────────────────────────────────────────────────── */
-.profile-form {
-    @apply space-y-6;
-}
 
-.form-row {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-}
-
-.form-group {
-    @apply space-y-2;
-}
-
-.form-label {
-    @apply block text-sm font-medium text-gray-300;
-}
-
-.form-label .required {
-    @apply text-pink-500 mr-1;
-}
-
-.form-input {
-    @apply w-full px-4 py-3 rounded-xl;
-    @apply text-white placeholder-gray-500;
-    @apply transition-all duration-200;
-    @apply focus:outline-none;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.form-input:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.form-input:focus {
-    border-color: var(--neon-pink);
-    box-shadow: 0 0 0 3px rgba(255, 0, 85, 0.1);
-}
-
-.form-input:disabled {
-    @apply opacity-50 cursor-not-allowed;
-}
-
-.form-input-icon {
-    @apply relative;
-}
-
-.form-input-icon input {
-    @apply pr-12;
-}
-
-.form-input-icon i {
-    @apply absolute left-4 top-1/2 -translate-y-1/2 text-gray-500;
-}
-
-.form-textarea {
-    @apply w-full px-4 py-3 rounded-xl min-h-[120px] resize-y;
-    @apply text-white placeholder-gray-500;
-    @apply transition-all duration-200;
-    @apply focus:outline-none;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.form-textarea:focus {
-    border-color: var(--neon-pink);
-    box-shadow: 0 0 0 3px rgba(255, 0, 85, 0.1);
-}
-
-.form-hint {
-    @apply text-xs text-gray-500;
-}
-
-.form-error {
-    @apply text-xs text-red-400;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   ORDERS TABLE
-   ───────────────────────────────────────────────────────────────────────────── */
-.orders-table-wrapper {
-    @apply overflow-x-auto;
-}
-
-.orders-table {
-    @apply w-full;
-}
-
-.orders-table th {
-    @apply px-4 py-3 text-right text-sm font-medium text-gray-400;
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.orders-table th:first-child {
-    @apply rounded-r-lg;
-}
-
-.orders-table th:last-child {
-    @apply rounded-l-lg;
-}
-
-.orders-table td {
-    @apply px-4 py-4 text-sm text-gray-300;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.orders-table tr:hover td {
+.order-card {
     background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.order-id {
-    @apply font-mono text-pink-400;
-}
-
-.order-product {
-    @apply flex items-center gap-3;
-}
-
-.order-product-image {
-    @apply w-12 h-12 rounded-lg overflow-hidden flex-shrink-0;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.order-product-image img {
-    @apply w-full h-full object-cover;
-}
-
-.order-product-name {
-    @apply text-white font-medium;
-}
-
-.order-product-variant {
-    @apply text-xs text-gray-500;
+.order-card:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(-4px);
 }
 
 .order-status {
-    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 .order-status.pending {
-    background: rgba(255, 204, 0, 0.15);
-    @apply text-yellow-400;
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
 }
 
 .order-status.processing {
-    background: rgba(0, 245, 255, 0.15);
-    @apply text-cyan-400;
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .order-status.completed {
-    background: rgba(0, 255, 136, 0.15);
-    @apply text-green-400;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .order-status.cancelled {
     background: rgba(239, 68, 68, 0.15);
-    @apply text-red-400;
-}
-
-.order-status.refunded {
-    background: rgba(156, 163, 175, 0.15);
-    @apply text-gray-400;
-}
-
-.order-actions {
-    @apply flex items-center gap-2;
-}
-
-.order-action-btn {
-    @apply w-8 h-8 rounded-lg flex items-center justify-center;
-    @apply text-gray-400 hover:text-white;
-    @apply transition-all duration-200;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.order-action-btn:hover {
-    background: rgba(255, 0, 85, 0.2);
-    @apply text-pink-400;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   ORDERS - MOBILE CARDS (Responsive)
-   ───────────────────────────────────────────────────────────────────────────── */
-.orders-mobile {
-    @apply lg:hidden space-y-4;
-}
-
-.order-mobile-card {
-    @apply rounded-xl p-4;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.order-mobile-header {
-    @apply flex items-center justify-between mb-3 pb-3;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.order-mobile-body {
-    @apply space-y-2;
-}
-
-.order-mobile-row {
-    @apply flex items-center justify-between text-sm;
-}
-
-.order-mobile-label {
-    @apply text-gray-500;
-}
-
-.order-mobile-value {
-    @apply text-gray-200;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   ADDRESS CARDS
-   ───────────────────────────────────────────────────────────────────────────── */
-.address-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
-}
-
-.address-card {
-    @apply relative rounded-xl p-5;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    @apply transition-all duration-300;
-}
-
-.address-card:hover {
-    border-color: rgba(255, 0, 85, 0.3);
-}
-
-.address-card.default {
-    border-color: rgba(255, 0, 85, 0.4);
-    background: rgba(255, 0, 85, 0.05);
-}
-
-.address-default-badge {
-    @apply absolute top-3 left-3 px-2 py-1 rounded-full;
-    @apply text-xs font-medium text-pink-400;
-    background: rgba(255, 0, 85, 0.2);
-}
-
-.address-title {
-    @apply flex items-center gap-2 text-white font-bold mb-3;
-}
-
-.address-title i {
-    @apply text-pink-500;
-}
-
-.address-content {
-    @apply text-sm text-gray-400 leading-relaxed mb-4;
-}
-
-.address-meta {
-    @apply flex items-center gap-4 text-sm text-gray-500 mb-4;
-}
-
-.address-meta-item {
-    @apply flex items-center gap-1;
-}
-
-.address-meta-item i {
-    @apply text-xs;
-}
-
-.address-actions {
-    @apply flex items-center gap-2 pt-4;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.address-action-btn {
-    @apply flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm;
-    @apply transition-all duration-200;
-}
-
-.address-action-btn.edit {
-    @apply text-cyan-400 hover:text-cyan-300;
-    background: rgba(0, 245, 255, 0.1);
-}
-
-.address-action-btn.edit:hover {
-    background: rgba(0, 245, 255, 0.2);
-}
-
-.address-action-btn.delete {
-    @apply text-red-400 hover:text-red-300;
-    background: rgba(239, 68, 68, 0.1);
-}
-
-.address-action-btn.delete:hover {
-    background: rgba(239, 68, 68, 0.2);
-}
-
-.address-action-btn.default {
-    @apply text-gray-400 hover:text-pink-400;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.address-action-btn.default:hover {
-    background: rgba(255, 0, 85, 0.1);
-}
-
-/* Add New Address Card */
-.address-add-card {
-    @apply rounded-xl p-5 flex flex-col items-center justify-center min-h-[200px];
-    @apply cursor-pointer;
-    background: rgba(255, 255, 255, 0.02);
-    border: 2px dashed rgba(255, 255, 255, 0.1);
-    @apply transition-all duration-300;
-}
-
-.address-add-card:hover {
-    border-color: rgba(255, 0, 85, 0.4);
-    background: rgba(255, 0, 85, 0.05);
-}
-
-.address-add-icon {
-    @apply w-14 h-14 rounded-full flex items-center justify-center mb-3;
-    @apply text-2xl text-gray-500;
-    background: rgba(255, 255, 255, 0.05);
-    @apply transition-all duration-300;
-}
-
-.address-add-card:hover .address-add-icon {
-    @apply text-pink-400;
-    background: rgba(255, 0, 85, 0.2);
-}
-
-.address-add-text {
-    @apply text-gray-400 font-medium;
-    @apply transition-colors duration-300;
-}
-
-.address-add-card:hover .address-add-text {
-    @apply text-white;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SETTINGS PAGE
-   ───────────────────────────────────────────────────────────────────────────── */
-.settings-section {
-    @apply mb-8;
-}
-
-.settings-section:last-child {
-    @apply mb-0;
-}
-
-.settings-section-title {
-    @apply text-lg font-bold text-white mb-4 flex items-center gap-2;
-}
-
-.settings-section-title i {
-    @apply text-pink-500;
-}
-
-.settings-list {
-    @apply space-y-3;
-}
-
-.settings-item {
-    @apply flex items-center justify-between p-4 rounded-xl;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    @apply transition-all duration-200;
-}
-
-.settings-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.settings-item-info {
-    @apply flex items-center gap-4;
-}
-
-.settings-item-icon {
-    @apply w-10 h-10 rounded-lg flex items-center justify-center;
-    @apply text-pink-400;
-    background: rgba(255, 0, 85, 0.1);
-}
-
-.settings-item-text h4 {
-    @apply text-white font-medium;
-}
-
-.settings-item-text p {
-    @apply text-sm text-gray-500;
-}
-
-/* Toggle Switch */
-.toggle-switch {
-    @apply relative w-12 h-6 rounded-full cursor-pointer;
-    @apply transition-all duration-300;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.toggle-switch.active {
-    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-}
-
-.toggle-switch::after {
-    content: '';
-    @apply absolute top-1 right-1 w-4 h-4 rounded-full;
-    @apply transition-all duration-300;
-    background: white;
-}
-
-.toggle-switch.active::after {
-    @apply right-auto left-1;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SECURITY SETTINGS
-   ───────────────────────────────────────────────────────────────────────────── */
-.security-card {
-    @apply p-5 rounded-xl;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.security-card-header {
-    @apply flex items-center justify-between mb-4;
-}
-
-.security-card-title {
-    @apply flex items-center gap-2 text-white font-medium;
-}
-
-.security-card-title i {
-    @apply text-cyan-400;
-}
-
-.security-status {
-    @apply flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium;
-}
-
-.security-status.enabled {
-    background: rgba(0, 255, 136, 0.15);
-    @apply text-green-400;
-}
-
-.security-status.disabled {
-    background: rgba(239, 68, 68, 0.15);
-    @apply text-red-400;
-}
-
-.security-card-content {
-    @apply text-sm text-gray-400 mb-4;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   NOTIFICATION PREFERENCES
-   ───────────────────────────────────────────────────────────────────────────── */
-.notification-group {
-    @apply space-y-3;
-}
-
-.notification-item {
-    @apply flex items-center justify-between p-3 rounded-lg;
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.notification-item-info {
-    @apply flex items-center gap-3;
-}
-
-.notification-item-icon {
-    @apply w-8 h-8 rounded-lg flex items-center justify-center text-sm;
-}
-
-.notification-item-icon.email {
-    background: rgba(255, 0, 85, 0.1);
-    @apply text-pink-400;
-}
-
-.notification-item-icon.sms {
-    background: rgba(0, 245, 255, 0.1);
-    @apply text-cyan-400;
-}
-
-.notification-item-icon.push {
-    background: rgba(191, 0, 255, 0.1);
-    @apply text-purple-400;
-}
-
-.notification-item-text {
-    @apply text-sm text-gray-300;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   DANGER ZONE
-   ───────────────────────────────────────────────────────────────────────────── */
-.danger-zone {
-    @apply rounded-xl p-5;
-    background: rgba(239, 68, 68, 0.05);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.danger-zone-title {
-    @apply flex items-center gap-2 text-red-400 font-bold mb-2;
-}
-
-.danger-zone-text {
-    @apply text-sm text-gray-400 mb-4;
-}
-
-.danger-zone-actions {
-    @apply flex flex-wrap gap-3;
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   ACCOUNT BUTTONS
-   ───────────────────────────────────────────────────────────────────────────── */
-.btn-account {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl;
-    @apply font-medium text-sm;
-    @apply transition-all duration-300;
-}
-
-.btn-account-primary {
-    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-    @apply text-white;
-    box-shadow: 0 0 20px rgba(255, 0, 85, 0.3);
-}
-
-.btn-account-primary:hover {
-    @apply transform -translate-y-0.5;
-    box-shadow: 0 0 30px rgba(255, 0, 85, 0.5);
-}
-
-.btn-account-secondary {
-    @apply text-gray-300;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-account-secondary:hover {
-    @apply text-white;
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.btn-account-danger {
-    @apply text-red-400;
-    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
     border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.btn-account-danger:hover {
-    @apply text-red-300;
-    background: rgba(239, 68, 68, 0.2);
+/* ─────────────────────────────────────────────────────────────────────────────
+   PIN & OTP INPUTS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.pin-container,
+.otp-container {
+    display: flex;
+    gap: 0.75rem;
+    direction: ltr;
+    justify-content: center;
 }
 
-.btn-account-outline {
-    @apply text-pink-400;
-    background: transparent;
-    border: 1px solid rgba(255, 0, 85, 0.4);
+.pin-input,
+.otp-input {
+    width: 48px;
+    height: 56px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
 }
 
-.btn-account-outline:hover {
-    @apply text-pink-300;
-    background: rgba(255, 0, 85, 0.1);
-    border-color: rgba(255, 0, 85, 0.6);
+.pin-input:focus,
+.otp-input:focus {
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    outline: none;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   RESPONSIVE FIXES
+   BUTTONS & UTILITY CLASSES
    ───────────────────────────────────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-    .accounts-container {
-        @apply flex-col;
-    }
 
-    .accounts-sidebar {
-        @apply w-full flex-row overflow-x-auto whitespace-nowrap;
-    }
-
-    .accounts-content {
-        @apply w-full;
-    }
-
-    .side-link {
-        @apply flex-shrink-0 px-4 py-3;
-    }
+.btn-neon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: white;
+    background: linear-gradient(135deg, #00ffff, #8b5cf6);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
 }
+
+.btn-neon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+.btn-outline-neon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #00ffff;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-neon:hover {
+    color: white;
+    background: rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.6);
+}
+
+/* Utility glow for status or accent icons */
+.glow-cyan { text-shadow: 0 0 12px #00ffff; }
+.glow-purple { text-shadow: 0 0 12px #8b5cf6; }
+.glow-pink { text-shadow: 0 0 12px #f472b6; }
+
+/* Fade and neon transitions */
+.neon-transition { transition: box-shadow 0.3s ease, transform 0.3s ease; }
+.neon-transition:hover { transform: scale(1.02); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE TWEAKS
+   ───────────────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
-    .dashboard-stats {
-        @apply grid-cols-1;
-    }
-
     .profile-avatar {
-        @apply w-16 h-16;
+        width: 80px;
+        height: 80px;
+    }
+    .stat-card {
+        padding: 1rem;
+    }
+    .bank-card {
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+    .profile-tab-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
     }
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   END OF FILE
-   ───────────────────────────────────────────────────────────────────────────── */
+/* Small fade for disabled or readonly elements */
+.element-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}

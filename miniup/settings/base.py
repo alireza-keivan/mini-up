@@ -55,7 +55,7 @@ LOCAL_APPS = [
     'apps.payments',
     'apps.wallet',
     'apps.coupons',
-    'apps.consulting',
+    # 'apps.consulting',  # Removed - no consulting service in business model
     'apps.content',
 ]
 

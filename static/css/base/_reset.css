@@ -30,7 +30,7 @@
     }
 
     body {
-        font-family: 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Lalezar', 'Vazirmatn', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         background: linear-gradient(180deg, #050a15 0%, #020308 100%);
         background-attachment: fixed;
         color: var(--text-primary);
