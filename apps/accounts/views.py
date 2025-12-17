@@ -953,13 +953,25 @@ class OrdersView(LoginRequiredMixin, TemplateView):
     """
     نمایش لیست سفارشات کاربر
     """
-    template_name = 'accounts/orders.html'
+    template_name = 'orders/order_list.html'
     login_url = '/accounts/login/'
     
     def get_context_data(self, **kwargs):
+        from apps.orders.models import Order
+        from django.db.models import Count, Q
+        
         context = super().get_context_data(**kwargs)
+        
+        # Get user's orders
+        orders = Order.objects.filter(user=self.request.user).order_by('-created_at')
+        
+        # Calculate stats
+        context['orders'] = orders
+        context['orders_count'] = orders.count()
+        context['completed_count'] = orders.filter(status='completed').count()
+        context['processing_count'] = orders.filter(status='processing').count()
         context['page_title'] = 'سفارشات من'
-        context['orders'] = []  # بعداً: Order.objects.filter(user=self.request.user)
+        
         return context
 
 

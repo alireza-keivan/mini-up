@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}درباره ما - {{ block.super }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section style="background: linear-gradient(135deg, rgba(191, 0, 255, 0.15) 0%, rgba(255, 0, 85, 0.15) 100%); 
+                padding: 4rem 1rem; 
+                margin-bottom: 3rem; 
+                position: relative; 
+                overflow: hidden;">
+    <div style="position: absolute; inset: 0; opacity: 0.05; pointer-events: none;">
+        <div style="position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, var(--neon-cyan) 0%, transparent 70%); top: -300px; right: -300px;"></div>
+        <div style="position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, var(--neon-pink) 0%, transparent 70%); bottom: -300px; left: -300px;"></div>
+    </div>
+    
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center; position: relative; z-index: 1;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(191, 0, 255, 0.1)); border: 3px solid var(--neon-cyan); border-radius: 50%; margin-bottom: 2rem; box-shadow: 0 0 40px rgba(0, 245, 255, 0.3);">
+            <i class="fas fa-gamepad" style="font-size: 3rem; color: var(--neon-cyan);"></i>
+        </div>
+        <h1 style="color: var(--neon-cyan); font-size: 3rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);">
+            درباره مینی‌آپ
+        </h1>
+        <p style="color: #ccc; font-size: 1.3rem; max-width: 800px; margin: 0 auto; line-height: 1.8;">
+            پلتفرم پیشرو خدمات دیجیتال و گیمینگ در ایران
+        </p>
+    </div>
+</section>
+
+<!-- Story Section -->
+<section style="max-width: 1200px; margin: 0 auto 4rem; padding: 0 1rem;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+        <div>
+            <h2 style="color: var(--neon-pink); font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-rocket" style="font-size: 1.5rem;"></i>
+                داستان ما
+            </h2>
+            <p style="color: #ccc; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
+                مینی‌آپ در سال ۱۴۰۰ با هدف ارائه بهترین خدمات دیجیتال و گیمینگ به جامعه گیمرها و کاربران ایرانی آغاز به کار کرد. ما با درک نیازهای واقعی کاربران و با تمرکز بر کیفیت و سرعت، توانستیم در مدت کوتاهی به یکی از پرطرفدارترین پلتفرم‌های خرید آنلاین در ایران تبدیل شویم.
+            </p>
+            <p style="color: #999; line-height: 1.8; font-size: 1.05rem;">
+                امروز، هزاران کاربر روزانه برای خرید خدمات پرمیوم، گیم‌کردیت، و محصولات دیجیتال به ما اعتماد می‌کنند.
+            </p>
+        </div>
+        <div style="position: relative;">
+            <div style="background: linear-gradient(135deg, rgba(20, 20, 35, 0.8), rgba(30, 20, 40, 0.8)); 
+                        border: 2px solid rgba(191, 0, 255, 0.3); 
+                        border-radius: 20px; 
+                        padding: 3rem; 
+                        box-shadow: 0 20px 60px rgba(191, 0, 255, 0.2);
+                        backdrop-filter: blur(10px);">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; font-weight: 700; color: var(--neon-cyan); text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);">
+                        +۵۰۰۰
+                    </div>
+                    <div style="color: #999; font-size: 1.1rem;">کاربر فعال</div>
+                </div>
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; font-weight: 700; color: var(--neon-pink); text-shadow: 0 0 20px rgba(255, 0, 85, 0.5);">
+                        +۱۰۰۰۰
+                    </div>
+                    <div style="color: #999; font-size: 1.1rem;">سفارش موفق</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; font-weight: 700; color: var(--neon-purple); text-shadow: 0 0 20px rgba(191, 0, 255, 0.5);">
+                        ۲۴/۷
+                    </div>
+                    <div style="color: #999; font-size: 1.1rem;">پشتیبانی آنلاین</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section style="background: linear-gradient(135deg, rgba(10, 10, 15, 0.95), rgba(26, 10, 31, 0.95)); 
+                padding: 4rem 1rem; 
+                margin-bottom: 4rem;
+                border-top: 2px solid rgba(191, 0, 255, 0.3);
+                border-bottom: 2px solid rgba(191, 0, 255, 0.3);">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <h2 style="color: var(--neon-cyan); font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 3rem; text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);">
+            ارزش‌های ما
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+            <!-- Value 1 -->
+            <div style="background: rgba(20, 20, 35, 0.6); 
+                        border: 1px solid rgba(191, 0, 255, 0.2); 
+                        border-radius: 16px; 
+                        padding: 2rem; 
+                        transition: all 0.3s;
+                        cursor: pointer;"
+                 onmouseover="this.style.borderColor='var(--neon-cyan)'; this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 30px rgba(0, 245, 255, 0.3)';"
+                 onmouseout="this.style.borderColor='rgba(191, 0, 255, 0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="width: 70px; height: 70px; background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 245, 255, 0.1)); border: 2px solid #00ff88; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                    <i class="fas fa-shield-check" style="font-size: 2rem; color: #00ff88;"></i>
+                </div>
+                <h3 style="color: var(--neon-cyan); font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;">
+                    اعتماد و امنیت
+                </h3>
+                <p style="color: #999; line-height: 1.7; font-size: 0.95rem;">
+                    امنیت اطلاعات و تراکنش‌های شما با بالاترین استانداردها برای ما در اولویت است.
+                </p>
+            </div>
+
+            <!-- Value 2 -->
+            <div style="background: rgba(20, 20, 35, 0.6); 
+                        border: 1px solid rgba(191, 0, 255, 0.2); 
+                        border-radius: 16px; 
+                        padding: 2rem; 
+                        transition: all 0.3s;
+                        cursor: pointer;"
+                 onmouseover="this.style.borderColor='var(--neon-pink)'; this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 30px rgba(255, 0, 85, 0.3)';"
+                 onmouseout="this.style.borderColor='rgba(191, 0, 255, 0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="width: 70px; height: 70px; background: linear-gradient(135deg, rgba(255, 0, 85, 0.1), rgba(191, 0, 255, 0.1)); border: 2px solid var(--neon-pink); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                    <i class="fas fa-bolt" style="font-size: 2rem; color: var(--neon-pink);"></i>
+                </div>
+                <h3 style="color: var(--neon-pink); font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;">
+                    سرعت و کیفیت
+                </h3>
+                <p style="color: #999; line-height: 1.7; font-size: 0.95rem;">
+                    ارائه سریع‌ترین و باکیفیت‌ترین خدمات برای تجربه‌ای عالی از خرید آنلاین.
+                </p>
+            </div>
+
+            <!-- Value 3 -->
+            <div style="background: rgba(20, 20, 35, 0.6); 
+                        border: 1px solid rgba(191, 0, 255, 0.2); 
+                        border-radius: 16px; 
+                        padding: 2rem; 
+                        transition: all 0.3s;
+                        cursor: pointer;"
+                 onmouseover="this.style.borderColor='var(--neon-purple)'; this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 30px rgba(191, 0, 255, 0.3)';"
+                 onmouseout="this.style.borderColor='rgba(191, 0, 255, 0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="width: 70px; height: 70px; background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(191, 0, 255, 0.1)); border: 2px solid var(--neon-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                    <i class="fas fa-headset" style="font-size: 2rem; color: var(--neon-purple);"></i>
+                </div>
+                <h3 style="color: var(--neon-purple); font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;">
+                    پشتیبانی حرفه‌ای
+                </h3>
+                <p style="color: #999; line-height: 1.7; font-size: 0.95rem;">
+                    تیم پشتیبانی ما ۲۴ ساعته آماده پاسخگویی به سوالات و مشکلات شماست.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section style="max-width: 1200px; margin: 0 auto 4rem; padding: 0 1rem;">
+    <h2 style="color: var(--neon-pink); font-size: 2.5rem; font-weight: 700; text-align: center; margin-bottom: 3rem; text-shadow: 0 0 20px rgba(255, 0, 85, 0.5);">
+        تیم ما
+    </h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+        <!-- Team Member 1 -->
+        <div style="background: linear-gradient(135deg, rgba(20, 20, 35, 0.8), rgba(30, 20, 40, 0.8)); 
+                    border: 1px solid rgba(191, 0, 255, 0.2); 
+                    border-radius: 16px; 
+                    padding: 2rem; 
+                    text-align: center;
+                    transition: all 0.3s;"
+             onmouseover="this.style.borderColor='var(--neon-cyan)'; this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 30px rgba(0, 245, 255, 0.2)';"
+             onmouseout="this.style.borderColor='rgba(191, 0, 255, 0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+            <div style="width: 100px; height: 100px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);">
+                <i class="fas fa-user-tie" style="font-size: 2.5rem; color: #0a0a1a;"></i>
+            </div>
+            <h3 style="color: #fff; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">مدیر تیم توسعه</h3>
+            <p style="color: var(--neon-cyan); font-size: 0.9rem; margin-bottom: 1rem;">Tech Lead</p>
+            <p style="color: #999; font-size: 0.9rem; line-height: 1.6;">
+                مسئول هدایت تیم فنی و توسعه پلتفرم
+            </p>
+        </div>
+
+        <!-- Team Member 2 -->
+        <div style="background: linear-gradient(135deg, rgba(20, 20, 35, 0.8), rgba(30, 20, 40, 0.8)); 
+                    border: 1px solid rgba(191, 0, 255, 0.2); 
+                    border-radius: 16px; 
+                    padding: 2rem; 
+                    text-align: center;
+                    transition: all 0.3s;"
+             onmouseover="this.style.borderColor='var(--neon-pink)'; this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 30px rgba(255, 0, 85, 0.2)';"
+             onmouseout="this.style.borderColor='rgba(191, 0, 255, 0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+            <div style="width: 100px; height: 100px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);">
+                <i class="fas fa-user-shield" style="font-size: 2.5rem; color: #0a0a1a;"></i>
+            </div>
+            <h3 style="color: #fff; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">مدیر امنیت</h3>
+            <p style="color: var(--neon-pink); font-size: 0.9rem; margin-bottom: 1rem;">Security Manager</p>
+            <p style="color: #999; font-size: 0.9rem; line-height: 1.6;">
+                مسئول امنیت و حفاظت از داده‌های کاربران
+            </p>
+        </div>
+
+        <!-- Team Member 3 -->
+        <div style="background: linear-gradient(135deg, rgba(20, 20, 35, 0.8), rgba(30, 20, 40, 0.8)); 
+                    border: 1px solid rgba(191, 0, 255, 0.2); 
+                    border-radius: 16px; 
+                    padding: 2rem; 
+                    text-align: center;
+                    transition: all 0.3s;"
+             onmouseover="this.style.borderColor='var(--neon-purple)'; this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 30px rgba(191, 0, 255, 0.2)';"
+             onmouseout="this.style.borderColor='rgba(191, 0, 255, 0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+            <div style="width: 100px; height: 100px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(191, 0, 255, 0.3);">
+                <i class="fas fa-users" style="font-size: 2.5rem; color: #0a0a1a;"></i>
+            </div>
+            <h3 style="color: #fff; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">مدیر پشتیبانی</h3>
+            <p style="color: var(--neon-purple); font-size: 0.9rem; margin-bottom: 1rem;">Support Manager</p>
+            <p style="color: #999; font-size: 0.9rem; line-height: 1.6;">
+                مسئول پشتیبانی و رضایت مشتریان
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section style="max-width: 1200px; margin: 0 auto 4rem; padding: 0 1rem;">
+    <div style="background: linear-gradient(135deg, rgba(191, 0, 255, 0.1), rgba(255, 0, 85, 0.1)); 
+                border: 2px solid var(--neon-purple); 
+                border-radius: 20px; 
+                padding: 4rem 2rem; 
+                text-align: center;
+                box-shadow: 0 20px 60px rgba(191, 0, 255, 0.2);">
+        <h2 style="color: var(--neon-cyan); font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);">
+            آماده شروع هستید؟
+        </h2>
+        <p style="color: #ccc; font-size: 1.2rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            به جمع هزاران کاربر راضی ما بپیوندید و تجربه خرید آنلاین بی‌نظیری داشته باشید
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'products:list' %}" 
+               style="display: inline-flex; align-items: center; gap: 0.75rem; 
+                      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)); 
+                      border: none; border-radius: 12px; color: #fff; 
+                      padding: 1.25rem 2.5rem; font-size: 1.1rem; font-weight: 700; 
+                      text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 15px rgba(191, 0, 255, 0.3);"
+               onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 30px rgba(191, 0, 255, 0.5)';"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(191, 0, 255, 0.3)';">
+                <i class="fas fa-shopping-bag"></i>
+                مشاهده محصولات
+            </a>
+            <a href="{% url 'core:contact' %}" 
+               style="display: inline-flex; align-items: center; gap: 0.75rem; 
+                      background: rgba(0, 245, 255, 0.1); 
+                      border: 2px solid var(--neon-cyan); border-radius: 12px; color: var(--neon-cyan); 
+                      padding: 1.25rem 2.5rem; font-size: 1.1rem; font-weight: 700; 
+                      text-decoration: none; transition: all 0.3s;"
+               onmouseover="this.style.background='rgba(0, 245, 255, 0.2)'; this.style.transform='translateY(-3px)';"
+               onmouseout="this.style.background='rgba(0, 245, 255, 0.1)'; this.style.transform='translateY(0)';">
+                <i class="fas fa-envelope"></i>
+                تماس با ما
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
