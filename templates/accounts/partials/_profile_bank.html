@@ -139,7 +139,7 @@
             </div>
             
             <!-- Form -->
-            <form id="addCardForm" method="POST" action="{% url 'accounts:add_bank_card' %}">
+            <form id="addCardForm" onsubmit="handleAddCard(event)">
                 {% csrf_token %}
                 
                 <!-- Card Number -->
@@ -249,15 +249,93 @@ function closeAddCardModal() {
     document.body.style.overflow = '';
 }
 
+function handleAddCard(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    fetch('/accounts/api/bank-card/add/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeAddCardModal();
+            location.reload();
+        } else {
+            alert(data.message || 'خطا در افزودن کارت');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('خطا در برقراری ارتباط');
+    });
+}
+
 function setDefaultCard(cardId) {
     if (confirm('این کارت به عنوان کارت پیش‌فرض تنظیم شود؟')) {
-        window.location.href = `{% url 'accounts:profile' %}?set_default_card=${cardId}`;
+        fetch(`/accounts/api/bank-card/set-default/${cardId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'خطا در تنظیم کارت پیش‌فرض');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('خطا در برقراری ارتباط');
+        });
     }
 }
 
 function deleteCard(cardId) {
     if (confirm('آیا از حذف این کارت اطمینان دارید؟')) {
-        window.location.href = `{% url 'accounts:profile' %}?delete_card=${cardId}`;
+        fetch(`/accounts/api/bank-card/delete/${cardId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'خطا در حذف کارت');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('خطا در برقراری ارتباط');
+        });
     }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 </script>

@@ -20,17 +20,19 @@
             
             <!-- Search Box -->
             <div class="navbar-search-box">
-                <form class="navbar-search-form" action="{% url 'products:search' %}" method="get">
+                <form class="navbar-search-form" action="{% url 'core:search' %}" method="get" autocomplete="off">
                     <button type="submit" class="navbar-search-btn">
                         <i class="fas fa-search"></i>
                     </button>
                     <input 
                         type="text" 
                         name="q"
+                        id="navbarSearchInput"
                         class="navbar-search-input" 
                         placeholder="جستجو در محصولات و خدمات..."
                         autocomplete="off"
                     >
+                    <div id="searchAutocomplete" class="search-autocomplete" style="display: none;"></div>
                 </form>
             </div>
             
@@ -691,4 +693,96 @@ window.addEventListener('scroll', function() {
         navbarBottom.style.pointerEvents = 'auto';
     }
 });
+// Search Autocomplete
+(function() {
+    const searchInput = document.getElementById('navbarSearchInput');
+    const autocompleteDiv = document.getElementById('searchAutocomplete');
+    let debounceTimer;
+    let currentRequest;
+
+    if (!searchInput || !autocompleteDiv) return;
+
+    searchInput.addEventListener('input', function(e) {
+        clearTimeout(debounceTimer);
+        const query = e.target.value.trim();
+
+        if (query.length < 2) {
+            autocompleteDiv.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetchResults(query);
+        }, 300);
+    });
+
+    searchInput.addEventListener('focus', function(e) {
+        const query = e.target.value.trim();
+        if (query.length >= 2 && autocompleteDiv.innerHTML) {
+            autocompleteDiv.style.display = 'block';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !autocompleteDiv.contains(e.target)) {
+            autocompleteDiv.style.display = 'none';
+        }
+    });
+
+    function fetchResults(query) {
+        // Cancel previous request
+        if (currentRequest) {
+            currentRequest.abort();
+        }
+
+        autocompleteDiv.innerHTML = '<div class="autocomplete-loading"><i class="fas fa-spinner fa-spin"></i> در حال جستجو...</div>';
+        autocompleteDiv.style.display = 'block';
+
+        currentRequest = new AbortController();
+
+        fetch(`{% url 'core:search_api' %}?q=${encodeURIComponent(query)}&limit=5`, {
+            signal: currentRequest.signal
+        })
+        .then(response => response.json())
+        .then(data => {
+            displayResults(data.results || []);
+        })
+        .catch(error => {
+            if (error.name !== 'AbortError') {
+                console.error('Search error:', error);
+                autocompleteDiv.innerHTML = '<div class="autocomplete-empty">خطا در جستجو</div>';
+            }
+        });
+    }
+
+    function displayResults(results) {
+        if (results.length === 0) {
+            autocompleteDiv.innerHTML = '<div class="autocomplete-empty"><i class="fas fa-search"></i> نتیجه‌ای یافت نشد</div>';
+            return;
+        }
+
+        let html = '';
+        results.forEach(item => {
+            const imageUrl = item.image || '{% static "images/no-image.jpg" %}';
+            const price = new Intl.NumberFormat('fa-IR').format(item.price);
+            const discount = item.discount_percentage > 0 ? `<span style="color: var(--neon-pink);">${item.discount_percentage}% تخفیف</span>` : '';
+            
+            html += `
+                <a href="${item.url}" class="autocomplete-item" style="text-decoration: none; color: inherit;">
+                    <img src="${imageUrl}" alt="${item.title}">
+                    <div class="autocomplete-info">
+                        <div class="autocomplete-title">${item.title}</div>
+                        <div class="autocomplete-meta">
+                            ${item.category || ''} ${item.brand ? '• ' + item.brand : ''} ${discount}
+                        </div>
+                    </div>
+                    <div class="autocomplete-price">${price} تومان</div>
+                </a>
+            `;
+        });
+
+        autocompleteDiv.innerHTML = html;
+    }
+})();
+
 </script>

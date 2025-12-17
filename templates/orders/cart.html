@@ -1,1 +1,624 @@
-1
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}سبد خرید - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cart-page {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, rgba(191, 0, 255, 0.1) 0%, rgba(255, 0, 85, 0.1) 100%);
+        border: 1px solid var(--neon-purple);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 0 20px rgba(191, 0, 255, 0.2);
+    }
+
+    .page-header h1 {
+        color: var(--neon-cyan);
+        font-size: 2rem;
+        margin: 0;
+        text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .cart-container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 2rem;
+    }
+
+    .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .cart-item {
+        background: rgba(20, 20, 35, 0.8);
+        border: 1px solid rgba(191, 0, 255, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: grid;
+        grid-template-columns: 120px 1fr auto;
+        gap: 1.5rem;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cart-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .cart-item:hover {
+        border-color: var(--neon-pink);
+        transform: translateX(-5px);
+        box-shadow: 0 10px 30px rgba(191, 0, 255, 0.3);
+    }
+
+    .cart-item:hover::before {
+        opacity: 1;
+    }
+
+    .cart-item-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .cart-item-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .cart-item-title {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .cart-item-meta {
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .cart-item-price {
+        color: var(--neon-cyan);
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .cart-item-original-price {
+        color: #666;
+        font-size: 0.9rem;
+        text-decoration: line-through;
+        margin-right: 0.5rem;
+    }
+
+    .cart-item-discount {
+        background: var(--neon-pink);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+
+    .cart-item-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-end;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(191, 0, 255, 0.3);
+        border-radius: 8px;
+        padding: 0.5rem;
+    }
+
+    .quantity-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 6px;
+        background: rgba(191, 0, 255, 0.2);
+        color: var(--neon-cyan);
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .quantity-btn:hover {
+        background: var(--neon-purple);
+        color: white;
+    }
+
+    .quantity-value {
+        min-width: 40px;
+        text-align: center;
+        color: white;
+        font-weight: bold;
+    }
+
+    .btn-remove {
+        background: rgba(255, 0, 85, 0.1);
+        border: 1px solid var(--neon-pink);
+        color: var(--neon-pink);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-remove:hover {
+        background: var(--neon-pink);
+        color: white;
+    }
+
+    .cart-summary {
+        background: rgba(20, 20, 35, 0.8);
+        border: 1px solid rgba(191, 0, 255, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        height: fit-content;
+        position: sticky;
+        top: 120px;
+    }
+
+    .cart-summary h2 {
+        color: var(--neon-pink);
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(191, 0, 255, 0.3);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: #ccc;
+    }
+
+    .summary-row.total {
+        border-top: 2px solid rgba(191, 0, 255, 0.3);
+        border-bottom: none;
+        padding-top: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .summary-label {
+        font-size: 1rem;
+    }
+
+    .summary-value {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    .summary-row.total .summary-label {
+        font-size: 1.2rem;
+        color: var(--neon-cyan);
+    }
+
+    .summary-row.total .summary-value {
+        font-size: 1.5rem;
+        color: var(--neon-cyan);
+    }
+
+    .summary-row.discount .summary-value {
+        color: #00ff88;
+    }
+
+    .coupon-section {
+        margin: 1.5rem 0;
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(191, 0, 255, 0.2);
+        border-radius: 8px;
+    }
+
+    .coupon-form {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .coupon-input {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(191, 0, 255, 0.3);
+        border-radius: 8px;
+        padding: 0.75rem;
+        color: white;
+        text-transform: uppercase;
+    }
+
+    .coupon-input:focus {
+        outline: none;
+        border-color: var(--neon-cyan);
+    }
+
+    .btn-apply-coupon {
+        background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-apply-coupon:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(191, 0, 255, 0.5);
+    }
+
+    .coupon-applied {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: rgba(0, 255, 136, 0.1);
+        border: 1px solid #00ff88;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+    }
+
+    .coupon-applied-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #00ff88;
+    }
+
+    .btn-remove-coupon {
+        background: rgba(255, 0, 85, 0.2);
+        border: 1px solid var(--neon-pink);
+        color: var(--neon-pink);
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-remove-coupon:hover {
+        background: var(--neon-pink);
+        color: white;
+    }
+
+    .btn-checkout {
+        width: 100%;
+        background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        padding: 1.25rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        text-decoration: none;
+    }
+
+    .btn-checkout:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(191, 0, 255, 0.6);
+    }
+
+    .empty-cart {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        background: rgba(20, 20, 35, 0.6);
+        border: 2px dashed rgba(191, 0, 255, 0.3);
+        border-radius: 12px;
+    }
+
+    .empty-cart i {
+        font-size: 5rem;
+        color: var(--neon-purple);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-cart h2 {
+        color: var(--neon-pink);
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-cart p {
+        color: #999;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-browse {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+
+    .btn-browse:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(191, 0, 255, 0.5);
+    }
+
+    @media (max-width: 968px) {
+        .cart-container {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-summary {
+            position: static;
+        }
+
+        .cart-item {
+            grid-template-columns: 80px 1fr;
+            gap: 1rem;
+        }
+
+        .cart-item-actions {
+            grid-column: 1 / -1;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cart-page">
+    <div class="page-header">
+        <h1><i class="fas fa-shopping-cart"></i> سبد خرید</h1>
+    </div>
+
+    <div class="cart-container">
+        {% if cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+            <div class="cart-item">
+                <img src="{% if item.product.main_image %}{{ item.product.main_image.url }}{% else %}{% static 'images/no-image.jpg' %}{% endif %}" 
+                     alt="{{ item.product.name }}" class="cart-item-image">
+                <div class="cart-item-info">
+                    <div>
+                        <h3 class="cart-item-title">{{ item.product.name }}</h3>
+                        <div class="cart-item-meta">
+                            {% if item.product.category %}<i class="fas fa-folder"></i> {{ item.product.category.name }}{% endif %}
+                            {% if item.product.brand %}| <i class="fas fa-copyright"></i> {{ item.product.brand.name }}{% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        {% if item.product.discount_percentage > 0 %}
+                        <span class="cart-item-discount">{{ item.product.discount_percentage }}% تخفیف</span>
+                        <span class="cart-item-original-price">{{ item.product.original_price|intcomma }} تومان</span>
+                        {% endif %}
+                        <div class="cart-item-price">{{ item.product.price|intcomma }} تومان</div>
+                    </div>
+                </div>
+                <div class="cart-item-actions">
+                    <div class="quantity-control">
+                        <button class="quantity-btn" onclick="decreaseQuantity({{ item.id }})"><i class="fas fa-minus"></i></button>
+                        <span class="quantity-value" id="quantity-{{ item.id }}">{{ item.quantity }}</span>
+                        <button class="quantity-btn" onclick="increaseQuantity({{ item.id }})"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <button class="btn-remove" onclick="removeItem({{ item.id }})"><i class="fas fa-trash"></i> حذف</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary">
+            <h2>خلاصه سبد خرید</h2>
+            <div class="summary-row">
+                <span class="summary-label">جمع کل محصولات ({{ cart_items_count }} کالا)</span>
+                <span class="summary-value">{{ subtotal|intcomma }} تومان</span>
+            </div>
+            {% if discount > 0 %}
+            <div class="summary-row discount">
+                <span class="summary-label">تخفیف محصولات</span>
+                <span class="summary-value">{{ discount|intcomma }} تومان</span>
+            </div>
+            {% endif %}
+
+            <div class="coupon-section">
+                {% if applied_coupon %}
+                <div class="coupon-applied">
+                    <div class="coupon-applied-info">
+                        <i class="fas fa-tag"></i>
+                        <span>کد تخفیف: <strong>{{ applied_coupon.code }}</strong></span>
+                    </div>
+                    <button class="btn-remove-coupon" onclick="removeCoupon()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="summary-row discount" style="margin-top: 1rem;">
+                    <span class="summary-label">تخفیف کوپن</span>
+                    <span class="summary-value">{{ coupon_discount|intcomma }} تومان</span>
+                </div>
+                {% else %}
+                <form class="coupon-form" onsubmit="applyCoupon(event)">
+                    {% csrf_token %}
+                    <input type="text" class="coupon-input" name="coupon_code" id="couponCode" placeholder="کد تخفیف" maxlength="20">
+                    <button type="submit" class="btn-apply-coupon"><i class="fas fa-check"></i> اعمال</button>
+                </form>
+                {% endif %}
+            </div>
+
+            <div class="summary-row total">
+                <span class="summary-label">مبلغ قابل پرداخت</span>
+                <span class="summary-value">{{ total|intcomma }} تومان</span>
+            </div>
+
+            <a href="{% url 'orders:checkout' %}" class="btn-checkout">
+                <i class="fas fa-credit-card"></i> ادامه و تسویه حساب
+            </a>
+        </div>
+
+        {% else %}
+        <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h2>سبد خرید شما خالی است</h2>
+            <p>هنوز محصولی به سبد خرید خود اضافه نکرده‌اید</p>
+            <a href="{% url 'core:search' %}" class="btn-browse"><i class="fas fa-shopping-bag"></i> مشاهده محصولات</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function updateQuantity(itemId, newQuantity) {
+    fetch(`/cart/update/${itemId}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
+        body: JSON.stringify({ quantity: newQuantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) location.reload();
+        else alert(data.message || 'خطا در به‌روزرسانی');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('خطا در برقراری ارتباط');
+    });
+}
+
+function increaseQuantity(itemId) {
+    const quantityEl = document.getElementById(`quantity-${itemId}`);
+    updateQuantity(itemId, parseInt(quantityEl.textContent) + 1);
+}
+
+function decreaseQuantity(itemId) {
+    const quantityEl = document.getElementById(`quantity-${itemId}`);
+    const currentQuantity = parseInt(quantityEl.textContent);
+    if (currentQuantity > 1) updateQuantity(itemId, currentQuantity - 1);
+}
+
+function removeItem(itemId) {
+    if (confirm('آیا از حذف این محصول اطمینان دارید؟')) {
+        fetch(`/cart/remove/${itemId}/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': getCookie('csrftoken')}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) location.reload();
+            else alert(data.message || 'خطا در حذف محصول');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('خطا در برقراری ارتباط');
+        });
+    }
+}
+
+function applyCoupon(event) {
+    event.preventDefault();
+    const couponCode = document.getElementById('couponCode').value.trim();
+    if (!couponCode) {
+        alert('لطفاً کد تخفیف را وارد کنید');
+        return;
+    }
+    fetch('/cart/apply-coupon/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
+        body: JSON.stringify({ coupon_code: couponCode })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) location.reload();
+        else alert(data.message || 'کد تخفیف نامعتبر است');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('خطا در اعمال کد تخفیف');
+    });
+}
+
+function removeCoupon() {
+    if (confirm('آیا از حذف کد تخفیف اطمینان دارید؟')) {
+        fetch('/cart/remove-coupon/', {
+            method: 'POST',
+            headers: {'X-CSRFToken': getCookie('csrftoken')}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) location.reload();
+            else alert(data.message || 'خطا در حذف کد تخفیف');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('خطا در برقراری ارتباط');
+        });
+    }
+}
+</script>
+{% endblock %}

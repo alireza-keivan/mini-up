@@ -1,1 +1,83 @@
-1
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}جزئیات سفارش #{{ order.order_number }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width:1200px;margin:2rem auto;padding:0 1rem">
+<div style="background:linear-gradient(135deg,rgba(191,0,255,.1),rgba(255,0,85,.1));border:1px solid var(--neon-purple);border-radius:12px;padding:2rem;margin-bottom:2rem;box-shadow:0 0 20px rgba(191,0,255,.2);display:flex;justify-content:space-between;align-items:center">
+<div>
+<h1 style="color:var(--neon-cyan);font-size:2rem;margin:0 0 .5rem;text-shadow:0 0 10px rgba(0,245,255,.5)"><i class="fas fa-receipt"></i> سفارش #{{ order.order_number }}</h1>
+<p style="color:#ccc">{{ order.created_at|date:"Y/m/d - H:i" }}</p>
+</div>
+<span style="padding:.75rem 1.5rem;border-radius:8px;font-weight:700;font-size:1rem" class="order-status {{ order.status }}">{{ order.get_status_display }}</span>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 400px;gap:2rem">
+<div>
+<div style="background:rgba(20,20,35,.8);border:1px solid rgba(191,0,255,.2);border-radius:12px;padding:2rem;margin-bottom:1.5rem">
+<h2 style="color:var(--neon-pink);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid rgba(191,0,255,.3)"><i class="fas fa-box"></i> محصولات سفارش</h2>
+{% for item in order.items.all %}
+<div style="display:flex;align-items:center;gap:1.5rem;padding:1rem;margin-bottom:1rem;background:rgba(0,0,0,.3);border-radius:8px">
+<img src="{% if item.product.main_image %}{{ item.product.main_image.url }}{% else %}{% static 'images/no-image.jpg' %}{% endif %}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;background:rgba(0,0,0,.5)">
+<div style="flex:1">
+<h3 style="color:#fff;font-size:1.1rem;margin-bottom:.5rem">{{ item.product.name }}</h3>
+<p style="color:#999;font-size:.85rem">تعداد: {{ item.quantity }} × {{ item.price|intcomma }} تومان</p>
+</div>
+<div style="color:var(--neon-cyan);font-size:1.2rem;font-weight:700">{{ item.total_price|intcomma }} تومان</div>
+</div>
+{% endfor %}
+</div>
+
+{% if order.shipping_address %}
+<div style="background:rgba(20,20,35,.8);border:1px solid rgba(191,0,255,.2);border-radius:12px;padding:2rem">
+<h2 style="color:var(--neon-pink);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid rgba(191,0,255,.3)"><i class="fas fa-map-marker-alt"></i> آدرس ارسال</h2>
+<div style="color:#ccc;line-height:1.8">
+<p><strong style="color:#fff">گیرنده:</strong> {{ order.shipping_address.recipient_name }}</p>
+<p><strong style="color:#fff">تلفن:</strong> {{ order.shipping_address.phone }}</p>
+<p><strong style="color:#fff">آدرس:</strong> {{ order.shipping_address.full_address }}</p>
+<p><strong style="color:#fff">کد پستی:</strong> {{ order.shipping_address.postal_code }}</p>
+</div>
+</div>
+{% endif %}
+</div>
+
+<div>
+<div style="background:rgba(20,20,35,.8);border:1px solid rgba(191,0,255,.3);border-radius:12px;padding:2rem;margin-bottom:1.5rem">
+<h2 style="color:var(--neon-pink);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid rgba(191,0,255,.3)">خلاصه سفارش</h2>
+<div style="display:flex;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.05);color:#ccc">
+<span>جمع محصولات:</span>
+<span style="font-weight:700;color:#fff">{{ order.subtotal|intcomma }} تومان</span>
+</div>
+{% if order.discount_amount > 0 %}
+<div style="display:flex;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.05);color:#00ff88">
+<span>تخفیف:</span>
+<span style="font-weight:700">{{ order.discount_amount|intcomma }} تومان</span>
+</div>
+{% endif %}
+{% if order.shipping_cost > 0 %}
+<div style="display:flex;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.05);color:#ccc">
+<span>هزینه ارسال:</span>
+<span style="font-weight:700;color:#fff">{{ order.shipping_cost|intcomma }} تومان</span>
+</div>
+{% endif %}
+<div style="display:flex;justify-content:space-between;padding:1.5rem 0;border-top:2px solid rgba(191,0,255,.3);margin-top:1rem">
+<span style="font-size:1.2rem;color:var(--neon-cyan);font-weight:700">مبلغ نهایی:</span>
+<span style="font-size:1.5rem;color:var(--neon-cyan);font-weight:700">{{ order.total_price|intcomma }} تومان</span>
+</div>
+</div>
+
+{% if order.payment_method %}
+<div style="background:rgba(20,20,35,.8);border:1px solid rgba(191,0,255,.2);border-radius:12px;padding:2rem">
+<h2 style="color:var(--neon-pink);margin-bottom:1rem;padding-bottom:1rem;border-bottom:2px solid rgba(191,0,255,.3)"><i class="fas fa-credit-card"></i> اطلاعات پرداخت</h2>
+<p style="color:#ccc;margin-bottom:.5rem"><strong style="color:#fff">روش پرداخت:</strong> {{ order.get_payment_method_display }}</p>
+{% if order.tracking_code %}
+<p style="color:#ccc"><strong style="color:#fff">کد پیگیری:</strong> <code style="color:var(--neon-cyan);background:rgba(0,0,0,.5);padding:.25rem .5rem;border-radius:4px">{{ order.tracking_code }}</code></p>
+{% endif %}
+</div>
+{% endif %}
+</div>
+</div>
+</div>
+{% endblock %}

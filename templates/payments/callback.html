@@ -1,1 +1,115 @@
-1
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}نتیجه پرداخت - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;margin:4rem auto;padding:0 1rem">
+
+{% if payment_status == 'success' %}
+<div style="background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(0,245,255,.15));border:2px solid #00ff88;border-radius:20px;padding:3rem;text-align:center;box-shadow:0 0 40px rgba(0,255,136,.3)">
+<div style="width:120px;height:120px;margin:0 auto 2rem;background:linear-gradient(135deg,#00ff88,#00f5ff);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(0,255,136,.5)">
+<i class="fas fa-check" style="font-size:4rem;color:#0a0a1a"></i>
+</div>
+
+<h1 style="color:#00ff88;font-size:2.5rem;margin-bottom:1rem;text-shadow:0 0 20px rgba(0,255,136,.5)">پرداخت موفق!</h1>
+<p style="color:#ccc;font-size:1.2rem;margin-bottom:2rem">سفارش شما با موفقیت ثبت شد و در حال پردازش است</p>
+
+<div style="background:rgba(0,0,0,.4);border:1px solid rgba(0,255,136,.2);border-radius:12px;padding:2rem;margin:2rem 0;text-align:right">
+<div style="display:grid;gap:1rem">
+<div style="display:flex;justify-content:space-between;padding:.75rem;border-bottom:1px solid rgba(255,255,255,.05)">
+<span style="color:#999">شماره سفارش:</span>
+<span style="color:#fff;font-weight:700;direction:ltr">{{ order.order_number }}</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:.75rem;border-bottom:1px solid rgba(255,255,255,.05)">
+<span style="color:#999">کد پیگیری:</span>
+<span style="color:var(--neon-cyan);font-weight:700;direction:ltr">{{ tracking_code }}</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:.75rem;border-bottom:1px solid rgba(255,255,255,.05)">
+<span style="color:#999">مبلغ پرداختی:</span>
+<span style="color:#00ff88;font-weight:700">{{ order.total|intcomma }} تومان</span>
+</div>
+<div style="display:flex;justify-content:space-between;padding:.75rem">
+<span style="color:#999">تاریخ:</span>
+<span style="color:#fff">{{ order.created_at|date:"Y/m/d - H:i" }}</span>
+</div>
+</div>
+</div>
+
+<div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
+<a href="{% url 'orders:detail' order.id %}" style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));border:none;border-radius:12px;color:#fff;padding:1rem 2rem;font-weight:700;text-decoration:none;transition:all .3s">
+<i class="fas fa-receipt"></i> مشاهده جزئیات سفارش
+</a>
+<a href="{% url 'products:index' %}" style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(191,0,255,.2);border:2px solid var(--neon-purple);border-radius:12px;color:#fff;padding:1rem 2rem;font-weight:700;text-decoration:none;transition:all .3s">
+<i class="fas fa-shopping-bag"></i> بازگشت به فروشگاه
+</a>
+</div>
+
+<div style="margin-top:2rem;padding:1.5rem;background:rgba(0,245,255,.05);border:1px solid rgba(0,245,255,.2);border-radius:8px">
+<div style="display:flex;align-items:center;gap:1rem;justify-content:center;color:var(--neon-cyan)">
+<i class="fas fa-info-circle"></i>
+<span style="font-size:.9rem">یک ایمیل تأیید به آدرس شما ارسال شد</span>
+</div>
+</div>
+</div>
+
+{% else %}
+<div style="background:linear-gradient(135deg,rgba(255,0,85,.15),rgba(191,0,255,.15));border:2px solid var(--neon-pink);border-radius:20px;padding:3rem;text-align:center;box-shadow:0 0 40px rgba(255,0,85,.3)">
+<div style="width:120px;height:120px;margin:0 auto 2rem;background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple));border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(255,0,85,.5)">
+<i class="fas fa-times" style="font-size:4rem;color:#0a0a1a"></i>
+</div>
+
+<h1 style="color:var(--neon-pink);font-size:2.5rem;margin-bottom:1rem;text-shadow:0 0 20px rgba(255,0,85,.5)">پرداخت ناموفق!</h1>
+<p style="color:#ccc;font-size:1.2rem;margin-bottom:2rem">متأسفانه پرداخت شما با خطا مواجه شد</p>
+
+{% if error_message %}
+<div style="background:rgba(255,0,85,.1);border:1px solid rgba(255,0,85,.3);border-radius:8px;padding:1.5rem;margin:2rem 0">
+<div style="color:#ff6b9d;text-align:center">
+<i class="fas fa-exclamation-triangle" style="margin-left:.5rem"></i>
+{{ error_message }}
+</div>
+</div>
+{% endif %}
+
+<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,0,85,.2);border-radius:12px;padding:2rem;margin:2rem 0;text-align:right">
+<div style="display:grid;gap:1rem">
+{% if tracking_code %}
+<div style="display:flex;justify-content:space-between;padding:.75rem;border-bottom:1px solid rgba(255,255,255,.05)">
+<span style="color:#999">کد پیگیری:</span>
+<span style="color:var(--neon-cyan);font-weight:700;direction:ltr">{{ tracking_code }}</span>
+</div>
+{% endif %}
+{% if amount %}
+<div style="display:flex;justify-content:space-between;padding:.75rem;border-bottom:1px solid rgba(255,255,255,.05)">
+<span style="color:#999">مبلغ:</span>
+<span style="color:#fff;font-weight:700">{{ amount|intcomma }} تومان</span>
+</div>
+{% endif %}
+<div style="display:flex;justify-content:space-between;padding:.75rem">
+<span style="color:#999">زمان:</span>
+<span style="color:#fff">{{ now|date:"Y/m/d - H:i" }}</span>
+</div>
+</div>
+</div>
+
+<div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
+<a href="{% url 'orders:cart' %}" style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));border:none;border-radius:12px;color:#fff;padding:1rem 2rem;font-weight:700;text-decoration:none;transition:all .3s">
+<i class="fas fa-redo"></i> تلاش مجدد
+</a>
+<a href="{% url 'products:index' %}" style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(191,0,255,.2);border:2px solid var(--neon-purple);border-radius:12px;color:#fff;padding:1rem 2rem;font-weight:700;text-decoration:none;transition:all .3s">
+<i class="fas fa-home"></i> بازگشت به صفحه اصلی
+</a>
+</div>
+
+<div style="margin-top:2rem;padding:1.5rem;background:rgba(191,0,255,.05);border:1px solid rgba(191,0,255,.2);border-radius:8px">
+<div style="display:flex;align-items:center;gap:1rem;justify-content:center;color:#999">
+<i class="fas fa-headset"></i>
+<span style="font-size:.9rem">در صورت بروز مشکل با پشتیبانی تماس بگیرید: 021-12345678</span>
+</div>
+</div>
+</div>
+{% endif %}
+
+</div>
+{% endblock %}
