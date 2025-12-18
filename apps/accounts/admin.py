@@ -447,59 +447,58 @@ class OrderInline(admin.TabularInline):
 
 
 # ============================================
-# SupportTicket Inline
+# SupportTicket Inline - DISABLED (consulting app removed from INSTALLED_APPS)
 # ============================================
-class SupportTicketInline(admin.TabularInline):
-    """نمایش تیکت‌های پشتیبانی کاربر به صورت Inline"""
-    from apps.consulting.models import SupportTicket
-    model = SupportTicket
-    extra = 0
-    can_delete = False
-    fk_name = 'user'  # Specify which FK to use (user vs assigned_to)
-    fields = (
-        'ticket_id_link',
-        'subject',
-        'status_display',
-        'message_count',
-        'created_at',
-    )
-    readonly_fields = ('ticket_id_link', 'subject', 'status_display', 'message_count', 'created_at')
-    ordering = ['-created_at']
-    verbose_name = _('تیکت پشتیبانی')
-    verbose_name_plural = _('تیکت‌های پشتیبانی')
-    
-    @admin.display(description=_('شماره تیکت'))
-    def ticket_id_link(self, obj):
-        """لینک به صفحه تیکت"""
-        if obj and obj.pk:
-            from django.urls import reverse
-            url = reverse('admin:consulting_supportticket_change', args=[obj.pk])
-            return format_html(
-                '<a href="{}" style="font-weight: bold; color: #0066cc;">#{}</a>',
-                url, obj.ticket_id
-            )
-        return '-'
-    
-    @admin.display(description=_('وضعیت'))
-    def status_display(self, obj):
-        """نمایش وضعیت با رنگ"""
-        if not obj:
-            return '-'
-        
-        status_colors = {
-            'pending': '#ffc107',
-            'in_progress': '#00f5ff',
-            'answered': '#28a745',
-            'closed': '#6c757d',
-        }
-        
-        color = status_colors.get(obj.status, '#6c757d')
-        return format_html(
-            '<span style="background: {}; color: white; padding: 3px 8px; '
-            'border-radius: 4px; font-size: 11px; font-weight: bold;">{}</span>',
-            color, obj.get_status_display()
-        )
-
+# class SupportTicketInline(admin.TabularInline):
+#     """نمایش تیکت‌های پشتیبانی کاربر به صورت Inline"""
+#     from apps.consulting.models import SupportTicket
+#     model = SupportTicket
+#     extra = 0
+#     can_delete = False
+#     fk_name = 'user'  # Specify which FK to use (user vs assigned_to)
+#     fields = (
+#         'ticket_id_link',
+#         'subject',
+#         'status_display',
+#         'message_count',
+#         'created_at',
+#     )
+#     readonly_fields = ('ticket_id_link', 'subject', 'status_display', 'message_count', 'created_at')
+#     ordering = ['-created_at']
+#     verbose_name = _('تیکت پشتیبانی')
+#     verbose_name_plural = _('تیکت‌های پشتیبانی')
+#     
+#     @admin.display(description=_('شماره تیکت'))
+#     def ticket_id_link(self, obj):
+#         """لینک به صفحه تیکت"""
+#         if obj and obj.pk:
+#             from django.urls import reverse
+#             url = reverse('admin:consulting_supportticket_change', args=[obj.pk])
+#             return format_html(
+#                 '<a href="{}" style="font-weight: bold; color: #0066cc;">#{}</a>',
+#                 url, obj.ticket_id
+#             )
+#         return '-'
+#     
+#     @admin.display(description=_('وضعیت'))
+#     def status_display(self, obj):
+#         """نمایش وضعیت با رنگ"""
+#         if not obj:
+#             return '-'
+#         
+#         status_colors = {
+#             'pending': '#ffc107',
+#             'in_progress': '#00f5ff',
+#             'answered': '#28a745',
+#             'closed': '#6c757d',
+#         }
+#         
+#         color = status_colors.get(obj.status, '#6c757d')
+#         return format_html(
+#             '<span style="background: {}; color: white; padding: 3px 8px; '
+#             'border-radius: 4px; font-size: 11px; font-weight: bold;">{}</span>',
+#             color, obj.get_status_display()
+#         )
 
 # ============================================
 # WalletTransaction Inline
@@ -571,7 +570,7 @@ UserAdmin.inlines = [
     AddressInline, 
     BankCardInline,
     OrderInline,
-    SupportTicketInline,
+    # SupportTicketInline,  # Disabled - consulting app removed
 ]
 
 

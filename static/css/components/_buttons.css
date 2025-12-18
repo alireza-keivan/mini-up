@@ -1,44 +1,267 @@
 /* ═══════════════════════════════════════════════════════════════════════════════
-   BUTTONS — Neon Variants
+   BUTTONS — Modern Neon Gaming Style
+   ═══════════════════════════════════════════════════════════════════════════════
+   
+   Usage Examples:
+   
+   <!-- Primary Button (Default) -->
+   <button class="btn btn-primary">Button Text</button>
+   <button class="btn btn-neon">Button Text</button>
+   
+   <!-- Secondary Button (Outline) -->
+   <button class="btn btn-secondary">Button Text</button>
+   <button class="btn btn-neon-outline">Button Text</button>
+   
+   <!-- Other Variants -->
+   <button class="btn btn-neon-cyan">Cyan Button</button>
+   <button class="btn btn-success">Success Button</button>
+   <button class="btn btn-danger">Danger Button</button>
+   <button class="btn btn-ghost">Ghost Button</button>
+   
+   <!-- Sizes -->
+   <button class="btn btn-primary btn-sm">Small</button>
+   <button class="btn btn-primary">Default</button>
+   <button class="btn btn-primary btn-lg">Large</button>
+   <button class="btn btn-primary btn-full">Full Width</button>
+   
+   <!-- With Icons -->
+   <button class="btn btn-primary">
+       <i class="fas fa-check"></i>
+       <span>Confirm</span>
+   </button>
+   
+   <button class="btn btn-primary">
+       <span>Next</span>
+       <i class="fas fa-arrow-left btn-icon-arrow"></i>
+   </button>
+   
+   <!-- States -->
+   <button class="btn btn-primary" disabled>Disabled</button>
+   <button class="btn btn-primary btn-loading">
+       <i class="fas fa-spinner btn-spinner"></i>
+       <span>Loading...</span>
+   </button>
+   
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 @layer components {
 
-    /* Primary Neon Button */
-    .btn-neon {
-        @apply px-6 py-3 flex items-center justify-center rounded-xl font-bold text-white 
-               transition-all duration-300 relative overflow-hidden;
-        background: var(--gradient-neon);
-        box-shadow: var(--shadow-neon-pink);
+    /* ─────────────────────────────────────────────────────────────────────────
+       Base Button Styles
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl 
+               font-semibold text-sm transition-all duration-300 overflow-hidden 
+               relative disabled:opacity-50 disabled:cursor-not-allowed;
     }
 
-    .btn-neon:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 35px var(--neon-pink-glow);
+    /* Button Sizes */
+    .btn-sm {
+        @apply px-4 py-2 rounded-lg text-xs gap-1.5;
     }
 
-    .btn-neon:active {
-        transform: translateY(0);
+    .btn-lg {
+        @apply px-8 py-4 rounded-xl text-base gap-2.5 font-bold;
     }
 
-    /* Cyan Variant */
+    .btn-full {
+        @apply w-full;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Primary Neon Button (Default)
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .btn-neon,
+    .btn-primary {
+        @apply border border-neon-pink/30 text-white;
+        background: linear-gradient(to right, var(--neon-pink), var(--neon-purple));
+    }
+
+    .btn-neon::before,
+    .btn-primary::before {
+        content: '';
+        @apply absolute inset-0 opacity-0 blur-xl transition-opacity duration-300;
+        background: linear-gradient(to right, var(--neon-pink), var(--neon-purple));
+    }
+
+    .btn-neon:hover,
+    .btn-primary:hover {
+        @apply shadow-xl scale-105;
+        box-shadow: 0 10px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-neon:hover::before,
+    .btn-primary:hover::before {
+        @apply opacity-100;
+    }
+
+    .btn-neon:active,
+    .btn-primary:active {
+        @apply scale-95;
+    }
+
+    /* Ensure button content stays above glow */
+    .btn-neon > *,
+    .btn-primary > * {
+        @apply relative z-10;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Secondary Neon Button (Cyan Outline)
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .btn-neon-outline,
+    .btn-secondary {
+        @apply bg-transparent border-2 border-neon-cyan text-neon-cyan;
+    }
+
+    .btn-neon-outline:hover,
+    .btn-secondary:hover {
+        @apply bg-neon-cyan text-dark-900 shadow-xl scale-105;
+        box-shadow: 0 10px 40px rgba(0, 255, 255, 0.4);
+    }
+
+    .btn-neon-outline:active,
+    .btn-secondary:active {
+        @apply scale-95;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Cyan Variant
+       ───────────────────────────────────────────────────────────────────────── */
+    
     .btn-neon-cyan {
-        background: var(--gradient-neon-alt);
-        box-shadow: var(--shadow-neon-cyan);
+        @apply border border-neon-cyan/30 text-white;
+        background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
+    }
+
+    .btn-neon-cyan::before {
+        content: '';
+        @apply absolute inset-0 opacity-0 blur-xl transition-opacity duration-300;
+        background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
     }
 
     .btn-neon-cyan:hover {
-        box-shadow: 0 8px 35px var(--neon-cyan-glow);
+        @apply shadow-xl scale-105;
+        box-shadow: 0 10px 40px rgba(0, 255, 255, 0.4);
     }
 
-    /* Outline Neon Button */
-    .btn-neon-outline {
-        @apply px-6 py-3 rounded-xl font-bold text-pink-400 border-2 border-pink-500/50 
-               transition-all duration-300;
+    .btn-neon-cyan:hover::before {
+        @apply opacity-100;
     }
 
-    .btn-neon-outline:hover {
-        @apply bg-pink-500/10 border-pink-400;
+    .btn-neon-cyan:active {
+        @apply scale-95;
+    }
+
+    .btn-neon-cyan > * {
+        @apply relative z-10;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Success Button (Green)
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .btn-success {
+        @apply border border-neon-green/30 text-white;
+        background: linear-gradient(to right, var(--neon-green), #059669);
+    }
+
+    .btn-success::before {
+        content: '';
+        @apply absolute inset-0 opacity-0 blur-xl transition-opacity duration-300;
+        background: linear-gradient(to right, var(--neon-green), #059669);
+    }
+
+    .btn-success:hover {
+        @apply shadow-xl scale-105;
+        box-shadow: 0 10px 40px rgba(0, 255, 136, 0.4);
+    }
+
+    .btn-success:hover::before {
+        @apply opacity-100;
+    }
+
+    .btn-success:active {
+        @apply scale-95;
+    }
+
+    .btn-success > * {
+        @apply relative z-10;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Danger Button (Red)
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .btn-danger {
+        @apply border border-red-500/30 text-white;
+        background: linear-gradient(to right, #ef4444, #dc2626);
+    }
+
+    .btn-danger::before {
+        content: '';
+        @apply absolute inset-0 opacity-0 blur-xl transition-opacity duration-300;
+        background: linear-gradient(to right, #ef4444, #dc2626);
+    }
+
+    .btn-danger:hover {
+        @apply shadow-xl scale-105;
+        box-shadow: 0 10px 40px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-danger:hover::before {
+        @apply opacity-100;
+    }
+
+    .btn-danger:active {
+        @apply scale-95;
+    }
+
+    .btn-danger > * {
+        @apply relative z-10;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Ghost Button (Minimal)
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .btn-ghost {
+        @apply bg-white/5 border border-white/10 text-white;
+    }
+
+    .btn-ghost:hover {
+        @apply bg-white/10 border-white/20;
+    }
+
+    .btn-ghost:active {
+        @apply scale-95;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Loading State
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .btn-loading {
+        @apply opacity-75 cursor-wait;
+    }
+
+    .btn-loading .btn-spinner {
+        @apply animate-spin;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Icon Animations
+       ───────────────────────────────────────────────────────────────────────── */
+    
+    .btn:hover .btn-icon-arrow {
+        @apply -translate-x-1;
+    }
+
+    .btn-icon-arrow {
+        @apply transition-transform duration-300;
     }
 }
 

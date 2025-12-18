@@ -55,7 +55,7 @@ LOCAL_APPS = [
     'apps.payments',
     'apps.wallet',
     'apps.coupons',
-    'apps.consulting',
+    'apps.consulting',  # Re-enabled for support ticket system
     'apps.content',
 ]
 

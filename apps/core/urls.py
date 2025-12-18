@@ -12,7 +12,6 @@ urlpatterns = [
     path('gaming-products/', views.gaming_products, name='gaming_products'),
     path('buy-products/', views.buy_products, name='buy_products'),
     path('mini-game/', views.mini_game, name='mini_game'),
-    path('consulting/', views.consulting, name='consulting'),
     path('about/', views.about, name='about'),
     path('faq/', views.faq, name='faq'), 
     # REMOVED: path('accounts/', views.accounts, name='accounts'),  # This conflicts with apps/accounts/

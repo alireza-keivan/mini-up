@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}خدمات مجازی | Mini-Up{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VIRTUAL SERVICES - DYNAMIC STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.vs-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 80px 0 60px;
+}
+
+.vs-hero {
+    text-align: center;
+    padding: 60px 20px;
+    margin-bottom: 40px;
+}
+
+.vs-hero__title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.vs-hero__subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0;
+}
+
+/* Category Sections */
+.vs-category {
+    margin-bottom: 60px;
+    padding: 0 20px;
+}
+
+.vs-category__header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.vs-category__icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.vs-category__info {
+    flex: 1;
+}
+
+.vs-category__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 4px;
+}
+
+.vs-category__description {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+/* Products Grid */
+.vs-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .vs-products {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+    }
+}
+
+/* Product Card */
+.vs-product {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+}
+
+.vs-product:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.vs-product__image-wrapper {
+    position: relative;
+    padding-top: 75%; /* 4:3 Aspect Ratio */
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    overflow: hidden;
+}
+
+.vs-product__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.vs-product:hover .vs-product__image {
+    transform: scale(1.1);
+}
+
+.vs-product__badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #667eea;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.vs-product__badge--stock {
+    background: rgba(76, 175, 80, 0.95);
+    color: white;
+}
+
+.vs-product__badge--low-stock {
+    background: rgba(255, 152, 0, 0.95);
+    color: white;
+}
+
+.vs-product__badge--out-stock {
+    background: rgba(244, 67, 54, 0.95);
+    color: white;
+}
+
+.vs-product__content {
+    padding: 20px;
+}
+
+.vs-product__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.vs-product__description {
+    font-size: 0.875rem;
+    color: #718096;
+    margin: 0 0 16px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.vs-product__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.vs-product__price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vs-product__price-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.vs-product__price-label {
+    font-size: 0.75rem;
+    color: #a0aec0;
+}
+
+.vs-product__action {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.vs-product__action:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Empty State */
+.vs-empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: white;
+}
+
+.vs-empty__icon {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    opacity: 0.6;
+}
+
+.vs-empty__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.vs-empty__text {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .vs-hero__title {
+        font-size: 2rem;
+    }
+    
+    .vs-hero__subtitle {
+        font-size: 1rem;
+    }
+    
+    .vs-category__title {
+        font-size: 1.25rem;
+    }
+    
+    .vs-category__icon {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vs-page">
+    <!-- Hero Section -->
+    <section class="vs-hero">
+        <h1 class="vs-hero__title">خدمات مجازی</h1>
+        <p class="vs-hero__subtitle">بهترین سرویس‌های دیجیتال با قیمت مناسب و تحویل سریع</p>
+    </section>
+
+    <!-- Categories & Products -->
+    {% if categories %}
+        {% for category in categories %}
+        <section class="vs-category" id="category-{{ category.slug }}">
+            <div class="vs-category__header">
+                {% if category.icon %}
+                <div class="vs-category__icon">{{ category.icon }}</div>
+                {% endif %}
+                <div class="vs-category__info">
+                    <h2 class="vs-category__title">{{ category.name }}</h2>
+                    {% if category.description %}
+                    <p class="vs-category__description">{{ category.description }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="vs-products">
+                {% for product in category.active_products %}
+                <article class="vs-product" onclick="window.location.href='{% url 'products:product_detail' product.slug %}'">
+                    <div class="vs-product__image-wrapper">
+                        {% if product.images.all %}
+                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="vs-product__image">
+                        {% else %}
+                            <img src="{% static 'images/placeholder-product.jpg' %}" alt="{{ product.name }}" class="vs-product__image">
+                        {% endif %}
+                        
+                        <!-- Stock Badge -->
+                        {% if product.stock > 50 %}
+                            <span class="vs-product__badge vs-product__badge--stock">موجود</span>
+                        {% elif product.stock > 0 %}
+                            <span class="vs-product__badge vs-product__badge--low-stock">محدود</span>
+                        {% else %}
+                            <span class="vs-product__badge vs-product__badge--out-stock">ناموجود</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="vs-product__content">
+                        <h3 class="vs-product__title">{{ product.name }}</h3>
+                        {% if product.short_description %}
+                        <p class="vs-product__description">{{ product.short_description }}</p>
+                        {% endif %}
+
+                        <div class="vs-product__footer">
+                            <div class="vs-product__price">
+                                <span class="vs-product__price-amount">{{ product.price|floatformat:0|safe }} تومان</span>
+                                {% if product.original_price and product.original_price > product.price %}
+                                <span class="vs-product__price-label">
+                                    <del>{{ product.original_price|floatformat:0|safe }}</del>
+                                </span>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'products:product_detail' product.slug %}" class="vs-product__action" onclick="event.stopPropagation()">
+                                مشاهده
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
+    {% else %}
+        <section class="vs-empty">
+            <div class="vs-empty__icon">📦</div>
+            <h2 class="vs-empty__title">هنوز محصولی وجود ندارد</h2>
+            <p class="vs-empty__text">به زودی محصولات جدید اضافه خواهد شد</p>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Smooth scroll for category navigation
+document.querySelectorAll('a[href^="#category-"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+
+// Add loading animation for product images
+document.querySelectorAll('.vs-product__image').forEach(img => {
+    img.addEventListener('load', function() {
+        this.style.opacity = '1';
+    });
+    img.style.opacity = '0';
+    img.style.transition = 'opacity 0.3s ease';
+});
+</script>
+{% endblock %}

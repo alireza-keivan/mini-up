@@ -3,6 +3,7 @@
 """
 Signals for Accounts App
 
+- Auto-create Profile when user registers
 - Auto-create Wallet when user registers
 - Log user activities
 """
@@ -21,65 +22,39 @@ def create_user_related_objects(sender, instance, created, **kwargs):
     """
     ایجاد خودکار Profile و Wallet برای کاربر جدید
     این سیگنال هم برای کاربران موبایلی و هم گوگلی کار می‌کند
+    
+    نکته: از get_or_create استفاده می‌کنیم تا اگر قبلاً ساخته شده، تکرار نشود
     """
     if not created:
         return
     
-    # شناسه کاربر برای لاگ (phone یا email یا id)
+    # شناسه کاربر برای لاگ
     user_identifier = instance.phone or instance.email or f"ID:{instance.id}"
+    auth_method = "Google" if instance.auth_provider == User.AuthProvider.GOOGLE else "Phone"
     
     # ۱. ایجاد پروفایل
     try:
         from .models import Profile
         profile, profile_created = Profile.objects.get_or_create(user=instance)
         if profile_created:
-            logger.info(f"Profile created for user: {user_identifier}")
+            logger.info(f"✅ Profile created for user: {user_identifier}")
+        else:
+            logger.debug(f"Profile already exists for user: {user_identifier}")
     except Exception as e:
-        logger.error(f"Error creating profile for {user_identifier}: {e}")
+        logger.error(f"❌ Error creating profile for {user_identifier}: {e}")
     
     # ۲. ایجاد کیف پول
     try:
         from apps.wallet.models import Wallet
         wallet, wallet_created = Wallet.objects.get_or_create(user=instance)
         if wallet_created:
-            logger.info(f"Wallet created for user: {user_identifier}")
+            logger.info(f"✅ Wallet created for user: {user_identifier}")
+        else:
+            logger.debug(f"Wallet already exists for user: {user_identifier}")
     except ImportError:
-        logger.warning("Wallet app not available, skipping wallet creation")
+        logger.warning("⚠️ Wallet app not available, skipping wallet creation")
     except Exception as e:
-        logger.error(f"Error creating wallet for {user_identifier}: {e}")
+        logger.error(f"❌ Error creating wallet for {user_identifier}: {e}")
     
     # ۳. لاگ ثبت‌نام
-    auth_method = "Google" if instance.auth_provider == User.AuthProvider.GOOGLE else "Phone"
-    logger.info(f"New user registered via {auth_method}: {user_identifier}")
-    
-    
-    
-@receiver(post_save, sender=User)
-def create_user_wallet(sender, instance, created, **kwargs):
-    """
-    ایجاد کیف پول خودکار برای کاربر جدید
-    """
-    if created:
-        try:
-            from apps.wallet.models import Wallet
-            
-            wallet, wallet_created = Wallet.objects.get_or_create(user=instance)
-            
-            if wallet_created:
-                logger.info(f"Wallet created for user: {instance.phone}")
-        
-        except ImportError:
-            # Wallet app not installed yet
-            logger.warning("Wallet app not available, skipping wallet creation")
-        
-        except Exception as e:
-            logger.error(f"Error creating wallet for {instance.phone}: {e}")
-
-
-@receiver(post_save, sender=User)
-def log_user_creation(sender, instance, created, **kwargs):
-    """
-    لاگ ایجاد کاربر جدید
-    """
-    if created:
-        logger.info(f"New user registered: {instance.phone}")
+    logger.info(f"🎉 New user registered via {auth_method}: {user_identifier}")

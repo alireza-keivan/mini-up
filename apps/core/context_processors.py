@@ -18,7 +18,6 @@ def site_context(request):
             {'name': 'محصولات گیمینگ', 'url': 'core:gaming_products', 'icon': 'fa-gamepad'},
             {'name': 'خرید محصولات', 'url': 'core:buy_products', 'icon': 'fa-shopping-cart'},
             {'name': 'مینی گیم', 'url': 'core:mini_game', 'icon': 'fa-puzzle-piece'},
-            {'name': 'مشاوره', 'url': 'core:consulting', 'icon': 'fa-comments'},
             {'name': 'درباره ما', 'url': 'core:about', 'icon': 'fa-info-circle'},
         ],
         'social_links': {

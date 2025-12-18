@@ -35,10 +35,6 @@ urlpatterns = [
     # Coupons
     path('coupons/api/v1/', include('apps.coupons.urls_api', namespace='coupons_api')),
     
-    # Consulting
-    path('consulting/', include('apps.consulting.urls', namespace='consulting')),
-    path('consulting/api/v1/', include('apps.consulting.urls_api', namespace='consulting_api')),
-    
     # Content
     path('blog/', include('apps.content.urls', namespace='content')),
     path('content/api/v1/', include('apps.content.urls_api', namespace='content_api')),

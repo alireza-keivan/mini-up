@@ -3,6 +3,10 @@
 
 {% block title %}خدمات مجازی | Mini-Up{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/_virtual_services.css' %}">
+{% endblock %}
+
 {% block content %}
 <!-- ═══════════════════════════════════════════════════════════════════════════════
      HERO SECTION
@@ -11,7 +15,7 @@
     <div class="vs-hero__background">
         <div class="vs-hero__grid"></div>
         <div class="vs-hero__glow vs-hero__glow--1"></div>
-        <div class="vs-hero__glow vs-hero__glow--2"></div>
+        <div class="vs-herovirtual_services.html__glow vs-hero__glow--2"></div>
     </div>
     
     <div class="vs-hero__content">
@@ -47,945 +51,175 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════════
-     QUICK NAVIGATION
+     FEATURED PRODUCTS CAROUSEL
      ═══════════════════════════════════════════════════════════════════════════════ -->
-<nav class="vs-quick-nav">
-    <div class="vs-quick-nav__container">
-        <a href="#telegram-premium" class="vs-quick-nav__item" data-color="blue">
-            <span class="vs-quick-nav__icon">✈️</span>
-            <span>تلگرام پرمیوم</span>
-        </a>
-        <a href="#instagram-followers" class="vs-quick-nav__item" data-color="pink">
-            <span class="vs-quick-nav__icon">📸</span>
-            <span>فالوور اینستاگرام</span>
-        </a>
-        <a href="#telegram-members" class="vs-quick-nav__item" data-color="cyan">
-            <span class="vs-quick-nav__icon">👥</span>
-            <span>ممبر تلگرام</span>
-        </a>
-        <a href="#apple-id" class="vs-quick-nav__item" data-color="gray">
-            <span class="vs-quick-nav__icon">🍎</span>
-            <span>اپل آیدی</span>
-        </a>
-        <a href="#spotify" class="vs-quick-nav__item" data-color="green">
-            <span class="vs-quick-nav__icon">🎵</span>
-            <span>اسپاتیفای</span>
-        </a>
-        <a href="#soundcloud" class="vs-quick-nav__item" data-color="orange">
-            <span class="vs-quick-nav__icon">☁️</span>
-            <span>ساندکلاد</span>
-        </a>
-        <a href="#apple-account" class="vs-quick-nav__item" data-color="purple">
-            <span class="vs-quick-nav__icon">📱</span>
-            <span>اپل اکانت</span>
-        </a>
-        <a href="#icloud" class="vs-quick-nav__item" data-color="sky">
-            <span class="vs-quick-nav__icon">☁️</span>
-            <span>آیکلود</span>
-        </a>
-        <a href="#wireguard" class="vs-quick-nav__item" data-color="red">
-            <span class="vs-quick-nav__icon">🔐</span>
-            <span>وایرگارد</span>
-        </a>
-        <a href="#v2ray" class="vs-quick-nav__item" data-color="yellow">
-            <span class="vs-quick-nav__icon">🚀</span>
-            <span>V2RAY</span>
-        </a>
+{% if carousel_products %}
+<section class="vs-carousel">
+    <div class="vs-carousel__container">
+        <h2 class="vs-carousel__title">
+            <span class="vs-carousel__title-icon">⭐</span>
+            محصولات ویژه
+        </h2>
+        
+        <div class="vs-carousel__wrapper">
+            <!-- Navigation Arrows -->
+            <button class="vs-carousel__nav vs-carousel__nav--prev" aria-label="قبلی">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="vs-carousel__nav vs-carousel__nav--next" aria-label="بعدی">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <!-- Carousel Track -->
+            <div class="vs-carousel__track">
+                {% for product in carousel_products %}
+                <div class="vs-carousel__slide">
+                    <div class="vs-carousel__card">
+                        <!-- Product Image -->
+                        <div class="vs-carousel__image">
+                            {% if product.images.all %}
+                                <img src="{{ product.images.first.image.url }}" 
+                                     alt="{{ product.name }}"
+                                     loading="lazy">
+                            {% else %}
+                                <img src="{% static 'images/placeholder-product.jpg' %}" 
+                                     alt="{{ product.name }}"
+                                     loading="lazy">
+                            {% endif %}
+                            
+                            {% if product.discount_percentage %}
+                            <span class="vs-carousel__badge">{{ product.discount_percentage }}% تخفیف</span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <div class="vs-carousel__info">
+                            <h3 class="vs-carousel__product-name">{{ product.name }}</h3>
+                            
+                            {% if product.short_description %}
+                            <p class="vs-carousel__product-desc">{{ product.short_description|truncatewords:10 }}</p>
+                            {% endif %}
+                            
+                            <!-- Price -->
+                            <div class="vs-carousel__price">
+                                {% if product.discount_percentage %}
+                                    <span class="vs-carousel__price-old">{{ product.price|floatformat:0 }} تومان</span>
+                                    <span class="vs-carousel__price-new">{{ product.final_price|floatformat:0 }} تومان</span>
+                                {% else %}
+                                    <span class="vs-carousel__price-current">{{ product.price|floatformat:0 }} تومان</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Action Button -->
+                            <a href="{% url 'products:detail' product.slug %}" 
+                               class="vs-carousel__btn"
+                               data-product-id="{{ product.id }}">
+                                <i class="fas fa-paper-plane"></i>
+                                ثبت درخواست
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Dots Indicator -->
+            <div class="vs-carousel__dots">
+                {% for product in carousel_products %}
+                <button class="vs-carousel__dot {% if forloop.first %}active{% endif %}" 
+                        data-index="{{ forloop.counter0 }}"
+                        aria-label="اسلاید {{ forloop.counter }}"></button>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-</nav>
+</section>
+{% endif %}
 
 <!-- ═══════════════════════════════════════════════════════════════════════════════
-     SERVICES CONTAINER
+     QUICK NAVIGATION
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+{% if categories %}
+<nav class="vs-quick-nav">
+    <div class="vs-quick-nav__container">
+        {% for category in categories %}
+        <a href="#category-{{ category.slug }}" class="vs-quick-nav__item" data-color="blue">
+            {% if category.icon %}
+            <span class="vs-quick-nav__icon">{{ category.icon }}</span>
+            {% else %}
+            <span class="vs-quick-nav__icon">�</span>
+            {% endif %}
+            <span>{{ category.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</nav>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     SERVICES CONTAINER - DYNAMIC
      ═══════════════════════════════════════════════════════════════════════════════ -->
 <main class="vs-services">
-
-    <!-- ═══════════════════════════════════════════════════════════════════════════
-         SERVICE 1: تلگرام پرمیوم
-         ═══════════════════════════════════════════════════════════════════════════ -->
-    <section id="telegram-premium" class="vs-service" data-color="blue">
+    {% for category in categories %}
+    <!-- Category: {{ category.name }} -->
+    <section id="category-{{ category.slug }}" class="vs-service" data-color="blue">
         <div class="vs-service__header">
-            <div class="vs-service__icon">✈️</div>
-            <div class="vs-service__info">
-                <h2 class="vs-service__title">تلگرام پرمیوم</h2>
-                <p class="vs-service__subtitle">اشتراک پرمیوم با تمام امکانات ویژه</p>
+            <div class="vs-service__icon">
+                {% if category.icon %}{{ category.icon }}{% else %}📦{% endif %}
             </div>
-            <a href="/virtual-services/telegram-premium/" class="vs-service__link">
-                مشاهده همه ←
-            </a>
+            <div class="vs-service__info">
+                <h2 class="vs-service__title">{{ category.name }}</h2>
+                {% if category.description %}
+                <p class="vs-service__subtitle">{{ category.description }}</p>
+                {% endif %}
+            </div>
         </div>
         
         <div class="vs-carousel" data-carousel>
             <div class="vs-carousel__track">
-                <!-- Card 1 -->
+                {% for product in category.active_products %}
+                <!-- Product Card -->
                 <article class="vs-card" data-color="blue">
-                    <div class="vs-card__badge">پرفروش</div>
-                    <h3 class="vs-card__title">۱ ماهه</h3>
+                    {% if product.is_featured %}
+                    <div class="vs-card__badge">ویژه</div>
+                    {% elif product.discount_percentage %}
+                    <div class="vs-card__badge vs-card__badge--discount">{{ product.discount_percentage }}٪ تخفیف</div>
+                    {% endif %}
+                    
+                    <h3 class="vs-card__title">{{ product.name }}</h3>
+                    
                     <div class="vs-card__price">
-                        <span class="vs-card__amount">۸۹,۰۰۰</span>
+                        {% if product.discount_percentage %}
+                            <span class="vs-card__amount--old">{{ product.price|floatformat:0 }}</span>
+                            <span class="vs-card__amount">{{ product.final_price|floatformat:0 }}</span>
+                        {% else %}
+                            <span class="vs-card__amount">{{ product.price|floatformat:0 }}</span>
+                        {% endif %}
                         <span class="vs-card__currency">تومان</span>
                     </div>
-                    <ul class="vs-card__features">
-                        <li>بدون محدودیت دانلود</li>
-                        <li>استیکرهای پرمیوم</li>
-                        <li>ترجمه پیام‌ها</li>
-                    </ul>
-                    <a href="/virtual-services/telegram-premium/?plan=1m" class="vs-card__btn">انتخاب</a>
+                    
+                    {% if product.short_description %}
+                    <p class="vs-card__desc">{{ product.short_description|truncatewords:15 }}</p>
+                    {% endif %}
+                    
+                    <a href="{% url 'products:detail' product.slug %}" class="vs-card__btn">مشاهده جزئیات</a>
                 </article>
-                
-                <!-- Card 2 -->
-                <article class="vs-card" data-color="blue">
-                    <div class="vs-card__badge vs-card__badge--discount">۱۰٪ تخفیف</div>
-                    <h3 class="vs-card__title">۳ ماهه</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۲۴۰,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>تمام امکانات ۱ ماهه</li>
-                        <li>صرفه‌جویی ۲۷ هزار</li>
-                        <li>پشتیبانی اولویت‌دار</li>
-                    </ul>
-                    <a href="/virtual-services/telegram-premium/?plan=3m" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 3 - Featured -->
-                <article class="vs-card vs-card--featured" data-color="blue">
-                    <div class="vs-card__ribbon">بهترین قیمت</div>
-                    <div class="vs-card__badge vs-card__badge--discount">۲۰٪ تخفیف</div>
-                    <h3 class="vs-card__title">۶ ماهه</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۴۲۷,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>تمام امکانات پرمیوم</li>
-                        <li>صرفه‌جویی ۱۰۷ هزار</li>
-                        <li>هدیه ویژه</li>
-                        <li>پشتیبانی VIP</li>
-                    </ul>
-                    <a href="/virtual-services/telegram-premium/?plan=6m" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 4 -->
-                <article class="vs-card" data-color="blue">
-                    <div class="vs-card__badge vs-card__badge--discount">۳۰٪ تخفیف</div>
-                    <h3 class="vs-card__title">۱۲ ماهه</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۷۴۸,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>یک سال کامل</li>
-                        <li>صرفه‌جویی ۳۲۰ هزار</li>
-                        <li>پشتیبانی اختصاصی</li>
-                    </ul>
-                    <a href="/virtual-services/telegram-premium/?plan=12m" class="vs-card__btn">انتخاب</a>
-                </article>
+                {% endfor %}
             </div>
         </div>
     </section>
+    {% endfor %}
 
-    <!-- ═══════════════════════════════════════════════════════════════════════════
-         SERVICE 2: فالوور اینستاگرام
-         ═══════════════════════════════════════════════════════════════════════════ -->
-    <section id="instagram-followers" class="vs-service" data-color="pink">
-        <div class="vs-service__header">
-            <div class="vs-service__icon">📸</div>
-            <div class="vs-service__info">
-                <h2 class="vs-service__title">فالوور اینستاگرام</h2>
-                <p class="vs-service__subtitle">افزایش فالوور واقعی و باکیفیت</p>
-            </div>
-            <a href="/virtual-services/instagram-followers/" class="vs-service__link">مشاهده همه ←</a>
-        </div>
-        
-        <div class="vs-carousel" data-carousel>
-            <div class="vs-carousel__track">
-                <article class="vs-card" data-color="pink">
-                    <div class="vs-card__badge">استارتر</div>
-                    <h3 class="vs-card__title">۱,۰۰۰ فالوور</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۴۵,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>فالوور واقعی ایرانی</li>
-                        <li>شروع: ۱-۳ ساعت</li>
-                        <li>گارانتی ۳۰ روزه</li>
-                    </ul>
-                    <a href="/virtual-services/instagram/?plan=1k" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <article class="vs-card vs-card--featured" data-color="pink">
-                    <div class="vs-card__ribbon">پیشنهاد ویژه</div>
-                    <h3 class="vs-card__title">۵,۰۰۰ فالوور</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۱۸۹,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>فالوور پرمیوم</li>
-                        <li>ریزش کمتر از ۵٪</li>
-                        <li>گارانتی ۶۰ روزه</li>
-                    </ul>
-                    <a href="/virtual-services/instagram/?plan=5k" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <article class="vs-card" data-color="pink">
-                    <div class="vs-card__badge">اینفلوئنسر</div>
-                    <h3 class="vs-card__title">۱۰,۰۰۰ فالوور</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۳۵۰,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>پکیج حرفه‌ای</li>
-                        <li>تحویل تدریجی</li>
-                        <li>گارانتی ۹۰ روزه</li>
-                    </ul>
-                    <a href="/virtual-services/instagram/?plan=10k" class="vs-card__btn">انتخاب</a>
-                </article>
-            </div>
-        </div>
-    </section>
+</main>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════════
-         SERVICE 3: ممبر تلگرام
-         ═══════════════════════════════════════════════════════════════════════════ -->
-    <section id="telegram-members" class="vs-service" data-color="cyan">
-        <div class="vs-service__header">
-            <div class="vs-service__icon">👥</div>
-            <div class="vs-service__info">
-                <h2 class="vs-service__title">ممبر تلگرام</h2>
-                <p class="vs-service__subtitle">افزایش ممبر واقعی کانال و گروه</p>
-            </div>
-            <a href="/virtual-services/telegram-members/" class="vs-service__link">مشاهده همه ←</a>
-        </div>
-        
-        <div class="vs-carousel" data-carousel>
-            <div class="vs-carousel__track">
-                <!-- Card 1 -->
-                <article class="vs-card" data-color="cyan">
-                    <div class="vs-card__badge">پایه</div>
-                    <h3 class="vs-card__title">۵۰۰ ممبر</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۳۵,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>ممبر واقعی ایرانی</li>
-                        <li>بدون نیاز به ادمین</li>
-                        <li>شروع: ۱ ساعت</li>
-                    </ul>
-                    <a href="/virtual-services/telegram-members/?plan=500" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 2 -->
-                <article class="vs-card" data-color="cyan">
-                    <div class="vs-card__badge">پرفروش</div>
-                    <h3 class="vs-card__title">۱,۰۰۰ ممبر</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۶۵,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>ممبر میکس</li>
-                        <li>ریزش کمتر از ۱۰٪</li>
-                        <li>گارانتی ۳۰ روزه</li>
-                    </ul>
-                    <a href="/virtual-services/telegram-members/?plan=1k" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 3 - Featured -->
-                <article class="vs-card vs-card--featured" data-color="cyan">
-                    <div class="vs-card__ribbon">محبوب‌ترین</div>
-                    <h3 class="vs-card__title">۵,۰۰۰ ممبر</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۲۸۰,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>ممبر پرمیوم اجباری</li>
-                        <li>ریزش کمتر از ۵٪</li>
-                        <li>پشتیبانی VIP</li>
-                        <li>گارانتی ۶۰ روزه</li>
-                    </ul>
-                    <a href="/virtual-services/telegram-members/?plan=5k" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 4 -->
-                <article class="vs-card" data-color="cyan">
-                    <div class="vs-card__badge vs-card__badge--discount">۱۵٪ تخفیف</div>
-                    <h3 class="vs-card__title">۱۰,۰۰۰ ممبر</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۵۱۰,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>پکیج حرفه‌ای</li>
-                        <li>تحویل ۲۴-۴۸ ساعت</li>
-                        <li>گارانتی ۹۰ روزه</li>
-                    </ul>
-                    <a href="/virtual-services/telegram-members/?plan=10k" class="vs-card__btn">انتخاب</a>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- ═══════════════════════════════════════════════════════════════════════════
-         SERVICE 4: اپل آیدی
-         ═══════════════════════════════════════════════════════════════════════════ -->
-    <section id="apple-id" class="vs-service" data-color="gray">
-        <div class="vs-service__header">
-            <div class="vs-service__icon">🍎</div>
-            <div class="vs-service__info">
-                <h2 class="vs-service__title">اپل آیدی</h2>
-                <p class="vs-service__subtitle">اپل آیدی آماده با ریجن دلخواه</p>
-            </div>
-            <a href="/virtual-services/apple-id/" class="vs-service__link">مشاهده همه ←</a>
-        </div>
-        
-        <div class="vs-carousel" data-carousel>
-            <div class="vs-carousel__track">
-                <!-- Card 1 -->
-                <article class="vs-card" data-color="gray">
-                    <div class="vs-card__badge">ایران</div>
-                    <h3 class="vs-card__title">آیدی ایران</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۲۵,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>ریجن ایران</li>
-                        <li>بدون نیاز به شماره</li>
-                        <li>تحویل فوری</li>
-                    </ul>
-                    <a href="/virtual-services/apple-id/?region=ir" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 2 - Featured -->
-                <article class="vs-card vs-card--featured" data-color="gray">
-                    <div class="vs-card__ribbon">پرفروش</div>
-                    <h3 class="vs-card__title">آیدی آمریکا</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۴۵,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>ریجن USA</li>
-                        <li>دسترسی به همه اپ‌ها</li>
-                        <li>قابل شارژ</li>
-                        <li>پشتیبانی ۷ روزه</li>
-                    </ul>
-                    <a href="/virtual-services/apple-id/?region=us" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 3 -->
-                <article class="vs-card" data-color="gray">
-                    <div class="vs-card__badge">اروپا</div>
-                    <h3 class="vs-card__title">آیدی آلمان</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۴۰,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>ریجن Germany</li>
-                        <li>مناسب اپ بانکی</li>
-                        <li>تحویل ۱۰ دقیقه</li>
-                    </ul>
-                    <a href="/virtual-services/apple-id/?region=de" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 4 -->
-                <article class="vs-card" data-color="gray">
-                    <div class="vs-card__badge">ترکیه</div>
-                    <h3 class="vs-card__title">آیدی ترکیه</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۳۵,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>ریجن Turkey</li>
-                        <li>قیمت ارزان‌تر اپ</li>
-                        <li>پشتیبانی کامل</li>
-                    </ul>
-                    <a href="/virtual-services/apple-id/?region=tr" class="vs-card__btn">انتخاب</a>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- ═══════════════════════════════════════════════════════════════════════════
-         SERVICE 5: اسپاتیفای
-         ═══════════════════════════════════════════════════════════════════════════ -->
-    <section id="spotify" class="vs-service" data-color="green">
-        <div class="vs-service__header">
-            <div class="vs-service__icon">🎵</div>
-            <div class="vs-service__info">
-                <h2 class="vs-service__title">اسپاتیفای پرمیوم</h2>
-                <p class="vs-service__subtitle">موسیقی بدون محدودیت و تبلیغات</p>
-            </div>
-            <a href="/virtual-services/spotify/" class="vs-service__link">مشاهده همه ←</a>
-        </div>
-        
-        <div class="vs-carousel" data-carousel>
-            <div class="vs-carousel__track">
-                <!-- Card 1 -->
-                <article class="vs-card" data-color="green">
-                    <div class="vs-card__badge">شخصی</div>
-                    <h3 class="vs-card__title">۱ ماهه</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۳۵,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>اکانت شخصی</li>
-                        <li>بدون تبلیغات</li>
-                        <li>دانلود آفلاین</li>
-                    </ul>
-                    <a href="/virtual-services/spotify/?plan=1m" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 2 -->
-                <article class="vs-card" data-color="green">
-                    <div class="vs-card__badge vs-card__badge--discount">۲۰٪ تخفیف</div>
-                    <h3 class="vs-card__title">۳ ماهه</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۸۴,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>صرفه‌جویی ۲۱ هزار</li>
-                        <li>کیفیت بالا</li>
-                        <li>پشتیبانی ۲۴/۷</li>
-                    </ul>
-                    <a href="/virtual-services/spotify/?plan=3m" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 3 - Featured -->
-                <article class="vs-card vs-card--featured" data-color="green">
-                    <div class="vs-card__ribbon">بهترین قیمت</div>
-                    <h3 class="vs-card__title">۶ ماهه</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۱۵۰,۰۰۰</span>
-                        <span class="vs-card__currency">تومان</span>
-                    </div>
-                    <ul class="vs-card__features">
-                        <li>صرفه‌جویی ۶۰ هزار</li>
-                        <li>اکانت اختصاصی</li>
-                        <li>گارانتی کامل</li>
-                        <li>پشتیبانی VIP</li>
-                    </ul>
-                    <a href="/virtual-services/spotify/?plan=6m" class="vs-card__btn">انتخاب</a>
-                </article>
-                
-                <!-- Card 4 -->
-                <article class="vs-card" data-color="green">
-                    <div class="vs-card__badge">سالانه</div>
-                    <h3 class="vs-card__title">۱۲ ماهه</h3>
-                    <div class="vs-card__price">
-                        <span class="vs-card__amount">۲۷۰,۰۰۰</span>
-                                            <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>یک سال کامل</li>
-                    <li>صرفه‌جویی ۱۵۰ هزار</li>
-                    <li>پایداری بالا</li>
-                </ul>
-                <a href="/virtual-services/spotify/?plan=12m" class="vs-card__btn">انتخاب</a>
-            </article>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     SERVICE 6: ساندکلاد
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<section id="soundcloud" class="vs-service" data-color="orange">
-    <div class="vs-service__header">
-        <div class="vs-service__icon">☁️</div>
-        <div class="vs-service__info">
-            <h2 class="vs-service__title">ساندکلاد پرمیوم</h2>
-            <p class="vs-service__subtitle">دسترسی کامل به موسیقی و استریم</p>
-        </div>
-        <a href="/virtual-services/soundcloud/" class="vs-service__link">مشاهده همه ←</a>
-    </div>
-
-    <div class="vs-carousel" data-carousel>
-        <div class="vs-carousel__track">
-            <article class="vs-card" data-color="orange">
-                <div class="vs-card__badge">پایه</div>
-                <h3 class="vs-card__title">۱ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۴۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>پرمیوم کامل</li>
-                    <li>بدون تبلیغات</li>
-                    <li>کیفیت بالا</li>
-                </ul>
-                <a href="/virtual-services/soundcloud/?plan=1m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card" data-color="orange">
-                <div class="vs-card__badge vs-card__badge--discount">۱۵٪ تخفیف</div>
-                <h3 class="vs-card__title">۳ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۹۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>تحویل فوری</li>
-                    <li>کیفیت عالی</li>
-                    <li>پشتیبانی ۲۴/۷</li>
-                </ul>
-                <a href="/virtual-services/soundcloud/?plan=3m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card vs-card--featured" data-color="orange">
-                <div class="vs-card__ribbon">ویژه</div>
-                <h3 class="vs-card__title">۶ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱۷۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>صرفه‌جویی عالی</li>
-                    <li>دسترسی کامل پرمیوم</li>
-                    <li>گارانتی کامل</li>
-                    <li>پشتیبانی VIP</li>
-                </ul>
-                <a href="/virtual-services/soundcloud/?plan=6m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card" data-color="orange">
-                <div class="vs-card__badge">اقتصادی</div>
-                <h3 class="vs-card__title">۱۲ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۳۲۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>یک سال کامل</li>
-                    <li>بهترین قیمت</li>
-                    <li>پشتیبانی ویژه</li>
-                </ul>
-                <a href="/virtual-services/soundcloud/?plan=12m" class="vs-card__btn">انتخاب</a>
-            </article>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     SERVICE 7: اپل اکانت
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<section id="apple-account" class="vs-service" data-color="purple">
-    <div class="vs-service__header">
-        <div class="vs-service__icon">📱</div>
-        <div class="vs-service__info">
-            <h2 class="vs-service__title">اپل اکانت</h2>
-            <p class="vs-service__subtitle">اکانت اپل با شارژ و اشتراک</p>
-        </div>
-        <a href="/virtual-services/apple-account/" class="vs-service__link">مشاهده همه ←</a>
-    </div>
-
-    <div class="vs-carousel" data-carousel>
-        <div class="vs-carousel__track">
-            <article class="vs-card" data-color="purple">
-                <div class="vs-card__badge">استارتر</div>
-                <h3 class="vs-card__title">شارژ ۵ دلار</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۳۵۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>گیفت کارت اپل</li>
-                    <li>ریجن آمریکا</li>
-                    <li>تحویل فوری</li>
-                </ul>
-                <a href="/virtual-services/apple-account/?credit=5" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card" data-color="purple">
-                <div class="vs-card__badge">پرفروش</div>
-                <h3 class="vs-card__title">شارژ ۱۰ دلار</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۶۸۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>گیفت کارت اپل</li>
-                    <li>قابل استفاده در اپ استور</li>
-                    <li>پشتیبانی کامل</li>
-                </ul>
-                <a href="/virtual-services/apple-account/?credit=10" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card vs-card--featured" data-color="purple">
-                <div class="vs-card__ribbon">محبوب</div>
-                <h3 class="vs-card__title">شارژ ۲۵ دلار</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱,۶۵۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>ارزش بالا</li>
-                    <li>مناسب خرید اپ</li>
-                    <li>گارانتی اصالت</li>
-                    <li>پشتیبانی VIP</li>
-                </ul>
-                <a href="/virtual-services/apple-account/?credit=25" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card" data-color="purple">
-                <div class="vs-card__badge">پرمیوم</div>
-                <h3 class="vs-card__title">شارژ ۵۰ دلار</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۳,۲۰۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>بالاترین ارزش</li>
-                    <li>مناسب گیمرها</li>
-                    <li>تحویل آنی</li>
-                </ul>
-                <a href="/virtual-services/apple-account/?credit=50" class="vs-card__btn">انتخاب</a>
-            </article>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     SERVICE 8: آیکلود
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<section id="icloud" class="vs-service" data-color="sky">
-    <div class="vs-service__header">
-        <div class="vs-service__icon">☁️</div>
-        <div class="vs-service__info">
-            <h2 class="vs-service__title">آیکلود پلاس</h2>
-            <p class="vs-service__subtitle">فضای ابری اپل با امکانات ویژه</p>
-        </div>
-        <a href="/virtual-services/icloud/" class="vs-service__link">مشاهده همه ←</a>
-    </div>
-
-    <div class="vs-carousel" data-carousel>
-        <div class="vs-carousel__track">
-            <article class="vs-card" data-color="sky">
-                <div class="vs-card__badge">پایه</div>
-                <h3 class="vs-card__title">۵۰ گیگ - ۱ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۲۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۵۰ گیگابایت فضا</li>
-                    <li>سینک اتوماتیک</li>
-                    <li>پشتیبان‌گیری</li>
-                </ul>
-                <a href="/virtual-services/icloud/?plan=50gb-1m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card" data-color="sky">
-                <div class="vs-card__badge">استاندارد</div>
-                <h3 class="vs-card__title">۲۰۰ گیگ - ۱ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۴۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۲۰۰ گیگابایت فضا</li>
-                    <li>اشتراک خانواده</li>
-                    <li>Hide My Email</li>
-                </ul>
-                <a href="/virtual-services/icloud/?plan=200gb-1m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card vs-card--featured" data-color="sky">
-                <div class="vs-card__ribbon">پیشنهادی</div>
-                <h3 class="vs-card__title">۲ ترابایت - ۱ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱۲۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۲ ترابایت فضا</li>
-                    <li>Private Relay</li>
-                    <li>Custom Email Domain</li>
-                    <li>پشتیبانی ویژه</li>
-                </ul>
-                <a href="/virtual-services/icloud/?plan=2tb-1m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <article class="vs-card" data-color="sky">
-                <div class="vs-card__badge vs-card__badge--discount">۲۰٪ تخفیف</div>
-                <h3 class="vs-card__title">۲ ترابایت - ۱۲ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱,۱۵۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>یک سال کامل</li>
-                    <li>صرفه‌جویی ۲۹۰ هزار</li>
-                    <li>تمام امکانات پرمیوم</li>
-                </ul>
-                <a href="/virtual-services/icloud/?plan=2tb-12m" class="vs-card__btn">انتخاب</a>
-            </article>
-        </div>
-    </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     SERVICE 9: وایرگارد
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<section id="wireguard" class="vs-service" data-color="red">
-    <div class="vs-service__header">
-        <div class="vs-service__icon">🔐</div>
-        <div class="vs-service__info">
-            <h2 class="vs-service__title">اشتراک وایرگارد</h2>
-            <p class="vs-service__subtitle">VPN سریع و امن با پروتکل WireGuard</p>
-        </div>
-        <a href="/virtual-services/wireguard/" class="vs-service__link">مشاهده همه ←</a>
-    </div>
-
-    <div class="vs-carousel" data-carousel>
-        <div class="vs-carousel__track">
-            <!-- Plan 1 -->
-            <article class="vs-card" data-color="red">
-                <div class="vs-card__badge">تست</div>
-                <h3 class="vs-card__title">۱ هفته‌ای</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۱ دستگاه همزمان</li>
-                    <li>سرعت نامحدود</li>
-                    <li>۵ لوکیشن</li>
-                </ul>
-                <a href="/virtual-services/wireguard/?plan=1w" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <!-- Plan 2 -->
-            <article class="vs-card" data-color="red">
-                <div class="vs-card__badge">پرفروش</div>
-                <h3 class="vs-card__title">۱ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۴۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۲ دستگاه همزمان</li>
-                    <li>سرعت فوق‌العاده</li>
-                    <li>۱۰+ لوکیشن</li>
-                    <li>پشتیبانی تلگرام</li>
-                </ul>
-                <a href="/virtual-services/wireguard/?plan=1m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <!-- Plan 3 - Featured -->
-            <article class="vs-card vs-card--featured" data-color="red">
-                <div class="vs-card__ribbon">پیشنهاد ویژه</div>
-                <h3 class="vs-card__title">۳ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱۱۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۳ دستگاه همزمان</li>
-                    <li>سرعت فوق‌العاده</li>
-                    <li>۲۰+ لوکیشن پرمیوم</li>
-                    <li>پشتیبانی اختصاصی</li>
-                    <li>بدون محدودیت حجم</li>
-                </ul>
-                <a href="/virtual-services/wireguard/?plan=3m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <!-- Plan 4 -->
-            <article class="vs-card" data-color="red">
-                <div class="vs-card__badge vs-card__badge--discount">۲۵٪ تخفیف</div>
-                <h3 class="vs-card__title">۶ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱۹۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۵ دستگاه همزمان</li>
-                    <li>تمام لوکیشن‌ها</li>
-                    <li>Kill Switch</li>
-                    <li>پشتیبانی VIP</li>
-                </ul>
-                <a href="/virtual-services/wireguard/?plan=6m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <!-- Plan 5 -->
-            <article class="vs-card" data-color="red">
-                <div class="vs-card__badge">سالانه</div>
-                <h3 class="vs-card__title">۱۲ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۳۵۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۱۰ دستگاه همزمان</li>
-                    <li>Dedicated IP</li>
-                    <li>پشتیبانی ۲۴/۷</li>
-                    <li>گارانتی بازگشت وجه</li>
-                </ul>
-                <a href="/virtual-services/wireguard/?plan=12m" class="vs-card__btn">انتخاب</a>
-            </article>
-        </div>
-
-        <!-- Carousel Navigation -->
-        <button class="vs-carousel__btn vs-carousel__btn--prev" aria-label="قبلی">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-            </svg>
-        </button>
-        <button class="vs-carousel__btn vs-carousel__btn--next" aria-label="بعدی">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6"/>
-            </svg>
-        </button>
-    </div>
-
-    <!-- Carousel Dots -->
-    <div class="vs-carousel__dots"></div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     SERVICE 10: OpenVPN
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<section id="openvpn" class="vs-service" data-color="teal">
-    <div class="vs-service__header">
-        <div class="vs-service__icon">🛡️</div>
-        <div class="vs-service__info">
-            <h2 class="vs-service__title">اشتراک OpenVPN</h2>
-            <p class="vs-service__subtitle">VPN کلاسیک با امنیت بالا و سازگاری عالی</p>
-        </div>
-        <a href="/virtual-services/openvpn/" class="vs-service__link">مشاهده همه ←</a>
-    </div>
-
-    <div class="vs-carousel" data-carousel>
-        <div class="vs-carousel__track">
-            <!-- Plan 1 -->
-            <article class="vs-card" data-color="teal">
-                <div class="vs-card__badge">آزمایشی</div>
-                <h3 class="vs-card__title">۱ هفته‌ای</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱۲,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۱ دستگاه</li>
-                    <li>۵ گیگ حجم</li>
-                    <li>۳ لوکیشن</li>
-                </ul>
-                <a href="/virtual-services/openvpn/?plan=1w" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <!-- Plan 2 -->
-            <article class="vs-card" data-color="teal">
-                <div class="vs-card__badge">استاندارد</div>
-                <h3 class="vs-card__title">۱ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۳۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۲ دستگاه همزمان</li>
-                    <li>حجم نامحدود</li>
-                    <li>۱۰ لوکیشن</li>
-                    <li>رمزنگاری AES-256</li>
-                </ul>
-                <a href="/virtual-services/openvpn/?plan=1m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <!-- Plan 3 - Featured -->
-            <article class="vs-card vs-card--featured" data-color="teal">
-                <div class="vs-card__ribbon">محبوب‌ترین</div>
-                <h3 class="vs-card__title">۳ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۸۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۳ دستگاه همزمان</li>
-                    <li>حجم نامحدود</li>
-                    <li>۱۵+ لوکیشن پرمیوم</li>
-                    <li>پروتکل TCP/UDP</li>
-                    <li>پشتیبانی تلگرام</li>
-                </ul>
-                <a href="/virtual-services/openvpn/?plan=3m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <!-- Plan 4 -->
-            <article class="vs-card" data-color="teal">
-                <div class="vs-card__badge vs-card__badge--discount">۳۰٪ تخفیف</div>
-                <h3 class="vs-card__title">۶ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۱۴۵,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۵ دستگاه همزمان</li>
-                    <li>تمام لوکیشن‌ها</li>
-                    <li>Split Tunneling</li>
-                    <li>پشتیبانی اختصاصی</li>
-                </ul>
-                <a href="/virtual-services/openvpn/?plan=6m" class="vs-card__btn">انتخاب</a>
-            </article>
-
-            <!-- Plan 5 -->
-            <article class="vs-card" data-color="teal">
-                <div class="vs-card__badge">VIP</div>
-                <h3 class="vs-card__title">۱۲ ماهه</h3>
-                <div class="vs-card__price">
-                    <span class="vs-card__amount">۲۶۰,۰۰۰</span>
-                    <span class="vs-card__currency">تومان</span>
-                </div>
-                <ul class="vs-card__features">
-                    <li>۱۰ دستگاه همزمان</li>
-                    <li>سرور اختصاصی</li>
-                    <li>پشتیبانی ۲۴/۷</li>
-                    <li>گارانتی ۳۰ روزه</li>
-                </ul>
-                <a href="/virtual-services/openvpn/?plan=12m" class="vs-card__btn">انتخاب</a>
-            </article>
-        </div>
-
-        <!-- Carousel Navigation -->
-        <button class="vs-carousel__btn vs-carousel__btn--prev" aria-label="قبلی">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18l6-6-6-6"/>
-            </svg>
-        </button>
-        <button class="vs-carousel__btn vs-carousel__btn--next" aria-label="بعدی">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6"/>
-            </svg>
-        </button>
-    </div>
-
-    <!-- Carousel Dots -->
-    <div class="vs-carousel__dots"></div>
-</section>
-
-            </div>
-        </main>
-
-        <!-- ═══════════════════════════════════════════════════════════════════════
-             FLOATING ACTION BUTTON - برگشت به بالا
-             ═══════════════════════════════════════════════════════════════════════ -->
-        <button id="backToTop" class="vs-fab" aria-label="برگشت به بالا" title="برگشت به بالا">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 15l-6-6-6 6"/>
-            </svg>
-        </button>
 
     </div>
+
+
+
 
 {% endblock content %}
 
 {% block extra_js %}
-<script src="{% static 'js/pages/virtual-services.js' %}"></script>
+<script src="{% static 'js/pages/virtual_services.js' %}"></script>
 {% endblock extra_js %}
