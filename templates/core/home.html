@@ -124,11 +124,6 @@
                 <span class="dot" onclick="goToSlide(2)"></span>
                 <span class="dot" onclick="goToSlide(3)"></span>
             </div>
-
-            <!-- Progress Bar -->
-            <div class="carousel-progress">
-                <div class="progress-bar"></div>
-            </div>
         </div>
     </div>
 </section>
@@ -335,14 +330,14 @@
     /* Modern Dots Indicators with Progress Animation */
     .carousel-dots {
         position: absolute;
-        bottom: 20px;
+        bottom: 35px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
         gap: 10px;
         z-index: 100;
         padding: 10px 20px;
-        background: rgba(0, 0, 0, 0.2);
+        background: rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(10px);
         border-radius: 50px;
     }
@@ -384,31 +379,7 @@
         animation: pulse 3s ease-in-out infinite;
     }
 
-    /* Top Progress Bar */
-    .carousel-progress {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: rgba(255, 255, 255, 0.1);
-        z-index: 101;
-        overflow: hidden;
-    }
 
-    .progress-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #ff0055, #8a2be2, #00f5ff);
-        background-size: 200% 100%;
-        width: 0%;
-        transition: width 0.1s linear;
-        animation: gradientShift 3s linear infinite;
-    }
-
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        100% { background-position: 200% 50%; }
-    }
 
     /* Modern Animations */
     @keyframes slideZoom {
@@ -528,28 +499,13 @@
     }
 
     function autoplay() {
-        const progressBar = document.querySelector('.progress-bar');
-        let progress = 0;
-        
-        // Reset progress bar
-        if (progressBar) progressBar.style.width = '0%';
-        
-        // Animate progress bar
-        const progressInterval = setInterval(() => {
-            progress += 1;
-            if (progressBar) progressBar.style.width = progress + '%';
-            if (progress >= 100) clearInterval(progressInterval);
-        }, 30); // 30ms * 100 = 3000ms
-        
         autoplayTimer = setInterval(() => {
             changeSlide(1);
-        }, 3000);
+        }, 5000); // Changed to 5 seconds
     }
 
     function resetAutoplay() {
         clearInterval(autoplayTimer);
-        const progressBar = document.querySelector('.progress-bar');
-        if (progressBar) progressBar.style.width = '0%';
         autoplay();
     }
 
