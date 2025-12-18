@@ -82,46 +82,46 @@
                 <div class="carousel-track flex transition-transform duration-500 ease-in-out">
                     
                     <!-- Slide 1: Virtual Services -->
-                    <div class="carousel-item min-w-full">
+                    <div class="carousel-item">
                         <a href="{% url 'core:virtual_services' %}" class="category-card relative block">
                             <img src="{% static 'images/cards/virtual-services.png' %}" 
                                  alt="خدمات مجازی" 
                                  class="category-card-image w-full h-[500px] object-cover rounded-2xl"
+                                 style="filter: brightness(1.4) contrast(1.1);"
                                  onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: virtual-services.png');">
-                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl"></div>
                         </a>
                     </div>
 
                     <!-- Slide 2: Gaming Products -->
-                    <div class="carousel-item min-w-full">
+                    <div class="carousel-item">
                         <a href="{% url 'core:gaming_products' %}" class="category-card relative block">
                             <img src="{% static 'images/cards/gaming-products.png' %}" 
                                  alt="محصولات گیمینگ" 
                                  class="category-card-image w-full h-[500px] object-cover rounded-2xl"
+                                 style="filter: brightness(1.3) contrast(1.1);"
                                  onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: gaming-products.png');">
-                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl"></div>
                         </a>
                     </div>
 
                     <!-- Slide 3: Game Credits -->
-                    <div class="carousel-item min-w-full">
+                    <div class="carousel-item">
                         <a href="{% url 'core:mini_game' %}" class="category-card relative block">
                             <img src="{% static 'images/cards/mini-game.png' %}" 
                                  alt="شارژ بازی‌ها" 
                                  class="category-card-image w-full h-[500px] object-cover rounded-2xl"
+                                 style="filter: brightness(1.2) contrast(1.1);"
                                  onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: mini-game.png');">
-                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl"></div>
                         </a>
                     </div>
 
                     <!-- Slide 4: By Products -->
-                    <div class="carousel-item min-w-full">
+                    <div class="carousel-item">
                         <a href="{% url 'core:buy_products' %}" class="category-card relative block">
                             <img src="{% static 'images/cards/by-products.png' %}" 
                                  alt="محصولات جانبی موبایل" 
                                  class="category-card-image w-full h-[500px] object-cover rounded-2xl"
+                                 style="filter: brightness(1.5) contrast(1.2);"
                                  onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: by-products.png');">
-                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl"></div>
                         </a>
                     </div>
 
@@ -277,13 +277,14 @@
 
     /* Carousel Track - FIXED WIDTH */
     .carousel-track {
-        width: 400%; /* 4 slides x 100% each */
-        display: flex;
+        width: 400% !important; /* 4 slides x 100% each */
+        display: flex !important;
     }
 
     .carousel-item {
-        flex: 0 0 25%; /* Each item takes 25% of track width (100% / 4 slides) */
-        min-width: 25%;
+        flex: 0 0 25% !important; /* Each item takes 25% of track width (100% / 4 slides) */
+        min-width: 25% !important;
+        max-width: 25% !important;
     }
 
     /* Category Card */
@@ -291,22 +292,16 @@
         position: relative;
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        border-radius: 1rem;
     }
 
     .category-card-image {
-        transition: transform 0.5s ease;
+        transition: all 0.5s ease;
     }
 
     .category-card:hover .category-card-image {
         transform: scale(1.05);
-    }
-
-    .category-card-overlay {
-        transition: background 0.3s ease;
-    }
-
-    .category-card:hover .category-card-overlay {
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.5), transparent);
+        filter: brightness(1.1) !important;
     }
 
     /* Carousel Controls */
