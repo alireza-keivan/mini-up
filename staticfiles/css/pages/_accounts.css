@@ -1,0 +1,530 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PROFILE PAGE STYLES — Mini-up.ir Neon Dark Theme
+   Path: static/css/pages/_accounts.css
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PROFILE HEADER SECTION
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.profile-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse at 20% 0%, rgba(0, 255, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Avatar Container */
+.profile-avatar {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.profile-avatar-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        #00ffff,
+        #8b5cf6,
+        #f472b6,
+        #00ffff
+    );
+    animation: avatar-ring-spin 8s linear infinite;
+    opacity: 0.7;
+}
+
+.profile-avatar-ring::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: #0a0a0f;
+    border-radius: 50%;
+}
+
+@keyframes avatar-ring-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.profile-avatar img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 255, 255, 0.3);
+}
+
+/* Level Badge */
+.profile-level-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(25%, 25%);
+    z-index: 2;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    border: 2px solid #0a0a0f;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    color: white;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAB NAVIGATION
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.profile-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 0.5rem;
+}
+
+.profile-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.profile-tab-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #9ca3af;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.profile-tab-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.profile-tab-btn.active {
+    color: #00ffff;
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.3);
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.profile-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+}
+
+.profile-tab-btn i {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.profile-tab-btn:hover i {
+    transform: scale(1.1);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAB CONTENT ANIMATIONS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.profile-tab-content {
+    animation: tab-fade-in 0.4s ease-out;
+}
+
+@keyframes tab-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: tab-fade-in 0.4s ease-out;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   STAT CARDS (Dashboard)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.stat-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--stat-color, linear-gradient(90deg, #00ffff, #8b5cf6));
+    opacity: 0.7;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card.stat-cyan::before { --stat-color: #00ffff; }
+.stat-card.stat-purple::before { --stat-color: #8b5cf6; }
+.stat-card.stat-pink::before { --stat-color: #f472b6; }
+.stat-card.stat-green::before { --stat-color: #10b981; }
+.stat-card.stat-yellow::before { --stat-color: #fbbf24; }
+
+.stat-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.25rem;
+    font-family: 'Vazirmatn', sans-serif;
+}
+
+.stat-card-label {
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   NEON CARDS (Bank Cards, Address Cards)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.neon-card {
+    position: relative;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.02) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.neon-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(0, 255, 255, 0.03) 50%,
+        transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.neon-card:hover::before {
+    opacity: 1;
+}
+
+.neon-card:hover {
+    border-color: rgba(0, 255, 255, 0.2);
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.1),
+        0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Bank Card Specific */
+.bank-card {
+    aspect-ratio: 1.586 / 1; /* Standard credit card ratio */
+    max-width: 380px;
+    background: linear-gradient(
+        135deg,
+        rgba(20, 20, 30, 0.9) 0%,
+        rgba(30, 30, 50, 0.9) 100%
+    );
+    border-radius: 1rem;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.bank-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 70%
+    );
+    pointer-events: none;
+}
+
+.bank-card-number {
+    font-family: 'Courier New', monospace;
+    font-size: 1.25rem;
+    letter-spacing: 0.15em;
+    color: white;
+    direction: ltr;
+    text-align: center;
+}
+
+.bank-card-chip {
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(
+        135deg,
+        #ffd700 0%,
+        #b8860b 50%,
+        #ffd700 100%
+    );
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.bank-card-chip::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.3) 3px,
+        rgba(0, 0, 0, 0.3) 6px
+    );
+}
+
+/* Default Badge */
+.default-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    color: #10b981;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ORDER CARDS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.order-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(-4px);
+}
+
+.order-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.order-status.pending {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.order-status.processing {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.order-status.completed {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.order-status.cancelled {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PIN & OTP INPUTS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.pin-container,
+.otp-container {
+    display: flex;
+    gap: 0.75rem;
+    direction: ltr;
+    justify-content: center;
+}
+
+.pin-input,
+.otp-input {
+    width: 48px;
+    height: 56px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.pin-input:focus,
+.otp-input:focus {
+    border-color: rgba(0, 255, 255, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    outline: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BUTTONS & UTILITY CLASSES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.btn-neon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: white;
+    background: linear-gradient(135deg, #00ffff, #8b5cf6);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.btn-neon:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+.btn-outline-neon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #00ffff;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-neon:hover {
+    color: white;
+    background: rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.6);
+}
+
+/* Utility glow for status or accent icons */
+.glow-cyan { text-shadow: 0 0 12px #00ffff; }
+.glow-purple { text-shadow: 0 0 12px #8b5cf6; }
+.glow-pink { text-shadow: 0 0 12px #f472b6; }
+
+/* Fade and neon transitions */
+.neon-transition { transition: box-shadow 0.3s ease, transform 0.3s ease; }
+.neon-transition:hover { transform: scale(1.02); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE TWEAKS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    .stat-card {
+        padding: 1rem;
+    }
+    .bank-card {
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+    .profile-tab-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Small fade for disabled or readonly elements */
+.element-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}

@@ -1,0 +1,720 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AUTH MODAL — Login/Register/OTP Modal Styles
+   Extends base modal styles from components/_modals.css
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH MODAL SPECIFIC CONTAINER
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-modal-overlay {
+    @apply fixed inset-0 z-[100];
+    @apply flex items-center justify-center p-4;
+    @apply opacity-0 invisible;
+    @apply transition-all duration-300;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.auth-modal-overlay.active {
+    @apply opacity-100 visible;
+}
+
+.auth-modal {
+    @apply relative w-full max-w-md;
+    @apply rounded-2xl overflow-hidden;
+    @apply transform scale-95 opacity-0;
+    @apply transition-all duration-300;
+    background: rgba(12, 12, 18, 0.98);
+    border: 1px solid rgba(255, 0, 85, 0.2);
+    box-shadow: 
+        0 25px 80px rgba(0, 0, 0, 0.7),
+        0 0 60px rgba(255, 0, 85, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.auth-modal-overlay.active .auth-modal {
+    @apply scale-100 opacity-100;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AUTH MODAL — Login/Register/OTP Modal Styles
+   Extends base modal styles from components/_modals.css
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH MODAL HEADER (ادامه)
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-modal-header {
+    @apply relative px-6 pt-6 pb-4;
+    @apply flex items-center justify-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.auth-modal-title {
+    @apply text-xl font-bold text-white;
+}
+
+.auth-modal-close {
+    @apply w-9 h-9 rounded-lg;
+    @apply flex items-center justify-center;
+    @apply text-gray-400 hover:text-white;
+    @apply bg-white/5 hover:bg-white/10;
+    @apply transition-all duration-200;
+    @apply cursor-pointer;
+}
+
+.auth-modal-close:hover {
+    @apply rotate-90;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH LOGO SECTION
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-logo-section {
+    @apply text-center py-6;
+}
+
+.auth-logo-icon {
+    @apply w-16 h-16 mx-auto mb-4 rounded-2xl;
+    @apply flex items-center justify-center;
+    @apply text-2xl text-white;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 0 40px rgba(255, 0, 85, 0.4);
+}
+
+.auth-logo-brand {
+    @apply text-2xl font-black;
+    background: linear-gradient(135deg, #fff, var(--neon-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.auth-logo-tagline {
+    @apply text-sm text-gray-500 mt-1;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH TABS (Login/Register Toggle)
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-tabs {
+    @apply flex mb-6 p-1 rounded-xl;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.auth-tab {
+    @apply flex-1 py-3 text-center text-sm font-medium;
+    @apply rounded-lg cursor-pointer;
+    @apply text-gray-400 transition-all duration-200;
+}
+
+.auth-tab:hover:not(.active) {
+    @apply text-gray-300;
+}
+
+.auth-tab.active {
+    @apply text-white;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH FORM CONTAINER
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-form-container {
+    @apply px-6 pb-6;
+}
+
+.auth-form {
+    @apply space-y-4;
+}
+
+.auth-panel {
+    @apply hidden;
+}
+
+.auth-panel.active {
+    @apply block;
+    animation: authFadeIn 0.3s ease forwards;
+}
+
+@keyframes authFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH INPUT FIELDS
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-input-group {
+    @apply relative;
+}
+
+.auth-input-label {
+    @apply block text-sm font-medium text-gray-400 mb-2;
+}
+
+.auth-input-wrapper {
+    @apply relative;
+}
+
+.auth-input {
+    @apply w-full py-3.5 px-4 pr-12;
+    @apply rounded-xl text-white text-sm;
+    @apply outline-none transition-all duration-200;
+    @apply placeholder-gray-500;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-input:focus {
+    border-color: rgba(255, 0, 85, 0.5);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.15);
+}
+
+.auth-input:disabled {
+    @apply opacity-50 cursor-not-allowed;
+}
+
+.auth-input.error {
+    border-color: rgba(255, 68, 68, 0.5);
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.15);
+}
+
+.auth-input.success {
+    border-color: rgba(0, 255, 136, 0.5);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.15);
+}
+
+/* RTL Support */
+[dir="rtl"] .auth-input {
+    @apply pr-4 pl-12;
+}
+
+/* Input Icon */
+.auth-input-icon {
+    @apply absolute top-1/2 -translate-y-1/2 right-4;
+    @apply text-gray-500 text-sm;
+    @apply transition-colors duration-200;
+    @apply pointer-events-none;
+}
+
+.auth-input:focus ~ .auth-input-icon {
+    @apply text-pink-400;
+}
+
+[dir="rtl"] .auth-input-icon {
+    @apply right-auto left-4;
+}
+
+/* Password Toggle */
+.auth-password-toggle {
+    @apply absolute top-1/2 -translate-y-1/2 left-4;
+    @apply text-gray-500 hover:text-gray-300;
+    @apply cursor-pointer transition-colors duration-200;
+}
+
+[dir="rtl"] .auth-password-toggle {
+    @apply left-auto right-4;
+}
+
+/* Input Hint */
+.auth-input-hint {
+    @apply text-xs text-gray-500 mt-1.5;
+}
+
+/* Input Error Message */
+.auth-input-error {
+    @apply text-xs text-red-400 mt-1.5;
+    @apply flex items-center gap-1;
+}
+
+.auth-input-error i {
+    @apply text-[10px];
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH CHECKBOX & REMEMBER ME
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-checkbox-wrapper {
+    @apply flex items-center gap-3;
+}
+
+.auth-checkbox {
+    @apply w-5 h-5 rounded;
+    @apply bg-white/5 border border-white/10;
+    @apply cursor-pointer transition-all duration-200;
+    @apply appearance-none;
+}
+
+.auth-checkbox:checked {
+    @apply bg-pink-500 border-pink-500;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+}
+
+.auth-checkbox-label {
+    @apply text-sm text-gray-400 cursor-pointer;
+}
+
+.auth-options-row {
+    @apply flex items-center justify-between;
+}
+
+.auth-forgot-link {
+    @apply text-sm text-pink-400 hover:text-pink-300;
+    @apply transition-colors duration-200;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH SUBMIT BUTTON
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-submit-btn {
+    @apply w-full py-4 rounded-xl;
+    @apply text-white font-bold text-sm;
+    @apply flex items-center justify-center gap-2;
+    @apply transition-all duration-300;
+    @apply cursor-pointer;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+    box-shadow: 0 4px 20px rgba(255, 0, 85, 0.3);
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+    @apply transform -translate-y-0.5;
+    box-shadow: 0 8px 30px rgba(255, 0, 85, 0.4);
+}
+
+.auth-submit-btn:active:not(:disabled) {
+    @apply transform translate-y-0;
+}
+
+/* Loading State */
+.auth-submit-btn.loading {
+    @apply pointer-events-none;
+}
+
+.auth-btn-spinner {
+    @apply w-5 h-5 border-2 border-white/30 border-t-white rounded-full;
+    animation: authBtnSpin 0.8s linear infinite;
+}
+
+@keyframes authBtnSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Secondary Button */
+.auth-secondary-btn {
+    @apply w-full py-3.5 rounded-xl;
+    @apply text-gray-300 font-medium text-sm;
+    @apply flex items-center justify-center gap-2;
+    @apply transition-all duration-200;
+    @apply cursor-pointer;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-secondary-btn:hover {
+    @apply text-white;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   OTP INPUT SECTION
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-otp-section {
+    @apply text-center py-4;
+}
+
+.auth-otp-title {
+    @apply text-lg font-bold text-white mb-2;
+}
+
+.auth-otp-subtitle {
+    @apply text-sm text-gray-400 mb-6;
+}
+
+.auth-otp-phone {
+    @apply text-cyan-400 font-medium;
+    direction: ltr;
+}
+
+.auth-otp-inputs {
+    @apply flex justify-center gap-3 mb-6;
+    direction: ltr;
+}
+
+.auth-otp-input {
+    @apply w-12 h-14 text-center text-xl font-bold text-white;
+    @apply rounded-xl outline-none;
+    @apply transition-all duration-200;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-otp-input:focus {
+    border-color: rgba(255, 0, 85, 0.5);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+}
+
+.auth-otp-input.filled {
+    border-color: rgba(0, 245, 255, 0.5);
+    background: rgba(0, 245, 255, 0.05);
+}
+
+.auth-otp-input.error {
+    border-color: rgba(255, 68, 68, 0.5);
+    animation: otpShake 0.5s ease;
+}
+
+@keyframes otpShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+/* OTP Timer */
+.auth-otp-timer {
+    @apply text-sm text-gray-400 mb-4;
+}
+
+.auth-otp-timer-value {
+    @apply text-pink-400 font-bold;
+}
+
+.auth-otp-timer.expired .auth-otp-timer-value {
+    @apply text-red-400;
+}
+
+/* Resend OTP */
+.auth-otp-resend {
+    @apply text-sm;
+}
+
+.auth-otp-resend-btn {
+    @apply text-pink-400 hover:text-pink-300;
+    @apply font-medium cursor-pointer;
+    @apply transition-colors duration-200;
+}
+
+.auth-otp-resend-btn:disabled {
+    @apply text-gray-500 cursor-not-allowed;
+}
+
+/* Edit Phone */
+.auth-otp-edit {
+    @apply text-xs text-gray-500 hover:text-gray-400 mt-3;
+    @apply inline-flex items-center gap-1;
+    @apply cursor-pointer transition-colors duration-200;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SOCIAL LOGIN SECTION
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-divider {
+    @apply relative flex items-center my-6;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    @apply flex-1;
+    content: '';
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.auth-divider-text {
+    @apply px-4 text-sm text-gray-500;
+}
+
+.auth-social-buttons {
+    @apply grid grid-cols-2 gap-3;
+}
+
+.auth-social-btn {
+    @apply py-3 px-4 rounded-xl;
+    @apply flex items-center justify-center gap-2;
+    @apply text-sm font-medium;
+    @apply transition-all duration-200;
+    @apply cursor-pointer;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-social-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+.auth-social-btn i {
+    @apply text-lg;
+}
+
+.auth-social-btn.google {
+    border-color: rgba(234, 67, 53, 0.4);
+    color: #ea4335;
+}
+
+.auth-social-btn.github {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH ERROR / WARNING / INFO BOXES
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-message-box {
+    @apply w-full p-4 rounded-xl mb-4;
+    @apply flex items-center gap-3;
+    @apply text-sm;
+    border: 1px solid transparent;
+}
+
+.auth-error-box {
+    @apply text-red-400 bg-red-500/10;
+    border-color: rgba(255, 68, 68, 0.3);
+}
+
+.auth-warning-box {
+    @apply text-yellow-400 bg-yellow-500/10;
+    border-color: rgba(255, 204, 0, 0.3);
+}
+
+.auth-info-box {
+    @apply text-cyan-400 bg-cyan-500/10;
+    border-color: rgba(0, 245, 255, 0.3);
+}
+
+.auth-message-box i {
+    @apply text-lg;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH SUCCESS VIEW
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-success-view {
+    @apply text-center py-10;
+}
+
+.auth-success-icon {
+    @apply w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center;
+    @apply text-3xl text-white;
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.5);
+    animation: authSuccessPulse 2s ease infinite;
+}
+
+@keyframes authSuccessPulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.5); }
+    50%      { box-shadow: 0 0 60px rgba(16, 185, 129, 0.7); }
+}
+
+.auth-success-title {
+    @apply text-xl font-bold text-white mb-2;
+}
+
+.auth-success-text {
+    @apply text-gray-400 mb-6;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AUTH FOOTER LINKS
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-footer {
+    @apply mt-10 pt-6 text-center text-sm;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-footer a {
+    @apply mx-2 text-gray-400 hover:text-pink-400;
+    @apply transition-colors duration-200;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DECORATIVE BLURS AND GLOWS
+   ───────────────────────────────────────────────────────────────────────── */
+.auth-decoration {
+    @apply absolute pointer-events-none;
+}
+
+.auth-glow-1 {
+    @apply w-72 h-72 rounded-full blur-[110px] opacity-30;
+    background: var(--neon-pink);
+    top: -120px;
+    right: -120px;
+}
+
+.auth-glow-2 {
+    @apply w-56 h-56 rounded-full blur-[90px] opacity-25;
+    background: var(--neon-cyan);
+    bottom: -100px;
+    left: -100px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RESPONSIVE (MOBILE)
+   ───────────────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .auth-modal {
+        @apply mx-2 rounded-xl;
+    }
+
+    .auth-modal-header {
+        @apply px-4 pt-4 pb-3;
+    }
+
+    .auth-modal-close {
+        @apply w-8 h-8;
+    }
+
+    .auth-logo-icon {
+        @apply w-14 h-14;
+    }
+
+    .auth-logo-brand {
+        @apply text-xl;
+    }
+
+    .auth-tabs {
+        @apply mb-4 p-1;
+    }
+
+    .auth-tab {
+        @apply py-2.5 text-xs;
+    }
+
+    .auth-input {
+        @apply py-3 text-sm;
+    }
+
+    .auth-submit-btn {
+        @apply py-3.5 text-sm;
+    }
+
+    .auth-otp-inputs {
+        @apply gap-2;
+    }
+
+    .auth-otp-input {
+        @apply w-10 h-12 text-lg;
+    }
+
+    .auth-social-buttons {
+        @apply grid-cols-1;
+    }
+
+    .auth-social-btn {
+        @apply py-3;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   RTL FIXES
+   ───────────────────────────────────────────────────────────────────────── */
+[dir="rtl"] .auth-modal-close {
+    @apply left-4 right-auto;
+}
+
+[dir="rtl"] .auth-input {
+    @apply text-right pr-4 pl-12;
+}
+
+[dir="rtl"] .auth-input-icon {
+    @apply right-auto left-4;
+}
+
+[dir="rtl"] .auth-password-toggle {
+    @apply left-auto right-4;
+}
+
+[dir="rtl"] .auth-checkbox-wrapper {
+    @apply flex-row-reverse;
+}
+
+[dir="rtl"] .auth-forgot-link {
+    @apply float-left;
+}
+
+[dir="rtl"] .auth-social-btn i {
+    @apply ml-2 mr-0;
+}
+
+[dir="rtl"] .auth-error-box i,
+[dir="rtl"] .auth-warning-box i,
+[dir="rtl"] .auth-info-box i {
+    @apply ml-2 mr-0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FINAL MICRO INTERACTIONS
+   ───────────────────────────────────────────────────────────────────────── */
+.input-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.input-wrapper .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(0);
+    animation: ripple-anim 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-anim {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.auth-hover-glow {
+    @apply transition-all duration-300;
+}
+
+.auth-hover-glow:hover {
+    box-shadow: 0 15px 50px rgba(255, 0, 85, 0.25),
+                0 0 40px rgba(0, 245, 255, 0.15);
+}
+
+.auth-animated-bg {
+    background: linear-gradient(-45deg,
+        rgba(255, 0, 85, 0.08),
+        rgba(191, 0, 255, 0.08),
+        rgba(0, 245, 255, 0.08),
+        rgba(255, 0, 85, 0.08));
+    background-size: 400% 400%;
+    animation: authAnimatedBackground 12s ease infinite;
+}
+
+@keyframes authAnimatedBackground {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.fade-in {
+    animation: authFadeInSmooth 0.4s ease forwards;
+}
+
+.fade-out {
+    animation: authFadeOutSmooth 0.4s ease forwards;
+}
+
+@keyframes authFadeInSmooth {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes authFadeOutSmooth {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(10px); }
+}

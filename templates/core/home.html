@@ -83,97 +83,46 @@
                     
                     <!-- Slide 1: Virtual Services -->
                     <div class="carousel-item min-w-full">
-                        <div class="category-card relative">
+                        <a href="{% url 'core:virtual_services' %}" class="category-card relative block">
                             <img src="{% static 'images/cards/virtual-services.png' %}" 
                                  alt="خدمات مجازی" 
-                                 class="category-card-image w-full h-[500px] object-cover rounded-2xl">
-                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl">
-                                <div class="category-card-content absolute bottom-0 left-0 right-0 p-8 text-center">
-                                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">خدمات مجازی</h3>
-                                    <p class="text-gray-200 text-lg mb-6">
-                                        اشتراک پرمیوم تلگرام، اسپاتیفای، نتفلیکس و سایر سرویس‌ها
-                                    </p>
-                                    <a href="{% url 'core:virtual_services' %}" 
-                                       class="btn btn-primary btn-lg inline-flex items-center gap-2">
-                                        مشاهده خدمات
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                                 class="category-card-image w-full h-[500px] object-cover rounded-2xl"
+                                 onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: virtual-services.png');">
+                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl"></div>
+                        </a>
                     </div>
 
                     <!-- Slide 2: Gaming Products -->
                     <div class="carousel-item min-w-full">
-                        <div class="category-card relative">
+                        <a href="{% url 'core:gaming_products' %}" class="category-card relative block">
                             <img src="{% static 'images/cards/gaming-products.png' %}" 
                                  alt="محصولات گیمینگ" 
-                                 class="category-card-image w-full h-[500px] object-cover rounded-2xl">
-                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl">
-                                <div class="category-card-content absolute bottom-0 left-0 right-0 p-8 text-center">
-                                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">محصولات گیمینگ</h3>
-                                    <p class="text-gray-200 text-lg mb-6">
-                                        لوازم جانبی گیمینگ شامل فن، انگشتی و تجهیزات حرفه‌ای
-                                    </p>
-                                    <a href="{% url 'core:gaming_products' %}" 
-                                       class="btn btn-primary btn-lg inline-flex items-center gap-2">
-                                        مشاهده محصولات
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                                 class="category-card-image w-full h-[500px] object-cover rounded-2xl"
+                                 onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: gaming-products.png');">
+                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl"></div>
+                        </a>
                     </div>
 
                     <!-- Slide 3: Game Credits -->
                     <div class="carousel-item min-w-full">
-                        <div class="category-card relative">
+                        <a href="{% url 'core:mini_game' %}" class="category-card relative block">
                             <img src="{% static 'images/cards/mini-game.png' %}" 
                                  alt="شارژ بازی‌ها" 
-                                 class="category-card-image w-full h-[500px] object-cover rounded-2xl">
-                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl">
-                                <div class="category-card-content absolute bottom-0 left-0 right-0 p-8 text-center">
-                                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">شارژ بازی‌ها</h3>
-                                    <p class="text-gray-200 text-lg mb-6">
-                                        خرید UC پابجی، CP کالاف دیوتی و سایر ارزهای درون بازی
-                                    </p>
-                                    <a href="{% url 'core:mini_game' %}" 
-                                       class="btn btn-primary btn-lg inline-flex items-center gap-2">
-                                        مشاهده بازی‌ها
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                                 class="category-card-image w-full h-[500px] object-cover rounded-2xl"
+                                 onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: mini-game.png');">
+                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl"></div>
+                        </a>
                     </div>
 
-                    <!-- Slide 4: Special Offers -->
+                    <!-- Slide 4: By Products -->
                     <div class="carousel-item min-w-full">
-                        <div class="category-card relative">
+                        <a href="{% url 'core:buy_products' %}" class="category-card relative block">
                             <img src="{% static 'images/cards/by-products.png' %}" 
-                                 alt="پیشنهادات ویژه" 
-                                 class="category-card-image w-full h-[500px] object-cover rounded-2xl">
-                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl">
-                                <div class="category-card-content absolute bottom-0 left-0 right-0 p-8 text-center">
-                                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">محصولات جانبی موبایل</h3>
-                                    <p class="text-gray-200 text-lg mb-6">
-                                        محصولات جانبی موبایل </p>
-                                    <a href="{% url 'core:home' %}" 
-                                       class="btn btn-primary btn-lg inline-flex items-center gap-2">
-                                        مشاهده محصولات
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                                 alt="محصولات جانبی موبایل" 
+                                 class="category-card-image w-full h-[500px] object-cover rounded-2xl"
+                                 onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: by-products.png');">
+                            <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl"></div>
+                        </a>
                     </div>
 
                 </div>
