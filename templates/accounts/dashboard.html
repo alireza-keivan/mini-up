@@ -794,11 +794,13 @@
                     style="display: none;"
                     @change="uploadAvatar($event)">
                 
-                <button type="button" 
-                        class="upload-button w-full"
-                        @click="document.getElementById('avatar-upload').click()">
-                    <i class="fas fa-camera"></i> انتخاب تصویر
-                </button>
+                <div class="btn-glow-container small purple">
+                    <button type="button" 
+                            class="btn-glow"
+                            @click="document.getElementById('avatar-upload').click()">
+                        <i class="fas fa-camera"></i> انتخاب تصویر
+                    </button>
+                </div>
             </div>
 
             <!-- Personal Information -->
@@ -859,16 +861,18 @@
         </div>
 
         <!-- دکمه ذخیره تغییرات -->
-        <button @click="savePersonalInfo()" 
-                :disabled="saving"
-                class="save-button">
-            <span x-show="!saving">
-                <i class="fas fa-save"></i> ذخیره تغییرات
-            </span>
-            <span x-show="saving">
-                <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
-            </span>
-        </button>
+        <div class="btn-glow-container large cyan">
+            <button @click="savePersonalInfo()" 
+                    :disabled="saving"
+                    class="btn-glow">
+                <span x-show="!saving">
+                    <i class="fas fa-save"></i> ذخیره تغییرات
+                </span>
+                <span x-show="saving">
+                    <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
+                </span>
+            </button>
+        </div>
     </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -920,10 +924,12 @@
                         </div>
                     {% endif %}
                     
-                    <button type="button" class="add-button" @click="showAddCardModal = true">
-                        <i class="fas fa-plus"></i>
-                        افزودن کارت جدید
-                    </button>
+                    <div class="btn-glow-container cyan">
+                        <button type="button" class="btn-glow" @click="showAddCardModal = true">
+                            <i class="fas fa-plus"></i>
+                            افزودن کارت جدید
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -969,16 +975,18 @@
                                        required>
                             </div>
 
-                            <button type="submit" 
-                                    class="save-button"
-                                    :disabled="changingPassword">
-                                <span x-show="!changingPassword">
-                                    <i class="fas fa-key"></i> تغییر رمز عبور
-                                </span>
-                                <span x-show="changingPassword">
-                                    <i class="fas fa-spinner fa-spin"></i> در حال تغییر...
-                                </span>
-                            </button>
+                            <div class="btn-glow-container large pink">
+                                <button type="submit" 
+                                        class="btn-glow"
+                                        :disabled="changingPassword">
+                                    <span x-show="!changingPassword">
+                                        <i class="fas fa-key"></i> تغییر رمز عبور
+                                    </span>
+                                    <span x-show="changingPassword">
+                                        <i class="fas fa-spinner fa-spin"></i> در حال تغییر...
+                                    </span>
+                                </button>
+                            </div>
                         </form>
                     </div>
 
@@ -1037,10 +1045,12 @@
                         </div>
                     {% endif %}
                     
-                    <button type="button" class="add-button" @click="showAddAddressModal = true">
-                        <i class="fas fa-plus"></i>
-                        افزودن آدرس جدید
-                    </button>
+                    <div class="btn-glow-container cyan">
+                        <button type="button" class="btn-glow" @click="showAddAddressModal = true">
+                            <i class="fas fa-plus"></i>
+                            افزودن آدرس جدید
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════

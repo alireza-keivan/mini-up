@@ -1,7 +1,7 @@
 # apps/core/views.py
 
 from django.shortcuts import render
-from .models import ServiceDescription
+from .models import ServiceDescription, SocialMediaLinks, YouTubeVideo
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -13,9 +13,17 @@ def home(request):
     # دریافت توضیحات خدمات فعال
     service_descriptions = ServiceDescription.objects.filter(is_active=True).order_by('service_type')
     
+    # دریافت لینک‌های شبکه‌های اجتماعی
+    social_links = SocialMediaLinks.objects.filter(is_active=True).first()
+    
+    # دریافت ویدیوی یوتیوب فعال
+    youtube_video = YouTubeVideo.objects.filter(is_active=True).first()
+    
     return render(request, 'core/home.html', {
         'title': 'صفحه اصلی',
-        'service_descriptions': service_descriptions
+        'service_descriptions': service_descriptions,
+        'social_links': social_links,
+        'youtube_video': youtube_video,
     })
 
 

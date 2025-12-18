@@ -1,0 +1,111 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FORMS — Input Fields, Selects, Checkboxes
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Base Input Style
+       ───────────────────────────────────────────────────────────────────────── */
+    .form-input {
+        @apply w-full px-4 py-3 rounded-xl;
+        @apply bg-white/5 text-white;
+        @apply border border-white/10;
+        @apply placeholder-gray-500;
+        @apply transition-all duration-200;
+    }
+
+    .form-input:focus {
+        @apply border-pink-500 bg-white/10;
+        box-shadow: 0 0 0 3px rgba(255, 0, 85, 0.1);
+    }
+
+    .form-input.error {
+        @apply border-red-500;
+    }
+
+    .form-input.success {
+        @apply border-green-500;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Input with Icon
+       ───────────────────────────────────────────────────────────────────────── */
+    .form-input-wrapper {
+        @apply relative;
+    }
+
+    .form-input-icon {
+        @apply absolute top-1/2 -translate-y-1/2 text-gray-500;
+        right: 1rem;
+    }
+
+    .form-input-wrapper .form-input {
+        @apply pr-12;
+    }
+
+    /* ─────────────────────────────────────────────────────────────cols────────
+       Labels
+       ───────────────────────────────────────────────────────────────────────── */
+    .form-label {
+        @apply block mb-2 text-sm font-medium text-gray-300;
+    }
+
+    .form-label-required::after {
+        content: ' *';
+        @apply text-pink-500;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Help Text & Errors
+       ───────────────────────────────────────────────────────────────────────── */
+    .form-help {
+        @apply mt-1 text-xs text-gray-500;
+    }
+
+    .form-error {
+        @apply mt-1 text-xs text-red-500;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Select
+       ───────────────────────────────────────────────────────────────────────── */
+    .form-select {
+        @apply form-input appearance-none cursor-pointer;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: left 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-left: 2.5rem;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Checkbox & Radio
+       ───────────────────────────────────────────────────────────────────────── */
+    .form-checkbox {
+        @apply w-5 h-5 rounded;
+        @apply bg-white/5 border border-white/20;
+        @apply checked:bg-pink-500 checked:border-pink-500;
+        @apply focus:ring-2 focus:ring-pink-500/30;
+        @apply cursor-pointer;
+    }
+
+    .form-radio {
+        @apply form-checkbox rounded-full;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Textarea
+       ───────────────────────────────────────────────────────────────────────── */
+    .form-textarea {
+        @apply form-input min-h-[120px] resize-y;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Form Group
+       ───────────────────────────────────────────────────────────────────────── */
+    .form-group {
+        @apply space-y-1;
+    }
+
+} /* End of @layer components */

@@ -1,0 +1,232 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   HOME PAGE — Landing & Hero Styles
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Hero Section
+       ───────────────────────────────────────────────────────────────────────── */
+    .hero-section {
+        @apply relative min-h-[90vh] flex items-center;
+        @apply overflow-hidden;
+    }
+
+    /* ===============================
+       HOME HERO BACKGROUND
+       ================================ */
+
+    .home-hero {
+        position: relative;
+        min-height: 100vh;
+
+        background-image: url("../../images/backgrounds/blur.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        overflow: hidden;
+    }
+
+    /* Dark overlay for readability */
+    .home-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        background:
+            radial-gradient(
+                ellipse at top,
+                rgba(0, 0, 0, 0.35),
+                rgba(5, 5, 10, 0.65)
+            );
+
+        z-index: 1;
+    }
+
+    /* Content must stay above the overlay */
+    .home-hero > * {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    .hero-bg {
+        @apply absolute inset-0 z-0;
+        background:
+            radial-gradient(ellipse at 20% 20%, rgba(255, 0, 85, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 80%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, rgba(191, 0, 255, 0.08) 0%, transparent 60%);
+    }
+
+    .hero-content {
+        @apply relative z-10 text-center;
+    }
+
+    .hero-title {
+        @apply text-4xl md:text-6xl lg:text-7xl font-black mb-6;
+        @apply leading-tight;
+    }
+
+    .hero-title-gradient {
+        background: linear-gradient(135deg, #fff 0%, var(--neon-pink) 50%, var(--neon-purple) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-subtitle {
+        @apply text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10;
+        @apply leading-relaxed;
+    }
+
+    .hero-cta {
+        @apply flex flex-col sm:flex-row items-center justify-center gap-4;
+    }
+
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Feature Badges (Stats)
+       ───────────────────────────────────────────────────────────────────────── */
+    .feature-badge {
+        @apply inline-flex items-center gap-2 px-4 py-2 rounded-full;
+        @apply text-sm font-medium;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-badge-icon {
+        @apply text-pink-500;
+    }
+
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Home Sections (Generic)
+       ───────────────────────────────────────────────────────────────────────── */
+    .section {
+        @apply py-20 lg:py-28;
+    }
+
+    .section-title {
+        @apply text-3xl md:text-4xl font-black text-center mb-4;
+    }
+
+    .section-subtitle {
+        @apply text-gray-400 text-center max-w-2xl mx-auto mb-12;
+    }
+
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Service Cards (Glass Style)
+       ───────────────────────────────────────────────────────────────────────── */
+    .service-card {
+        @apply relative rounded-2xl p-8;
+        @apply transition-all duration-300;
+        background: rgba(20, 20, 30, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+    }
+
+    .service-card:hover {
+        @apply transform -translate-y-1;
+        border-color: rgba(255, 0, 85, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 0, 85, 0.2);
+    }
+
+    .service-card-icon {
+        @apply w-14 h-14 rounded-xl flex items-center justify-center mb-6;
+        @apply text-white text-2xl;
+        background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+        box-shadow: var(--shadow-neon-pink);
+    }
+
+    .service-card-title {
+        @apply text-xl font-bold mb-3;
+    }
+
+    .service-card-text {
+        @apply text-gray-400 leading-relaxed;
+    }
+
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Featured Slider / Carousel (Generic)
+       ───────────────────────────────────────────────────────────────────────── */
+    .featured-slider {
+        @apply overflow-hidden relative py-10;
+    }
+
+    .featured-slide {
+        @apply rounded-xl overflow-hidden;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.05);
+        @apply transition-transform duration-300;
+    }
+
+    .featured-slide:hover {
+        transform: scale(1.02);
+    }
+
+    .featured-slide img {
+        @apply w-full h-auto object-cover;
+    }
+
+    .featured-slide-title {
+        @apply mt-4 text-center text-lg font-semibold;
+    }
+
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       Testimonials (Glass Cards)
+       ───────────────────────────────────────────────────────────────────────── */
+    .testimonial-card {
+        @apply p-6 rounded-2xl;
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        @apply transition-all duration-300;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255, 0, 85, 0.25);
+    }
+
+    .testimonial-avatar {
+        @apply w-14 h-14 rounded-full overflow-hidden mb-4;
+        @apply ring-2 ring-pink-500/30;
+    }
+
+    .testimonial-name {
+        @apply font-semibold text-white mb-1;
+    }
+
+    .testimonial-text {
+        @apply text-gray-400 text-sm leading-relaxed;
+    }
+
+
+    /* ─────────────────────────────────────────────────────────────────────────
+       CTA Section
+       ───────────────────────────────────────────────────────────────────────── */
+    .cta-section {
+        @apply relative p-10 md:p-16 rounded-3xl text-center;
+        background: linear-gradient(
+            135deg,
+            rgba(255, 0, 85, 0.15),
+            rgba(191, 0, 255, 0.15),
+            rgba(0, 245, 255, 0.1)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+    }
+
+    .cta-title {
+        @apply text-3xl md:text-4xl font-black mb-4;
+    }
+
+    .cta-text {
+        @apply text-gray-300 mb-8;
+    }
+
+} /* End of @layer components */
