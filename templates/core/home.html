@@ -124,6 +124,11 @@
                 <span class="dot" onclick="goToSlide(2)"></span>
                 <span class="dot" onclick="goToSlide(3)"></span>
             </div>
+
+            <!-- Progress Bar -->
+            <div class="carousel-progress">
+                <div class="progress-bar"></div>
+            </div>
         </div>
     </div>
 </section>
@@ -241,12 +246,17 @@
     .carousel-slide {
         display: none;
         width: 100%;
-        animation: fadeIn 0.5s ease-in-out;
+        opacity: 0;
+        transform: scale(0.95);
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Show only active slide */
+    /* Show only active slide with modern animations */
     .carousel-slide.active {
         display: block;
+        opacity: 1;
+        transform: scale(1);
+        animation: slideZoom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* Slide link and image */
@@ -261,25 +271,35 @@
     .carousel-slide img {
         width: 100%;
         height: 100%;
-        object-fit: contain; /* Changed from 'cover' to 'contain' to show full image */
+        object-fit: contain;
         display: block;
         filter: brightness(1.3) contrast(1.1);
-        transition: transform 0.3s ease;
-        background: rgba(0, 0, 0, 0.3); /* Add subtle background for letterboxing */
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(0, 0, 0, 0.3);
     }
 
     .carousel-slide .slide-link:hover img {
         transform: scale(1.05);
+        filter: brightness(1.4) contrast(1.15) saturate(1.1);
     }
 
-    /* Navigation Buttons */
+    /* Parallax effect on hover */
+    .carousel-slide .slide-link {
+        perspective: 1000px;
+    }
+
+    .carousel-slide.active .slide-link:hover {
+        transform: translateZ(20px);
+    }
+
+    /* Modern Navigation Buttons with Glassmorphism */
     .carousel-btn {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(255, 255, 255, 0.1);
         color: white;
-        border: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         width: 50px;
         height: 50px;
         border-radius: 50%;
@@ -288,13 +308,20 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px) saturate(180%);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     }
 
     .carousel-btn:hover {
         background: linear-gradient(135deg, #ff0055, #8a2be2);
-        transform: translateY(-50%) scale(1.1);
+        border-color: transparent;
+        transform: translateY(-50%) scale(1.15);
+        box-shadow: 0 12px 40px rgba(255, 0, 85, 0.4);
+    }
+
+    .carousel-btn:active {
+        transform: translateY(-50%) scale(0.95);
     }
 
     .prev-btn {
@@ -305,7 +332,7 @@
         right: 20px;
     }
 
-    /* Dots Indicators */
+    /* Modern Dots Indicators with Progress Animation */
     .carousel-dots {
         position: absolute;
         bottom: 20px;
@@ -314,31 +341,117 @@
         display: flex;
         gap: 10px;
         z-index: 100;
+        padding: 10px 20px;
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 50px;
     }
 
     .dot {
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.4);
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        border: 2px solid transparent;
     }
 
     .dot.active {
         background: linear-gradient(135deg, #ff0055, #8a2be2);
-        width: 32px;
-        border-radius: 6px;
+        width: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(255, 0, 85, 0.5);
     }
 
-    .dot:hover {
-        background: rgba(255, 255, 255, 0.8);
+    .dot:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.7);
+        transform: scale(1.2);
     }
 
-    /* Fade animation */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+    /* Progress bar animation for active dot */
+    .dot.active::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        opacity: 0.5;
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    /* Top Progress Bar */
+    .carousel-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        z-index: 101;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ff0055, #8a2be2, #00f5ff);
+        background-size: 200% 100%;
+        width: 0%;
+        transition: width 0.1s linear;
+        animation: gradientShift 3s linear infinite;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+    }
+
+    /* Modern Animations */
+    @keyframes slideZoom {
+        0% {
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+    }
+
+    /* Shimmer effect on load */
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+
+    .carousel-slide.active img {
+        animation: shimmer 2s ease-in-out;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 100%
+        );
+        background-size: 1000px 100%;
     }
 
     /* Mobile Responsive */
@@ -415,13 +528,28 @@
     }
 
     function autoplay() {
+        const progressBar = document.querySelector('.progress-bar');
+        let progress = 0;
+        
+        // Reset progress bar
+        if (progressBar) progressBar.style.width = '0%';
+        
+        // Animate progress bar
+        const progressInterval = setInterval(() => {
+            progress += 1;
+            if (progressBar) progressBar.style.width = progress + '%';
+            if (progress >= 100) clearInterval(progressInterval);
+        }, 30); // 30ms * 100 = 3000ms
+        
         autoplayTimer = setInterval(() => {
             changeSlide(1);
-        }, 3000); // Changed from 5000ms (5s) to 3000ms (3s)
+        }, 3000);
     }
 
     function resetAutoplay() {
         clearInterval(autoplayTimer);
+        const progressBar = document.querySelector('.progress-bar');
+        if (progressBar) progressBar.style.width = '0%';
         autoplay();
     }
 
