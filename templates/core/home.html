@@ -84,7 +84,7 @@
                     <!-- Slide 1: Virtual Services -->
                     <div class="carousel-item min-w-full">
                         <div class="category-card relative">
-                            <img src="{% static 'images/cards/virtual-services.jpg' %}" 
+                            <img src="{% static 'images/cards/virtual-services.png' %}" 
                                  alt="خدمات مجازی" 
                                  class="category-card-image w-full h-[500px] object-cover rounded-2xl">
                             <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl">
@@ -108,7 +108,7 @@
                     <!-- Slide 2: Gaming Products -->
                     <div class="carousel-item min-w-full">
                         <div class="category-card relative">
-                            <img src="{% static 'images/cards/gaming-products.jpg' %}" 
+                            <img src="{% static 'images/cards/gaming-products.png' %}" 
                                  alt="محصولات گیمینگ" 
                                  class="category-card-image w-full h-[500px] object-cover rounded-2xl">
                             <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl">
@@ -132,7 +132,7 @@
                     <!-- Slide 3: Game Credits -->
                     <div class="carousel-item min-w-full">
                         <div class="category-card relative">
-                            <img src="{% static 'images/cards/game-credits.jpg' %}" 
+                            <img src="{% static 'images/cards/mini-game.png' %}" 
                                  alt="شارژ بازی‌ها" 
                                  class="category-card-image w-full h-[500px] object-cover rounded-2xl">
                             <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl">
@@ -156,18 +156,17 @@
                     <!-- Slide 4: Special Offers -->
                     <div class="carousel-item min-w-full">
                         <div class="category-card relative">
-                            <img src="{% static 'images/cards/special-offers.jpg' %}" 
+                            <img src="{% static 'images/cards/by-products.png' %}" 
                                  alt="پیشنهادات ویژه" 
                                  class="category-card-image w-full h-[500px] object-cover rounded-2xl">
                             <div class="category-card-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent rounded-2xl">
                                 <div class="category-card-content absolute bottom-0 left-0 right-0 p-8 text-center">
-                                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">پیشنهادات ویژه</h3>
+                                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">محصولات جانبی موبایل</h3>
                                     <p class="text-gray-200 text-lg mb-6">
-                                        تخفیف‌های شگفت‌انگیز و پیشنهادات ویژه فقط برای شما
-                                    </p>
+                                        محصولات جانبی موبایل </p>
                                     <a href="{% url 'core:home' %}" 
                                        class="btn btn-primary btn-lg inline-flex items-center gap-2">
-                                        مشاهده پیشنهادها
+                                        مشاهده محصولات
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                         </svg>
@@ -327,6 +326,17 @@
         background: rgba(255, 255, 255, 0.6);
     }
 
+    /* Carousel Track - FIXED WIDTH */
+    .carousel-track {
+        width: 400%; /* 4 slides x 100% each */
+        display: flex;
+    }
+
+    .carousel-item {
+        flex: 0 0 25%; /* Each item takes 25% of track width (100% / 4 slides) */
+        min-width: 25%;
+    }
+
     /* Category Card */
     .category-card {
         position: relative;
@@ -431,7 +441,8 @@
         // Update carousel position
         function updateCarousel(index) {
             currentSlide = (index + totalSlides) % totalSlides;
-            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+            // Move by 25% for each slide (since track is 400% and each slide is 25%)
+            track.style.transform = `translateX(-${currentSlide * 25}%)`;
 
             // Update indicators
             indicators.forEach((indicator, i) => {
