@@ -53,10 +53,10 @@
 </section>
 
 <!-- ===============================================================================
-     CATEGORY CAROUSEL SECTION
+     CATEGORY CAROUSEL SECTION - NEW SIMPLE APPROACH
      =============================================================================== -->
 <section class="category-carousel-section py-20 bg-dark-800/50">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 max-w-6xl">
         <!-- Section Header -->
         <div class="section-header text-center mb-12">
             <h2 class="section-title text-3xl md:text-4xl font-bold text-white mb-4">
@@ -67,80 +67,63 @@
             </p>
         </div>
 
-        <!-- Carousel Container -->
-        <div id="categoryCarousel" class="carousel-container relative" data-carousel>
-            <!-- Carousel Indicators -->
-            <div class="carousel-indicators flex justify-center gap-2 mb-8">
-                <button data-slide="0" class="indicator active"></button>
-                <button data-slide="1" class="indicator"></button>
-                <button data-slide="2" class="indicator"></button>
-                <button data-slide="3" class="indicator"></button>
+        <!-- Simple Carousel - Show only one slide at a time -->
+        <div class="simple-carousel">
+            <!-- Slide 1: Virtual Services -->
+            <div class="carousel-slide active" data-slide="0">
+                <a href="{% url 'core:virtual_services' %}" class="slide-link">
+                    <img src="{% static 'images/cards/virtual-services.png' %}" 
+                         alt="خدمات مجازی"
+                         loading="lazy">
+                </a>
             </div>
 
-            <!-- Carousel Inner -->
-            <div class="carousel-inner relative overflow-hidden rounded-2xl" style="width: 100%; height: 500px;">
-                <div class="carousel-track" style="display: flex; width: 400%; height: 100%; transition: transform 0.5s ease-in-out;">
-                    
-                    <!-- Slide 1: Virtual Services -->
-                    <div class="carousel-item" style="width: 25%; height: 100%; flex-shrink: 0;">
-                        <a href="{% url 'core:virtual_services' %}" class="category-card relative block" style="width: 100%; height: 100%;">
-                            <img src="{% static 'images/cards/virtual-services.png' %}" 
-                                 alt="خدمات مجازی" 
-                                 class="category-card-image object-cover rounded-2xl"
-                                 style="width: 100%; height: 100%; filter: brightness(1.4) contrast(1.1);"
-                                 onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: virtual-services.png');">
-                        </a>
-                    </div>
-
-                    <!-- Slide 2: Gaming Products -->
-                    <div class="carousel-item" style="width: 25%; height: 100%; flex-shrink: 0;">
-                        <a href="{% url 'core:gaming_products' %}" class="category-card relative block" style="width: 100%; height: 100%;">
-                            <img src="{% static 'images/cards/gaming-products.png' %}" 
-                                 alt="محصولات گیمینگ" 
-                                 class="category-card-image object-cover rounded-2xl"
-                                 style="width: 100%; height: 100%; filter: brightness(1.3) contrast(1.1);"
-                                 onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: gaming-products.png');">
-                        </a>
-                    </div>
-
-                    <!-- Slide 3: Game Credits -->
-                    <div class="carousel-item" style="width: 25%; height: 100%; flex-shrink: 0;">
-                        <a href="{% url 'core:mini_game' %}" class="category-card relative block" style="width: 100%; height: 100%;">
-                            <img src="{% static 'images/cards/mini-game.png' %}" 
-                                 alt="شارژ بازی‌ها" 
-                                 class="category-card-image object-cover rounded-2xl"
-                                 style="width: 100%; height: 100%; filter: brightness(1.2) contrast(1.1);"
-                                 onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: mini-game.png');">
-                        </a>
-                    </div>
-
-                    <!-- Slide 4: By Products -->
-                    <div class="carousel-item" style="width: 25%; height: 100%; flex-shrink: 0;">
-                        <a href="{% url 'core:buy_products' %}" class="category-card relative block" style="width: 100%; height: 100%;">
-                            <img src="{% static 'images/cards/by-products.png' %}" 
-                                 alt="محصولات جانبی موبایل" 
-                                 class="category-card-image object-cover rounded-2xl"
-                                 style="width: 100%; height: 100%; filter: brightness(1.5) contrast(1.2);"
-                                 onerror="this.onerror=null; this.src='{% static 'images/placeholder.png' %}'; console.log('Image not found: by-products.png');">
-                        </a>
-                    </div>
-
-                </div>
+            <!-- Slide 2: Gaming Products -->
+            <div class="carousel-slide" data-slide="1">
+                <a href="{% url 'core:gaming_products' %}" class="slide-link">
+                    <img src="{% static 'images/cards/gaming-products.png' %}" 
+                         alt="محصولات گیمینگ"
+                         loading="lazy">
+                </a>
             </div>
 
-            <!-- Carousel Controls -->
-            <button class="carousel-control carousel-control-prev" data-direction="prev">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Slide 3: Game Credits -->
+            <div class="carousel-slide" data-slide="2">
+                <a href="{% url 'core:mini_game' %}" class="slide-link">
+                    <img src="{% static 'images/cards/mini-game.png' %}" 
+                         alt="شارژ بازی‌ها"
+                         loading="lazy">
+                </a>
+            </div>
+
+            <!-- Slide 4: By Products -->
+            <div class="carousel-slide" data-slide="3">
+                <a href="{% url 'core:buy_products' %}" class="slide-link">
+                    <img src="{% static 'images/cards/by-products.png' %}" 
+                         alt="محصولات جانبی موبایل"
+                         loading="lazy">
+                </a>
+            </div>
+
+            <!-- Navigation Arrows -->
+            <button class="carousel-btn prev-btn" onclick="changeSlide(-1)">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
-                <span class="sr-only">قبلی</span>
             </button>
-            <button class="carousel-control carousel-control-next" data-direction="next">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button class="carousel-btn next-btn" onclick="changeSlide(1)">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-                <span class="sr-only">بعدی</span>
             </button>
+
+            <!-- Dots Indicators -->
+            <div class="carousel-dots">
+                <span class="dot active" onclick="goToSlide(0)"></span>
+                <span class="dot" onclick="goToSlide(1)"></span>
+                <span class="dot" onclick="goToSlide(2)"></span>
+                <span class="dot" onclick="goToSlide(3)"></span>
+            </div>
         </div>
     </div>
 </section>
@@ -159,8 +142,8 @@
                 انواع خدمات مجازی و محصولات گیمینگ با بهترین کیفیت
             </p>
         </div>
-        
-   
+    </div>    
+</section>
 
 <!-- ===============================================================================
      SERVICE DESCRIPTIONS WIDGET
@@ -240,235 +223,238 @@
 {% endif %}
 
 <!-- ===============================================================================
-     CATEGORY CAROUSEL STYLES & SCRIPT
+     SIMPLE CAROUSEL STYLES & SCRIPT
      =============================================================================== -->
 <style>
-    /* Carousel Container */
-    .carousel-container {
+    /* Simple Carousel - Show one slide at a time */
+    .simple-carousel {
+        position: relative;
+        width: 100%;
         max-width: 1200px;
         margin: 0 auto;
-    }
-
-    /* Carousel Indicators */
-    .carousel-indicators {
-        position: relative;
-        z-index: 10;
-    }
-
-    .carousel-indicators .indicator {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .carousel-indicators .indicator.active {
-        background: linear-gradient(135deg, #ff0055, #8a2be2);
-        width: 32px;
-        border-radius: 6px;
-    }
-
-    .carousel-indicators .indicator:hover {
-        background: rgba(255, 255, 255, 0.6);
-    }
-
-    /* Carousel Inner Container */
-    .carousel-inner {
-        position: relative;
-        overflow: hidden;
-    }
-
-    /* Category Card */
-    .category-card {
-        position: relative;
+        border-radius: 1rem;
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        border-radius: 1rem;
+    }
+
+    /* Hide all slides by default */
+    .carousel-slide {
+        display: none;
+        width: 100%;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    /* Show only active slide */
+    .carousel-slide.active {
         display: block;
     }
 
-    .category-card-image {
-        transition: all 0.5s ease;
+    /* Slide link and image */
+    .carousel-slide .slide-link {
         display: block;
+        width: 100%;
+        height: 500px;
+        position: relative;
+        overflow: hidden;
     }
 
-    .category-card:hover .category-card-image {
+    .carousel-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: brightness(1.3) contrast(1.1);
+        transition: transform 0.3s ease;
+    }
+
+    .carousel-slide .slide-link:hover img {
         transform: scale(1.05);
     }
 
-    /* Carousel Controls */
-    .carousel-control {
+    /* Navigation Buttons */
+    .carousel-btn {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.6);
         color: white;
         border: none;
         width: 50px;
         height: 50px;
         border-radius: 50%;
+        cursor: pointer;
+        z-index: 100;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        z-index: 10;
         transition: all 0.3s ease;
         backdrop-filter: blur(10px);
     }
 
-    .carousel-control:hover {
+    .carousel-btn:hover {
         background: linear-gradient(135deg, #ff0055, #8a2be2);
         transform: translateY(-50%) scale(1.1);
     }
 
-    .carousel-control-prev {
+    .prev-btn {
         left: 20px;
     }
 
-    .carousel-control-next {
+    .next-btn {
         right: 20px;
+    }
+
+    /* Dots Indicators */
+    .carousel-dots {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 100;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dot.active {
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        width: 32px;
+        border-radius: 6px;
+    }
+
+    .dot:hover {
+        background: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Fade animation */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
 
     /* Mobile Responsive */
     @media (max-width: 768px) {
-        .category-card-image {
-            height: 400px !important;
+        .carousel-slide .slide-link {
+            height: 300px;
         }
 
-        .category-card-content h3 {
-            font-size: 1.5rem;
-        }
-
-        .category-card-content p {
-            font-size: 0.875rem;
-        }
-
-        .carousel-control {
+        .carousel-btn {
             width: 40px;
             height: 40px;
         }
 
-        .carousel-control-prev {
+        .prev-btn {
             left: 10px;
         }
 
-        .carousel-control-next {
+        .next-btn {
             right: 10px;
+        }
+
+        .carousel-dots {
+            bottom: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+        }
+
+        .dot.active {
+            width: 24px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .carousel-slide .slide-link {
+            height: 250px;
         }
     }
 </style>
 
 <script>
-    // Category Carousel Functionality
+    // Simple Carousel JavaScript
+    let currentSlideIndex = 0;
+    let autoplayTimer;
+
+    function showSlide(index) {
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.dot');
+        
+        // Wrap around
+        if (index >= slides.length) currentSlideIndex = 0;
+        if (index < 0) currentSlideIndex = slides.length - 1;
+        if (index >= 0 && index < slides.length) currentSlideIndex = index;
+        
+        // Hide all slides
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        // Show current slide
+        slides[currentSlideIndex].classList.add('active');
+        dots[currentSlideIndex].classList.add('active');
+    }
+
+    function changeSlide(direction) {
+        showSlide(currentSlideIndex + direction);
+        resetAutoplay();
+    }
+
+    function goToSlide(index) {
+        showSlide(index);
+        resetAutoplay();
+    }
+
+    function autoplay() {
+        autoplayTimer = setInterval(() => {
+            changeSlide(1);
+        }, 5000);
+    }
+
+    function resetAutoplay() {
+        clearInterval(autoplayTimer);
+        autoplay();
+    }
+
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
-        const carousel = document.querySelector('[data-carousel]');
-        if (!carousel) return;
-
-        const track = carousel.querySelector('.carousel-track');
-        const items = carousel.querySelectorAll('.carousel-item');
-        const indicators = carousel.querySelectorAll('.indicator');
-        const prevBtn = carousel.querySelector('[data-direction="prev"]');
-        const nextBtn = carousel.querySelector('[data-direction="next"]');
-
-        let currentSlide = 0;
-        const totalSlides = items.length;
-        let autoplayInterval;
-
-        // Update carousel position
-        function updateCarousel(index) {
-            currentSlide = (index + totalSlides) % totalSlides;
-            // Move by 25% for each slide (since track is 400% and each slide is 25%)
-            track.style.transform = `translateX(-${currentSlide * 25}%)`;
-
-            // Update indicators
-            indicators.forEach((indicator, i) => {
-                indicator.classList.toggle('active', i === currentSlide);
-            });
-        }
-
-        // Next slide
-        function nextSlide() {
-            updateCarousel(currentSlide + 1);
-        }
-
-        // Previous slide
-        function prevSlide() {
-            updateCarousel(currentSlide - 1);
-        }
-
-        // Event listeners
-        nextBtn.addEventListener('click', () => {
-            nextSlide();
-            resetAutoplay();
-        });
-
-        prevBtn.addEventListener('click', () => {
-            prevSlide();
-            resetAutoplay();
-        });
-
-        // Indicator clicks
-        indicators.forEach((indicator, index) => {
-            indicator.addEventListener('click', () => {
-                updateCarousel(index);
-                resetAutoplay();
-            });
-        });
-
+        showSlide(0);
+        autoplay();
+        
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') nextSlide();
-            if (e.key === 'ArrowRight') prevSlide();
+            if (e.key === 'ArrowLeft') changeSlide(1);
+            if (e.key === 'ArrowRight') changeSlide(-1);
         });
-
+        
         // Touch/Swipe support
         let touchStartX = 0;
         let touchEndX = 0;
-
-        carousel.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        carousel.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            if (touchStartX - touchEndX > 50) {
-                nextSlide();
-                resetAutoplay();
-            }
-            if (touchEndX - touchStartX > 50) {
-                prevSlide();
-                resetAutoplay();
-            }
+        const carousel = document.querySelector('.simple-carousel');
+        
+        if (carousel) {
+            carousel.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            carousel.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                if (touchStartX - touchEndX > 50) changeSlide(1);
+                if (touchEndX - touchStartX > 50) changeSlide(-1);
+            });
+            
+            // Pause on hover
+            carousel.addEventListener('mouseenter', () => clearInterval(autoplayTimer));
+            carousel.addEventListener('mouseleave', () => autoplay());
         }
-
-        // Autoplay
-        function startAutoplay() {
-            autoplayInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
-        }
-
-        function resetAutoplay() {
-            clearInterval(autoplayInterval);
-            startAutoplay();
-        }
-
-        // Start autoplay
-        startAutoplay();
-
-        // Pause on hover
-        carousel.addEventListener('mouseenter', () => {
-            clearInterval(autoplayInterval);
-        });
-
-        carousel.addEventListener('mouseleave', () => {
-            startAutoplay();
-        });
     });
 </script>
 
