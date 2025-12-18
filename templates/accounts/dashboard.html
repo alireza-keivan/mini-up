@@ -655,15 +655,6 @@
                     <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" class="w-8 h-8 rounded-full object-cover border-2 border-blue-500">
                 {% else %}
                     <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
-            <div class="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full">
-                <div class="text-left" dir="ltr">
-                    <p class="text-white font-bold text-sm">{{ user.phone }}</p>
-                </div>
-                {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" class="w-10 h-10 rounded-full object-cover border-2 border-blue-500">
-                {% else %}
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold">
-
                         {{ user.get_full_name.0|default:user.phone.0|default:'U' }}
                     </div>
                 {% endif %}
@@ -1284,7 +1275,6 @@
     </div>
 </div>
 {% endblock %}
-
 {% block extra_js %}
 <script>
 function dashboard() {
