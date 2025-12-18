@@ -152,50 +152,6 @@
         margin-bottom: 1rem;
     }
 
-    .quick-amount-btn {
-        padding: 0.75rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.875rem;
-    }
-
-    .quick-amount-btn:hover {
-        background: rgba(0, 245, 255, 0.1);
-        border-color: #00f5ff;
-    }
-
-    .quick-amount-btn.active {
-        background: rgba(0, 245, 255, 0.2);
-        border-color: #00f5ff;
-    }
-
-    .deposit-button {
-        width: 100%;
-        padding: 1rem;
-        background: linear-gradient(135deg, #00f5ff, #00d4ff);
-        border: none;
-        border-radius: 12px;
-        color: #000;
-        font-size: 1rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .deposit-button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(0, 245, 255, 0.4);
-    }
-
-    .deposit-button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
     /* Profile Picture Upload */
     .profile-picture-section {
         background: rgba(255, 255, 255, 0.03);
@@ -229,22 +185,6 @@
         color: #fff;
         font-weight: bold;
         border: 3px solid rgba(255, 0, 85, 0.3);
-    }
-
-    .upload-button {
-        padding: 0.5rem 1rem;
-        background: linear-gradient(135deg, #ff0055, #8a2be2);
-        border: none;
-        border-radius: 6px;
-        color: #fff;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .upload-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(255, 0, 85, 0.3);
     }
 
     /* Address & Card Cards */
@@ -569,31 +509,6 @@
         color: #00ff88;
     }
 
-    /* Save Button */
-    .save-button {
-        width: 100%;
-        padding: 0.75rem;
-        background: linear-gradient(135deg, #ff0055, #8a2be2);
-        border: none;
-        border-radius: 8px;
-        color: #fff;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        margin-top: 1.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .save-button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(255, 0, 85, 0.4);
-    }
-
-    .save-button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
     /* Empty State */
     .empty-state {
         text-align: center;
@@ -794,11 +709,13 @@
                     style="display: none;"
                     @change="uploadAvatar($event)">
                 
-                <button type="button" 
-                        class="upload-button w-full"
-                        @click="document.getElementById('avatar-upload').click()">
-                    <i class="fas fa-camera"></i> انتخاب تصویر
-                </button>
+                <div class="btn-glow-container small purple">
+                    <button type="button" 
+                            class="btn-glow"
+                            @click="document.getElementById('avatar-upload').click()">
+                        <i class="fas fa-camera"></i> انتخاب تصویر
+                    </button>
+                </div>
             </div>
 
             <!-- Personal Information -->
@@ -859,16 +776,18 @@
         </div>
 
         <!-- دکمه ذخیره تغییرات -->
-        <button @click="savePersonalInfo()" 
-                :disabled="saving"
-                class="save-button">
-            <span x-show="!saving">
-                <i class="fas fa-save"></i> ذخیره تغییرات
-            </span>
-            <span x-show="saving">
-                <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
-            </span>
-        </button>
+        <div class="btn-glow-container small purple">
+            <button @click="savePersonalInfo()" 
+                    :disabled="saving"
+                    class="btn-glow">
+                <span x-show="!saving">
+                    <i class="fas fa-save"></i> ذخیره تغییرات
+                </span>
+                <span x-show="saving">
+                    <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
+                </span>
+            </button>
+        </div>
     </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -920,10 +839,12 @@
                         </div>
                     {% endif %}
                     
-                    <button type="button" class="add-button" @click="showAddCardModal = true">
-                        <i class="fas fa-plus"></i>
-                        افزودن کارت جدید
-                    </button>
+                    <div class="btn-glow-container small purple">
+                        <button type="button" class="btn-glow" @click="showAddCardModal = true">
+                            <i class="fas fa-plus"></i>
+                            افزودن کارت جدید
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -969,16 +890,18 @@
                                        required>
                             </div>
 
-                            <button type="submit" 
-                                    class="save-button"
-                                    :disabled="changingPassword">
-                                <span x-show="!changingPassword">
-                                    <i class="fas fa-key"></i> تغییر رمز عبور
-                                </span>
-                                <span x-show="changingPassword">
-                                    <i class="fas fa-spinner fa-spin"></i> در حال تغییر...
-                                </span>
-                            </button>
+                            <div class="btn-glow-container small purple">
+                                <button type="submit" 
+                                        class="btn-glow"
+                                        :disabled="changingPassword">
+                                    <span x-show="!changingPassword">
+                                        <i class="fas fa-key"></i> تغییر رمز عبور
+                                    </span>
+                                    <span x-show="changingPassword">
+                                        <i class="fas fa-spinner fa-spin"></i> در حال تغییر...
+                                    </span>
+                                </button>
+                            </div>
                         </form>
                     </div>
 
@@ -1037,10 +960,12 @@
                         </div>
                     {% endif %}
                     
-                    <button type="button" class="add-button" @click="showAddAddressModal = true">
-                        <i class="fas fa-plus"></i>
-                        افزودن آدرس جدید
-                    </button>
+                    <div class="btn-glow-container small purple">
+                        <button type="button" class="btn-glow" @click="showAddAddressModal = true">
+                            <i class="fas fa-plus"></i>
+                            افزودن آدرس جدید
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -1153,16 +1078,18 @@
                                                 @click="showAddAddressModal = false">
                                             انصراف
                                         </button>
-                                        <button type="submit" 
-                                                class="btn-submit"
-                                                :disabled="submittingAddress">
-                                            <span x-show="!submittingAddress">
-                                                <i class="fas fa-save"></i> ذخیره آدرس
-                                            </span>
-                                            <span x-show="submittingAddress">
-                                                <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
-                                            </span>
-                                        </button>
+                                        <div class="btn-glow-container small purple">
+                                            <button type="submit" 
+                                                    class="btn-glow"
+                                                    :disabled="submittingAddress">
+                                                <span x-show="!submittingAddress">
+                                                    <i class="fas fa-save"></i> ذخیره آدرس
+                                                </span>
+                                                <span x-show="submittingAddress">
+                                                    <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
+                                                </span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -1242,16 +1169,18 @@
                                                 @click="showAddCardModal = false">
                                             انصراف
                                         </button>
-                                        <button type="submit" 
-                                                class="btn-submit"
-                                                :disabled="submittingCard">
-                                            <span x-show="!submittingCard">
-                                                <i class="fas fa-save"></i> ذخیره کارت
-                                            </span>
-                                            <span x-show="submittingCard">
-                                                <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
-                                            </span>
-                                        </button>
+                                        <div class="btn-glow-container small purple">
+                                            <button type="submit" 
+                                                    class="btn-glow"
+                                                    :disabled="submittingCard">
+                                                <span x-show="!submittingCard">
+                                                    <i class="fas fa-save"></i> ذخیره کارت
+                                                </span>
+                                                <span x-show="submittingCard">
+                                                    <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
+                                                </span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </form>
                             </div>

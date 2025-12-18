@@ -41,3 +41,112 @@
         @apply bg-pink-500/10 border-pink-400;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Glow Button (Gradient Border with Blur Effect)
+   این کلاس‌ها خارج از @layer components هستن تا همیشه کامپایل شوند
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn-glow-container {
+    position: relative;
+    padding: 3px;
+    background: linear-gradient(90deg, #00f5ff, #bf00ff, #ff0055);
+    border-radius: 0.9em;
+    transition: all 0.4s ease;
+    display: inline-block;
+}
+
+.btn-glow-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    border-radius: 0.9em;
+    z-index: -1;
+    filter: blur(0);
+    transition: filter 0.4s ease;
+}
+
+.btn-glow-container:hover::before {
+    background: linear-gradient(90deg, #00f5ff, #bf00ff, #ff0055);
+    filter: blur(1.2em);
+}
+
+.btn-glow-container:active::before {
+    filter: blur(0.2em);
+}
+
+.btn-glow {
+    font-size: 1.4em;
+    padding: 0.6em 0.8em;
+    border-radius: 0.7em;
+    border: none;
+    background-color: #000;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.7);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.btn-glow:hover {
+    background-color: #111;
+}
+
+.btn-glow:active {
+    transform: scale(0.98);
+}
+
+
+/* Variant: Pink Glow */
+.btn-glow-container.pink {
+    background: linear-gradient(90deg, #ff0055, #bf00ff);
+}
+
+.btn-glow-container.pink:hover::before {
+    background: linear-gradient(90deg, #ff0055, #bf00ff);
+}
+
+/* Variant: Cyan Glow */
+.btn-glow-container.cyan {
+    background: linear-gradient(90deg, #00f5ff, #00ff88);
+}
+
+.btn-glow-container.cyan:hover::before {
+    background: linear-gradient(90deg, #00f5ff, #00ff88);
+}
+
+/* Variant: Purple Glow */
+.btn-glow-container.purple {
+    background: linear-gradient(90deg, #bf00ff, #ff0055);
+}
+
+.btn-glow-container.purple:hover::before {
+    background: linear-gradient(90deg, #bf00ff, #ff0055);
+}
+
+
+/* Small Size */
+.btn-glow-container.small {
+    padding: 2px;
+}
+
+.btn-glow-container.small .btn-glow {
+    font-size: 1em;
+    padding: 0.5em 0.8em;
+}
+
+/* Large Size */
+.btn-glow-container.large {
+    padding: 4px;
+}
+
+.btn-glow-container.large .btn-glow {
+    font-size: 1.6em;
+    padding: 0.7em 1em;
+}
