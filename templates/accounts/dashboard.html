@@ -81,7 +81,7 @@
 
     .info-value {
         color: #fff;
-
+        font-size: 0.875rem;
         font-weight: 600;
     }
 
@@ -200,7 +200,8 @@
     .profile-picture-section {
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.1);
-
+        border-radius: 8px;
+        padding: 1rem;
         /* margin-bottom: 2rem; */
         text-align: center;
     }
@@ -606,7 +607,7 @@
         opacity: 0.5;
     }
     .quick-card {
-
+    min-height: 90px;
     transition: all 0.3s ease;
     }
 
@@ -620,7 +621,9 @@
     }
     #myorders{
         background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 20, 40, 0.95));
-
+        border-radius: 16px;
+        border: 1px solid rgba(255, 0, 85, 0.2);
+        padding: 1rem;
         box-shadow: 0 20px 60px rgba(255, 0, 85, 0.15);
         backdrop-filter: blur(20px);
     }
@@ -646,7 +649,6 @@
         <!-- Right Side: User Info & Wallet -->
         <div class="flex items-center gap-3">
             <!-- User Info -->
-
             <div class="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-full">
                 <div class="text-left" dir="ltr">
                     <p class="text-white font-bold text-xs">{{ user.phone }}</p>
@@ -660,7 +662,6 @@
                 {% endif %}
             </div>
             <!-- Wallet Info -->
-
             <div class="flex items-center justify-between gap-2 bg-gray-800 px-3 py-1.5 rounded-full">
                 <div class="flex items-center gap-2">
                     <div class="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center">
@@ -669,24 +670,14 @@
                     <div class="text-right">
                         <p class="text-gray-400" style="font-size:0.7rem">جمع کیف‌پول‌ من</p>
                         <p class="text-white font-bold text-xs">{{ wallet.total_balance|floatformat:0|intcomma|default:'۰' }} ریال</p>
-
-            <div class="flex items-center justify-between gap-2 bg-gray-800 px-4 py-2 rounded-full">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-wallet text-white text-sm"></i>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-gray-400 text-xs">جمع کیف‌پول‌ من</p>
-                        <p class="text-white font-bold text-sm">{{ wallet.total_balance|floatformat:0|intcomma|default:'۰' }} ریال</p>
-
                     </div>
                 </div>
                 
                 <!-- Wallet Arrow Button (Inside) -->
                 <a 
                     href="{% url 'wallet:dashboard' %}"
-                    class="w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition flex-shrink-0">
-                    <i class="fas fa-chevron-left text-sm"></i>
+                    class="w-7 h-7 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition flex-shrink-0">
+                    <i class="fas fa-chevron-left text-xs"></i>
                 </a>
             </div>
             
@@ -695,35 +686,35 @@
     </div>
     
     <!-- Quick Access Cards -->
-    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-5" id="myorders">
-        <h3 class="text-right text-gray-400 text-sm mb-4">سفارش</h3>
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-3" id="myorders">
+        <h3 class="text-right text-gray-400 text-xs mb-3">سفارش</h3>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             <!-- سفارش‌های جاری -->
             <a href="{% url 'orders:order_list' %}" 
-               class="quick-card flex flex-col items-center justify-center p-4 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
-                <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center mb-2">
-                    <i class="fas fa-shopping-bag text-blue-400 text-lg"></i>
+               class="quick-card flex flex-col items-center justify-center p-3 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
+                <div class="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center mb-1.5">
+                    <i class="fas fa-shopping-bag text-blue-400 text-sm"></i>
                 </div>
-                <span class="text-white font-medium text-sm">سفارش‌های جاری</span>
+                <span class="text-white font-medium text-xs">سفارش‌های جاری</span>
             </a>
             
             <!-- سفارش‌های لغو شده -->
             <a href="{% url 'orders:order_list' %}" 
-            class="quick-card flex flex-col items-center justify-center p-4 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
-                <div class="w-10 h-10 bg-red-600/20 rounded-lg flex items-center justify-center mb-2">
-                    <i class="fas fa-ban text-red-500 text-lg"></i>
+            class="quick-card flex flex-col items-center justify-center p-3 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
+                <div class="w-8 h-8 bg-red-600/20 rounded-lg flex items-center justify-center mb-1.5">
+                    <i class="fas fa-ban text-red-500 text-sm"></i>
                 </div>
-                <span class="text-white font-medium text-sm">سفارش‌های لغو شده</span>
+                <span class="text-white font-medium text-xs">سفارش‌های لغو شده</span>
             </a>
 
             <!-- سفارش‌های تحویل داده شده -->
             <a href="{% url 'orders:order_list' %}" 
-            class="quick-card flex flex-col items-center justify-center p-4 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
-                <div class="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center mb-2">
-                    <i class="fas fa-box-open text-green-500 text-lg"></i>
+            class="quick-card flex flex-col items-center justify-center p-3 bg-gray-900/50 rounded-xl hover:bg-gray-800 transition cursor-pointer">
+                <div class="w-8 h-8 bg-green-600/20 rounded-lg flex items-center justify-center mb-1.5">
+                    <i class="fas fa-box-open text-green-500 text-sm"></i>
                 </div>
-                <span class="text-white font-medium text-sm">سفارش‌های تحویل داده</span>
+                <span class="text-white font-medium text-xs">سفارش‌های تحویل داده</span>
             </a>
 
         </div>
@@ -803,11 +794,13 @@
                     style="display: none;"
                     @change="uploadAvatar($event)">
                 
-                <button type="button" 
-                        class="upload-button w-full"
-                        @click="document.getElementById('avatar-upload').click()">
-                    <i class="fas fa-camera"></i> انتخاب تصویر
-                </button>
+                <div class="btn-glow-container small purple">
+                    <button type="button" 
+                            class="btn-glow"
+                            @click="document.getElementById('avatar-upload').click()">
+                        <i class="fas fa-camera"></i> انتخاب تصویر
+                    </button>
+                </div>
             </div>
 
             <!-- Personal Information -->
@@ -868,16 +861,18 @@
         </div>
 
         <!-- دکمه ذخیره تغییرات -->
-        <button @click="savePersonalInfo()" 
-                :disabled="saving"
-                class="save-button">
-            <span x-show="!saving">
-                <i class="fas fa-save"></i> ذخیره تغییرات
-            </span>
-            <span x-show="saving">
-                <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
-            </span>
-        </button>
+        <div class="btn-glow-container large cyan">
+            <button @click="savePersonalInfo()" 
+                    :disabled="saving"
+                    class="btn-glow">
+                <span x-show="!saving">
+                    <i class="fas fa-save"></i> ذخیره تغییرات
+                </span>
+                <span x-show="saving">
+                    <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
+                </span>
+            </button>
+        </div>
     </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -897,7 +892,7 @@
                         <div class="bank-card-item {% if card.is_default %}default{% endif %}">
                             {% if card.is_default %}
                             <span class="default-badge">پیش‌فرض</span>
-                            {% endif %}
+                            {% endif %}ظ
                             
                             <div class="bank-card-template">
                                 <div class="card-bank-name">
@@ -929,10 +924,12 @@
                         </div>
                     {% endif %}
                     
-                    <button type="button" class="add-button" @click="showAddCardModal = true">
-                        <i class="fas fa-plus"></i>
-                        افزودن کارت جدید
-                    </button>
+                    <div class="btn-glow-container cyan">
+                        <button type="button" class="btn-glow" @click="showAddCardModal = true">
+                            <i class="fas fa-plus"></i>
+                            افزودن کارت جدید
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -978,16 +975,18 @@
                                        required>
                             </div>
 
-                            <button type="submit" 
-                                    class="save-button"
-                                    :disabled="changingPassword">
-                                <span x-show="!changingPassword">
-                                    <i class="fas fa-key"></i> تغییر رمز عبور
-                                </span>
-                                <span x-show="changingPassword">
-                                    <i class="fas fa-spinner fa-spin"></i> در حال تغییر...
-                                </span>
-                            </button>
+                            <div class="btn-glow-container large pink">
+                                <button type="submit" 
+                                        class="btn-glow"
+                                        :disabled="changingPassword">
+                                    <span x-show="!changingPassword">
+                                        <i class="fas fa-key"></i> تغییر رمز عبور
+                                    </span>
+                                    <span x-show="changingPassword">
+                                        <i class="fas fa-spinner fa-spin"></i> در حال تغییر...
+                                    </span>
+                                </button>
+                            </div>
                         </form>
                     </div>
 
@@ -1046,10 +1045,12 @@
                         </div>
                     {% endif %}
                     
-                    <button type="button" class="add-button" @click="showAddAddressModal = true">
-                        <i class="fas fa-plus"></i>
-                        افزودن آدرس جدید
-                    </button>
+                    <div class="btn-glow-container cyan">
+                        <button type="button" class="btn-glow" @click="showAddAddressModal = true">
+                            <i class="fas fa-plus"></i>
+                            افزودن آدرس جدید
+                        </button>
+                    </div>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -1275,6 +1276,7 @@
     </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script>
 function dashboard() {
