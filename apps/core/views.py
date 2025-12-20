@@ -205,15 +205,13 @@ def buy_products(request):
     from apps.products.models import Category
     
     # Get active categories with their active products
-    # Using select_related and prefetch_related for optimal performance
+    # Using prefetch_related for optimal performance
     categories = Category.objects.filter(
         is_active=True,
         products__is_active=True  # Only categories that have active products
     ).prefetch_related(
         'products__brand',  # Prefetch brand for each product
         'products__images',  # Prefetch product images
-    ).select_related(
-        'parent'  # If you want to show parent category info
     ).distinct().order_by('sort_order', 'name')
     
     # Filter products per category to only show active ones

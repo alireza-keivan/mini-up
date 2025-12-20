@@ -108,7 +108,7 @@ class CategoryService:
     def get_category_by_slug(slug: str) -> Optional[Category]:
         """Get category by slug with caching."""
         try:
-            return Category.objects.select_related('parent').get(
+            return Category.objects.get(
                 slug=slug,
                 is_active=True
             )
@@ -117,26 +117,13 @@ class CategoryService:
     
     @staticmethod
     def get_category_ancestors(category: Category) -> List[Category]:
-        """Get all ancestor categories (for breadcrumbs)."""
-        ancestors = []
-        current = category.parent
-        while current:
-            ancestors.insert(0, current)
-            current = current.parent
-        return ancestors
+        """Get all ancestor categories (for breadcrumbs). Returns empty list as categories are now flat."""
+        return []
     
     @staticmethod
     def get_category_descendants(category: Category) -> List[int]:
-        """Get all descendant category IDs (for filtering)."""
-        descendants = [category.id]
-        
-        def collect_children(cat):
-            for child in cat.children.filter(is_active=True):
-                descendants.append(child.id)
-                collect_children(child)
-        
-        collect_children(category)
-        return descendants
+        """Get category ID (categories are now flat, no descendants)."""
+        return [category.id]
     
     @staticmethod
     def get_featured_categories(limit: int = 8) -> List[Category]:
