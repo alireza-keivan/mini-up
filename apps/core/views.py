@@ -71,38 +71,126 @@ def virtual_services(request):
 
 def gaming_products(request):
     """
-    صفحه محصولات گیمینگ
-    Displays gaming product categories with their products in horizontal scrollable carousels.
+    صفحه محصولات گیمینگ با قابلیت فیلتر کردن
+    Displays gaming product categories with filtering options.
     """
-    from apps.products.models import Category, Brand
+    from apps.products.models import Category, Brand, Product
+    from django.db.models import Q, Min, Max
     
-    # Get active gaming categories with their active products
-    # Filter by category_type = 'gaming'
-    categories = Category.objects.filter(
+    # Get filter parameters from request
+    selected_categories = request.GET.getlist('category')
+    selected_brands = request.GET.getlist('brand')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    stock_filter = request.GET.get('stock')
+    is_new = request.GET.get('is_new')
+    is_bestseller = request.GET.get('is_bestseller')
+    is_featured = request.GET.get('is_featured')
+    sort_by = request.GET.get('sort', '-created_at')
+    
+    # Base queryset for gaming products
+    products = Product.objects.filter(
         is_active=True,
-        category_type='gaming',
-        products__is_active=True
-    ).prefetch_related(
-        'products__brand',
-        'products__images',
-        'products__variants'
-    ).select_related(
-        'parent'
-    ).distinct().order_by('sort_order', 'name')
+        category__category_type='gaming'
+    ).select_related('category', 'brand').prefetch_related('images')
+    
+    # Apply filters
+    if selected_categories:
+        products = products.filter(category__id__in=selected_categories)
+    
+    if selected_brands:
+        products = products.filter(brand__id__in=selected_brands)
+    
+    if min_price:
+        try:
+            products = products.filter(price__gte=int(min_price))
+        except ValueError:
+            pass
+    
+    if max_price:
+        try:
+            products = products.filter(price__lte=int(max_price))
+        except ValueError:
+            pass
+    
+    if stock_filter == 'available':
+        products = products.filter(stock__gt=0)
+    elif stock_filter == 'out_of_stock':
+        products = products.filter(stock=0)
+    
+    if is_new == 'true':
+        products = products.filter(is_new=True)
+    
+    if is_bestseller == 'true':
+        products = products.filter(is_bestseller=True)
+    
+    if is_featured == 'true':
+        products = products.filter(is_featured=True)
+    
+    # Sorting
+    sort_options = {
+        'newest': '-created_at',
+        'oldest': 'created_at',
+        'price_low': 'price',
+        'price_high': '-price',
+        'name_asc': 'name',
+        'name_desc': '-name',
+        'popular': '-sales_count',
+    }
+    products = products.order_by(sort_options.get(sort_by, '-created_at'))
+    
+    # Get all gaming categories for filter sidebar
+    all_categories = Category.objects.filter(
+        is_active=True,
+        category_type='gaming'
+    ).order_by('sort_order', 'name')
+    
+    # Get all brands that have gaming products
+    all_brands = Brand.objects.filter(
+        products__category__category_type='gaming',
+        products__is_active=True,
+        is_active=True
+    ).distinct().order_by('name')
+    
+    # Get price range
+    price_range = products.aggregate(
+        min_price=Min('price'),
+        max_price=Max('price')
+    )
+    
+    # Group products by category for display
+    categories_with_products = []
+    for category in all_categories:
+        category_products = products.filter(category=category)
+        if category_products.exists():
+            # Attach filtered products to category
+            category.filtered_products = category_products
+            categories_with_products.append(category)
     
     # Get total counts for stats
-    total_products = sum(cat.get_active_products_count() for cat in categories)
-    total_brands = Brand.objects.filter(
-        products__category__category_type='gaming',
-        products__is_active=True
-    ).distinct().count()
+    total_products = products.count()
+    total_brands = all_brands.count()
     
     context = {
         'title': 'محصولات گیمینگ',
-        'categories': categories,
+        'categories': categories_with_products,
+        'all_categories': all_categories,
+        'all_brands': all_brands,
+        'products': products,
         'total_products': total_products,
-        'total_categories': categories.count(),
+        'total_categories': all_categories.count(),
         'total_brands': total_brands,
+        'price_range': price_range,
+        # Filter states
+        'selected_categories': selected_categories,
+        'selected_brands': selected_brands,
+        'min_price': min_price,
+        'max_price': max_price,
+        'stock_filter': stock_filter,
+        'is_new': is_new,
+        'is_bestseller': is_bestseller,
+        'is_featured': is_featured,
+        'sort_by': sort_by,
     }
     
     return render(request, 'core/gaming_products.html', context)

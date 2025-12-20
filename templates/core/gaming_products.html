@@ -6,6 +6,143 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/pages/gaming_products.css' %}">
+<style>
+    /* ═══════════════════════════════════════════════════════════════════════
+       FILTER PANEL STYLES
+       ═══════════════════════════════════════════════════════════════════════ */
+    
+    /* Custom scrollbar for filter groups */
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: rgba(30, 30, 45, 0.5);
+        border-radius: 3px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: rgba(255, 0, 85, 0.3);
+        border-radius: 3px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 0, 85, 0.5);
+    }
+    
+    /* Filter panel mobile overlay */
+    @media (max-width: 1023px) {
+        #filterPanel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 90%;
+            max-width: 400px;
+            z-index: 100;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+            overflow-y: auto;
+        }
+        
+        #filterPanel.block {
+            transform: translateX(0);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        #filterPanel::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 100%;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-out;
+        }
+        
+        #filterPanel.block::before {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+    
+    /* Checkbox and radio custom styles */
+    input[type="checkbox"],
+    input[type="radio"] {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    input[type="checkbox"]:checked,
+    input[type="radio"]:checked {
+        background-size: 100% 100%;
+        border-width: 2px;
+    }
+    
+    input[type="checkbox"]:hover,
+    input[type="radio"]:hover {
+        transform: scale(1.1);
+    }
+    
+    /* Filter group animation */
+    .filter-group {
+        animation: fadeInUp 0.3s ease-out backwards;
+    }
+    
+    .filter-group:nth-child(1) { animation-delay: 0.05s; }
+    .filter-group:nth-child(2) { animation-delay: 0.1s; }
+    .filter-group:nth-child(3) { animation-delay: 0.15s; }
+    .filter-group:nth-child(4) { animation-delay: 0.2s; }
+    .filter-group:nth-child(5) { animation-delay: 0.25s; }
+    .filter-group:nth-child(6) { animation-delay: 0.3s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Active filter highlight */
+    input[type="checkbox"]:checked + span,
+    input[type="radio"]:checked + span {
+        color: #fff;
+        font-weight: 600;
+    }
+    
+    /* Neon glow on focus */
+    input:focus,
+    select:focus {
+        box-shadow: 0 0 0 2px rgba(255, 0, 85, 0.2);
+    }
+    
+    /* Filter panel backdrop blur effect */
+    .gp-filter-panel {
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+    }
+    
+    /* Responsive grid for products when filter is open */
+    @media (min-width: 1024px) {
+        .gp-carousel-track {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+        
+        .gp-product-card {
+            width: 100%;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -119,6 +256,315 @@
 <main class="gp-main py-12 md:py-20">
     <div class="container mx-auto px-4">
         
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- ═══════════════════════════════════════════════════════════════
+                 FILTER SIDEBAR
+                 ═══════════════════════════════════════════════════════════════ -->
+            <aside class="lg:w-80 flex-shrink-0">
+                <!-- Filter Toggle Button (Mobile) -->
+                <button type="button" 
+                        id="filterToggle"
+                        class="lg:hidden w-full mb-4 px-6 py-3 rounded-xl
+                               bg-gradient-to-r from-neon-pink to-neon-purple
+                               text-white font-bold
+                               flex items-center justify-center gap-2
+                               hover:shadow-lg hover:shadow-neon-pink/30
+                               transition-all duration-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    <span>فیلترها</span>
+                    <span id="activeFiltersCount" class="hidden px-2 py-0.5 rounded-full bg-neon-cyan text-dark-900 text-xs font-bold">0</span>
+                </button>
+                
+                <!-- Filter Panel -->
+                <div id="filterPanel" 
+                     class="gp-filter-panel hidden lg:block
+                            bg-dark-800/60 backdrop-blur-sm rounded-2xl
+                            border border-dark-700/50 overflow-hidden">
+                    
+                    <!-- Filter Header -->
+                    <div class="p-6 border-b border-dark-700/50 flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                            </svg>
+                            فیلترها
+                        </h3>
+                        <button type="button"
+                                id="clearFilters"
+                                class="text-sm text-neon-cyan hover:text-white transition-colors">
+                            پاک کردن
+                        </button>
+                    </div>
+                    
+                    <!-- Filter Form -->
+                    <form id="filterForm" class="p-6 space-y-6">
+                        
+                        <!-- Sort By -->
+                        <div class="filter-group">
+                            <label class="block text-white font-semibold mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                </svg>
+                                مرتب‌سازی
+                            </label>
+                            <select name="sort" 
+                                    class="w-full px-4 py-3 rounded-xl
+                                           bg-dark-900/50 border border-dark-600
+                                           text-gray-300 font-medium
+                                           focus:border-neon-purple focus:outline-none
+                                           transition-colors">
+                                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>جدیدترین</option>
+                                <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>قدیمی‌ترین</option>
+                                <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>ارزان‌ترین</option>
+                                <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>گران‌ترین</option>
+                                <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>پرفروش‌ترین</option>
+                                <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>نام (الف - ی)</option>
+                                <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>نام (ی - الف)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Price Range -->
+                        <div class="filter-group">
+                            <label class="block text-white font-semibold mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                محدوده قیمت
+                            </label>
+                            <div class="space-y-3">
+                                <div class="flex gap-3">
+                                    <input type="number" 
+                                           name="min_price" 
+                                           placeholder="از"
+                                           value="{{ min_price }}"
+                                           class="w-1/2 px-3 py-2 rounded-lg
+                                                  bg-dark-900/50 border border-dark-600
+                                                  text-gray-300 text-sm
+                                                  focus:border-neon-pink focus:outline-none
+                                                  transition-colors">
+                                    <input type="number" 
+                                           name="max_price" 
+                                           placeholder="تا"
+                                           value="{{ max_price }}"
+                                           class="w-1/2 px-3 py-2 rounded-lg
+                                                  bg-dark-900/50 border border-dark-600
+                                                  text-gray-300 text-sm
+                                                  focus:border-neon-pink focus:outline-none
+                                                  transition-colors">
+                                </div>
+                                {% if price_range.min_price and price_range.max_price %}
+                                <p class="text-xs text-gray-500">
+                                    محدوده: {{ price_range.min_price|intcomma }} - {{ price_range.max_price|intcomma }} تومان
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Categories -->
+                        <div class="filter-group">
+                            <label class="block text-white font-semibold mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                </svg>
+                                دسته‌بندی
+                            </label>
+                            <div class="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-dark-600 scrollbar-track-dark-800">
+                                {% for category in all_categories %}
+                                <label class="flex items-center gap-3 p-2 rounded-lg
+                                              hover:bg-dark-700/50 cursor-pointer
+                                              transition-colors group">
+                                    <input type="checkbox" 
+                                           name="category" 
+                                           value="{{ category.id }}"
+                                           {% if category.id|stringformat:"s" in selected_categories %}checked{% endif %}
+                                           class="w-4 h-4 rounded border-dark-600
+                                                  bg-dark-900 text-neon-pink
+                                                  focus:ring-neon-pink focus:ring-offset-0">
+                                    <span class="text-gray-300 group-hover:text-white text-sm flex-1">
+                                        {{ category.name }}
+                                    </span>
+                                    <span class="text-xs text-gray-600 group-hover:text-gray-400">
+                                        ({{ category.get_active_products_count }})
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Brands -->
+                        {% if all_brands %}
+                        <div class="filter-group">
+                            <label class="block text-white font-semibold mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-neon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
+                                برند
+                            </label>
+                            <div class="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-dark-600 scrollbar-track-dark-800">
+                                {% for brand in all_brands %}
+                                <label class="flex items-center gap-3 p-2 rounded-lg
+                                              hover:bg-dark-700/50 cursor-pointer
+                                              transition-colors group">
+                                    <input type="checkbox" 
+                                           name="brand" 
+                                           value="{{ brand.id }}"
+                                           {% if brand.id|stringformat:"s" in selected_brands %}checked{% endif %}
+                                           class="w-4 h-4 rounded border-dark-600
+                                                  bg-dark-900 text-neon-purple
+                                                  focus:ring-neon-purple focus:ring-offset-0">
+                                    <span class="text-gray-300 group-hover:text-white text-sm">
+                                        {{ brand.name }}
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Stock Status -->
+                        <div class="filter-group">
+                            <label class="block text-white font-semibold mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                                وضعیت موجودی
+                            </label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 p-2 rounded-lg
+                                              hover:bg-dark-700/50 cursor-pointer
+                                              transition-colors group">
+                                    <input type="radio" 
+                                           name="stock" 
+                                           value=""
+                                           {% if not stock_filter %}checked{% endif %}
+                                           class="w-4 h-4 border-dark-600
+                                                  bg-dark-900 text-neon-cyan
+                                                  focus:ring-neon-cyan focus:ring-offset-0">
+                                    <span class="text-gray-300 group-hover:text-white text-sm">
+                                        همه محصولات
+                                    </span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2 rounded-lg
+                                              hover:bg-dark-700/50 cursor-pointer
+                                              transition-colors group">
+                                    <input type="radio" 
+                                           name="stock" 
+                                           value="available"
+                                           {% if stock_filter == 'available' %}checked{% endif %}
+                                           class="w-4 h-4 border-dark-600
+                                                  bg-dark-900 text-neon-green
+                                                  focus:ring-neon-green focus:ring-offset-0">
+                                    <span class="text-gray-300 group-hover:text-white text-sm">
+                                        فقط موجود
+                                    </span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2 rounded-lg
+                                              hover:bg-dark-700/50 cursor-pointer
+                                              transition-colors group">
+                                    <input type="radio" 
+                                           name="stock" 
+                                           value="out_of_stock"
+                                           {% if stock_filter == 'out_of_stock' %}checked{% endif %}
+                                           class="w-4 h-4 border-dark-600
+                                                  bg-dark-900 text-red-500
+                                                  focus:ring-red-500 focus:ring-offset-0">
+                                    <span class="text-gray-300 group-hover:text-white text-sm">
+                                        ناموجود
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Features -->
+                        <div class="filter-group">
+                            <label class="block text-white font-semibold mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-neon-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                </svg>
+                                ویژگی‌ها
+                            </label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 p-2 rounded-lg
+                                              hover:bg-dark-700/50 cursor-pointer
+                                              transition-colors group">
+                                    <input type="checkbox" 
+                                           name="is_new" 
+                                           value="true"
+                                           {% if is_new == 'true' %}checked{% endif %}
+                                           class="w-4 h-4 rounded border-dark-600
+                                                  bg-dark-900 text-neon-cyan
+                                                  focus:ring-neon-cyan focus:ring-offset-0">
+                                    <span class="text-gray-300 group-hover:text-white text-sm">
+                                        محصولات جدید
+                                    </span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2 rounded-lg
+                                              hover:bg-dark-700/50 cursor-pointer
+                                              transition-colors group">
+                                    <input type="checkbox" 
+                                           name="is_bestseller" 
+                                           value="true"
+                                           {% if is_bestseller == 'true' %}checked{% endif %}
+                                           class="w-4 h-4 rounded border-dark-600
+                                                  bg-dark-900 text-neon-pink
+                                                  focus:ring-neon-pink focus:ring-offset-0">
+                                    <span class="text-gray-300 group-hover:text-white text-sm">
+                                        پرفروش‌ترین‌ها
+                                    </span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2 rounded-lg
+                                              hover:bg-dark-700/50 cursor-pointer
+                                              transition-colors group">
+                                    <input type="checkbox" 
+                                           name="is_featured" 
+                                           value="true"
+                                           {% if is_featured == 'true' %}checked{% endif %}
+                                           class="w-4 h-4 rounded border-dark-600
+                                                  bg-dark-900 text-neon-purple
+                                                  focus:ring-neon-purple focus:ring-offset-0">
+                                    <span class="text-gray-300 group-hover:text-white text-sm">
+                                        محصولات ویژه
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Apply Button -->
+                        <button type="submit"
+                                class="w-full px-6 py-3 rounded-xl
+                                       bg-gradient-to-r from-neon-pink to-neon-purple
+                                       text-white font-bold
+                                       hover:shadow-lg hover:shadow-neon-pink/30
+                                       transition-all duration-300">
+                            اعمال فیلترها
+                        </button>
+                    </form>
+                </div>
+            </aside>
+            
+            <!-- ═══════════════════════════════════════════════════════════════
+                 PRODUCTS SECTION
+                 ═══════════════════════════════════════════════════════════════ -->
+            <div class="flex-1 min-w-0">
+                <!-- Results Info -->
+                <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
+                    <p class="text-gray-400">
+                        نمایش 
+                        <span class="text-neon-cyan font-bold">{{ products.count }}</span>
+                        محصول
+                    </p>
+                    {% if selected_categories or selected_brands or min_price or max_price or stock_filter or is_new or is_bestseller or is_featured %}
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-sm text-gray-500">فیلترهای فعال:</span>
+                        <div id="activeFilterTags" class="flex flex-wrap gap-2">
+                            <!-- Active filter tags will be populated here -->
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+        
         {% for category in categories %}
         <!-- Category Section: {{ category.name }} -->
         <section id="category-{{ category.id }}" 
@@ -195,7 +641,7 @@
                             scroll-smooth snap-x snap-mandatory cursor-grab active:cursor-grabbing"
                      data-carousel="true">
                     
-                    {% for product in category.get_active_products %}
+                    {% for product in category.filtered_products|default:category.get_active_products %}
                     <!-- Product Card -->
                     <article class="gp-product-card flex-shrink-0 w-72 md:w-80 snap-start
                                     bg-dark-800/60 backdrop-blur-sm rounded-2xl overflow-hidden
@@ -468,25 +914,27 @@
                 </svg>
             </div>
             <h3 class="text-2xl font-bold text-gray-300 mb-4">
-                دسته‌بندی‌ای یافت نشد
+                محصولی یافت نشد
             </h3>
             <p class="text-gray-500 max-w-md mx-auto mb-8">
-                در حال حاضر هیچ دسته‌بندی محصولی وجود ندارد. به زودی محصولات جدید اضافه خواهند شد.
+                با فیلترهای انتخابی شما محصولی پیدا نشد. لطفاً فیلترها را تغییر دهید.
             </p>
-            <a href="{% url 'core:home' %}" 
-               class="inline-flex items-center gap-2 px-6 py-3 rounded-xl
-                      bg-gradient-to-r from-neon-pink to-neon-purple
-                      text-white font-bold
-                      hover:shadow-lg hover:shadow-neon-pink/30
-                      hover:scale-105 transition-all duration-300">
+            <button type="button"
+                    id="clearFiltersBtn"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-xl
+                           bg-gradient-to-r from-neon-pink to-neon-purple
+                           text-white font-bold
+                           hover:shadow-lg hover:shadow-neon-pink/30
+                           hover:scale-105 transition-all duration-300">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
-                بازگشت به خانه
-            </a>
+                پاک کردن فیلترها
+            </button>
         </div>
         {% endfor %}
+            </div>
+        </div>
     </div>
     
     <!-- ═══════════════════════════════════════════════════════════════════════
@@ -671,4 +1119,147 @@
 
 {% block extra_js %}
 <script src="{% static 'js/pages/gaming_products.js' %}"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// FILTER FUNCTIONALITY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function() {
+    const filterToggle = document.getElementById('filterToggle');
+    const filterPanel = document.getElementById('filterPanel');
+    const filterForm = document.getElementById('filterForm');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    const clearFiltersBtn2 = document.getElementById('clearFiltersBtn');
+    const activeFiltersCount = document.getElementById('activeFiltersCount');
+    
+    // Toggle filter panel on mobile
+    if (filterToggle && filterPanel) {
+        filterToggle.addEventListener('click', function() {
+            filterPanel.classList.toggle('hidden');
+            filterPanel.classList.toggle('block');
+        });
+    }
+    
+    // Submit form on any filter change
+    if (filterForm) {
+        const filterInputs = filterForm.querySelectorAll('input, select');
+        filterInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        });
+        
+        // Prevent auto-submit for text inputs (price range)
+        const textInputs = filterForm.querySelectorAll('input[type="number"]');
+        textInputs.forEach(input => {
+            input.removeEventListener('change', function() {
+                filterForm.submit();
+            });
+        });
+    }
+    
+    // Clear all filters
+    function clearAllFilters() {
+        if (filterForm) {
+            // Uncheck all checkboxes
+            filterForm.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            // Uncheck all radio buttons except "all" options
+            filterForm.querySelectorAll('input[type="radio"][value=""]').forEach(rb => rb.checked = true);
+            
+            // Clear text inputs
+            filterForm.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
+            
+            // Reset select to first option
+            filterForm.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+            
+            // Submit form or redirect to base URL
+            window.location.href = '{% url "core:gaming_products" %}';
+        }
+    }
+    
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', clearAllFilters);
+    }
+    
+    if (clearFiltersBtn2) {
+        clearFiltersBtn2.addEventListener('click', clearAllFilters);
+    }
+    
+    // Count active filters
+    function countActiveFilters() {
+        let count = 0;
+        
+        if (filterForm) {
+            // Count checked checkboxes
+            count += filterForm.querySelectorAll('input[type="checkbox"]:checked').length;
+            
+            // Count selected radio buttons (excluding default "all" option)
+            filterForm.querySelectorAll('input[type="radio"]:checked').forEach(rb => {
+                if (rb.value !== '') count++;
+            });
+            
+            // Count filled text inputs
+            filterForm.querySelectorAll('input[type="number"]').forEach(input => {
+                if (input.value) count++;
+            });
+            
+            // Check if sort is not default
+            const sortSelect = filterForm.querySelector('select[name="sort"]');
+            if (sortSelect && sortSelect.value !== 'newest') count++;
+        }
+        
+        // Update counter badge
+        if (activeFiltersCount) {
+            if (count > 0) {
+                activeFiltersCount.textContent = count;
+                activeFiltersCount.classList.remove('hidden');
+            } else {
+                activeFiltersCount.classList.add('hidden');
+            }
+        }
+        
+        return count;
+    }
+    
+    // Initial count
+    countActiveFilters();
+    
+    // Update count on filter changes
+    if (filterForm) {
+        filterForm.addEventListener('change', countActiveFilters);
+    }
+    
+    // Smooth scroll to categories
+    document.querySelectorAll('a[href^="#category-"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                const offset = 100; // Account for sticky header
+                const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - offset;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    
+    // Mobile filter panel close when clicking outside
+    document.addEventListener('click', function(event) {
+        if (window.innerWidth < 1024) { // Only on mobile
+            if (filterPanel && filterToggle &&
+                !filterPanel.contains(event.target) && 
+                !filterToggle.contains(event.target) &&
+                !filterPanel.classList.contains('hidden')) {
+                filterPanel.classList.add('hidden');
+            }
+        }
+    });
+});
+</script>
 {% endblock %}
