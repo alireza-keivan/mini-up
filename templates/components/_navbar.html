@@ -43,7 +43,7 @@
                 <button type="button" 
                         class="navbar-action-btn" 
                         id="cartToggle"
-                        data-sidebar-target="cartSidebar"
+                        data-cart-open
                         aria-label="سبد خرید"
                         title="سبد خرید">
                     <i class="fas fa-shopping-cart"></i>
@@ -167,7 +167,7 @@
                                 </div>
                             </div>
                             
-                            <a href="{% url 'accounts:dashboard' %}#orders" class="navbar-user-dropdown-item">
+                            <a href="{% url 'accounts:dashboard' %}" class="navbar-user-dropdown-item">
                                 <i class="fas fa-shopping-bag"></i>
                                 <span>سفارش‌ها</span>
                             </a>
@@ -175,11 +175,11 @@
                                 <i class="fas fa-headset"></i>
                                 <span>تیکت‌های پشتیبانی</span>
                             </a>
-                            <a href="{% url 'accounts:dashboard' %}#wallet" class="navbar-user-dropdown-item">
+                            <a href="{% url 'accounts:dashboard' %}" class="navbar-user-dropdown-item">
                                 <i class="fas fa-wallet"></i>
                                 <span>کیف پول</span>
                             </a>
-                            <a href="{% url 'accounts:dashboard' %}#info" class="navbar-user-dropdown-item">
+                            <a href="{% url 'accounts:dashboard' %}" class="navbar-user-dropdown-item">
                                 <i class="fas fa-user-edit"></i>
                                 <span>پروفایل</span>
                             </a>

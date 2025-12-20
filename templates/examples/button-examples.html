@@ -1,0 +1,136 @@
+<!-- نمونه استفاده از دکمه‌های Glow -->
+<!-- این فایل فقط برای راهنمایی است و نیازی به استفاده در پروژه ندارد -->
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Button Examples</title>
+    <link rel="stylesheet" href="/static/css/dist/main.css">
+</head>
+<body style="background: #0a0a0a; padding: 3rem;">
+
+    <h1 style="color: #fff; margin-bottom: 2rem;">نمونه دکمه‌های Glow</h1>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         دکمه استاندارد با افکت Glow (تمام رنگ‌ها)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <div style="display: flex; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap;">
+        
+        <!-- دکمه پیش‌فرض (Cyan + Purple + Pink) -->
+        <div class="btn-glow-container">
+            <button class="btn-glow">
+                <i class="fas fa-shopping-cart"></i>
+                افزودن به سبد خرید
+            </button>
+        </div>
+        
+        <!-- دکمه صورتی -->
+        <div class="btn-glow-container pink">
+            <button class="btn-glow">
+                <i class="fas fa-heart"></i>
+                علاقه‌مندی
+            </button>
+        </div>
+        
+        <!-- دکمه آبی -->
+        <div class="btn-glow-container cyan">
+            <button class="btn-glow">
+                <i class="fas fa-check"></i>
+                تایید خرید
+            </button>
+        </div>
+        
+        <!-- دکمه بنفش -->
+        <div class="btn-glow-container purple">
+            <button class="btn-glow">
+                <i class="fas fa-star"></i>
+                ویژه
+            </button>
+        </div>
+        
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         دکمه‌های با سایزهای مختلف
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <h2 style="color: #fff; margin-bottom: 1rem;">سایزهای مختلف</h2>
+    <div style="display: flex; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap; align-items: center;">
+        
+        <!-- کوچک -->
+        <div class="btn-glow-container small cyan">
+            <button class="btn-glow">
+                دکمه کوچک
+            </button>
+        </div>
+        
+        <!-- متوسط (پیش‌فرض) -->
+        <div class="btn-glow-container">
+            <button class="btn-glow">
+                دکمه متوسط
+            </button>
+        </div>
+        
+        <!-- بزرگ -->
+        <div class="btn-glow-container large pink">
+            <button class="btn-glow">
+                دکمه بزرگ
+            </button>
+        </div>
+        
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         استفاده به عنوان لینک (a tag)
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <h2 style="color: #fff; margin-bottom: 1rem;">به عنوان لینک</h2>
+    <div style="display: flex; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap;">
+        
+        <div class="btn-glow-container purple">
+            <a href="#" class="btn-glow" style="text-decoration: none;">
+                <i class="fas fa-shopping-bag"></i>
+                مشاهده محصولات
+            </a>
+        </div>
+        
+        <div class="btn-glow-container cyan">
+            <a href="#" class="btn-glow" style="text-decoration: none;">
+                <i class="fas fa-user"></i>
+                ورود / ثبت‌نام
+            </a>
+        </div>
+        
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+         کد HTML برای استفاده
+         ═══════════════════════════════════════════════════════════════════════════ -->
+    <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 12px; color: #fff;">
+        <h3 style="margin-bottom: 1rem;">نحوه استفاده:</h3>
+        <pre style="background: #000; padding: 1rem; border-radius: 8px; overflow-x: auto;"><code>&lt;!-- دکمه استاندارد --&gt;
+&lt;div class="btn-glow-container"&gt;
+    &lt;button class="btn-glow"&gt;
+        &lt;i class="fas fa-icon"&gt;&lt;/i&gt;
+        متن دکمه
+    &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- دکمه با رنگ خاص (pink, cyan, purple) --&gt;
+&lt;div class="btn-glow-container pink"&gt;
+    &lt;button class="btn-glow"&gt;متن دکمه&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- دکمه با سایز خاص (small, large) --&gt;
+&lt;div class="btn-glow-container small cyan"&gt;
+    &lt;button class="btn-glow"&gt;دکمه کوچک&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- به عنوان لینک --&gt;
+&lt;div class="btn-glow-container purple"&gt;
+    &lt;a href="#" class="btn-glow"&gt;لینک&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+</body>
+</html>

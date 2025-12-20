@@ -19,6 +19,8 @@
     
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+
 
     <!-- Main Compiled CSS (Tailwind + Custom) -->
     <link rel="stylesheet" href="{% static 'css/dist/main.css' %}?v=1.7">
@@ -55,8 +57,8 @@
                          .search-modal-overlay { position: fixed !important; inset: 0; z-index: 1240; background: rgba(0,0,0,.5); opacity: 0; transition: opacity .2s; }
                          .search-modal-overlay.active { display: block !important; opacity: 1 !important; }
 
-                         /* Cart sidebar positioning (RTL: slide from left) */
-                         .cart-sidebar { position: fixed !important; top: 0; left: 0; height: 100vh; width: 360px; max-width: 95vw; transform: translateX(-100%); transition: transform .25s ease-in-out; z-index: 1300; display: none; }
+                         /* Cart sidebar positioning (RTL: slide from right) */
+                         .cart-sidebar { position: fixed !important; top: 0; right: 0; height: 100vh; width: 420px; max-width: 95vw; transform: translateX(100%); transition: transform .25s ease-in-out; z-index: 1300; display: none; }
                          .cart-sidebar.active { display: block !important; transform: translateX(0) !important; }
                          .cart-sidebar-overlay { position: fixed !important; inset: 0; z-index: 1290; background: rgba(0,0,0,.45); opacity: 0; transition: opacity .2s; }
                          .cart-sidebar-overlay.active { display: block !important; opacity: 1 !important; }
