@@ -24,21 +24,15 @@ class CategoryMinimalSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     """Standard category serializer."""
     
-    parent = CategoryMinimalSerializer(read_only=True)
-    children_count = serializers.SerializerMethodField()
     products_count = serializers.SerializerMethodField()
-    full_path = serializers.ReadOnlyField()
     
     class Meta:
         model = Category
         fields = [
-            'id', 'name', 'name_en', 'slug', 'parent', 'category_type',
+            'id', 'name', 'name_en', 'slug',
             'description', 'image', 'icon', 'is_active', 'is_featured',
-            'sort_order', 'children_count', 'products_count', 'full_path'
+            'sort_order', 'products_count'
         ]
-    
-    def get_children_count(self, obj):
-        return obj.children.filter(is_active=True).count()
     
     def get_products_count(self, obj):
         return obj.products.filter(is_active=True).count()
@@ -526,40 +520,20 @@ class ProductCompareSerializer(serializers.ModelSerializer):
 class CategoryDetailSerializer(serializers.ModelSerializer):
     """Category detail with full information."""
     
-    parent = CategoryMinimalSerializer(read_only=True)
-    children = CategoryMinimalSerializer(many=True, read_only=True, source='children.filter(is_active=True)')
     products_count = serializers.SerializerMethodField()
-    breadcrumbs = serializers.SerializerMethodField()
     
     class Meta:
         model = Category
         fields = [
-            'id', 'name', 'name_en', 'slug', 'parent', 'children',
-            'category_type', 'description', 'image', 'icon',
+            'id', 'name', 'name_en', 'slug',
+            'description', 'image', 'icon',
             'is_active', 'is_featured', 'sort_order',
-            'products_count', 'breadcrumbs',
+            'products_count',
             'meta_title', 'meta_description'
         ]
     
-    def get_children(self, obj):
-        children = obj.children.filter(is_active=True).order_by('sort_order')
-        return CategoryMinimalSerializer(children, many=True).data
-    
     def get_products_count(self, obj):
         return obj.products.filter(is_active=True).count()
-    
-    def get_breadcrumbs(self, obj):
-        """Get category breadcrumbs from root to current."""
-        breadcrumbs = []
-        current = obj
-        while current:
-            breadcrumbs.insert(0, {
-                'id': current.id,
-                'name': current.name,
-                'slug': current.slug
-            })
-            current = current.parent
-        return breadcrumbs
 
 
 class BrandDetailSerializer(serializers.ModelSerializer):

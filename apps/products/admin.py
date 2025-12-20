@@ -1,18 +1,57 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django import forms
 from .models import (
     Category, Brand, Product, ProductImage, 
     GameCurrencyRate, ProductReview, RecentlyViewed
 )
 
 
+# ============================================
+# Custom Forms for Product Type Filtering
+# ============================================
+class VirtualProductForm(forms.ModelForm):
+    """Form for virtual products with limited sub_type choices"""
+    class Meta:
+        model = Product
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Limit sub_type choices to virtual product options only
+        if 'sub_type' in self.fields:
+            self.fields['sub_type'].choices = [
+                ('', '---------'),
+                (Product.ProductSubType.VIRTUAL_SERVICE, 'خدمات مجازی'),
+                (Product.ProductSubType.MINI_APP, 'مینی گیم'),
+            ]
+
+
+class PhysicalProductForm(forms.ModelForm):
+    """Form for physical products with limited sub_type choices"""
+    class Meta:
+        model = Product
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Limit sub_type choices to physical product options only
+        if 'sub_type' in self.fields:
+            self.fields['sub_type'].choices = [
+                ('', '---------'),
+                (Product.ProductSubType.GAMING, 'خدمات گیمینگ'),
+                (Product.ProductSubType.ACCESSORY, 'محصولات جانبی'),
+            ]
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'parent', 'slug', 'is_active')
-    list_filter = ('is_active', 'parent')
-    search_fields = ('name', 'slug')
-    prepopulated_fields = {'slug': ('name',)}
+    list_display = ('name', 'slug', 'is_active', 'sort_order')
+    list_filter = ('is_active', 'is_featured')
+    search_fields = ('name', 'name_en', 'slug')
+    prepopulated_fields = {'slug': ('name_en',)}
+    list_editable = ('sort_order',)
 
 
 @admin.register(Brand)
@@ -121,6 +160,7 @@ class VirtualProductProxy(Product):
 class VirtualProductAdmin(BaseProductAdmin):
     """Admin for virtual products (mini-games and virtual services)"""
     
+    form = VirtualProductForm
     list_display = ('name', 'category', 'price', 'is_active', 'is_featured', 'sales_count')
     list_filter = ('is_active', 'is_featured', 'is_new', 'category')
     inlines = [ProductImageInline, GameCurrencyRateInline]
@@ -182,6 +222,7 @@ class PhysicalProductProxy(Product):
 class PhysicalProductAdmin(BaseProductAdmin):
     """Admin for physical products (gaming products and accessories)"""
     
+    form = PhysicalProductForm
     list_display = ('name', 'category', 'brand', 'price', 'stock', 'stock_status', 'is_active', 'sales_count')
     list_filter = ('brand', 'is_active', 'is_featured', 'is_new', 'category', 'track_stock', 'sub_type')
     

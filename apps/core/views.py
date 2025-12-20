@@ -36,12 +36,12 @@ def virtual_services(request):
     from apps.products.models import Category, Product
     from django.db.models import Prefetch
     
-    # Get virtual service categories (top-level only)
+    # Get categories that have virtual products
     categories = Category.objects.filter(
-        category_type=Category.CategoryType.VIRTUAL,
-        parent__isnull=True,
-        is_active=True
-    ).prefetch_related(
+        is_active=True,
+        products__is_active=True,
+        products__product_type=Product.ProductType.VIRTUAL
+    ).distinct().prefetch_related(
         Prefetch(
             'products',
             queryset=Product.objects.filter(
@@ -91,7 +91,7 @@ def gaming_products(request):
     # Base queryset for gaming products
     products = Product.objects.filter(
         is_active=True,
-        category__category_type='gaming'
+        product_type=Product.ProductType.PHYSICAL
     ).select_related('category', 'brand').prefetch_related('images')
     
     # Apply filters
@@ -139,15 +139,16 @@ def gaming_products(request):
     }
     products = products.order_by(sort_options.get(sort_by, '-created_at'))
     
-    # Get all gaming categories for filter sidebar
+    # Get all categories that have physical/gaming products
     all_categories = Category.objects.filter(
         is_active=True,
-        category_type='gaming'
-    ).order_by('sort_order', 'name')
+        products__is_active=True,
+        products__product_type=Product.ProductType.PHYSICAL
+    ).distinct().order_by('sort_order', 'name')
     
-    # Get all brands that have gaming products
+    # Get all brands that have physical/gaming products
     all_brands = Brand.objects.filter(
-        products__category__category_type='gaming',
+        products__product_type=Product.ProductType.PHYSICAL,
         products__is_active=True,
         is_active=True
     ).distinct().order_by('name')

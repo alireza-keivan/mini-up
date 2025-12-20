@@ -12,35 +12,13 @@ import uuid
 
 class Category(models.Model):
     """
-    Product categories with hierarchical structure.
-    Examples: Virtual Services > Spotify, Gaming > Fans
+    Product categories - flat structure.
+    Examples: Spotify, Gaming Headsets, PlayStation Plus
     """
-    
-    class CategoryType(models.TextChoices):
-        VIRTUAL = 'virtual', 'خدمات مجازی'
-        GAMING = 'gaming', 'محصولات گیمینگ'
-        ACCESSORY = 'accessory', 'لوازم جانبی'
-        GAME_CURRENCY = 'game_currency', 'ارز بازی'
     
     name = models.CharField(max_length=100, verbose_name='نام')
     name_en = models.CharField(max_length=100, blank=True, verbose_name='نام انگلیسی')
     slug = models.SlugField(max_length=120, unique=True, allow_unicode=True, verbose_name='اسلاگ')
-    
-    parent = models.ForeignKey(
-        'self',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='children',
-        verbose_name='دسته‌بندی والد'
-    )
-    
-    category_type = models.CharField(
-        max_length=20,
-        choices=CategoryType.choices,
-        default=CategoryType.VIRTUAL,
-        verbose_name='نوع دسته‌بندی'
-    )
     
     description = models.TextField(blank=True, verbose_name='توضیحات')
     image = models.ImageField(
@@ -66,32 +44,15 @@ class Category(models.Model):
         indexes = [
             models.Index(fields=['slug']),
             models.Index(fields=['is_active', 'sort_order']),
-            models.Index(fields=['parent', 'is_active']),
         ]
     
     def __str__(self):
-        if self.parent:
-            return f'{self.parent.name} > {self.name}'
         return self.name
     
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name_en or self.name, allow_unicode=True)
         super().save(*args, **kwargs)
-    
-    @property
-    def full_path(self):
-        """Get full category path (e.g., 'Virtual Services > Spotify')."""
-        if self.parent:
-            return f'{self.parent.full_path} > {self.name}'
-        return self.name
-    
-    def get_all_children(self):
-        """Get all descendant categories recursively."""
-        children = list(self.children.filter(is_active=True))
-        for child in self.children.filter(is_active=True):
-            children.extend(child.get_all_children())
-        return children
     
     def get_active_products_count(self):
         """Get count of active products in this category."""
