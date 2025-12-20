@@ -15,5 +15,5 @@ package-lock.json
 .DS_Store
 .bin/
 # Compiled static assets
-apps/core/static/core/css/main.css
-apps/core/static/core/js/*.min.js
+static/css/main.css
+static/js/*.min.js

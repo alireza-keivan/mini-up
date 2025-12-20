@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} - بلاگ مینی‌آپ{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Article Detail Page Styles */
+    .article-detail-container {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .article-header {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+    
+    .article-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .article-breadcrumb a {
+        color: #00f5ff;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .article-breadcrumb a:hover {
+        color: #8a2be2;
+    }
+    
+    .article-category {
+        display: inline-block;
+        background: linear-gradient(135deg, #8a2be2, #00f5ff);
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .article-category:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(138, 43, 226, 0.4);
+    }
+    
+    .article-title {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    .article-meta {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+        padding: 1.5rem 0;
+        border-top: 1px solid rgba(138, 43, 226, 0.2);
+        border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+        margin-bottom: 2rem;
+    }
+    
+    .article-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+    }
+    
+    .article-meta-item i {
+        color: #00f5ff;
+    }
+    
+    .article-featured-image {
+        max-width: 900px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+    
+    .article-featured-image img {
+        width: 100%;
+        border-radius: 1rem;
+        border: 2px solid rgba(138, 43, 226, 0.3);
+        box-shadow: 0 10px 40px rgba(138, 43, 226, 0.2);
+    }
+    
+    .article-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1rem 3rem;
+        background: rgba(15, 15, 35, 0.4);
+        border-radius: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+        line-height: 1.8;
+    }
+    
+    .article-content-inner {
+        padding: 3rem;
+    }
+    
+    .article-content h2 {
+        color: #fff;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(138, 43, 226, 0.3);
+    }
+    
+    .article-content h3 {
+        color: #00f5ff;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 2rem 0 1rem;
+    }
+    
+    .article-content h4 {
+        color: #8a2be2;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 1.5rem 0 0.75rem;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .article-content ul,
+    .article-content ol {
+        margin: 1.5rem 0;
+        padding-right: 2rem;
+    }
+    
+    .article-content li {
+        margin-bottom: 0.75rem;
+        font-size: 1.05rem;
+    }
+    
+    .article-content blockquote {
+        border-right: 4px solid #8a2be2;
+        padding: 1rem 1.5rem;
+        margin: 2rem 0;
+        background: rgba(138, 43, 226, 0.1);
+        border-radius: 0.5rem;
+        font-style: italic;
+    }
+    
+    .article-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 0.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .article-content code {
+        background: rgba(0, 245, 255, 0.1);
+        color: #00f5ff;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.25rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+    }
+    
+    .article-content pre {
+        background: rgba(10, 10, 15, 0.9);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        margin: 2rem 0;
+        border: 1px solid rgba(138, 43, 226, 0.3);
+    }
+    
+    .article-content pre code {
+        background: none;
+        padding: 0;
+    }
+    
+    .article-tags {
+        max-width: 800px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+    
+    .article-tags-title {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .article-tags-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    
+    .article-tag {
+        background: rgba(138, 43, 226, 0.2);
+        color: #00f5ff;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        text-decoration: none;
+        border: 1px solid rgba(138, 43, 226, 0.3);
+        transition: all 0.3s;
+    }
+    
+    .article-tag:hover {
+        background: rgba(138, 43, 226, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+    }
+    
+    .article-author {
+        max-width: 800px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: rgba(15, 15, 35, 0.6);
+        border-radius: 1rem;
+        border: 1px solid rgba(138, 43, 226, 0.2);
+    }
+    
+    .article-author-content {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    .article-author-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #8a2be2, #00f5ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #fff;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    
+    .article-author-info h3 {
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .article-author-info p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .article-nav {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, #8a2be2, #00f5ff);
+        color: #fff;
+        padding: 1rem 2rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(138, 43, 226, 0.4);
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .article-title {
+            font-size: 1.75rem;
+        }
+        
+        .article-meta {
+            gap: 1rem;
+        }
+        
+        .article-content-inner {
+            padding: 1.5rem;
+        }
+        
+        .article-content h2 {
+            font-size: 1.5rem;
+        }
+        
+        .article-content h3 {
+            font-size: 1.25rem;
+        }
+        
+        .article-content p,
+        .article-content li {
+            font-size: 1rem;
+        }
+        
+        .article-author-content {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="article-detail-container">
+    <!-- Breadcrumb -->
+    <div class="article-header">
+        <div class="article-breadcrumb">
+            <a href="{% url 'core:home' %}">
+                <i class="fas fa-home"></i> صفحه اصلی
+            </a>
+            <span>/</span>
+            <a href="{% url 'content:article_list' %}">بلاگ</a>
+            <span>/</span>
+            <span>{{ article.title|truncatewords:5 }}</span>
+        </div>
+        
+        <!-- Category -->
+        {% if article.category %}
+        <a href="#" class="article-category">
+            <i class="fas fa-folder"></i> {{ article.category.name }}
+        </a>
+        {% endif %}
+        
+        <!-- Title -->
+        <h1 class="article-title">{{ article.title }}</h1>
+        
+        <!-- Meta Information -->
+        <div class="article-meta">
+            {% if article.author %}
+            <div class="article-meta-item">
+                <i class="fas fa-user"></i>
+                <span>{{ article.author.get_full_name }}</span>
+            </div>
+            {% endif %}
+            
+            {% if article.published_at %}
+            <div class="article-meta-item">
+                <i class="fas fa-calendar"></i>
+                <span>{{ article.published_at|date:"j F Y" }}</span>
+            </div>
+            {% endif %}
+            
+            {% if article.reading_time %}
+            <div class="article-meta-item">
+                <i class="fas fa-clock"></i>
+                <span>{{ article.reading_time }} دقیقه مطالعه</span>
+            </div>
+            {% endif %}
+            
+            <div class="article-meta-item">
+                <i class="fas fa-eye"></i>
+                <span>{{ article.views_count|default:0 }} بازدید</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Featured Image -->
+    {% if article.featured_image %}
+    <div class="article-featured-image">
+        <img src="{{ article.featured_image.url }}" 
+             alt="{{ article.featured_image_alt|default:article.title }}">
+    </div>
+    {% endif %}
+    
+    <!-- Article Content -->
+    <div class="article-content">
+        <div class="article-content-inner">
+            {% if article.excerpt %}
+            <div style="font-size: 1.2rem; color: #00f5ff; font-weight: 500; margin-bottom: 2rem; padding: 1rem; background: rgba(0, 245, 255, 0.05); border-radius: 0.5rem; border-right: 3px solid #00f5ff;">
+                {{ article.excerpt }}
+            </div>
+            {% endif %}
+            
+            {{ article.content|safe }}
+        </div>
+    </div>
+    
+    <!-- Tags -->
+    {% if article.tags.all %}
+    <div class="article-tags">
+        <div class="article-tags-title">
+            <i class="fas fa-tags"></i> برچسب‌ها:
+        </div>
+        <div class="article-tags-list">
+            {% for tag in article.tags.all %}
+            <a href="#" class="article-tag"># {{ tag.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Author Box -->
+    {% if article.author %}
+    <div class="article-author">
+        <div class="article-author-content">
+            <div class="article-author-avatar">
+                {% if article.author.first_name %}
+                    {{ article.author.first_name.0|upper }}
+                {% elif article.author.phone %}
+                    {{ article.author.phone.0 }}
+                {% else %}
+                    U
+                {% endif %}
+            </div>
+            <div class="article-author-info">
+                <h3>{{ article.author.get_full_name }}</h3>
+                <p>نویسنده این مقاله</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Navigation -->
+    <div class="article-nav">
+        <a href="{% url 'content:article_list' %}" class="btn-back">
+            <i class="fas fa-arrow-right"></i>
+            بازگشت به لیست مقالات
+        </a>
+    </div>
+</div>
+{% endblock %}
