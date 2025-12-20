@@ -171,9 +171,35 @@ class GoogleLoginView(View):
         if request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL or '/')
         
-        # Redirect to allauth's Google login URL
-        # allauth will handle the entire OAuth flow
-        return redirect('/accounts/google/login/')
+        try:
+            # Check if Google Social App is configured
+            from allauth.socialaccount.models import SocialApp
+            from django.contrib.sites.models import Site
+            
+            current_site = Site.objects.get_current()
+            google_app = SocialApp.objects.filter(
+                provider='google',
+                sites=current_site
+            ).first()
+            
+            if not google_app:
+                # Social app not configured - show error
+                return JsonResponse({
+                    'success': False,
+                    'message': 'لطفاً ابتدا Google Social App را در پنل ادمین تنظیم کنید (/admin/socialaccount/socialapp/)'
+                }, status=400)
+            
+            # Redirect to allauth's Google login URL
+            # The URL pattern is provided by allauth.socialaccount.providers.oauth2.urls
+            from allauth.socialaccount.providers.google.views import oauth2_login
+            return oauth2_login(request)
+            
+        except Exception as e:
+            logger.error(f"Google login error: {e}")
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در ورود با گوگل: {str(e)}'
+            }, status=500)
 
 class GoogleCallbackView(View):
     """Callback از گوگل - allauth handles this automatically"""

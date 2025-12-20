@@ -41,6 +41,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://192.168.48.101:8000',
     'http://192.168.1.3:8000',
+    'http://172.29.64.1:8000',
         # Local network access for mobile
 ]
 
