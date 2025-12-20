@@ -1163,7 +1163,7 @@ def ticket_create_view(request):
     """
     ایجاد تیکت جدید
     """
-    from apps.consulting.models import ConsultingCategory, SupportTicket, TicketMessage, TicketAttachment
+    from apps.consulting.models import SupportTicket, TicketMessage, TicketAttachment
     
     if request.method == 'POST':
         subject = request.POST.get('subject')
@@ -1175,24 +1175,20 @@ def ticket_create_view(request):
             messages.error(request, 'لطفا تمام فیلدهای ضروری را پر کنید.')
             return render(request, 'accounts/ticket_create.html', {})
         
-        # Get or create default category
-        default_category, _ = ConsultingCategory.objects.get_or_create(
-            slug='general',
-            defaults={
-                'name': 'عمومی',
-                'icon': 'fas fa-question-circle',
-                'is_active': True,
-                'order': 0
-            }
-        )
+        # بررسی حجم فایل (حداکثر 5 مگابایت)
+        if attachment:
+            max_size = 5 * 1024 * 1024  # 5 MB in bytes
+            if attachment.size > max_size:
+                messages.error(request, 'حجم فایل نباید بیشتر از 5 مگابایت باشد.')
+                return render(request, 'accounts/ticket_create.html', {})
         
-        # ایجاد تیکت
+        # ایجاد تیکت بدون دسته‌بندی و اولویت
         ticket = SupportTicket.objects.create(
             user=request.user,
-            category=default_category,
+            category=None,
             subject=subject,
             initial_message=initial_message,
-            priority='medium'
+            priority=None
         )
         
         # Handle attachment if provided
@@ -1284,6 +1280,12 @@ def ticket_message_create_view(request, ticket_id):
     # آپلود فایل (در صورت وجود)
     uploaded_file = request.FILES.get('attachment')
     if uploaded_file:
+        # بررسی حجم فایل (حداکثر 5 مگابایت)
+        max_size = 5 * 1024 * 1024  # 5 MB in bytes
+        if uploaded_file.size > max_size:
+            messages.error(request, 'حجم فایل نباید بیشتر از 5 مگابایت باشد.')
+            return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+        
         try:
             TicketAttachment.objects.create(
                 message=message,

@@ -420,7 +420,7 @@
         
         <!-- Back Button -->
         <div style="margin-bottom: 20px;">
-            <a href="{% url 'consulting:ticket_list' %}" class="action-btn">
+            <a href="{% url 'accounts:tickets' %}" class="action-btn">
                 <i class="fas fa-arrow-right"></i> بازگشت به لیست تیکت‌ها
             </a>
         </div>
@@ -437,14 +437,14 @@
                         {{ ticket.get_status_display }}
                     </span>
                     {% if not ticket.is_closed %}
-                    <form method="post" action="{% url 'consulting:ticket_close' ticket.ticket_id %}" style="display: inline;">
+                    <form method="post" action="{% url 'accounts:ticket_close' ticket.ticket_id %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="action-btn close" onclick="return confirm('آیا از بستن این تیکت اطمینان دارید؟')">
                             <i class="fas fa-times-circle"></i> بستن تیکت
                         </button>
                     </form>
                     {% else %}
-                    <form method="post" action="{% url 'consulting:ticket_reopen' ticket.ticket_id %}" style="display: inline;">
+                    <form method="post" action="{% url 'accounts:ticket_reopen' ticket.ticket_id %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="action-btn reopen">
                             <i class="fas fa-redo"></i> بازگشایی تیکت
@@ -455,14 +455,6 @@
             </div>
 
             <div class="ticket-meta">
-                <div class="meta-item">
-                    <i class="fas fa-tag"></i>
-                    <span>{{ ticket.category.name }}</span>
-                </div>
-                <div class="meta-item">
-                    <i class="fas fa-flag"></i>
-                    <span>اولویت: {{ ticket.get_priority_display }}</span>
-                </div>
                 <div class="meta-item">
                     <i class="fas fa-calendar"></i>
                     <span>تاریخ ایجاد: {{ ticket.created_at|date:"Y/m/d - H:i" }}</span>
@@ -544,7 +536,7 @@
 
             <!-- Input Form -->
             {% if not ticket.is_closed %}
-            <form method="post" action="{% url 'consulting:ticket_message_create' ticket.ticket_id %}" enctype="multipart/form-data" class="chat-input-form">
+            <form method="post" action="{% url 'accounts:ticket_message_create' ticket.ticket_id %}" enctype="multipart/form-data" class="chat-input-form">
                 {% csrf_token %}
                 <div class="chat-input-wrapper">
                     <div class="input-group">

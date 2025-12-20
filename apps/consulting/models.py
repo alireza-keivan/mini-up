@@ -179,7 +179,8 @@ class SupportTicket(models.Model):
     priority = models.CharField(
         max_length=10,
         choices=Priority.choices,
-        default=Priority.MEDIUM,
+        null=True,
+        blank=True,
         verbose_name='اولویت'
     )
     

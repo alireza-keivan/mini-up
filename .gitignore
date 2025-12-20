@@ -8,12 +8,16 @@ db.sqlite3
 # Node / Tailwind
 node_modules/
 package-lock.json
-
+venv/
+Scripts/
+bin/
+lib/
+pyvenv.cfg
 # IDE / OS
 .vscode/
 .idea/
 .DS_Store
 .bin/
 # Compiled static assets
-apps/core/static/core/css/main.css
-apps/core/static/core/js/*.min.js
+/static/css/main.css
+static/js/*.min.js
