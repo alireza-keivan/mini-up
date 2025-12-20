@@ -41,7 +41,7 @@ from .models import (
 
 class TicketAttachmentInline(admin.TabularInline):
     model = TicketAttachment
-    extra = 0
+    extra = 1
     fields = ['file', 'file_size_display', 'uploaded_at']
     readonly_fields = ['file_size_display', 'uploaded_at']
     can_delete = True
@@ -56,7 +56,7 @@ class TicketAttachmentInline(admin.TabularInline):
 class TicketMessageInline(admin.StackedInline):
     model = TicketMessage
     extra = 0
-    fields = ['sender', 'message', 'is_staff_reply', 'is_read', 'created_at']
+    fields = ['message', 'is_staff_reply', 'is_read', 'sender', 'created_at']
     readonly_fields = ['sender', 'created_at']
     can_delete = False
     ordering = ['created_at']
@@ -116,6 +116,15 @@ class SupportTicketAdmin(admin.ModelAdmin):
     inlines = [TicketMessageInline]
     
     actions = ['close_tickets', 'reopen_tickets', 'mark_as_in_progress']
+    
+    def save_formset(self, request, form, formset, change):
+        """Automatically set sender for new ticket messages"""
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if isinstance(instance, TicketMessage) and not instance.sender_id:
+                instance.sender = request.user
+            instance.save()
+        formset.save_m2m()
     
     @admin.display(description='شماره تیکت')
     def ticket_id_display(self, obj):

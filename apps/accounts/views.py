@@ -1235,6 +1235,9 @@ def ticket_detail_view(request, ticket_id):
     for msg in unread_staff_messages:
         msg.mark_as_read()
     
+    # بروزرسانی تعداد پیام‌ها
+    ticket.refresh_from_db()
+    
     context = {
         'ticket': ticket,
         'ticket_messages': messages_qs,

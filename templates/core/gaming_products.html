@@ -128,6 +128,27 @@
     .gp-filter-panel {
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        width: 320px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        z-index: 50;
+    }
+    
+    @media (max-width: 1279px) {
+        .gp-filter-panel {
+            position: static;
+            width: 100%;
+            max-height: none;
+        }
+    }
+    
+    /* Persian digits for number inputs */
+    input[type="number"] {
+        font-family: 'Vazirmatn', 'Tahoma', sans-serif;
+        direction: rtl;
     }
     
     /* Responsive grid for products when filter is open */
@@ -261,21 +282,24 @@
                  FILTER SIDEBAR
                  ═══════════════════════════════════════════════════════════════ -->
             <aside class="lg:w-80 flex-shrink-0">
-                <!-- Filter Toggle Button (Mobile) -->
-                <button type="button" 
-                        id="filterToggle"
-                        class="lg:hidden w-full mb-4 px-6 py-3 rounded-xl
-                               bg-gradient-to-r from-neon-pink to-neon-purple
-                               text-white font-bold
-                               flex items-center justify-center gap-2
-                               hover:shadow-lg hover:shadow-neon-pink/30
-                               transition-all duration-300">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
-                    <span>فیلترها</span>
-                    <span id="activeFiltersCount" class="hidden px-2 py-0.5 rounded-full bg-neon-cyan text-dark-900 text-xs font-bold">0</span>
-                </button>
+                <!-- Mobile Controls -->
+                <div class="lg:hidden mb-4">
+                    <!-- Filter Toggle Button -->
+                    <button type="button" 
+                            id="filterToggle"
+                            class="w-full px-6 py-3 rounded-xl
+                                   bg-gradient-to-r from-neon-pink to-neon-purple
+                                   text-white font-bold
+                                   flex items-center justify-center gap-2
+                                   hover:shadow-lg hover:shadow-neon-pink/30
+                                   transition-all duration-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        <span>فیلترها</span>
+                        <span id="activeFiltersCount" class="hidden px-2 py-0.5 rounded-full bg-neon-cyan text-dark-900 text-xs font-bold">0</span>
+                    </button>
+                </div>
                 
                 <!-- Filter Panel -->
                 <div id="filterPanel" 
@@ -460,20 +484,6 @@
                                         فقط موجود
                                     </span>
                                 </label>
-                                <label class="flex items-center gap-3 p-2 rounded-lg
-                                              hover:bg-dark-700/50 cursor-pointer
-                                              transition-colors group">
-                                    <input type="radio" 
-                                           name="stock" 
-                                           value="out_of_stock"
-                                           {% if stock_filter == 'out_of_stock' %}checked{% endif %}
-                                           class="w-4 h-4 border-dark-600
-                                                  bg-dark-900 text-red-500
-                                                  focus:ring-red-500 focus:ring-offset-0">
-                                    <span class="text-gray-300 group-hover:text-white text-sm">
-                                        ناموجود
-                                    </span>
-                                </label>
                             </div>
                         </div>
                         
@@ -593,6 +603,7 @@
                 </div>
                 
                 <!-- View All Link -->
+                {% if category.slug %}
                 <a href="{% url 'products:category_detail' category.slug %}" 
                    class="gp-view-all inline-flex items-center gap-2 text-neon-cyan hover:text-white 
                           transition-colors group">
@@ -602,6 +613,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>
                 </a>
+                {% endif %}
             </div>
             
             <!-- Products Carousel Wrapper -->
@@ -1140,21 +1152,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Submit form on any filter change
-    if (filterForm) {
-        const filterInputs = filterForm.querySelectorAll('input, select');
-        filterInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                filterForm.submit();
-            });
+    // Close filter panel with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && filterPanel && !filterPanel.classList.contains('hidden')) {
+            filterPanel.classList.add('hidden');
+            filterPanel.classList.remove('block');
+        }
+    });
+    
+    // Convert English digits to Persian in number inputs
+    function toPersianDigits(num) {
+        const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+        return num.toString().replace(/\d/g, digit => persianDigits[digit]);
+    }
+    
+    // Apply Persian digits to price inputs on display
+    const priceInputs = document.querySelectorAll('input[type="number"]');
+    priceInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value) {
+                this.setAttribute('data-value', this.value);
+                this.type = 'text';
+                this.value = toPersianDigits(this.getAttribute('data-value'));
+            }
         });
         
-        // Prevent auto-submit for text inputs (price range)
-        const textInputs = filterForm.querySelectorAll('input[type="number"]');
-        textInputs.forEach(input => {
-            input.removeEventListener('change', function() {
-                filterForm.submit();
-            });
+        input.addEventListener('focus', function() {
+            if (this.getAttribute('data-value')) {
+                this.type = 'number';
+                this.value = this.getAttribute('data-value');
+            }
+        });
+    });
+    
+    // Sort panel toggle
+    const sortToggle = document.getElementById('sortToggle');
+    const sortPanel = document.getElementById('sortPanel');
+    
+    if (sortToggle && sortPanel) {
+        sortToggle.addEventListener('click', function() {
+            sortPanel.classList.toggle('hidden');
         });
     }
     

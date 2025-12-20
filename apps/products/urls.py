@@ -1,6 +1,6 @@
 # apps/products/urls.py
 
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 app_name = 'products'
@@ -25,11 +25,10 @@ urlpatterns = [
     # Category listing
     path('categories/', views.CategoryListView.as_view(), name='category_list'),
     
-    # Category detail (products in category)
-    path('category/<slug:slug>/', views.CategoryDetailView.as_view(), name='category_detail'),
-    # Backwards-compatible alias: some templates reference 'products:category'
-    # so expose a short name 'category' that maps to the same view.
-    path('category/<slug:slug>/', views.CategoryDetailView.as_view(), name='category'),
+    # Category detail (products in category) - supports Unicode slugs
+    re_path(r'^category/(?P<slug>[\w\-]+)/$', views.CategoryDetailView.as_view(), name='category_detail'),
+    # Backwards-compatible alias
+    re_path(r'^category/(?P<slug>[\w\-]+)/$', views.CategoryDetailView.as_view(), name='category'),
     path('category/<int:pk>/', views.CategoryDetailView.as_view(), name='category_detail_by_id'),
     
     # ═══════════════════════════════════════════════════════════════════════════

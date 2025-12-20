@@ -1,5 +1,6 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
+{% load jalali_tags %}
 
 {% block title %}{{ page_title }} | Mini-up{% endblock %}
 
@@ -25,7 +26,7 @@
                     </div>
                     <div class="notification-content">
                         <p class="notification-text">{{ notif.message }}</p>
-                        <span class="notification-time">{{ notif.created_at }}</span>
+                        <span class="notification-time">{{ notif.created_at|jalali }}</span>
                     </div>
                 </div>
                 {% endfor %}

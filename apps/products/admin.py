@@ -76,6 +76,31 @@ class BaseProductAdmin(admin.ModelAdmin):
     
     readonly_fields = ('view_count', 'sales_count', 'created_at', 'updated_at')
     
+    def save_model(self, request, obj, form, change):
+        """Override to validate and generate SKU"""
+        from django.core.exceptions import ValidationError
+        import random
+        
+        # If SKU is provided, validate it
+        if obj.sku:
+            # Remove any whitespace
+            obj.sku = obj.sku.strip()
+            
+            # Check if it's exactly 5 digits
+            if not obj.sku.isdigit() or len(obj.sku) != 5:
+                from django.contrib import messages
+                messages.error(request, 'کد محصول باید دقیقاً 5 رقم باشد')
+                raise ValidationError('کد محصول باید دقیقاً 5 رقم باشد')
+        else:
+            # Generate a unique 5-digit SKU
+            while True:
+                sku = str(random.randint(10000, 99999))
+                if not Product.objects.filter(sku=sku).exists():
+                    obj.sku = sku
+                    break
+        
+        super().save_model(request, obj, form, change)
+    
     def get_queryset(self, request):
         """Override in child classes to filter by product_type"""
         return super().get_queryset(request)

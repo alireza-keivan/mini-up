@@ -1,5 +1,6 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
+{% load jalali_tags %}
 
 {% block title %}تیکت #{{ ticket.ticket_id }} | مینی‌آپ{% endblock %}
 
@@ -480,19 +481,15 @@
 
             <div class="ticket-meta">
                 <div class="meta-item">
-                    <i class="fas fa-calendar"></i>
-                    <span>تاریخ ایجاد: {{ ticket.created_at|date:"Y/m/d - H:i" }}</span>
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>تاریخ ایجاد: {{ ticket.created_at|jalali }}</span>
                 </div>
                 {% if ticket.last_response_at %}
                 <div class="meta-item">
                     <i class="fas fa-reply"></i>
-                    <span>آخرین پاسخ: {{ ticket.last_response_at|date:"Y/m/d - H:i" }}</span>
+                    <span>آخرین پاسخ: {{ ticket.last_response_at|jalali }}</span>
                 </div>
                 {% endif %}
-                <div class="meta-item">
-                    <i class="fas fa-comments"></i>
-                    <span>{{ ticket.message_count }} پیام</span>
-                </div>
             </div>
         </div>
 
@@ -509,7 +506,7 @@
                     <div class="message-content">
                         <div class="message-header">
                             <span class="message-sender">شما</span>
-                            <span class="message-time">{{ ticket.created_at|date:"Y/m/d - H:i" }}</span>
+                            <span class="message-time">{{ ticket.created_at|jalali }}</span>
                         </div>
                         <div class="message-bubble">
                             {{ ticket.initial_message|linebreaks }}
@@ -536,7 +533,7 @@
                                     شما
                                 {% endif %}
                             </span>
-                            <span class="message-time">{{ message.created_at|date:"Y/m/d - H:i" }}</span>
+                            <span class="message-time">{{ message.created_at|jalali }}</span>
                         </div>
                         <div class="message-bubble">
                             {{ message.message|linebreaks }}
