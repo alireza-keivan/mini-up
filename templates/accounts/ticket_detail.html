@@ -290,14 +290,14 @@
     .chat-input-wrapper {
         display: flex;
         gap: 12px;
-        align-items: stretch;
+        align-items: flex-start;
     }
 
     .input-group {
         flex: 1;
         display: flex;
         gap: 8px;
-        align-items: center;
+        align-items: flex-start;
     }
 
     .chat-input {
@@ -602,6 +602,17 @@
         textarea.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Handle Enter key: Submit on Enter, new line on Shift+Enter
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const form = this.closest('form');
+                if (form && this.value.trim()) {
+                    form.submit();
+                }
+            }
         });
     }
 
