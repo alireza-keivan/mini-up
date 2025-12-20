@@ -165,169 +165,25 @@ class LoginView(View):
 
 
 class GoogleLoginView(View):
-    """شروع فرآیند ورود با گوگل"""
+    """شروع فرآیند ورود با گوگل - استفاده از django-allauth"""
     
     def get(self, request):
         if request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL or '/')
         
-        # TODO: Redirect to Google OAuth URL
-        # از کتابخانه‌هایی مثل social-auth-app-django استفاده کنید
-        # یا OAuth flow را دستی پیاده‌سازی کنید
-        
-        google_client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', None)
-        if not google_client_id:
-            return JsonResponse({
-                'success': False,
-                'message': 'ورود با گوگل فعال نیست'
-            }, status=400)
-        
-        # Build Google OAuth URL
-        redirect_uri = request.build_absolute_uri(reverse('accounts:google_callback'))
-        scope = 'openid email profile'
-        
-        google_auth_url = (
-            f"https://accounts.google.com/o/oauth2/v2/auth?"
-            f"client_id={google_client_id}&"
-            f"redirect_uri={redirect_uri}&"
-            f"response_type=code&"
-            f"scope={scope}&"
-            f"access_type=offline&"
-            f"prompt=consent"
-        )
-        
-        return redirect(google_auth_url)
+        # Redirect to allauth's Google login URL
+        # allauth will handle the entire OAuth flow
+        return redirect('/accounts/google/login/')
 
 class GoogleCallbackView(View):
-    """دریافت callback از گوگل و ایجاد/ورود کاربر"""
+    """Callback از گوگل - allauth handles this automatically"""
     
     def get(self, request):
-        code = request.GET.get('code')
-        error = request.GET.get('error')
-        
-        if error:
-            logger.warning(f"Google OAuth error: {error}")
-            return redirect(f"{reverse('accounts:login')}?error=google_denied")
-        
-        if not code:
-            return redirect(f"{reverse('accounts:login')}?error=google_failed")
-        
-        try:
-            # Exchange code for tokens
-            google_data = self._exchange_code_for_user_info(request, code)
-            
-            if not google_data:
-                return redirect(f"{reverse('accounts:login')}?error=google_failed")
-            
-            # Find or create user
-            user, created = self._get_or_create_google_user(google_data)
-            
-            # Login user
-            login(request, user)
-            
-            logger.info(f"Google login successful for: {user.email}")
-            
-            # Redirect
-            next_url = request.session.pop('next', None) or settings.LOGIN_REDIRECT_URL or '/'
-            return redirect(next_url)
-            
-        except Exception as e:
-            logger.error(f"Google OAuth callback error: {e}")
-            return redirect(f"{reverse('accounts:login')}?error=google_failed")
-    
-    def _exchange_code_for_user_info(self, request, code):
-        """Exchange authorization code for user info"""
-        import requests
-        
-        client_id = settings.GOOGLE_OAUTH_CLIENT_ID
-        client_secret = settings.GOOGLE_OAUTH_CLIENT_SECRET
-        redirect_uri = request.build_absolute_uri(reverse('accounts:google_callback'))
-        
-        # Get tokens
-        token_response = requests.post(
-            'https://oauth2.googleapis.com/token',
-            data={
-                'code': code,
-                'client_id': client_id,
-                'client_secret': client_secret,
-                'redirect_uri': redirect_uri,
-                'grant_type': 'authorization_code',
-            },
-            timeout=10
-        )
-        
-        if not token_response.ok:
-            logger.error(f"Google token exchange failed: {token_response.text}")
-            return None
-        
-        tokens = token_response.json()
-        access_token = tokens.get('access_token')
-        
-        # Get user info
-        userinfo_response = requests.get(
-            'https://www.googleapis.com/oauth2/v2/userinfo',
-            headers={'Authorization': f'Bearer {access_token}'},
-            timeout=10
-        )
-        
-        if not userinfo_response.ok:
-            logger.error(f"Google userinfo failed: {userinfo_response.text}")
-            return None
-        
-        return userinfo_response.json()
-    
-    def _get_or_create_google_user(self, google_data):
-        """Find existing user or create new one from Google data"""
-        google_id = google_data.get('id')
-        email = google_data.get('email')
-        
-        # Try to find by google_id first
-        user = User.objects.filter(google_id=google_id).first()
-        if user:
-            # Update info if needed
-            self._update_google_user_info(user, google_data)
-            return user, False
-        
-        # Try to find by email
-        if email:
-            user = User.objects.filter(email=email).first()
-            if user:
-                # Link Google account to existing user
-                user.google_id = google_id
-                user.avatar_url = google_data.get('picture', '')
-                if not user.is_email_verified:
-                    user.is_email_verified = google_data.get('verified_email', False)
-                user.save()
-                return user, False
-        
-        # Create new user
-        user = User.objects.create_google_user(
-            email=email,
-            google_id=google_id,
-            first_name=google_data.get('given_name', ''),
-            last_name=google_data.get('family_name', ''),
-            avatar_url=google_data.get('picture', ''),
-            is_email_verified=google_data.get('verified_email', False),
-        )
-        
-        return user, True
-    
-    def _update_google_user_info(self, user, google_data):
-        """به‌روزرسانی اطلاعات کاربر گوگل در ورودهای بعدی"""
-        updated = False
+        # This view is kept for backward compatibility
+        # but allauth handles the callback at /accounts/google/login/callback/
+        # Redirect to home or login page
+        return redirect(settings.LOGIN_REDIRECT_URL or '/')
 
-        if user.avatar_url != google_data.get('picture', ''):
-            user.avatar_url = google_data.get('picture', '')
-            updated = True
-
-        if not user.is_email_verified and google_data.get('verified_email', False):
-            user.is_email_verified = True
-            updated = True
-
-        if updated:
-            user.save()
-            logger.info(f"Updated Google user info for: {user.email or user.id}")
-        return user
 
 # ============================================================================
 # VERIFY VIEW
