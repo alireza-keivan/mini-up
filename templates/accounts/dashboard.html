@@ -5,545 +5,7 @@
 {% block title %}داشبورد | مینی‌آپ{% endblock %}
 
 {% block extra_css %}
-<style>
-    .dashboard-container {
-        min-height: 100vh;
-        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);
-        padding: 2rem 0;
-    }
-
-    .dashboard-card {
-        background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 20, 40, 0.95));
-        border-radius: 20px;
-        border: 1px solid rgba(255, 0, 85, 0.2);
-        padding: 1.25rem;
-        box-shadow: 0 20px 60px rgba(255, 0, 85, 0.15);
-        backdrop-filter: blur(20px);
-    }
-
-    /* Tab Navigation */
-    .tab-nav {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 2rem;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 1rem;
-        flex-wrap: wrap;
-    }
-
-    .tab-button {
-        padding: 0.5rem 1rem;
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        color: #999;
-        font-weight: 600;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .tab-button:hover {
-        border-color: rgba(255, 0, 85, 0.5);
-        color: #fff;
-    }
-
-    .tab-button.active {
-        background: linear-gradient(135deg, #ff0055, #8a2be2);
-        border-color: transparent;
-        color: #fff;
-        box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
-    }
-
-    /* Info Grid */
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-    }
-
-    .info-item {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 0.875rem;
-    }
-
-    .info-label {
-        color: #999;
-        font-size: 0.75rem;
-        margin-bottom: 0.375rem;
-    }
-
-    .info-value {
-        color: #fff;
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-
-    .info-input {
-        width: 100%;
-        padding: 0.5rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        color: #fff;
-        font-size: 0.875rem;
-    }
-
-    .info-input:focus {
-        outline: none;
-        border-color: #ff0055;
-        background: rgba(255, 0, 85, 0.1);
-    }
-
-    /* Wallet Balance */
-    .wallet-balance {
-        background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(138, 43, 226, 0.1));
-        border: 2px solid rgba(0, 245, 255, 0.3);
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        text-align: center;
-    }
-
-    .balance-amount {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #00f5ff;
-        margin: 1rem 0;
-    }
-
-    /* Wallet Deposit Form */
-    .deposit-form {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .amount-input {
-        width: 100%;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        color: #fff;
-        font-size: 1.125rem;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-
-    .amount-input:focus {
-        outline: none;
-        border-color: #00f5ff;
-        background: rgba(0, 245, 255, 0.1);
-    }
-
-    .quick-amounts {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-        gap: 0.75rem;
-        margin-bottom: 1rem;
-    }
-
-    /* Profile Picture Upload */
-    .profile-picture-section {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 1rem;
-        /* margin-bottom: 2rem; */
-        text-align: center;
-    }
-
-    .profile-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin: 0 auto 0.75rem;
-        object-fit: cover;
-        border: 3px solid rgba(255, 0, 85, 0.3);
-        box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
-    }
-
-    .profile-avatar-placeholder {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin: 0 auto 0.75rem;
-        background: linear-gradient(135deg, #ff0055, #8a2be2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        color: #fff;
-        font-weight: bold;
-        border: 3px solid rgba(255, 0, 85, 0.3);
-    }
-
-    /* Address & Card Cards */
-    .address-card, .bank-card-item {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        position: relative;
-    }
-
-    .address-card.default, .bank-card-item.default {
-        border-color: rgba(0, 245, 255, 0.5);
-        background: rgba(0, 245, 255, 0.05);
-    }
-
-    .default-badge {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        padding: 0.25rem 0.75rem;
-        background: rgba(0, 245, 255, 0.2);
-        border: 1px solid rgba(0, 245, 255, 0.5);
-        border-radius: 6px;
-        font-size: 0.75rem;
-        color: #00f5ff;
-    }
-
-    /* Bank Card Template */
-    .bank-card-template {
-        background: linear-gradient(135deg, #1a1a2e, #16213e);
-        border-radius: 16px;
-        padding: 1.5rem;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .bank-card-template::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255, 0, 85, 0.1) 0%, transparent 70%);
-        pointer-events: none;
-    }
-
-    .card-number {
-        font-family: 'Courier New', monospace;
-        font-size: 1.25rem;
-        letter-spacing: 0.15rem;
-        color: #fff;
-        margin: 1rem 0;
-        direction: ltr;
-        text-align: center;
-    }
-
-    .card-bank-name {
-        color: #00f5ff;
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-
-    .section-title {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: #fff;
-        margin: 1.5rem 0 0.75rem 0;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .add-button {
-        padding: 0.75rem 1.5rem;
-        background: rgba(0, 245, 255, 0.1);
-        border: 1px solid rgba(0, 245, 255, 0.3);
-        border-radius: 8px;
-        color: #00f5ff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.875rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .add-button:hover {
-        background: rgba(0, 245, 255, 0.2);
-        border-color: #00f5ff;
-    }
-
-    /* Modal Styles */
-    .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(10px);
-        z-index: 9998;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-    }
-
-    .modal-content {
-        background: linear-gradient(135deg, rgba(20, 20, 30, 0.98), rgba(30, 20, 40, 0.98));
-        border-radius: 24px;
-        border: 1px solid rgba(255, 0, 85, 0.3);
-        max-width: 600px;
-        width: 100%;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 20px 60px rgba(255, 0, 85, 0.3);
-        position: relative;
-        z-index: 9999;
-    }
-
-    .modal-header {
-        padding: 2rem 2rem 1rem 2rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .modal-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .modal-close {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .modal-close:hover {
-        background: rgba(255, 0, 85, 0.2);
-        border-color: #ff0055;
-        transform: rotate(90deg);
-    }
-
-    .modal-body {
-        padding: 2rem;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-label {
-        display: block;
-        color: #fff;
-        font-size: 0.875rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .form-input, .form-select, .form-textarea {
-        width: 100%;
-        padding: 0.875rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        color: #fff;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-        outline: none;
-        border-color: #ff0055;
-        background: rgba(255, 0, 85, 0.1);
-    }
-
-    .form-textarea {
-        resize: vertical;
-        min-height: 100px;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-
-    .checkbox-group {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-
-    .checkbox-input {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-    }
-
-    .checkbox-label {
-        color: #fff;
-        font-size: 0.875rem;
-        cursor: pointer;
-    }
-
-    .modal-footer {
-        padding: 1rem 2rem 2rem 2rem;
-        display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
-    }
-
-    .btn-cancel {
-        padding: 0.75rem 1.5rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-cancel:hover {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .btn-submit {
-        padding: 0.75rem 1.5rem;
-        background: linear-gradient(135deg, #ff0055, #8a2be2);
-        border: none;
-        border-radius: 8px;
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 600;
-    }
-
-    .btn-submit:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
-    }
-
-    .btn-submit:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    /* Transaction List */
-    .transaction-list {
-        margin-top: 1.5rem;
-    }
-
-    .transaction-item {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .transaction-amount.positive {
-        color: #00ff88;
-    }
-
-    .transaction-amount.negative {
-        color: #ff0055;
-    }
-
-    /* Orders List */
-    .orders-list {
-        margin-top: 1.5rem;
-    }
-
-    .order-item {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-    }
-
-    .order-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-    }
-
-    .order-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 600;
-    }
-
-    .order-status.pending {
-        background: rgba(255, 193, 7, 0.2);
-        color: #ffc107;
-    }
-
-    .order-status.completed {
-        background: rgba(0, 255, 136, 0.2);
-        color: #00ff88;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #999;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    .quick-card {
-    min-height: 90px;
-    transition: all 0.3s ease;
-    }
-
-    .quick-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .dashboard-header {
-        direction: rtl;
-    }
-    #myorders{
-        background: linear-gradient(135deg, rgba(20, 20, 30, 0.95), rgba(30, 20, 40, 0.95));
-        border-radius: 16px;
-        border: 1px solid rgba(255, 0, 85, 0.2);
-        padding: 1rem;
-        box-shadow: 0 20px 60px rgba(255, 0, 85, 0.15);
-        backdrop-filter: blur(20px);
-    }
-
-</style>
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -642,7 +104,7 @@
             <!-- Tab Navigation -->
             <div class="tab-nav">
                 <button 
-                    class="tab-button"
+                    class="btn-tab-neon pink small"
                     :class="{ 'active': activeTab === 'info' }"
                     @click="switchTab('info')"
                     type="button">
@@ -651,7 +113,7 @@
                 </button>
 
                 <button 
-                    class="tab-button"
+                    class="btn-tab-neon cyan small active"
                     :class="{ 'active': activeTab === 'bank' }"
                     @click="switchTab('bank')"
                     type="button">
@@ -660,7 +122,7 @@
                 </button>
 
                 <button 
-                    class="tab-button"
+                    class="btn-tab-neon purple small active"
                     :class="{ 'active': activeTab === 'security' }"
                     @click="switchTab('security')"
                     type="button">
@@ -669,7 +131,7 @@
                 </button>
 
                 <button 
-                    class="tab-button"
+                    class="btn-tab-neon small active"
                     :class="{ 'active': activeTab === 'addresses' }"
                     @click="switchTab('addresses')"
                     type="button">
@@ -709,13 +171,12 @@
                     style="display: none;"
                     @change="uploadAvatar($event)">
                 
-                <div class="btn-glow-container small purple">
-                    <button type="button" 
-                            class="btn-glow"
-                            @click="document.getElementById('avatar-upload').click()">
-                        <i class="fas fa-camera"></i> انتخاب تصویر
-                    </button>
-                </div>
+                <button type="button" 
+                        class="btn btn-neon-border gradient-pink-purple"
+                        @click="document.getElementById('avatar-upload').click()">
+                    <i class="fas fa-camera"></i>
+                    <span>انتخاب تصویر</span>
+                </button>
             </div>
 
             <!-- Personal Information -->
@@ -776,15 +237,17 @@
         </div>
 
         <!-- دکمه ذخیره تغییرات -->
-        <div class="btn-glow-container small purple">
+        <div class="flex justify-center">
             <button @click="savePersonalInfo()" 
                     :disabled="saving"
-                    class="btn-glow">
+                    class="btn btn-neon-border small gradient-pink-purple">
                 <span x-show="!saving">
-                    <i class="fas fa-save"></i> ذخیره تغییرات
+                    <i class="fas fa-save"></i>
+                    <span>ذخیره تغییرات</span>
                 </span>
                 <span x-show="saving">
-                    <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>در حال ذخیره...</span>
                 </span>
             </button>
         </div>
@@ -807,27 +270,36 @@
                         <div class="bank-card-item {% if card.is_default %}default{% endif %}">
                             {% if card.is_default %}
                             <span class="default-badge">پیش‌فرض</span>
-                            {% endif %}ظ
+                            {% endif %}
                             
-                            <div class="bank-card-template">
-                                <div class="card-bank-name">
-                                    <i class="fas fa-university"></i>
-                                    {{ card.bank_name|default:"بانک" }}
+                            <div style="position: relative; width: 100%; padding-bottom: 63%; background-image: url('{% static 'images/cards/bank.png' %}'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border-radius: 16px; overflow: hidden;">
+                                <!-- Bank Name -->
+                                <div style="position: absolute; top: 8%; right: 6%; color: white; font-size: 0.95rem; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                    <i class="fas {{ card.bank_logo_icon }}" style="color: {{ card.bank_color }}; margin-left: 0.3rem;"></i>
+                                    {{ card.bank_full_name|default:"بانک" }}
                                 </div>
                                 
-                                <div class="card-number">
+                                <!-- Card Number -->
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-family: 'Courier New', monospace; font-size: 1.1rem; letter-spacing: 0.2rem; font-weight: 600; text-shadow: 0 2px 6px rgba(0,0,0,0.4);">
                                     {{ card.masked_number }}
                                 </div>
                                 
-                                <div class="flex justify-between items-center text-xs text-gray-400">
-                                    <span>
-                                        {% if card.is_verified %}
-                                            <i class="fas fa-check-circle text-green-400"></i> تایید شده
-                                        {% else %}
-                                            <i class="fas fa-clock text-yellow-400"></i> در انتظار تایید
-                                        {% endif %}
-                                    </span>
-                                    <span>{{ card.created_at|date:"Y/m/d" }}</span>
+                                <!-- User Name -->
+                                <div style="position: absolute; bottom: 12%; right: 6%; color: white; font-size: 0.85rem; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                    {{ user.get_full_name|default:user.phone }}
+                                </div>
+                                
+                                <!-- Status Badge -->
+                                <div style="position: absolute; bottom: 8%; left: 6%; font-size: 0.7rem;">
+                                    {% if card.is_verified %}
+                                        <span style="background: rgba(0, 255, 136, 0.2); color: #00ff88; padding: 0.2rem 0.5rem; border-radius: 4px; backdrop-filter: blur(10px);">
+                                            <i class="fas fa-check-circle"></i> تایید شده
+                                        </span>
+                                    {% else %}
+                                        <span style="background: rgba(255, 193, 7, 0.2); color: #ffc107; padding: 0.2rem 0.5rem; border-radius: 4px; backdrop-filter: blur(10px);">
+                                            <i class="fas fa-clock"></i> در انتظار
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -839,12 +311,14 @@
                         </div>
                     {% endif %}
                     
-                    <div class="btn-glow-container small purple">
-                        <button type="button" class="btn-glow" @click="showAddCardModal = true">
-                            <i class="fas fa-plus"></i>
-                            افزودن کارت جدید
-                        </button>
-                    </div>
+                <div class="flex justify-center">    
+                    <button type="button" 
+                            class="btn btn-neon-border small gradient-pink-purple" 
+                            @click="showAddCardModal = true">
+                        <i class="fas fa-plus"></i>
+                        <span>افزودن کارت جدید</span>
+                    </button>
+                </div>
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════
@@ -889,18 +363,19 @@
                                        minlength="8"
                                        required>
                             </div>
-
-                            <div class="btn-glow-container small purple">
-                                <button type="submit" 
-                                        class="btn-glow"
-                                        :disabled="changingPassword">
-                                    <span x-show="!changingPassword">
-                                        <i class="fas fa-key"></i> تغییر رمز عبور
-                                    </span>
-                                    <span x-show="changingPassword">
-                                        <i class="fas fa-spinner fa-spin"></i> در حال تغییر...
-                                    </span>
-                                </button>
+                         <div class="flex justify-center">      
+                            <button type="submit" 
+                                    class="btn btn-neon-border small danger"
+                                    :disabled="changingPassword">
+                                <span x-show="!changingPassword">
+                                    <i class="fas fa-key"></i>
+                                    <span>تغییر رمز عبور</span>
+                                </span>
+                                <span x-show="changingPassword">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>در حال تغییر...</span>
+                                </span>
+                            </button>
                             </div>
                         </form>
                     </div>
@@ -959,236 +434,237 @@
                             <p>هنوز آدرسی ثبت نکرده‌اید</p>
                         </div>
                     {% endif %}
-                    
-                    <div class="btn-glow-container small purple">
-                        <button type="button" class="btn-glow" @click="showAddAddressModal = true">
+                    <div class="flex justify-center">
+                        <button type="button" 
+                                class="btn btn-neon-border small gradient-pink-purple" 
+                                @click="showAddAddressModal = true">
                             <i class="fas fa-plus"></i>
-                            افزودن آدرس جدید
+                            <span>افزودن آدرس جدید</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- ═══════════════════════════════════════════════════════
-                     TAB 5: WALLET
-                     ═══════════════════════════════════════════════════════ -->
-                    <div x-show="showAddAddressModal" 
-                         class="modal-overlay" 
-                         @click.self="showAddAddressModal = false"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0"
-                         x-transition:enter-end="opacity-100"
-                         style="display: none;">
-                        <div class="modal-content">
-                            <button class="modal-close" @click="showAddAddressModal = false">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            
-                            <div class="modal-header">
-                                <h3 class="modal-title">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    افزودن آدرس جدید
-                                </h3>
-                            </div>
-                            
-                            <div class="modal-body">
-                                <form @submit.prevent="submitAddress()">
-                                    <div class="form-group">
-                                        <label class="form-label">عنوان آدرس</label>
-                                        <input type="text" 
-                                               class="form-input" 
-                                               x-model="addressForm.title"
-                                               placeholder="مثال: خانه، محل کار"
-                                               required>
-                                    </div>
-
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">نام گیرنده</label>
-                                            <input type="text" 
-                                                   class="form-input" 
-                                                   x-model="addressForm.recipient_name"
-                                                   placeholder="نام و نام خانوادگی"
-                                                   required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label">شماره تماس گیرنده</label>
-                                            <input type="tel" 
-                                                   class="form-input" 
-                                                   x-model="addressForm.recipient_phone"
-                                                   placeholder="09xxxxxxxxx"
-                                                   maxlength="11"
-                                                   dir="ltr"
-                                                   required>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label class="form-label">استان</label>
-                                            <input type="text" 
-                                                   class="form-input" 
-                                                   x-model="addressForm.province"
-                                                   placeholder="مثال: تهران"
-                                                   required>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label">شهر</label>
-                                            <input type="text" 
-                                                   class="form-input" 
-                                                   x-model="addressForm.city"
-                                                   placeholder="مثال: تهران"
-                                                   required>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">کد پستی</label>
-                                        <input type="text" 
-                                               class="form-input" 
-                                               x-model="addressForm.postal_code"
-                                               placeholder="کد پستی ۱۰ رقمی"
-                                               maxlength="10"
-                                               dir="ltr"
-                                               required>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">آدرس کامل</label>
-                                        <textarea class="form-textarea" 
-                                                  x-model="addressForm.full_address"
-                                                  placeholder="آدرس کامل را وارد کنید..."
-                                                  required></textarea>
-                                    </div>
-
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" 
-                                               id="default-address"
-                                               class="checkbox-input" 
-                                               x-model="addressForm.is_default">
-                                        <label for="default-address" class="checkbox-label">
-                                            تنظیم به عنوان آدرس پیش‌فرض
-                                        </label>
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button type="button" 
-                                                class="btn-cancel" 
-                                                @click="showAddAddressModal = false">
-                                            انصراف
-                                        </button>
-                                        <div class="btn-glow-container small purple">
-                                            <button type="submit" 
-                                                    class="btn-glow"
-                                                    :disabled="submittingAddress">
-                                                <span x-show="!submittingAddress">
-                                                    <i class="fas fa-save"></i> ذخیره آدرس
-                                                </span>
-                                                <span x-show="submittingAddress">
-                                                    <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+            </div>
+            
+            <!-- ═══════════════════════════════════════════════════════
+                 MODALS - خارج از Tab Content (در سطح dashboard-card)
+                 ═══════════════════════════════════════════════════════ -->
+            
+            <!-- Add Address Modal -->
+            <div x-show="showAddAddressModal" 
+                 class="modal-overlay" 
+                 @click.self="showAddAddressModal = false"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 style="display: none;">
+                <div class="modal-content">
+                    <button class="modal-close" @click="showAddAddressModal = false">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <div class="modal-header">
+                        <h3 class="modal-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            افزودن آدرس جدید
+                        </h3>
                     </div>
-
-                    <!-- Add Bank Card Modal -->
-                    <div x-show="showAddCardModal" 
-                         class="modal-overlay" 
-                         @click.self="showAddCardModal = false"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0"
-                         x-transition:enter-end="opacity-100"
-                         style="display: none;">
-                        <div class="modal-content">
-                            <button class="modal-close" @click="showAddCardModal = false">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            
-                            <div class="modal-header">
-                                <h3 class="modal-title">
-                                    <i class="fas fa-credit-card"></i>
-                                    افزودن کارت بانکی
-                                </h3>
+                    
+                    <div class="modal-body">
+                        <form @submit.prevent="submitAddress()">
+                            <div class="form-group">
+                                <label class="form-label">عنوان آدرس</label>
+                                <input type="text" 
+                                       class="form-input" 
+                                       x-model="addressForm.title"
+                                       placeholder="مثال: خانه، محل کار"
+                                       required>
                             </div>
-                            
-                            <div class="modal-body">
-                                <form @submit.prevent="submitBankCard()">
-                                    <div class="form-group">
-                                        <label class="form-label">شماره کارت</label>
-                                        <input type="text" 
-                                               class="form-input" 
-                                               x-model="cardForm.card_number"
-                                               placeholder="۱۶ رقم شماره کارت"
-                                               maxlength="16"
-                                               dir="ltr"
-                                               @input="cardForm.card_number = cardForm.card_number.replace(/\D/g, '')"
-                                               required>
-                                        <p class="text-xs text-gray-400 mt-1">
-                                            شماره کارت باید ۱۶ رقم باشد
-                                        </p>
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label">نام بانک</label>
-                                        <select class="form-select" 
-                                                x-model="cardForm.bank_name"
-                                                required>
-                                            <option value="">انتخاب بانک</option>
-                                            <option value="ملی">بانک ملی ایران</option>
-                                            <option value="ملت">بانک ملت</option>
-                                            <option value="تجارت">بانک تجارت</option>
-                                            <option value="صادرات">بانک صادرات</option>
-                                            <option value="سپه">بانک سپه</option>
-                                            <option value="پاسارگاد">بانک پاسارگاد</option>
-                                            <option value="پارسیان">بانک پارسیان</option>
-                                            <option value="سامان">بانک سامان</option>
-                                            <option value="کشاورزی">بانک کشاورزی</option>
-                                            <option value="آینده">بانک آینده</option>
-                                            <option value="سایر">سایر</option>
-                                        </select>
-                                    </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">نام گیرنده</label>
+                                    <input type="text" 
+                                           class="form-input" 
+                                           x-model="addressForm.recipient_name"
+                                           placeholder="نام و نام خانوادگی"
+                                           required>
+                                </div>
 
-                                    <div class="checkbox-group">
-                                        <input type="checkbox" 
-                                               id="default-card"
-                                               class="checkbox-input" 
-                                               x-model="cardForm.is_default">
-                                        <label for="default-card" class="checkbox-label">
-                                            تنظیم به عنوان کارت پیش‌فرض
-                                        </label>
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button type="button" 
-                                                class="btn-cancel" 
-                                                @click="showAddCardModal = false">
-                                            انصراف
-                                        </button>
-                                        <div class="btn-glow-container small purple">
-                                            <button type="submit" 
-                                                    class="btn-glow"
-                                                    :disabled="submittingCard">
-                                                <span x-show="!submittingCard">
-                                                    <i class="fas fa-save"></i> ذخیره کارت
-                                                </span>
-                                                <span x-show="submittingCard">
-                                                    <i class="fas fa-spinner fa-spin"></i> در حال ذخیره...
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
+                                <div class="form-group">
+                                    <label class="form-label">شماره تماس گیرنده</label>
+                                    <input type="tel" 
+                                           class="form-input" 
+                                           x-model="addressForm.recipient_phone"
+                                           placeholder="09xxxxxxxxx"
+                                           maxlength="11"
+                                           dir="ltr"
+                                           required>
+                                </div>
                             </div>
-                        </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">استان</label>
+                                    <input type="text" 
+                                           class="form-input" 
+                                           x-model="addressForm.province"
+                                           placeholder="مثال: تهران"
+                                           required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">شهر</label>
+                                    <input type="text" 
+                                           class="form-input" 
+                                           x-model="addressForm.city"
+                                           placeholder="مثال: تهران"
+                                           required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">کد پستی</label>
+                                <input type="text" 
+                                       class="form-input" 
+                                       x-model="addressForm.postal_code"
+                                       placeholder="کد پستی ۱۰ رقمی"
+                                       maxlength="10"
+                                       dir="ltr"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">آدرس کامل</label>
+                                <textarea class="form-textarea" 
+                                          x-model="addressForm.full_address"
+                                          placeholder="آدرس کامل را وارد کنید..."
+                                          required></textarea>
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" 
+                                       id="default-address"
+                                       class="checkbox-input" 
+                                       x-model="addressForm.is_default">
+                                <label for="default-address" class="checkbox-label">
+                                    تنظیم به عنوان آدرس پیش‌فرض
+                                </label>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" 
+                                        class="btn-cancel" 
+                                        @click="showAddAddressModal = false">
+                                    انصراف
+                                </button>
+                                <button type="submit" 
+                                        class="btn btn-success"
+                                        :disabled="submittingAddress">
+                                    <span x-show="!submittingAddress">
+                                        <i class="fas fa-save"></i>
+                                        <span>ذخیره آدرس</span>
+                                    </span>
+                                    <span x-show="submittingAddress">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>در حال ذخیره...</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
                 </div>
+            </div>
 
+            <!-- Add Bank Card Modal -->
+            <div x-show="showAddCardModal" 
+                 class="modal-overlay" 
+                 @click.self="showAddCardModal = false"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 style="display: none;">
+                <div class="modal-content">
+                    <button class="modal-close" @click="showAddCardModal = false">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    
+                    <div class="modal-header">
+                        <h3 class="modal-title">
+                            <i class="fas fa-credit-card"></i>
+                            افزودن کارت بانکی
+                        </h3>
+                    </div>
+                    
+                    <div class="modal-body">
+                        <form @submit.prevent="submitBankCard()">
+                            <div class="form-group">
+                                <label class="form-label">شماره کارت</label>
+                                <input type="text" 
+                                       class="form-input" 
+                                       x-model="cardForm.card_number"
+                                       placeholder="۱۶ رقم شماره کارت"
+                                       maxlength="16"
+                                       dir="ltr"
+                                       @input="cardForm.card_number = cardForm.card_number.replace(/\D/g, '')"
+                                       required>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    شماره کارت باید ۱۶ رقم باشد
+                                </p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">نام بانک</label>
+                                <select class="form-select" 
+                                        x-model="cardForm.bank_name"
+                                        required>
+                                    <option value="">انتخاب بانک</option>
+                                    <option value="ملی">بانک ملی ایران</option>
+                                    <option value="ملت">بانک ملت</option>
+                                    <option value="تجارت">بانک تجارت</option>
+                                    <option value="صادرات">بانک صادرات</option>
+                                    <option value="سپه">بانک سپه</option>
+                                    <option value="پاسارگاد">بانک پاسارگاد</option>
+                                    <option value="پارسیان">بانک پارسیان</option>
+                                    <option value="سامان">بانک سامان</option>
+                                    <option value="کشاورزی">بانک کشاورزی</option>
+                                    <option value="آینده">بانک آینده</option>
+                                    <option value="سایر">سایر</option>
+                                </select>
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" 
+                                       id="default-card"
+                                       class="checkbox-input" 
+                                       x-model="cardForm.is_default">
+                                <label for="default-card" class="checkbox-label">
+                                    تنظیم به عنوان کارت پیش‌فرض
+                                </label>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" 
+                                        class="btn-cancel" 
+                                        @click="showAddCardModal = false">
+                                    انصراف
+                                </button>
+                                <button type="submit" 
+                                        class="btn btn-success"
+                                        :disabled="submittingCard">
+                                    <span x-show="!submittingCard">
+                                        <i class="fas fa-save"></i>
+                                        <span>ذخیره کارت</span>
+                                    </span>
+                                    <span x-show="submittingCard">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>در حال ذخیره...</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -1198,431 +674,26 @@
 
 {% block extra_js %}
 <script>
-function dashboard() {
-    return {
-        activeTab: 'info',
-        saving: false,
-        depositProcessing: false,
-        showAddAddressModal: false,
-        showAddCardModal: false,
-        submittingAddress: false,
-        submittingCard: false,
-        
-        // User Data
-        userData: {
+// Set Django URLs and data for JavaScript
+window.dashboardUrl = '{% url "accounts:dashboard" %}';
+
+// Initialize dashboard component with Django data
+document.addEventListener('DOMContentLoaded', function() {
+    // Set user data from Django template
+    const dashboardComponent = Alpine.$data(document.querySelector('[x-data="dashboard()"]'));
+    if (dashboardComponent) {
+        dashboardComponent.userData = {
             first_name: '{{ user.first_name|default:"" }}',
             last_name: '{{ user.last_name|default:"" }}',
             national_code: '{% if profile %}{{ profile.national_code|default:"" }}{% endif %}'
-        },
-
-        // Wallet Data
-        walletData: {
+        };
+        dashboardComponent.walletData = {
             balance: {{ wallet.total_balance|default:0 }},
             gift_balance: {{ wallet.gift_balance|default:0 }}
-        },
-
-        // Deposit Data
-        depositData: {
-            amount: null,
-            gateway: 'zarinpal'
-        },
-
-        // Address Form Data
-        addressForm: {
-            title: '',
-            recipient_name: '',
-            recipient_phone: '',
-            province: '',
-            city: '',
-            postal_code: '',
-            full_address: '',
-            is_default: false
-        },
-
-        // Bank Card Form Data
-        cardForm: {
-            card_number: '',
-            bank_name: '',
-            is_default: false
-        },
-
-        // Security Form Data
-        securityForm: {
-            current_password: '',
-            new_password: '',
-            confirm_password: ''
-        },
-
-        changingPassword: false,
-
-        // Initialize component
-        init() {
-            // Check URL hash and switch to appropriate tab
-            this.checkHashAndSwitchTab();
-            
-            // Listen for hash changes (browser back/forward)
-            window.addEventListener('hashchange', () => {
-                this.checkHashAndSwitchTab();
-            });
-        },
-
-        // Check URL hash and switch tab
-        checkHashAndSwitchTab() {
-            const hash = window.location.hash.substring(1); // Remove #
-            const validTabs = ['info', 'bank', 'security', 'addresses'];
-            
-            if (hash && validTabs.includes(hash)) {
-                this.activeTab = hash;
-            }
-        },
-
-        // Switch tab and update URL hash
-        switchTab(tab) {
-            this.activeTab = tab;
-            window.history.pushState(null, '', '#' + tab);
-        },
-
-        // Format currency helper
-        formatCurrency(amount) {
-            return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
-        },
-
-        // Set deposit amount from quick buttons
-        setDepositAmount(amount) {
-            this.depositData.amount = amount;
-        },
-
-        // Save personal info
-        async savePersonalInfo() {
-            this.saving = true;
-
-            try {
-                const csrfToken = this.getCSRFToken();
-
-                const response = await fetch('{% url "accounts:dashboard" %}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        action: 'update_profile',
-                        ...this.userData
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    this.showNotification('✅ تغییرات با موفقیت ذخیره شد', 'success');
-                    
-                    // Update displayed values
-                    if (data.user) {
-                        this.userData.first_name = data.user.first_name;
-                        this.userData.last_name = data.user.last_name;
-                    }
-                } else {
-                    this.showNotification('❌ ' + (data.message || 'خطا در ذخیره اطلاعات'), 'error');
-                }
-            } catch (error) {
-                console.error('Save error:', error);
-                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
-            } finally {
-                this.saving = false;
-            }
-        },
-
-        // Process wallet deposit
-        async processDeposit() {
-            const amount = parseInt(this.depositData.amount);
-
-            // Validation
-            if (!amount || amount < 10000) {
-                this.showNotification('❌ حداقل مبلغ شارژ ۱۰,۰۰۰ تومان است', 'error');
-                return;
-            }
-
-            if (amount > 50000000) {
-                this.showNotification('❌ حداکثر مبلغ شارژ ۵۰,۰۰۰,۰۰۰ تومان است', 'error');
-                return;
-            }
-
-            this.depositProcessing = true;
-
-            try {
-                const csrfToken = this.getCSRFToken();
-
-                const response = await fetch('{% url "accounts:dashboard" %}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        action: 'wallet_deposit',
-                        amount: amount,
-                        gateway: this.depositData.gateway
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success && data.payment_url) {
-                    this.showNotification('✅ در حال انتقال به درگاه پرداخت...', 'success');
-                    // Redirect to payment gateway
-                    setTimeout(() => {
-                        window.location.href = data.payment_url;
-                    }, 1000);
-                } else {
-                    this.showNotification('❌ ' + (data.message || 'خطا در ایجاد درخواست پرداخت'), 'error');
-                    this.depositProcessing = false;
-                }
-            } catch (error) {
-                console.error('Deposit error:', error);
-                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
-                this.depositProcessing = false;
-            }
-        },
-
-        // Submit Address
-        async submitAddress() {
-            // Validate phone number
-            if (!/^09\d{9}$/.test(this.addressForm.recipient_phone)) {
-                this.showNotification('❌ شماره تماس باید با ۰۹ شروع شده و ۱۱ رقم باشد', 'error');
-                return;
-            }
-
-            // Validate postal code
-            if (!/^\d{10}$/.test(this.addressForm.postal_code)) {
-                this.showNotification('❌ کد پستی باید ۱۰ رقم باشد', 'error');
-                return;
-            }
-
-            this.submittingAddress = true;
-
-            try {
-                const csrfToken = this.getCSRFToken();
-
-                const response = await fetch('{% url "accounts:dashboard" %}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        action: 'add_address',
-                        ...this.addressForm
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    this.showNotification('✅ آدرس با موفقیت ذخیره شد', 'success');
-                    this.showAddAddressModal = false;
-                    // Reset form
-                    this.addressForm = {
-                        title: '',
-                        recipient_name: '',
-                        recipient_phone: '',
-                        province: '',
-                        city: '',
-                        postal_code: '',
-                        full_address: '',
-                        is_default: false
-                    };
-                    // Reload to show new address
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    this.showNotification('❌ ' + (data.message || 'خطا در ذخیره آدرس'), 'error');
-                }
-            } catch (error) {
-                console.error('Address error:', error);
-                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
-            } finally {
-                this.submittingAddress = false;
-            }
-        },
-
-        // Submit Bank Card
-        async submitBankCard() {
-            // Validate card number (must be 16 digits)
-            if (!/^\d{16}$/.test(this.cardForm.card_number)) {
-                this.showNotification('❌ شماره کارت باید ۱۶ رقم باشد', 'error');
-                return;
-            }
-
-            this.submittingCard = true;
-
-            try {
-                const csrfToken = this.getCSRFToken();
-
-                const response = await fetch('{% url "accounts:dashboard" %}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        action: 'add_bank_card',
-                        ...this.cardForm
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    this.showNotification('✅ کارت بانکی با موفقیت ذخیره شد', 'success');
-                    this.showAddCardModal = false;
-                    // Reset form
-                    this.cardForm = {
-                        card_number: '',
-                        bank_name: '',
-                        is_default: false
-                    };
-                    // Reload to show new card
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    this.showNotification('❌ ' + (data.message || 'خطا در ذخیره کارت'), 'error');
-                }
-            } catch (error) {
-                console.error('Card error:', error);
-                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
-            } finally {
-                this.submittingCard = false;
-            }
-        },
-
-        // Upload avatar
-        async uploadAvatar(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-                this.showNotification('❌ لطفا یک فایل تصویری انتخاب کنید', 'error');
-                return;
-            }
-
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                this.showNotification('❌ حجم فایل نباید بیشتر از ۵ مگابایت باشد', 'error');
-                return;
-            }
-
-            this.saving = true;
-
-            try {
-                const formData = new FormData();
-                formData.append('avatar', file);
-                formData.append('action', 'upload_avatar');
-
-                const csrfToken = this.getCSRFToken();
-
-                const response = await fetch('{% url "accounts:dashboard" %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    this.showNotification('✅ تصویر پروفایل با موفقیت بروزرسانی شد', 'success');
-                    // Reload page to show new avatar
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                } else {
-                    this.showNotification('❌ ' + (data.message || 'خطا در آپلود تصویر'), 'error');
-                }
-            } catch (error) {
-                console.error('Upload error:', error);
-                this.showNotification('❌ خطا در آپلود تصویر', 'error');
-            } finally {
-                this.saving = false;
-            }
-        },
-
-        // Get CSRF token
-        getCSRFToken() {
-            return document.cookie
-                .split('; ')
-                .find(row => row.startsWith('csrftoken='))
-                ?.split('=')[1] || '';
-        },
-
-        // Show notification
-        showNotification(message, type) {
-            // Simple notification - enhance with toast library if needed
-            alert(message);
-        },
-
-        // Change Password
-        async changePassword() {
-            // Validate passwords match
-            if (this.securityForm.new_password !== this.securityForm.confirm_password) {
-                this.showNotification('❌ رمز عبور جدید و تکرار آن یکسان نیستند', 'error');
-                return;
-            }
-
-            // Validate password length
-            if (this.securityForm.new_password.length < 8) {
-                this.showNotification('❌ رمز عبور باید حداقل 8 کاراکتر باشد', 'error');
-                return;
-            }
-
-            this.changingPassword = true;
-
-            try {
-                const csrfToken = this.getCSRFToken();
-                const response = await fetch('{% url "accounts:dashboard" %}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
-                        action: 'change_password',
-                        ...this.securityForm
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    this.showNotification('✅ رمز عبور با موفقیت تغییر کرد', 'success');
-                    // Reset form
-                    this.securityForm = {
-                        current_password: '',
-                        new_password: '',
-                        confirm_password: ''
-                    };
-                } else {
-                    this.showNotification('❌ ' + (data.message || 'خطا در تغییر رمز عبور'), 'error');
-                }
-            } catch (error) {
-                console.error('Change password error:', error);
-                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
-            } finally {
-                this.changingPassword = false;
-            }
-        }
-    };
-}
+        };
+    }
+});
 </script>
+<script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
+ 

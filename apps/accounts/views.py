@@ -885,6 +885,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # ═══════════════════════════════════════════════════════════
             elif action == 'add_bank_card':
                 from .models import BankCard
+                from .bank_utils import detect_bank_from_card_number
                 
                 # Validate card number
                 card_number = data.get('card_number', '').strip()
@@ -894,11 +895,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                         'message': 'شماره کارت باید ۱۶ رقم باشد'
                     }, status=400)
                 
-                # Validate bank name
-                if not data.get('bank_name'):
+                # Auto-detect bank from card number
+                bank_info = detect_bank_from_card_number(card_number)
+                bank_name = bank_info['name'] if bank_info else data.get('bank_name', '').strip()
+                
+                if not bank_name:
                     return JsonResponse({
                         'success': False,
-                        'message': 'نام بانک الزامی است'
+                        'message': 'بانک قابل تشخیص نیست. لطفا دوباره تلاش کنید'
                     }, status=400)
                 
                 # Check if card already exists
@@ -909,15 +913,15 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     }, status=400)
                 
                 try:
-                    # Create bank card
+                    # Create bank card (bank_name will be auto-detected in model's save method)
                     bank_card = BankCard.objects.create(
                         user=user,
                         card_number=card_number,
-                        bank_name=data.get('bank_name').strip(),
+                        bank_name=bank_name,
                         is_default=data.get('is_default', False)
                     )
                     
-                    logger.info(f"Bank card created: {bank_card.id} for user {user.phone}")
+                    logger.info(f"Bank card created: {bank_card.id} ({bank_card.bank_full_name}) for user {user.phone}")
                     
                     return JsonResponse({
                         'success': True,

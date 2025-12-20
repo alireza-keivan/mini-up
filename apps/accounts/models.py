@@ -433,6 +433,7 @@ class BankCard(models.Model):
     """
     User bank cards for wallet withdrawals.
     Card numbers are stored masked for security.
+    Bank is auto-detected from card number BIN.
     """
     user = models.ForeignKey(
         User,
@@ -467,7 +468,43 @@ class BankCard(models.Model):
             return f'{self.card_number[:4]}-{self.card_number[4:6]}**-****-{self.card_number[-4:]}'
         return self.card_number
     
+    @property
+    def bank_info(self):
+        """Get complete bank information from card number."""
+        from .bank_utils import detect_bank_from_card_number
+        return detect_bank_from_card_number(self.card_number)
+    
+    @property
+    def bank_logo_icon(self):
+        """Get bank logo icon class."""
+        info = self.bank_info
+        return info['logo'] if info else 'fa-university'
+    
+    @property
+    def bank_color(self):
+        """Get bank brand color."""
+        info = self.bank_info
+        return info['color'] if info else '#999999'
+    
+    @property
+    def bank_full_name(self):
+        """Get bank full name."""
+        info = self.bank_info
+        return info['full_name'] if info else self.bank_name or 'بانک نامشخص'
+    
+    def detect_and_set_bank(self):
+        """Detect bank from card number and set bank_name."""
+        from .bank_utils import detect_bank_from_card_number
+        bank_info = detect_bank_from_card_number(self.card_number)
+        if bank_info:
+            self.bank_name = bank_info['name']
+        return self.bank_name
+    
     def save(self, *args, **kwargs):
+        # Auto-detect bank if not set
+        if not self.bank_name or self.bank_name == 'سایر':
+            self.detect_and_set_bank()
+        
         # Ensure only one default card per user
         if self.is_default:
             BankCard.objects.filter(user=self.user, is_default=True).update(is_default=False)
