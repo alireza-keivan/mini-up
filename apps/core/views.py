@@ -625,3 +625,21 @@ def category_view(request, slug):
         'featured_products': featured_products,
     }
     return render(request, 'core/category.html', context)
+
+
+def neon_products_demo(request):
+    """
+    Demo page for neon-themed product cards
+    Showcases the new card design with proper 2:1 proportions
+    """
+    from apps.products.models import Product
+    
+    # Get sample products (first 8 active products)
+    products = Product.objects.filter(
+        is_active=True
+    ).select_related('category', 'brand')[:8]
+    
+    return render(request, 'core/neon_products_demo.html', {
+        'title': 'نمایش کارت‌های نئون',
+        'products': products,
+    })

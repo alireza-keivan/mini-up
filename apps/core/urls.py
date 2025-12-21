@@ -16,6 +16,9 @@ urlpatterns = [
     path('faq/', views.faq, name='faq'), 
     # REMOVED: path('accounts/', views.accounts, name='accounts'),  # This conflicts with apps/accounts/
     
+    # ===== Demo Pages =====
+    path('neon-demo/', views.neon_products_demo, name='neon_demo'),
+    
     # ===== صفحات احراز هویت =====
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
