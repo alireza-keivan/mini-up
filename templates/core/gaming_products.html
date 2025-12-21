@@ -171,108 +171,6 @@
      GAMING PRODUCTS PAGE - NEON DARK RTL THEME
      ═══════════════════════════════════════════════════════════════════════════════ -->
 
-<!-- Hero Section -->
-<section class="gp-hero relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-    <!-- Animated Background -->
-    <div class="gp-hero-bg absolute inset-0">
-        <div class="gp-grid-overlay"></div>
-        <div class="gp-floating-shapes">
-            <div class="gp-shape gp-shape-1"></div>
-            <div class="gp-shape gp-shape-2"></div>
-            <div class="gp-shape gp-shape-3"></div>
-            <div class="gp-shape gp-shape-4"></div>
-        </div>
-        <!-- Neon Lines -->
-        <div class="gp-neon-line gp-neon-line-1"></div>
-        <div class="gp-neon-line gp-neon-line-2"></div>
-        <div class="gp-neon-line gp-neon-line-3"></div>
-    </div>
-    
-    <!-- Hero Content -->
-    <div class="relative z-10 text-center px-4 max-w-5xl mx-auto">
-        <!-- Glitch Title -->
-        <h1 class="gp-glitch-title text-5xl md:text-7xl font-black mb-6" data-text="محصولات گیمینگ">
-            <span class="gp-glitch-text">محصولات گیمینگ</span>
-        </h1>
-        
-        <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            بهترین تجهیزات گیمینگ با گارانتی اصالت کالا
-            <br>
-            <span class="text-neon-cyan">قدرت بازی خود را ارتقا دهید</span>
-        </p>
-        
-        <!-- Stats Row -->
-        <div class="flex flex-wrap justify-center gap-8 mt-10">
-            <div class="gp-stat-box">
-                <span class="gp-stat-number text-neon-pink">{{ total_products|default:"۵۰+" }}</span>
-                <span class="gp-stat-label">محصول</span>
-            </div>
-            <div class="gp-stat-box">
-                <span class="gp-stat-number text-neon-cyan">{{ total_categories|default:"۸" }}</span>
-                <span class="gp-stat-label">دسته‌بندی</span>
-            </div>
-            <div class="gp-stat-box">
-                <span class="gp-stat-number text-neon-purple">{{ total_brands|default:"۲۰+" }}</span>
-                <span class="gp-stat-label">برند</span>
-            </div>
-        </div>
-        
-        <!-- Scroll Indicator -->
-        <div class="gp-scroll-indicator mt-16">
-            <div class="gp-mouse">
-                <div class="gp-mouse-wheel"></div>
-            </div>
-            <span class="text-gray-400 text-sm mt-2 block">اسکرول کنید</span>
-        </div>
-    </div>
-</section>
-
-<!-- Quick Category Navigation -->
-<section class="gp-category-nav sticky top-16 z-40 bg-dark-900/95 backdrop-blur-xl border-b border-dark-700/50">
-    <div class="container mx-auto px-4">
-        <div class="gp-nav-wrapper relative py-4">
-            <!-- Left Arrow -->
-            <button class="gp-nav-arrow gp-nav-arrow-left hidden md:flex" aria-label="اسکرول به چپ">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </button>
-            
-            <!-- Categories Scroll Container -->
-            <div class="gp-nav-scroll flex gap-3 overflow-x-auto scrollbar-hide px-8 md:px-12" id="categoryNav">
-                {% for category in categories %}
-                <a href="#category-{{ category.id }}" 
-                   class="gp-nav-item flex-shrink-0 px-5 py-2.5 rounded-full border border-dark-600 
-                          bg-dark-800/50 hover:bg-neon-pink/20 hover:border-neon-pink/50 
-                          transition-all duration-300 whitespace-nowrap group"
-                   data-category-id="{{ category.id }}">
-                    {% if category.icon %}
-                    <span class="inline-block ml-2 text-lg group-hover:scale-110 transition-transform">
-                        {{ category.icon }}
-                    </span>
-                    {% endif %}
-                    <span class="text-gray-300 group-hover:text-white font-medium">
-                        {{ category.name }}
-                    </span>
-                    <span class="mr-2 text-xs text-gray-500 group-hover:text-neon-pink">
-                        ({{ category.get_active_products_count }})
-                    </span>
-                </a>
-                {% empty %}
-                <span class="text-gray-500 py-2">دسته‌بندی موجود نیست</span>
-                {% endfor %}
-            </div>
-            
-            <!-- Right Arrow -->
-            <button class="gp-nav-arrow gp-nav-arrow-right hidden md:flex" aria-label="اسکرول به راست">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-</section>
-
 <!-- Main Categories & Products Section -->
 <main class="gp-main py-12 md:py-20">
     <div class="container mx-auto px-4">
@@ -281,7 +179,7 @@
             <!-- ═══════════════════════════════════════════════════════════════
                  FILTER SIDEBAR
                  ═══════════════════════════════════════════════════════════════ -->
-            <aside class="lg:w-80 flex-shrink-0">
+            <aside class="lg:w-80 flex-shrink-0 lg:order-2">
                 <!-- Mobile Controls -->
                 <div class="lg:hidden mb-4">
                     <!-- Filter Toggle Button -->
@@ -557,7 +455,7 @@
             <!-- ═══════════════════════════════════════════════════════════════
                  PRODUCTS SECTION
                  ═══════════════════════════════════════════════════════════════ -->
-            <div class="flex-1 min-w-0">
+            <div class="flex-1 min-w-0 lg:order-1">
                 <!-- Results Info -->
                 <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
                     <p class="text-gray-400">
