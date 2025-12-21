@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}نمایش کارت‌های محصول نئونی{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Neon Product Cards Demo Page */
+    .neon-demo-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 50%, #16213e 100%);
+        padding: 3rem 1rem;
+    }
+
+    /* Animated gradient title */
+    .neon-demo-title {
+        background: linear-gradient(90deg, 
+            #22d3ee 0%, 
+            #f472b6 25%, 
+            #c084fc 50%, 
+            #4ade80 75%, 
+            #22d3ee 100%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient-shift 3s ease-in-out infinite;
+    }
+
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Grid layout for cards */
+    .neon-products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Responsive adjustments */
+    @media (min-width: 768px) {
+        .neon-products-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .neon-products-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    /* Card hover effects enhancement */
+    .neon-product-card:hover {
+        transform: translateY(-8px);
+    }
+
+    /* Instructions panel */
+    .neon-instructions {
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .neon-instructions h3 {
+        color: #22d3ee;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .neon-instructions ul {
+        color: #cbd5e1;
+        list-style: none;
+        padding: 0;
+    }
+
+    .neon-instructions li {
+        padding: 0.5rem 0;
+        padding-right: 1.5rem;
+        position: relative;
+    }
+
+    .neon-instructions li::before {
+        content: "▹";
+        position: absolute;
+        right: 0;
+        color: #f472b6;
+        font-weight: bold;
+    }
+
+    .neon-instructions code {
+        background: rgba(34, 211, 238, 0.1);
+        border: 1px solid rgba(34, 211, 238, 0.3);
+        border-radius: 0.25rem;
+        padding: 0.125rem 0.5rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        color: #22d3ee;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="neon-demo-container">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="neon-demo-title text-5xl font-bold mb-4">
+            Neon Tech Store
+        </h1>
+        <p class="text-gray-400 text-lg">
+            محصولات تکنولوژی با طراحی نئون مدرن
+        </p>
+    </div>
+
+    <!-- Instructions Panel -->
+    <div class="neon-instructions">
+        <h3>راهنمای استفاده از کامپوننت</h3>
+        <ul>
+            <li>نسبت کارت: <code>2:1</code> (ارتفاع به عرض)</li>
+            <li>نسبت تصویر: <code>1:1</code> (مربع کامل)</li>
+            <li>نسبت محتوا: <code>1:1</code> (هم‌اندازه با تصویر)</li>
+            <li>رنگ‌های نئون: <code>cyan</code>, <code>pink</code>, <code>purple</code>, <code>green</code></li>
+            <li>استفاده: <code>{% templatetag openblock %} include 'components/neon_product_card.html' with product=product neon_color='cyan' {% templatetag closeblock %}</code></li>
+        </ul>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="neon-products-grid">
+        <!-- Card 1: Cyan (Gaming Headset) -->
+        {% with product=products.0 %}
+        {% if product %}
+            {% include 'components/neon_product_card.html' with product=product neon_color='cyan' %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Card 2: Pink (Mechanical Keyboard) -->
+        {% with product=products.1 %}
+        {% if product %}
+            {% include 'components/neon_product_card.html' with product=product neon_color='pink' %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Card 3: Purple (SmartWatch) -->
+        {% with product=products.2 %}
+        {% if product %}
+            {% include 'components/neon_product_card.html' with product=product neon_color='purple' %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Card 4: Green (Wireless Earbuds) -->
+        {% with product=products.3 %}
+        {% if product %}
+            {% include 'components/neon_product_card.html' with product=product neon_color='green' %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Additional cards if more products exist -->
+        {% for product in products|slice:"4:" %}
+            {% cycle 'cyan' 'pink' 'purple' 'green' as neon_colors silent %}
+            {% include 'components/neon_product_card.html' with product=product neon_color=neon_colors %}
+        {% endfor %}
+    </div>
+
+    <!-- Footer Note -->
+    <div class="text-center mt-12">
+        <p class="text-gray-500 text-sm">
+            این صفحه برای نمایش کارت‌های محصول با طراحی نئون ایجاد شده است
+        </p>
+        <p class="text-gray-600 text-xs mt-2">
+            برای اعمال در صفحات اصلی، از کامپوننت <code class="text-cyan-400">neon_product_card.html</code> استفاده کنید
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add to Cart functionality
+    document.querySelectorAll('[data-add-cart]').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.addCart;
+            console.log('Adding product to cart:', productId);
+            
+            // Visual feedback
+            const originalText = this.innerHTML;
+            this.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>در حال افزودن...</span>';
+            
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                alert('محصول به سبد خرید اضافه شد!');
+            }, 1000);
+        });
+    });
+
+    // Wishlist functionality
+    document.querySelectorAll('[data-wishlist]').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.wishlist;
+            const svg = this.querySelector('svg');
+            
+            // Toggle fill
+            if (svg.getAttribute('fill') === 'currentColor') {
+                svg.setAttribute('fill', 'none');
+                console.log('Removed from wishlist:', productId);
+            } else {
+                svg.setAttribute('fill', 'currentColor');
+                console.log('Added to wishlist:', productId);
+            }
+        });
+    });
+</script>
+{% endblock %}
