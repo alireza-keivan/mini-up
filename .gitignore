@@ -18,6 +18,10 @@ pyvenv.cfg
 .idea/
 .DS_Store
 .bin/
+
 # Compiled static assets
 /static/css/main.css
 static/js/*.min.js
+apps/core/static/core/css/main.css
+apps/core/static/core/js/*.min.js
+templates/core/*backup*.html

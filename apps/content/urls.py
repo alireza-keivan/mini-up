@@ -7,7 +7,7 @@ URL Configuration for Content App
 - مسیرهای API برای دسترسی به داده‌ها
 """
 
-from django.urls import path
+from django.urls import path, re_path
 from . import views, api_views
 
 app_name = 'content'
@@ -20,13 +20,14 @@ app_name = 'content'
 urlpatterns = [
     # ----- Articles (Blog) -----
     path('articles/', views.ArticleListPageView.as_view(), name='article_list'),
-    path('articles/<slug:slug>/', views.ArticleDetailPageView.as_view(), name='article_detail'),
+    # Support Persian/Arabic characters in article slugs
+    re_path(r'^articles/(?P<slug>[\w\-\u0600-\u06FF]+)/$', views.ArticleDetailPageView.as_view(), name='article_detail'),
     
     # ----- FAQ -----
     path('faq/', views.FAQPageView.as_view(), name='faq'),
     
     # ----- Static Pages -----
-    path('page/<slug:slug>/', views.PageDetailView.as_view(), name='page_detail'),
+    re_path(r'^page/(?P<slug>[\w\-\u0600-\u06FF]+)/$', views.PageDetailView.as_view(), name='page_detail'),
 ]
 
 

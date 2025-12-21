@@ -2,6 +2,7 @@
 
 from django.shortcuts import render
 from .models import ServiceDescription, SocialMediaLinks, YouTubeVideo
+from apps.content.models import Article
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -19,11 +20,15 @@ def home(request):
     # دریافت ویدیوی یوتیوب فعال
     youtube_video = YouTubeVideo.objects.filter(is_active=True).first()
     
+    # دریافت آخرین مقالات منتشر شده
+    latest_articles = Article.objects.filter(status='published').order_by('-published_at')[:8]
+    
     return render(request, 'core/home.html', {
         'title': 'صفحه اصلی',
         'service_descriptions': service_descriptions,
         'social_links': social_links,
         'youtube_video': youtube_video,
+        'latest_articles': latest_articles,
     })
 
 

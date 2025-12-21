@@ -1,149 +1,703 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}صفحه اصلی | Mini-up{% endblock %}
+{% block title %}صفحه اصلی - مینی‌آپ{% endblock %}
 
 {% block content %}
+
 <!-- ===============================================================================
-     HERO SECTION
+     HERO SECTION WITH CUSTOM ALTURA-STYLE DESIGN
      =============================================================================== -->
-<section class="hero-section home-hero">
-    <div class="container mx-auto px-4">
-        <div class="hero-content text-center py-20 lg:py-32">
+<section class="hero-section-custom">
+    <div class="hero-container">
+        <!-- Left Side: Text Content -->
+        <div class="hero-text-side">
             <!-- Badge -->
-            <div class="hero-badge inline-flex items-center gap-2 bg-primary-500/10 text-primary-400 px-4 py-2 rounded-full mb-6">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <div class="hero-badge">
+                <svg class="badge-icon" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                 </svg>
-                <span class="text-sm font-medium">پلتفرم برتر خدمات مجازی و گیمینگ</span>
+                <span>پلتفرم معتبر گیمینگ</span>
             </div>
-            
-            <!-- Main Title -->
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
-                <span class="text-gradient">Mini-up</span>
+
+            <!-- Main Title - Plain White Text -->
+            <h1 class="hero-title">
+                دنیای جدیدی از
                 <br>
-                گیمینگ و خدمات مجازی
+                گیمینگ را تجربه کنید
             </h1>
-            
+
             <!-- Subtitle -->
-            <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-                بهترین کیفیت، کمترین قیمت، سریع‌ترین تحویل
+            <p class="hero-subtitle">
+                خرید امن و سریع محصولات گیمینگ، خدمات مجازی
                 <br>
-                تجربه‌ای متفاوت از خرید آنلاین
+                و شارژ بازی‌های محبوب با بهترین قیمت
             </p>
-            
+
             <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{% url 'core:virtual_services' %}" 
-                   class="btn btn-primary btn-lg group">
+            <div class="hero-buttons">
+                <a href="{% url 'core:virtual_services' %}" class="btn-primary-hero">
                     <span>مشاهده خدمات</span>
-                    <svg class="w-5 h-5 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="btn-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
                 </a>
+                <a href="{% url 'consulting:ticket_list' %}" class="btn-secondary-hero">
+                    <span>تماس با ما</span>
+                </a>
+            </div>
+
+            <!-- Social Media Links Sidebar with Custom PNG Icons -->
+            <div class="social-sidebar">
+                <a href="https://t.me/miniupgaming" target="_blank" class="social-icon" title="تلگرام">
+                    <img src="{% static 'images/telegram.png' %}" alt="Telegram">
+                </a>
+                <a href="https://instagram.com/miniup.gaming" target="_blank" class="social-icon" title="اینستاگرام">
+                    <img src="{% static 'images/instagram.png' %}" alt="Instagram">
+                </a>
+                <a href="https://youtube.com/@miniupgaming" target="_blank" class="social-icon" title="یوتیوب">
+                    <img src="{% static 'images/youtube.png' %}" alt="YouTube">
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Side: 3D Gaming Setup Image -->
+        <div class="hero-image-side">
+            <div class="hero-3d-image">
+                <img src="{% static 'images/hero-gaming-setup.png' %}" alt="Gaming Setup">
             </div>
         </div>
     </div>
-    
-    <!-- Background Effects -->
-    <div class="hero-bg-effects">
-        <div class="hero-glow hero-glow-1"></div>
-        <div class="hero-glow hero-glow-2"></div>
-    </div>
+
+    <!-- SVG Wave Divider at Bottom -->
+    <div class="wave-divider"></div>
 </section>
+
+<style>
+    /* Hero Section Container */
+    .hero-section-custom {
+        position: relative;
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);
+        overflow: hidden;
+        padding: 5rem 0 0 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Left Side: Text Content */
+    .hero-text-side {
+        position: relative;
+        z-index: 3;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(138, 43, 226, 0.2);
+        border: 1px solid rgba(138, 43, 226, 0.4);
+        padding: 0.75rem 1.5rem;
+        border-radius: 2rem;
+        margin-bottom: 2rem;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .badge-icon {
+        width: 20px;
+        height: 20px;
+        color: #00f5ff;
+    }
+
+    .hero-badge span {
+        color: #00f5ff;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 900;
+        color: #fff;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.25rem;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.8;
+        margin-bottom: 2.5rem;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: linear-gradient(135deg, #8a2be2, #00f5ff);
+        color: #fff;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+    }
+
+    .btn-primary-hero:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(138, 43, 226, 0.5);
+    }
+
+    .btn-arrow {
+        width: 20px;
+        height: 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-primary-hero:hover .btn-arrow {
+        transform: translateX(-5px);
+    }
+
+    .btn-secondary-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(138, 43, 226, 0.4);
+        color: #fff;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary-hero:hover {
+        background: rgba(138, 43, 226, 0.2);
+        border-color: rgba(138, 43, 226, 0.6);
+        transform: translateY(-5px);
+    }
+
+    /* Right Side: 3D Gaming Setup Image */
+    .hero-image-side {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-3d-image {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .hero-3d-image img {
+        width: 100%;
+        height: auto;
+        max-height: 120%;
+        object-fit: contain;
+        filter: drop-shadow(0 20px 60px rgba(138, 43, 226, 0.4));
+        
+        /* Four-edge gradient mask */
+        -webkit-mask-image: 
+            linear-gradient(to bottom, 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,0,0,0.03) 2%, 
+                rgba(0,0,0,0.06) 4%,
+                rgba(0,0,0,0.1) 6%,
+                rgba(0,0,0,1) 8%, 
+                rgba(0,0,0,1) 92%, 
+                rgba(0,0,0,0.1) 94%,
+                rgba(0,0,0,0.06) 96%,
+                rgba(0,0,0,0.03) 98%,
+                rgba(0,0,0,0) 100%),
+            linear-gradient(to right, 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,0,0,0.03) 2%,
+                rgba(0,0,0,0.06) 4%,
+                rgba(0,0,0,0.1) 6%,
+                rgba(0,0,0,1) 8%, 
+                rgba(0,0,0,1) 92%, 
+                rgba(0,0,0,0.1) 94%,
+                rgba(0,0,0,0.06) 96%,
+                rgba(0,0,0,0.03) 98%,
+                rgba(0,0,0,0) 100%);
+        -webkit-mask-composite: source-in;
+        mask-image: 
+            linear-gradient(to bottom, 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,0,0,0.03) 2%,
+                rgba(0,0,0,0.06) 4%,
+                rgba(0,0,0,0.1) 6%,
+                rgba(0,0,0,1) 8%, 
+                rgba(0,0,0,1) 92%, 
+                rgba(0,0,0,0.1) 94%,
+                rgba(0,0,0,0.06) 96%,
+                rgba(0,0,0,0.03) 98%,
+                rgba(0,0,0,0) 100%),
+            linear-gradient(to right, 
+                rgba(0,0,0,0) 0%, 
+                rgba(0,0,0,0.03) 2%,
+                rgba(0,0,0,0.06) 4%,
+                rgba(0,0,0,0.1) 6%,
+                rgba(0,0,0,1) 8%, 
+                rgba(0,0,0,1) 92%, 
+                rgba(0,0,0,0.1) 94%,
+                rgba(0,0,0,0.06) 96%,
+                rgba(0,0,0,0.03) 98%,
+                rgba(0,0,0,0) 100%);
+        mask-composite: intersect;
+    }
+
+    /* Social Media Sidebar with Custom PNG Icons */
+    .social-sidebar {
+        position: absolute;
+        right: -80px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        z-index: 10;
+    }
+
+    .social-icon {
+        width: 50px;
+        height: 50px;
+        display: block;
+        transition: all 0.3s ease;
+    }
+
+    .social-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        mix-blend-mode: screen;
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        transition: filter 0.3s ease;
+    }
+
+    .social-icon:hover img {
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+    }
+
+    /* SVG Wave Divider */
+    .wave-divider::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 80px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,60 Q300,0 600,60 T1200,60 L1200,120 L0,120 Z' fill='%231a0a1f'/%3E%3C/svg%3E");
+        background-size: cover;
+        background-repeat: no-repeat;
+        z-index: 1;
+    }
+
+    /* Floating Animation */
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .hero-container {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            padding: 0 1.5rem;
+        }
+
+        .hero-text-side {
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+        }
+
+        .hero-buttons {
+            justify-content: center;
+        }
+
+        .social-sidebar {
+            position: static;
+            transform: none;
+            flex-direction: row;
+            justify-content: center;
+            margin-top: 2rem;
+            z-index: 1;
+        }
+
+        .hero-image-side {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 2rem;
+        }
+
+        .hero-3d-image {
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-section-custom {
+            padding: 3rem 0 0 0;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .btn-primary-hero,
+        .btn-secondary-hero {
+            font-size: 1rem;
+            padding: 0.875rem 1.5rem;
+        }
+
+        .hero-3d-image {
+            max-width: 400px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 1.75rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+
+        .hero-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-primary-hero,
+        .btn-secondary-hero {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .hero-3d-image {
+            max-width: 100%;
+        }
+    }
+</style>
 
 <!-- ===============================================================================
-     CATEGORY CAROUSEL SECTION - NEW SIMPLE APPROACH
+     ARTICLES CAROUSEL SECTION
      =============================================================================== -->
-<section class="category-carousel-section py-20 bg-dark-800/50">
-    <div class="container mx-auto px-4 max-w-6xl">
-        <!-- Section Header -->
-        <div class="section-header text-center mb-12">
-            <h2 class="section-title text-3xl md:text-4xl font-bold text-white mb-4">
-                خدمات <span class="text-gradient">ما</span>
-            </h2>
-            <p class="section-subtitle text-gray-400 max-w-2xl mx-auto">
-                انواع خدمات مجازی و محصولات گیمینگ با بهترین کیفیت
-            </p>
-        </div>
-
-        <!-- Simple Carousel - Show only one slide at a time -->
-        <div class="simple-carousel">
-            <!-- Slide 1: Virtual Services -->
-            <div class="carousel-slide active" data-slide="0">
-                <a href="{% url 'core:virtual_services' %}" class="slide-link">
-                    <img src="{% static 'images/cards/virtual-services.png' %}" 
-                         alt="خدمات مجازی"
-                         loading="lazy">
-                </a>
-            </div>
-
-            <!-- Slide 2: Gaming Products -->
-            <div class="carousel-slide" data-slide="1">
-                <a href="{% url 'core:gaming_products' %}" class="slide-link">
-                    <img src="{% static 'images/cards/gaming-products.png' %}" 
-                         alt="محصولات گیمینگ"
-                         loading="lazy">
-                </a>
-            </div>
-
-            <!-- Slide 3: Game Credits -->
-            <div class="carousel-slide" data-slide="2">
-                <a href="{% url 'core:mini_game' %}" class="slide-link">
-                    <img src="{% static 'images/cards/mini-game.png' %}" 
-                         alt="شارژ بازی‌ها"
-                         loading="lazy">
-                </a>
-            </div>
-
-            <!-- Slide 4: By Products -->
-            <div class="carousel-slide" data-slide="3">
-                <a href="{% url 'core:buy_products' %}" class="slide-link">
-                    <img src="{% static 'images/cards/by-products.png' %}" 
-                         alt="محصولات جانبی موبایل"
-                         loading="lazy">
-                </a>
-            </div>
-
-            <!-- Navigation Arrows -->
-            <button class="carousel-btn prev-btn" onclick="changeSlide(-1)">
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
+{% if latest_articles %}
+<section class="articles-carousel-section">
+    <div class="articles-container">
+        <h2 class="section-title">آخرین مقالات ما</h2>
+        
+        <div class="articles-carousel-wrapper">
+            <!-- Navigation Buttons -->
+            <button class="articles-nav-btn articles-prev" onclick="scrollArticles(-1)" aria-label="مقاله قبلی">
+                &#8249;
             </button>
-            <button class="carousel-btn next-btn" onclick="changeSlide(1)">
-                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            </button>
-
-            <!-- Dots Indicators -->
-            <div class="carousel-dots">
-                <span class="dot active" onclick="goToSlide(0)"></span>
-                <span class="dot" onclick="goToSlide(1)"></span>
-                <span class="dot" onclick="goToSlide(2)"></span>
-                <span class="dot" onclick="goToSlide(3)"></span>
+            
+            <div class="articles-carousel">
+                {% for article in latest_articles %}
+                <a href="{% url 'content:article_detail' article.slug %}" class="article-card">
+                    <div class="article-image-wrapper">
+                        {% if article.featured_image %}
+                        <img src="{{ article.featured_image.url }}" 
+                             alt="{{ article.featured_image_alt|default:article.title }}"
+                             class="article-image">
+                        {% else %}
+                        <div class="article-image-placeholder"></div>
+                        {% endif %}
+                    </div>
+                    <div class="article-title-wrapper">
+                        <h3 class="article-title">{{ article.title }}</h3>
+                    </div>
+                </a>
+                {% endfor %}
             </div>
+            
+            <button class="articles-nav-btn articles-next" onclick="scrollArticles(1)" aria-label="مقاله بعدی">
+                &#8250;
+            </button>
         </div>
     </div>
 </section>
 
-<!-- ===============================================================================
-     SERVICES SECTION
-     =============================================================================== -->
-<section class="services-section py-20">
-    <div class="container mx-auto px-4">
-        <!-- Section Header -->
-        <div class="section-header text-center mb-12">
-            <h2 class="section-title text-3xl md:text-4xl font-bold text-white mb-4">
-                خدمات <span class="text-gradient">ما</span>
-            </h2>
-            <p class="section-subtitle text-gray-400 max-w-2xl mx-auto">
-                انواع خدمات مجازی و محصولات گیمینگ با بهترین کیفیت
-            </p>
-        </div>
-    </div>    
-</section>
+<style>
+    .articles-carousel-section {
+        background: linear-gradient(180deg, #1a0a1f 0%, #0a0a0f 100%);
+        padding: 5rem 0;
+        position: relative;
+    }
+
+    .articles-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: clamp(2rem, 4vw, 2.5rem);
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 3rem;
+        background: linear-gradient(135deg, #8a2be2, #00f5ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .articles-carousel-wrapper {
+        position: relative;
+        padding: 0 60px;
+    }
+
+    .articles-carousel {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .articles-carousel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .article-card {
+        background: rgba(15, 15, 35, 0.6);
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 2px solid rgba(138, 43, 226, 0.3);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .article-card:hover {
+        transform: translateY(-10px);
+        border-color: rgba(138, 43, 226, 0.6);
+        box-shadow: 0 20px 60px rgba(138, 43, 226, 0.4);
+    }
+
+    .article-image-wrapper {
+        width: 100%;
+        height: 250px;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 245, 255, 0.2));
+    }
+
+    .article-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .article-card:hover .article-image {
+        transform: scale(1.1);
+    }
+
+    .article-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 245, 255, 0.2));
+    }
+
+    .article-title-wrapper {
+        padding: 1.5rem;
+        background: rgba(10, 10, 15, 0.8);
+        backdrop-filter: blur(10px);
+    }
+
+    .article-title {
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+        line-height: 1.4;
+        transition: color 0.3s ease;
+    }
+
+    .article-card:hover .article-title {
+        color: #00f5ff;
+    }
+
+    /* Navigation Buttons - Simple Arrows */
+    .articles-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        color: rgba(255, 255, 255, 0.6);
+        border: none;
+        width: 45px;
+        height: 45px;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        font-size: 2rem;
+        font-weight: 300;
+    }
+
+    .articles-nav-btn:hover {
+        color: #fff;
+        transform: translateY(-50%) scale(1.2);
+        text-shadow: 0 0 20px rgba(138, 43, 226, 0.8),
+                     0 0 40px rgba(0, 245, 255, 0.6);
+    }
+
+    .articles-prev {
+        left: 0;
+    }
+
+    .articles-next {
+        right: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .articles-carousel {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .articles-carousel-wrapper {
+            padding: 0 50px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
+
+        .article-title {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .articles-carousel-section {
+            padding: 3rem 0;
+        }
+
+        .articles-carousel {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .articles-carousel-wrapper {
+            padding: 0 40px;
+        }
+
+        .article-image-wrapper {
+            height: 180px;
+        }
+
+        .article-title {
+            font-size: 0.95rem;
+            padding: 1rem;
+        }
+
+        .article-title-wrapper {
+            padding: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .articles-carousel {
+            grid-template-columns: 1fr;
+        }
+
+        .article-image-wrapper {
+            height: 200px;
+        }
+
+        .articles-carousel-section {
+            padding: 2rem 0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .articles-nav-btn {
+            width: 35px;
+            height: 35px;
+            font-size: 1.5rem;
+        }
+
+        .articles-prev {
+            left: 5px;
+        }
+
+        .articles-next {
+            right: 5px;
+        }
+    }
+</style>
+
+<script>
+    function scrollArticles(direction) {
+        const carousel = document.querySelector('.articles-carousel');
+        const cardWidth = carousel.querySelector('.article-card').offsetWidth;
+        const gap = 32; // 2rem gap
+        const scrollAmount = (cardWidth + gap) * direction;
+        carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+</script>
+{% endif %}
 
 <!-- ===============================================================================
      SERVICE DESCRIPTIONS WIDGET
@@ -151,6 +705,9 @@
 {% if service_descriptions %}
 <section class="service-descriptions-section py-16 bg-dark-800/30">
     <div class="container mx-auto px-4">
+        <h2 style="color: white; font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 3rem;">
+            توضیحات خدمات ما
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for item in service_descriptions %}
             <div class="description-card group">
@@ -223,69 +780,66 @@
 {% endif %}
 
 <!-- ===============================================================================
-     SOCIAL MEDIA SECTION
+     SOCIAL MEDIA LINKS SECTION
      =============================================================================== -->
 {% if social_links %}
-<section class="social-media-section py-16 bg-dark-900">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
-                با ما <span class="text-gradient">همراه باشید</span>
-            </h2>
-            <p class="text-gray-400 max-w-2xl mx-auto">
-                برای دریافت آخرین اخبار، تخفیف‌ها و محتوای ویژه ما را در شبکه‌های اجتماعی دنبال کنید
-            </p>
-        </div>
-
-        <div class="social-links-container flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
-            {% if social_links.instagram %}
-            <a href="{{ social_links.instagram_url }}" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               class="social-link instagram">
-                <div class="social-icon">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                    </svg>
-                </div>
-                <div class="social-info">
-                    <span class="social-name">Instagram</span>
-                    <span class="social-username">@{{ social_links.instagram }}</span>
-                </div>
-            </a>
-            {% endif %}
-
+<section class="py-16 bg-dark-900/50">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">
+            ما را در شبکه‌های اجتماعی دنبال کنید
+        </h2>
+        <p class="text-gray-400 mb-8">
+            از آخرین اخبار و تخفیف‌های ویژه باخبر شوید
+        </p>
+        
+        <div class="social-links-container">
             {% if social_links.telegram %}
             <a href="{{ social_links.telegram_url }}" 
                target="_blank" 
                rel="noopener noreferrer"
-               class="social-link telegram">
-                <div class="social-icon">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                    </svg>
-                </div>
-                <div class="social-info">
-                    <span class="social-name">Telegram</span>
-                    <span class="social-username">@{{ social_links.telegram }}</span>
-                </div>
+               class="social-link"
+               title="تلگرام">
+                <img src="{% static 'images/telegram.png' %}" alt="Telegram">
             </a>
             {% endif %}
-
+            
+            {% if social_links.instagram %}
+            <a href="{{ social_links.instagram_url }}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="social-link"
+               title="اینستاگرام">
+                <img src="{% static 'images/instagram.png' %}" alt="Instagram">
+            </a>
+            {% endif %}
+            
             {% if social_links.youtube %}
             <a href="{{ social_links.youtube_url }}" 
                target="_blank" 
                rel="noopener noreferrer"
-               class="social-link youtube">
-                <div class="social-icon">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                </div>
-                <div class="social-info">
-                    <span class="social-name">YouTube</span>
-                    <span class="social-username">@{{ social_links.youtube }}</span>
-                </div>
+               class="social-link"
+               title="یوتیوب">
+                <img src="{% static 'images/youtube.png' %}" alt="YouTube">
+            </a>
+            {% endif %}
+            
+            {% if social_links.twitter %}
+            <a href="{{ social_links.twitter_url }}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="social-link"
+               title="توییتر">
+                <img src="{% static 'images/twitter.png' %}" alt="Twitter">
+            </a>
+            {% endif %}
+            
+            {% if social_links.whatsapp %}
+            <a href="{{ social_links.whatsapp_url }}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="social-link"
+               title="واتساپ">
+                <img src="{% static 'images/whatsapp.png' %}" alt="WhatsApp">
             </a>
             {% endif %}
         </div>
@@ -296,100 +850,194 @@
     .social-links-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 1.5rem;
+        justify-content: center;
+        gap: 2rem;
     }
 
     .social-link {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.25rem 2rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: inline-block;
+        width: 80px;
+        height: 80px;
         border-radius: 1rem;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease;
         text-decoration: none;
-        min-width: 280px;
+        position: relative;
+        background: transparent;
+    }
+
+    .social-link img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        transition: filter 0.3s ease;
+        mix-blend-mode: screen;
     }
 
     .social-link:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform: scale(1.15);
     }
 
-    .social-icon {
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-center;
-        border-radius: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .social-info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .social-name {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: white;
-    }
-
-    .social-username {
-        font-size: 0.875rem;
-        color: rgba(255, 255, 255, 0.6);
-        direction: ltr;
-        text-align: left;
-    }
-
-    /* Instagram */
-    .social-link.instagram .social-icon {
-        background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    }
-
-    .social-link.instagram:hover {
-        border-color: #e6683c;
-        box-shadow: 0 20px 40px rgba(230, 104, 60, 0.4);
-    }
-
-    /* Telegram */
-    .social-link.telegram .social-icon {
-        background: linear-gradient(135deg, #2AABEE, #229ED9);
-    }
-
-    .social-link.telegram:hover {
-        border-color: #2AABEE;
-        box-shadow: 0 20px 40px rgba(42, 171, 238, 0.4);
-    }
-
-    /* YouTube */
-    .social-link.youtube .social-icon {
-        background: linear-gradient(135deg, #FF0000, #CC0000);
-    }
-
-    .social-link.youtube:hover {
-        border-color: #FF0000;
-        box-shadow: 0 20px 40px rgba(255, 0, 0, 0.4);
+    .social-link:hover img {
+        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9)) 
+                drop-shadow(0 0 30px rgba(255, 255, 255, 0.7))
+                drop-shadow(0 0 45px rgba(255, 255, 255, 0.5));
     }
 
     @media (max-width: 768px) {
         .social-link {
-            min-width: auto;
-            width: 100%;
-            max-width: 400px;
+            width: 70px;
+            height: 70px;
         }
     }
 </style>
 {% endif %}
 
 <!-- ===============================================================================
-     SIMPLE CAROUSEL STYLES & SCRIPT
+     YOUTUBE VIDEO SECTION
      =============================================================================== -->
+{% if youtube_video %}
+<section class="youtube-section py-20 bg-gradient-to-b from-dark-900/50 to-dark-800/30">
+    <div class="container mx-auto px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-bold text-white mb-4">
+                    {{ youtube_video.title }}
+                </h2>
+                {% if youtube_video.description %}
+                <p class="text-gray-400 text-lg">
+                    {{ youtube_video.description }}
+                </p>
+                {% endif %}
+            </div>
+            
+            <div class="video-wrapper">
+                <iframe 
+                    src="https://www.youtube.com/embed/{{ youtube_video.video_id }}"
+                    title="{{ youtube_video.title }}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    class="video-iframe">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .youtube-section {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .video-wrapper {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 25px 50px rgba(138, 43, 226, 0.3);
+        border: 2px solid rgba(138, 43, 226, 0.4);
+        background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 245, 255, 0.1));
+    }
+
+    .video-iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    @media (max-width: 768px) {
+        .youtube-section {
+            padding: 3rem 0;
+        }
+
+        .youtube-section h2 {
+            font-size: 2rem;
+        }
+
+        .youtube-section p {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endif %}
+
+<!-- ===============================================================================
+     CATEGORY CAROUSEL SECTION
+     =============================================================================== -->
+<section class="category-carousel-section py-20 bg-dark-800/50">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Section Header -->
+        <div class="section-header text-center mb-12">
+            <h2 class="section-title-cat text-3xl md:text-4xl font-bold text-white mb-4">
+                خدمات <span class="text-gradient">ما</span>
+            </h2>
+            <p class="section-subtitle text-gray-400 max-w-2xl mx-auto">
+                انواع خدمات مجازی و محصولات گیمینگ با بهترین کیفیت
+            </p>
+        </div>
+
+        <!-- Simple Carousel - Show only one slide at a time -->
+        <div class="simple-carousel">
+            <!-- Slide 1: Virtual Services -->
+            <div class="carousel-slide active" data-slide="0">
+                <a href="{% url 'core:virtual_services' %}" class="slide-link">
+                    <img src="{% static 'images/cards/virtual-services.png' %}" 
+                         alt="خدمات مجازی"
+                         loading="lazy">
+                </a>
+            </div>
+
+            <!-- Slide 2: Gaming Products -->
+            <div class="carousel-slide" data-slide="1">
+                <a href="{% url 'core:gaming_products' %}" class="slide-link">
+                    <img src="{% static 'images/cards/gaming-products.png' %}" 
+                         alt="محصولات گیمینگ"
+                         loading="lazy">
+                </a>
+            </div>
+
+            <!-- Slide 3: Game Credits -->
+            <div class="carousel-slide" data-slide="2">
+                <a href="{% url 'core:mini_game' %}" class="slide-link">
+                    <img src="{% static 'images/cards/mini-game.png' %}" 
+                         alt="شارژ بازی‌ها"
+                         loading="lazy">
+                </a>
+            </div>
+
+            <!-- Slide 4: By Products -->
+            <div class="carousel-slide" data-slide="3">
+                <a href="{% url 'products:list' %}" class="slide-link">
+                    <img src="{% static 'images/cards/by-products.png' %}" 
+                         alt="محصولات جانبی"
+                         loading="lazy">
+                </a>
+            </div>
+
+            <!-- Navigation Arrows -->
+            <button class="carousel-btn prev-btn" onclick="changeSlide(-1)" aria-label="قبلی">
+                &#8249;
+            </button>
+            <button class="carousel-btn next-btn" onclick="changeSlide(1)" aria-label="بعدی">
+                &#8250;
+            </button>
+
+            <!-- Dot Indicators -->
+            <div class="carousel-dots">
+                <span class="dot active" onclick="goToSlide(0)"></span>
+                <span class="dot" onclick="goToSlide(1)"></span>
+                <span class="dot" onclick="goToSlide(2)"></span>
+                <span class="dot" onclick="goToSlide(3)"></span>
+            </div>
+        </div>
+    </div>
+</section>
+
 <style>
     /* Simple Carousel - Show one slide at a time */
     .simple-carousel {
@@ -400,6 +1048,12 @@
         border-radius: 1rem;
         overflow: hidden;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        /* Soft neon border */
+        border: 2px solid rgba(138, 43, 226, 0.4);
+        box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.4),
+            0 0 20px rgba(138, 43, 226, 0.3),
+            inset 0 0 20px rgba(138, 43, 226, 0.1);
     }
 
     /* Hide all slides by default */
@@ -431,16 +1085,18 @@
     .carousel-slide img {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: contain; /* Keep contain to show full image without cropping text */
+        object-position: center;
         display: block;
-        filter: brightness(1.3) contrast(1.1);
+        filter: brightness(1.1) contrast(1.05);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        background: rgba(0, 0, 0, 0.3);
+        background: transparent;
+        transform: scale(0.95); /* Zoom out to prevent text cutting */
     }
 
     .carousel-slide .slide-link:hover img {
-        transform: scale(1.05);
-        filter: brightness(1.4) contrast(1.15) saturate(1.1);
+        transform: scale(1); /* Remove zoom on hover to prevent cutting */
+        filter: brightness(1.2) contrast(1.1) saturate(1.05);
     }
 
     /* Parallax effect on hover */
@@ -452,32 +1108,31 @@
         transform: translateZ(20px);
     }
 
-    /* Modern Navigation Buttons with Glassmorphism */
+    /* Modern Navigation Buttons - Simple Arrows */
     .carousel-btn {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: rgba(255, 255, 255, 0.6);
+        border: none;
         width: 50px;
         height: 50px;
-        border-radius: 50%;
         cursor: pointer;
         z-index: 100;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(20px) saturate(180%);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        font-size: 2.5rem;
+        font-weight: 300;
     }
 
     .carousel-btn:hover {
-        background: linear-gradient(135deg, #ff0055, #8a2be2);
-        border-color: transparent;
-        transform: translateY(-50%) scale(1.15);
-        box-shadow: 0 12px 40px rgba(255, 0, 85, 0.4);
+        color: #fff;
+        transform: translateY(-50%) scale(1.2);
+        text-shadow: 0 0 20px rgba(138, 43, 226, 0.8),
+                     0 0 40px rgba(0, 245, 255, 0.6);
     }
 
     .carousel-btn:active {
@@ -544,8 +1199,6 @@
         animation: pulse 3s ease-in-out infinite;
     }
 
-
-
     /* Modern Animations */
     @keyframes slideZoom {
         0% {
@@ -580,25 +1233,50 @@
     }
 
     .carousel-slide.active img {
-        animation: shimmer 2s ease-in-out;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.1) 50%,
-            transparent 100%
-        );
+        animation: shimmer 3s ease-in-out;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.1) 50%, 
+            transparent 100%);
         background-size: 1000px 100%;
     }
 
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
+    /* Responsive Breakpoints */
+    @media (max-width: 1024px) {
         .carousel-slide .slide-link {
-            height: 300px;
+            height: 400px;
         }
 
         .carousel-btn {
             width: 40px;
             height: 40px;
+        }
+
+        .prev-btn {
+            left: 15px;
+        }
+
+        .next-btn {
+            right: 15px;
+        }
+
+        .carousel-dots {
+            bottom: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .category-carousel-section {
+            padding: 3rem 0 !important;
+        }
+
+        .carousel-slide .slide-link {
+            height: 300px;
+        }
+
+        .carousel-btn {
+            width: 35px;
+            height: 35px;
         }
 
         .prev-btn {
@@ -610,7 +1288,8 @@
         }
 
         .carousel-dots {
-            bottom: 10px;
+            bottom: 15px;
+            padding: 8px 16px;
         }
 
         .dot {
@@ -621,11 +1300,52 @@
         .dot.active {
             width: 24px;
         }
+
+        .simple-carousel {
+            border-radius: 0.75rem;
+        }
     }
 
     @media (max-width: 480px) {
+        .category-carousel-section {
+            padding: 2.5rem 0 !important;
+        }
+
         .carousel-slide .slide-link {
-            height: 250px;
+            height: 220px;
+        }
+
+        .carousel-btn {
+            width: 35px;
+            height: 35px;
+            font-size: 2rem;
+        }
+
+        .prev-btn {
+            left: 5px;
+        }
+
+        .next-btn {
+            right: 5px;
+        }
+
+        .carousel-dots {
+            bottom: 10px;
+            padding: 6px 12px;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+        }
+
+        .dot.active {
+            width: 20px;
+        }
+
+        .simple-carousel {
+            border-radius: 0.5rem;
         }
     }
 </style>
@@ -663,169 +1383,22 @@
         resetAutoplay();
     }
 
-    function autoplay() {
-        autoplayTimer = setInterval(() => {
-            changeSlide(1);
-        }, 5000); // Changed to 5 seconds
-    }
-
     function resetAutoplay() {
         clearInterval(autoplayTimer);
-        autoplay();
+        startAutoplay();
     }
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    function startAutoplay() {
+        autoplayTimer = setInterval(() => {
+            showSlide(currentSlideIndex + 1);
+        }, 5000); // Auto-advance every 5 seconds
+    }
+
+    // Initialize carousel on page load
+    document.addEventListener('DOMContentLoaded', () => {
         showSlide(0);
-        autoplay();
-        
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') changeSlide(1);
-            if (e.key === 'ArrowRight') changeSlide(-1);
-        });
-        
-        // Touch/Swipe support
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const carousel = document.querySelector('.simple-carousel');
-        
-        if (carousel) {
-            carousel.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-            });
-            
-            carousel.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                if (touchStartX - touchEndX > 50) changeSlide(1);
-                if (touchEndX - touchStartX > 50) changeSlide(-1);
-            });
-            
-            // Pause on hover
-            carousel.addEventListener('mouseenter', () => clearInterval(autoplayTimer));
-            carousel.addEventListener('mouseleave', () => autoplay());
-        }
+        startAutoplay();
     });
 </script>
-
-<!-- ===============================================================================
-     YOUTUBE VIDEO SECTION
-     =============================================================================== -->
-<section class="youtube-section py-16 bg-gradient-to-b from-dark-900 to-dark-800">
-    <div class="container mx-auto px-4">
-        {% if youtube_video %}
-        <div class="max-w-5xl mx-auto">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
-                    {{ youtube_video.title }}
-                </h2>
-                {% if youtube_video.description %}
-                <p class="text-gray-400 max-w-2xl mx-auto">
-                    {{ youtube_video.description }}
-                </p>
-                {% endif %}
-            </div>
-
-            <div class="video-container">
-                <div class="video-wrapper">
-                    <iframe 
-                        src="{{ youtube_video.embed_url }}"
-                        title="{{ youtube_video.title }}"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen
-                        loading="lazy">
-                    </iframe>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <!-- Placeholder when no video is active -->
-        <div class="max-w-4xl mx-auto text-center">
-            <div class="placeholder-container">
-                <div class="placeholder-icon">
-                    <svg class="w-24 h-24 mx-auto mb-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">
-                    ویدیوی معرفی Mini-up
-                </h3>
-                <p class="text-gray-400 text-lg">
-                    به زودی ویدیوی معرفی کامل سرویس‌های ما منتشر خواهد شد
-                </p>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-</section>
-
-<style>
-    .video-container {
-        background: linear-gradient(135deg, rgba(30, 30, 45, 0.6), rgba(20, 20, 35, 0.8));
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 1.5rem;
-        padding: 2rem;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .video-container:hover {
-        border-color: rgba(138, 43, 226, 0.5);
-        box-shadow: 0 25px 70px rgba(138, 43, 226, 0.3);
-        transform: translateY(-4px);
-    }
-
-    .video-wrapper {
-        position: relative;
-        padding-bottom: 56.25%; /* 16:9 aspect ratio */
-        height: 0;
-        overflow: hidden;
-        border-radius: 1rem;
-        background: #000;
-    }
-
-    .video-wrapper iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 1rem;
-    }
-
-    .placeholder-container {
-        background: linear-gradient(135deg, rgba(30, 30, 45, 0.6), rgba(20, 20, 35, 0.8));
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 1.5rem;
-        padding: 4rem 2rem;
-        backdrop-filter: blur(20px);
-    }
-
-    .placeholder-icon svg {
-        animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-10px);
-        }
-    }
-
-    @media (max-width: 768px) {
-        .video-container {
-            padding: 1rem;
-        }
-
-        .placeholder-container {
-            padding: 3rem 1.5rem;
-        }
-    }
-</style>
 
 {% endblock %}
