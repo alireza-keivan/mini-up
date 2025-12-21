@@ -50,12 +50,10 @@ def _invalidate_product_cache(product):
         CACHE_KEYS['new_products'],
     ]
 
-    # Invalidate product list caches for category and parents
+    # Invalidate product list caches for category
     if product.category:
         cat = product.category
-        while cat:
-            keys.append(CACHE_KEYS['product_list'].format(category_slug=cat.slug))
-            cat = cat.parent
+        keys.append(CACHE_KEYS['product_list'].format(category_slug=cat.slug))
 
     # Brand cache
     if product.brand:
