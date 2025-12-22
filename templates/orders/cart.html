@@ -535,7 +535,7 @@ function getCookie(name) {
 }
 
 function updateQuantity(itemId, newQuantity) {
-    fetch(`/cart/update/${itemId}/`, {
+    fetch(`/orders/cart/update/${itemId}/`, {
         method: 'POST',
         headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
         body: JSON.stringify({ quantity: newQuantity })
@@ -564,7 +564,7 @@ function decreaseQuantity(itemId) {
 
 function removeItem(itemId) {
     if (confirm('آیا از حذف این محصول اطمینان دارید؟')) {
-        fetch(`/cart/remove/${itemId}/`, {
+        fetch(`/orders/cart/remove/${itemId}/`, {
             method: 'POST',
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         })
@@ -587,7 +587,7 @@ function applyCoupon(event) {
         alert('لطفاً کد تخفیف را وارد کنید');
         return;
     }
-    fetch('/cart/apply-coupon/', {
+    fetch('/orders/cart/apply-coupon/', {
         method: 'POST',
         headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
         body: JSON.stringify({ coupon_code: couponCode })
@@ -605,7 +605,7 @@ function applyCoupon(event) {
 
 function removeCoupon() {
     if (confirm('آیا از حذف کد تخفیف اطمینان دارید؟')) {
-        fetch('/cart/remove-coupon/', {
+        fetch('/orders/cart/remove-coupon/', {
             method: 'POST',
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         })

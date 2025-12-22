@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}خدمات مجازی | Mini-Up{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/_virtual_services.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     HERO SECTION
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+<section class="vs-hero">
+    <div class="vs-hero__background">
+        <div class="vs-hero__grid"></div>
+        <div class="vs-hero__glow vs-hero__glow--1"></div>
+        <div class="vs-herovirtual_services.html__glow vs-hero__glow--2"></div>
+    </div>
+    
+    <div class="vs-hero__content">
+        <div class="vs-hero__badge">
+            <span class="vs-hero__badge-icon">⚡</span>
+            <span>خدمات پرمیوم</span>
+        </div>
+        
+        <h1 class="vs-hero__title">
+            <span class="vs-hero__title-main">خدمات مجازی</span>
+            <span class="vs-hero__title-accent">Virtual Services</span>
+        </h1>
+        
+        <p class="vs-hero__description">
+            دسترسی به بهترین سرویس‌های دیجیتال با قیمت مناسب و پشتیبانی ۲۴/۷
+        </p>
+        
+        <div class="vs-hero__stats">
+            <div class="vs-hero__stat">
+                <span class="vs-hero__stat-number">10</span>
+                <span class="vs-hero__stat-label">سرویس فعال</span>
+            </div>
+            <div class="vs-hero__stat">
+                <span class="vs-hero__stat-number">50+</span>
+                <span class="vs-hero__stat-label">پلن متنوع</span>
+            </div>
+            <div class="vs-hero__stat">
+                <span class="vs-hero__stat-number">24/7</span>
+                <span class="vs-hero__stat-label">پشتیبانی</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     FEATURED PRODUCTS CAROUSEL
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+{% if carousel_products %}
+<section class="vs-carousel">
+    <div class="vs-carousel__container">
+        <h2 class="vs-carousel__title">
+            <span class="vs-carousel__title-icon">⭐</span>
+            محصولات ویژه
+        </h2>
+        
+        <div class="vs-carousel__wrapper">
+            <!-- Navigation Arrows -->
+            <button class="vs-carousel__nav vs-carousel__nav--prev" aria-label="قبلی">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="vs-carousel__nav vs-carousel__nav--next" aria-label="بعدی">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <!-- Carousel Track -->
+            <div class="vs-carousel__track">
+                {% for product in carousel_products %}
+                <div class="vs-carousel__slide">
+                    <div class="vs-carousel__card">
+                        <!-- Product Image -->
+                        <div class="vs-carousel__image">
+                            {% if product.images.all %}
+                                <img src="{{ product.images.first.image.url }}" 
+                                     alt="{{ product.name }}"
+                                     loading="lazy">
+                            {% else %}
+                                <img src="{% static 'images/placeholder-product.jpg' %}" 
+                                     alt="{{ product.name }}"
+                                     loading="lazy">
+                            {% endif %}
+                            
+                            {% if product.discount_percentage %}
+                            <span class="vs-carousel__badge">{{ product.discount_percentage }}% تخفیف</span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <div class="vs-carousel__info">
+                            <h3 class="vs-carousel__product-name">{{ product.name }}</h3>
+                            
+                            {% if product.short_description %}
+                            <p class="vs-carousel__product-desc">{{ product.short_description|truncatewords:10 }}</p>
+                            {% endif %}
+                            
+                            <!-- Price -->
+                            <div class="vs-carousel__price">
+                                {% if product.discount_percentage %}
+                                    <span class="vs-carousel__price-old">{{ product.price|floatformat:0 }} تومان</span>
+                                    <span class="vs-carousel__price-new">{{ product.final_price|floatformat:0 }} تومان</span>
+                                {% else %}
+                                    <span class="vs-carousel__price-current">{{ product.price|floatformat:0 }} تومان</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Action Button -->
+                            <a href="{% url 'products:detail' product.slug %}" 
+                               class="vs-carousel__btn"
+                               data-product-id="{{ product.id }}">
+                                <i class="fas fa-paper-plane"></i>
+                                ثبت درخواست
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Dots Indicator -->
+            <div class="vs-carousel__dots">
+                {% for product in carousel_products %}
+                <button class="vs-carousel__dot {% if forloop.first %}active{% endif %}" 
+                        data-index="{{ forloop.counter0 }}"
+                        aria-label="اسلاید {{ forloop.counter }}"></button>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     QUICK NAVIGATION
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+{% if categories %}
+<nav class="vs-quick-nav">
+    <div class="vs-quick-nav__container">
+        {% for category in categories %}
+        <a href="#category-{{ category.slug }}" class="vs-quick-nav__item" data-color="blue">
+            {% if category.icon %}
+            <span class="vs-quick-nav__icon">{{ category.icon }}</span>
+            {% else %}
+            <span class="vs-quick-nav__icon">�</span>
+            {% endif %}
+            <span>{{ category.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</nav>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
+     SERVICES CONTAINER - DYNAMIC
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+<main class="vs-services">
+    {% for category in categories %}
+    <!-- Category: {{ category.name }} -->
+    <section id="category-{{ category.slug }}" class="vs-service" data-color="blue">
+        <div class="vs-service__header">
+            <div class="vs-service__icon">
+                {% if category.icon %}{{ category.icon }}{% else %}📦{% endif %}
+            </div>
+            <div class="vs-service__info">
+                <h2 class="vs-service__title">{{ category.name }}</h2>
+                {% if category.description %}
+                <p class="vs-service__subtitle">{{ category.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="vs-carousel" data-carousel>
+            <div class="vs-carousel__track">
+                {% for product in category.active_products %}
+                <!-- Product Card -->
+                <article class="vs-card" data-color="blue">
+                    {% if product.is_featured %}
+                    <div class="vs-card__badge">ویژه</div>
+                    {% elif product.discount_percentage %}
+                    <div class="vs-card__badge vs-card__badge--discount">{{ product.discount_percentage }}٪ تخفیف</div>
+                    {% endif %}
+                    
+                    <h3 class="vs-card__title">{{ product.name }}</h3>
+                    
+                    <div class="vs-card__price">
+                        {% if product.discount_percentage %}
+                            <span class="vs-card__amount--old">{{ product.price|floatformat:0 }}</span>
+                            <span class="vs-card__amount">{{ product.final_price|floatformat:0 }}</span>
+                        {% else %}
+                            <span class="vs-card__amount">{{ product.price|floatformat:0 }}</span>
+                        {% endif %}
+                        <span class="vs-card__currency">تومان</span>
+                    </div>
+                    
+                    {% if product.short_description %}
+                    <p class="vs-card__desc">{{ product.short_description|truncatewords:15 }}</p>
+                    {% endif %}
+                    
+                    <a href="{% url 'products:detail' product.slug %}" class="vs-card__btn">مشاهده جزئیات</a>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endfor %}
+
+</main>
+
+
+    </div>
+
+
+
+
+{% endblock content %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/virtual_services.js' %}"></script>
+{% endblock extra_js %}
