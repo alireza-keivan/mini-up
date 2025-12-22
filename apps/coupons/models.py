@@ -160,6 +160,15 @@ class Coupon(models.Model):
         if cart_total < self.min_purchase:
             return False, f'حداقل خرید {self.min_purchase:,.0f} تومان'
         
+        # For guest users, skip user-specific checks
+        if user is None or not user.is_authenticated:
+            # Guest users can't use user-restricted coupons
+            if self.allowed_users.exists():
+                return False, 'این کوپن نیاز به ورود دارد'
+            if self.first_purchase_only:
+                return False, 'این کوپن نیاز به ورود دارد'
+            return True, 'معتبر'
+        
         # Check user restrictions
         if self.allowed_users.exists() and user not in self.allowed_users.all():
             return False, 'این کوپن برای شما فعال نیست'
