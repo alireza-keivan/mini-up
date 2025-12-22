@@ -26,6 +26,9 @@ class VirtualProductForm(forms.ModelForm):
                 (Product.ProductSubType.VIRTUAL_SERVICE, 'خدمات مجازی'),
                 (Product.ProductSubType.MINI_APP, 'مینی گیم'),
             ]
+        # Add SKU validation help text
+        if 'sku' in self.fields:
+            self.fields['sku'].help_text = '⚠️ کد محصول باید دقیقاً 5 رقم باشد (مثال: 12345). اگر خالی بگذارید، به صورت خودکار تولید می‌شود.'
 
 
 class PhysicalProductForm(forms.ModelForm):
@@ -43,6 +46,9 @@ class PhysicalProductForm(forms.ModelForm):
                 (Product.ProductSubType.GAMING, 'خدمات گیمینگ'),
                 (Product.ProductSubType.ACCESSORY, 'محصولات جانبی'),
             ]
+        # Add SKU validation help text
+        if 'sku' in self.fields:
+            self.fields['sku'].help_text = '⚠️ کد محصول باید دقیقاً 5 رقم باشد (مثال: 12345). اگر خالی بگذارید، به صورت خودکار تولید می‌شود.'
 
 
 @admin.register(Category)

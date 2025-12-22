@@ -40,36 +40,46 @@ def virtual_services(request):
     """
     from apps.products.models import Category, Product
     from django.db.models import Prefetch
+    from django.core.paginator import Paginator
     
-    # Get categories that have virtual products
+    # Get categories that have virtual service products only
     categories = Category.objects.filter(
         is_active=True,
         products__is_active=True,
-        products__product_type=Product.ProductType.VIRTUAL
+        products__sub_type=Product.ProductSubType.VIRTUAL_SERVICE
     ).distinct().prefetch_related(
         Prefetch(
             'products',
             queryset=Product.objects.filter(
                 is_active=True,
-                product_type=Product.ProductType.VIRTUAL
+                sub_type=Product.ProductSubType.VIRTUAL_SERVICE
             ).select_related('category', 'brand').prefetch_related('images').order_by('-is_featured', '-created_at')[:12],
             to_attr='active_products'
         )
     ).order_by('sort_order', 'name')
     
     # Filter out categories with no products
-    categories_with_products = [cat for cat in categories if cat.active_products]
+    categories_with_products = []
+    for cat in categories:
+        if hasattr(cat, 'active_products') and cat.active_products:
+            categories_with_products.append(cat)
+    
+    # Pagination - 12 categories per page
+    paginator = Paginator(categories_with_products, 12)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
     
     # Get featured products for carousel (admin-controlled via is_featured flag)
     carousel_products = Product.objects.filter(
         is_active=True,
-        product_type=Product.ProductType.VIRTUAL,
+        sub_type=Product.ProductSubType.VIRTUAL_SERVICE,
         is_featured=True  # Only featured products appear in carousel
     ).select_related('category', 'brand').prefetch_related('images').order_by('-created_at')[:6]
     
     return render(request, 'core/virtual_services.html', {
         'title': 'خدمات مجازی',
-        'categories': categories_with_products,
+        'categories': page_obj.object_list,
+        'page_obj': page_obj,
         'carousel_products': carousel_products
     })
 
@@ -96,7 +106,7 @@ def gaming_products(request):
     # Base queryset for gaming products
     products = Product.objects.filter(
         is_active=True,
-        product_type=Product.ProductType.PHYSICAL
+        sub_type=Product.ProductSubType.GAMING
     ).select_related('category', 'brand').prefetch_related('images')
     
     # Apply filters
@@ -144,16 +154,16 @@ def gaming_products(request):
     }
     products = products.order_by(sort_options.get(sort_by, '-created_at'))
     
-    # Get all categories that have physical/gaming products
+    # Get all categories that have gaming products
     all_categories = Category.objects.filter(
         is_active=True,
         products__is_active=True,
-        products__product_type=Product.ProductType.PHYSICAL
+        products__sub_type=Product.ProductSubType.GAMING
     ).distinct().order_by('sort_order', 'name')
     
-    # Get all brands that have physical/gaming products
+    # Get all brands that have gaming products
     all_brands = Brand.objects.filter(
-        products__product_type=Product.ProductType.PHYSICAL,
+        products__sub_type=Product.ProductSubType.GAMING,
         products__is_active=True,
         is_active=True
     ).distinct().order_by('name')
@@ -204,36 +214,72 @@ def gaming_products(request):
 
 def buy_products(request):
     """
-    صفحه خرید محصولات
+    صفحه خرید محصولات - محصولات جانبی
     Displays product categories with their products in horizontal scrollable carousels.
+    Only shows ACCESSORY sub-type products.
     """
-    from apps.products.models import Category
+    from apps.products.models import Category, Product
+    from django.db.models import Prefetch
     
-    # Get active categories with their active products
+    # Get active categories with their active accessory products
     # Using prefetch_related for optimal performance
     categories = Category.objects.filter(
         is_active=True,
-        products__is_active=True  # Only categories that have active products
+        products__is_active=True,
+        products__sub_type=Product.ProductSubType.ACCESSORY
     ).prefetch_related(
-        'products__brand',  # Prefetch brand for each product
-        'products__images',  # Prefetch product images
+        Prefetch(
+            'products',
+            queryset=Product.objects.filter(
+                is_active=True,
+                sub_type=Product.ProductSubType.ACCESSORY
+            ).select_related('brand').prefetch_related('images').order_by('-is_featured', '-created_at'),
+            to_attr='active_products'
+        )
     ).distinct().order_by('sort_order', 'name')
     
-    # Filter products per category to only show active ones
-    # This is already handled by the template with category.products.all
-    # but we're ensuring the queryset is optimized
+    # Filter out categories with no products
+    categories_with_products = [cat for cat in categories if cat.active_products]
     
     context = {
         'title': 'خرید محصولات',
-        'categories': categories,
+        'categories': categories_with_products,
     }
     
     return render(request, 'core/buy_products.html', context)
 
 
 def mini_game(request):
-    """صفحه مینی گیم"""
-    return render(request, 'core/mini_game.html', {'title': 'مینی گیم'})
+    """
+    صفحه مینی گیم
+    Displays mini app products
+    """
+    from apps.products.models import Product, Category
+    from django.db.models import Prefetch
+    
+    # Get categories that have mini app products
+    categories = Category.objects.filter(
+        is_active=True,
+        products__is_active=True,
+        products__sub_type=Product.ProductSubType.MINI_APP
+    ).distinct().prefetch_related(
+        Prefetch(
+            'products',
+            queryset=Product.objects.filter(
+                is_active=True,
+                sub_type=Product.ProductSubType.MINI_APP
+            ).select_related('category', 'brand').prefetch_related('images').order_by('-is_featured', '-created_at'),
+            to_attr='active_products'
+        )
+    ).order_by('sort_order', 'name')
+    
+    # Filter out categories with no products
+    categories_with_products = [cat for cat in categories if cat.active_products]
+    
+    return render(request, 'core/mini_game.html', {
+        'title': 'مینی گیم',
+        'categories': categories_with_products
+    })
 
 
 def contact(request):
