@@ -64,8 +64,8 @@ def virtual_services(request):
         if hasattr(cat, 'active_products') and cat.active_products:
             categories_with_products.append(cat)
     
-    # Pagination - 12 categories per page
-    paginator = Paginator(categories_with_products, 12)
+    # Pagination - 6 categories per page
+    paginator = Paginator(categories_with_products, 6)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
     

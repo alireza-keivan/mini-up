@@ -5,19 +5,39 @@
 {% block title %}خدمات مجازی | Mini-Up{% endblock %}
 
 {% block content %}
-<main class="vs-page min-h-screen py-8 px-4 md:px-8">
+<!-- Hero Section with Background Image -->
+<section class="vs-hero relative w-auto overflow-hidden mb-16 mt-4">
+    <!-- Background Image -->
+    <div class="relative z-0 w-full bg-black">
+        <img src="{% static 'images/backgrounds/blur.jpg' %}" 
+             alt="Virtual Services Background"
+             class="w-full h-auto">
+        <!-- Dark Overlay for better text readability -->
+        <div class="absolute inset-0 bg-black/40"></div>
+    </div>
     
-    <!-- Page Header -->
-    <header class="vs-header text-center mb-12">
-        <h1 class="text-3xl md:text-5xl font-black mb-4">
-            <span class="text-transparent bg-clip-text bg-gradient-to-l from-neon-cyan via-neon-purple to-neon-pink">
-                خدمات مجازی
-            </span>
+    <!-- Hero Content (Positioned absolutely over the image) -->
+    <div class="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 md:px-8 py-16 text-center">
+        <h1 class="hero-title">
+            خدمات مجازی
         </h1>
-        <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p class="text-gray-200 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-8 drop-shadow-lg">
             خدمات دیجیتال و مجازی با تحویل فوری و پشتیبانی ۲۴ ساعته
         </p>
-    </header>
+        <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto drop-shadow-md">
+            بهترین و با کیفیت‌ترین خدمات مجازی را از ما بخواهید. از افزایش فالوور گرفته تا خدمات حرفه‌ای استریم، گیمینگ، طراحی و برنامه‌نویسی
+        </p>
+        
+        <!-- Scroll Down Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+            <svg class="w-8 h-8 text-neon-cyan drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
+        </div>
+    </div>
+</section>
+
+<main class="vs-page min-h-screen px-4 md:px-8 pb-16">
 
     <!-- Categories -->
     <div class="vs-categories-container space-y-16">
@@ -37,13 +57,19 @@
             </div>
             
             <!-- Horizontal Scrolling Carousel -->
-            <div class="vs-scroll-container relative">
+            <div class="vs-scroll-container relative overflow-hidden">
+                <!-- Left Fade Mask -->
+                <div class="absolute left-0 top-0 bottom-4 w-24 bg-gradient-to-r from-black via-black/60 to-transparent pointer-events-none z-10"></div>
+                
+                <!-- Right Fade Mask -->
+                <div class="absolute right-0 top-0 bottom-4 w-24 bg-gradient-to-l from-black via-black/60 to-transparent pointer-events-none z-10"></div>
+                
                 <!-- Navigation Arrows -->
                 <button class="vs-scroll-btn vs-scroll-prev absolute right-0 top-1/2 -translate-y-1/2 z-20
                                w-12 h-12 rounded-full bg-dark-800/90 border border-gray-700
                                flex items-center justify-center text-gray-400
                                hover:bg-neon-pink hover:border-neon-pink hover:text-white
-                               transition-all duration-300 opacity-0 hover:opacity-100 -mr-6">
+                               transition-all duration-300 opacity-0 hover:opacity-100 -mr-6 cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
@@ -53,7 +79,7 @@
                                w-12 h-12 rounded-full bg-dark-800/90 border border-gray-700
                                flex items-center justify-center text-gray-400
                                hover:bg-neon-cyan hover:border-neon-cyan hover:text-white
-                               transition-all duration-300 opacity-0 hover:opacity-100 -ml-6">
+                               transition-all duration-300 opacity-0 hover:opacity-100 -ml-6 cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
@@ -82,10 +108,11 @@
                                 </div>
                                 {% endif %}
                                 
-                                <!-- Wishlist/Favorite Button -->
+                                <!-- Wishlist/Favorite Button - Hidden by default, shown on card hover -->
                                 <button type="button"
                                         class="wishlist-btn absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-all duration-300
-                                               border border-cyan-400 bg-cyan-500/20 hover:bg-red-500/40 hover:border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)] hover:scale-110"
+                                               border border-cyan-400 bg-cyan-500/20 hover:bg-red-500/40 hover:border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)] hover:scale-110
+                                               opacity-0 group-hover:opacity-100"
                                         data-product-id="{{ product.id }}"
                                         data-wishlist-toggle
                                         aria-label="افزودن به علاقه‌مندی‌ها">
@@ -115,7 +142,7 @@
                                     </div>
                                     <button type="button" 
                                             class="add-to-cart-btn flex items-center gap-1 px-4 py-2 rounded-lg border border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/40 hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] transition-all text-sm"
-                                            data-product-id="{{ product.id }}">
+                                            data-product-uuid="{{ product.uuid }}">
                                         <span class="font-medium">افزودن</span>
                                     </button>
                                 </div>
@@ -204,19 +231,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
             wrapper.addEventListener('mousedown', (e) => {
                 isDown = true;
-                wrapper.style.cursor = 'grabbing';
                 startX = e.pageX - wrapper.offsetLeft;
                 scrollLeft = wrapper.scrollLeft;
             });
             
             wrapper.addEventListener('mouseleave', () => {
                 isDown = false;
-                wrapper.style.cursor = 'grab';
             });
             
             wrapper.addEventListener('mouseup', () => {
                 isDown = false;
-                wrapper.style.cursor = 'grab';
             });
             
             wrapper.addEventListener('mousemove', (e) => {
@@ -249,14 +273,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 heartIcon.setAttribute('fill', 'none');
                 heartIcon.classList.remove('text-red-500');
                 heartIcon.classList.add('text-white');
-                button.classList.remove('bg-red-500/40', 'border-red-400');
+                button.classList.remove('bg-red-500/40', 'border-red-400', '!opacity-100');
                 button.classList.add('bg-cyan-500/20', 'border-cyan-400');
             } else {
                 // Add to favorites
                 heartIcon.setAttribute('fill', 'currentColor');
                 heartIcon.classList.add('text-red-500');
                 heartIcon.classList.remove('text-white');
-                button.classList.add('bg-red-500/40', 'border-red-400');
+                button.classList.add('bg-red-500/40', 'border-red-400', '!opacity-100');
                 button.classList.remove('bg-cyan-500/20', 'border-cyan-400');
                 
                 // Animation effect
@@ -284,6 +308,72 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 // Silently fail - visual toggle already happened
                 console.log('Wishlist backend not available');
+            }
+        });
+    });
+    
+    // ==========================================
+    // Add to Cart Functionality
+    // ==========================================
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productUuid = this.dataset.productUuid;
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.innerHTML = '<span class="font-medium">در حال افزودن...</span>';
+            
+            try {
+                const response = await fetch('/orders/cart/add/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ 
+                        product_id: productUuid,
+                        quantity: 1
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Success animation
+                    button.innerHTML = '<span class="font-medium">✓ اضافه شد</span>';
+                    button.classList.add('bg-green-500/40', 'border-green-400');
+                    button.classList.remove('bg-cyan-500/20', 'border-cyan-400');
+                    
+                    // Update cart count in navbar (if exists)
+                    const cartBadge = document.querySelector('.navbar-action-badge');
+                    if (cartBadge) {
+                        const currentCount = parseInt(cartBadge.textContent) || 0;
+                        cartBadge.textContent = currentCount + 1;
+                    }
+                    
+                    // Show success notification
+                    showNotification(data.message || 'محصول به سبد خرید اضافه شد', 'success');
+                    
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('bg-green-500/40', 'border-green-400');
+                        button.classList.add('bg-cyan-500/20', 'border-cyan-400');
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || 'خطا در افزودن به سبد خرید');
+                }
+            } catch (error) {
+                console.error('Cart error:', error);
+                showNotification(error.message || 'خطا در ارتباط با سرور', 'error');
+                button.innerHTML = originalText;
+                button.disabled = false;
             }
         });
     });
