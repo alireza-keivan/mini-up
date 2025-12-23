@@ -826,6 +826,120 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     }, status=500)
             
             # ═══════════════════════════════════════════════════════════
+            # UPDATE BANK CARD
+            # ═══════════════════════════════════════════════════════════
+            elif action == 'update_bank_card':
+                from .models import BankCard
+                
+                card_id = data.get('id')
+                card_number = data.get('card_number', '').strip()
+                is_default = data.get('is_default', False)
+                
+                if not card_id:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'شناسه کارت یافت نشد'
+                    }, status=400)
+                
+                # Validate card number
+                if not card_number or len(card_number) != 16 or not card_number.isdigit():
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'شماره کارت نامعتبر است'
+                    }, status=400)
+                
+                try:
+                    card = BankCard.objects.get(id=card_id, user=user)
+                    
+                    # Check if changing to a different card number and if it already exists
+                    if card.card_number != card_number:
+                        if BankCard.objects.filter(user=user, card_number=card_number).exclude(id=card_id).exists():
+                            return JsonResponse({
+                                'success': False,
+                                'message': 'این کارت قبلا ثبت شده است'
+                            }, status=400)
+                        card.card_number = card_number
+                    
+                    # Handle default status
+                    if is_default and not card.is_default:
+                        # Remove default from other cards
+                        BankCard.objects.filter(user=user, is_default=True).update(is_default=False)
+                        card.is_default = True
+                    elif not is_default and card.is_default:
+                        # Check if this is the only card
+                        other_cards_count = BankCard.objects.filter(user=user).exclude(id=card_id).count()
+                        if other_cards_count == 0:
+                            return JsonResponse({
+                                'success': False,
+                                'message': 'حداقل یک کارت باید به عنوان کارت پیش‌فرض انتخاب شود'
+                            })
+                        card.is_default = False
+                    
+                    card.save()
+                    
+                    logger.info(f"Bank card {card_id} updated for user {user.phone}")
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'کارت بانکی با موفقیت بروزرسانی شد'
+                    })
+                except BankCard.DoesNotExist:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'کارت یافت نشد'
+                    }, status=404)
+                except Exception as e:
+                    logger.error(f"Bank card update error: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'خطا در بروزرسانی کارت'
+                    }, status=500)
+            
+            # ═══════════════════════════════════════════════════════════
+            # DELETE BANK CARD
+            # ═══════════════════════════════════════════════════════════
+            elif action == 'delete_bank_card':
+                from .models import BankCard
+                
+                card_id = data.get('card_id')
+                
+                if not card_id:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'شناسه کارت یافت نشد'
+                    }, status=400)
+                
+                try:
+                    card = BankCard.objects.get(id=card_id, user=user)
+                    
+                    # If this was the default card, set another card as default
+                    if card.is_default:
+                        next_card = BankCard.objects.filter(user=user).exclude(id=card_id).first()
+                        if next_card:
+                            next_card.is_default = True
+                            next_card.save(update_fields=['is_default'])
+                    
+                    card.delete()
+                    
+                    logger.info(f"Bank card {card_id} deleted for user {user.phone}")
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'کارت بانکی با موفقیت حذف شد'
+                    })
+                except BankCard.DoesNotExist:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'کارت یافت نشد'
+                    }, status=404)
+                except Exception as e:
+                    logger.error(f"Bank card deletion error: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'خطا در حذف کارت'
+                    }, status=500)
+            
+            # ═══════════════════════════════════════════════════════════
             # UPDATE PROFILE
             # ═══════════════════════════════════════════════════════════
             elif action == 'update_profile':
