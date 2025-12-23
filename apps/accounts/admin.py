@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .models import User, Profile, OTP
+from .models import User, Profile, OTP, Address
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -328,8 +328,10 @@ class AddressInline(admin.TabularInline):
         'title',
         'recipient_name',
         'recipient_phone',
+        'province',
         'city',
         'postal_code',
+        'full_address',
         'is_default',
     )
     readonly_fields = ()
@@ -683,6 +685,74 @@ class OTPAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         """فقط مشاهده و حذف"""
         return False
+
+
+# ============================================
+# Address Admin
+# ============================================
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    """مدیریت آدرس‌ها"""
+    from .models import Address
+    
+    list_display = (
+        'user',
+        'title',
+        'recipient_name',
+        'recipient_phone',
+        'province',
+        'city',
+        'postal_code',
+        'is_default',
+        'created_at',
+    )
+    
+    list_filter = (
+        'is_default',
+        'province',
+        'city',
+        'created_at',
+    )
+    
+    search_fields = (
+        'user__phone',
+        'user__first_name',
+        'user__last_name',
+        'recipient_name',
+        'recipient_phone',
+        'title',
+        'city',
+        'province',
+        'postal_code',
+        'full_address',
+    )
+    
+    fieldsets = (
+        ('اطلاعات کاربر', {
+            'fields': ('user',)
+        }),
+        ('عنوان و گیرنده', {
+            'fields': ('title', 'recipient_name', 'recipient_phone')
+        }),
+        ('موقعیت جغرافیایی', {
+            'fields': ('province', 'city', 'postal_code')
+        }),
+        ('آدرس کامل', {
+            'fields': ('full_address',)
+        }),
+        ('تنظیمات', {
+            'fields': ('is_default',)
+        }),
+    )
+    
+    readonly_fields = ('created_at', 'updated_at')
+    
+    autocomplete_fields = ['user']
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # Editing
+            return self.readonly_fields + ('created_at', 'updated_at')
+        return self.readonly_fields
 
 
 # ============================================

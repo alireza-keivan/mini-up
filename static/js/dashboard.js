@@ -3,8 +3,8 @@ function dashboard() {
         activeTab: 'info',
         saving: false,
         depositProcessing: false,
-        showAddAddressModal: false,
-        showAddCardModal: false,
+        showAddAddressForm: false,
+        showCardForm: false,
         submittingAddress: false,
         submittingCard: false,
         
@@ -29,6 +29,7 @@ function dashboard() {
 
         // Address Form Data
         addressForm: {
+            id: null,
             title: '',
             recipient_name: '',
             recipient_phone: '',
@@ -38,25 +39,83 @@ function dashboard() {
             full_address: '',
             is_default: false
         },
+        
+        // Available cities based on selected province
+        availableCities: [],
+        
+        // Cities data for each province
+        citiesData: {
+            'آذربایجان شرقی': ['تبریز', 'مراغه', 'مرند', 'میانه', 'شبستر', 'سراب', 'اهر', 'بناب', 'کلیبر', 'آذرشهر', 'هریس', 'هشترود'],
+            'آذربایجان غربی': ['ارومیه', 'خوی', 'مهاباد', 'بوکان', 'میاندوآب', 'سلماس', 'نقده', 'پیرانشهر', 'سردشت', 'ماکو', 'شاهین‌دژ'],
+            'اردبیل': ['اردبیل', 'پارس‌آباد', 'خلخال', 'مشگین‌شهر', 'سرعین', 'نمین', 'نیر', 'گرمی'],
+            'اصفهان': ['اصفهان', 'کاشان', 'نجف‌آباد', 'خمینی‌شهر', 'شاهین‌شهر', 'نطنز', 'گلپایگان', 'فلاورجان', 'نایین', 'دولت‌آباد', 'مبارکه', 'فریدن', 'فریدون‌شهر', 'سمیرم'],
+            'البرز': ['کرج', 'نظرآباد', 'طالقان', 'ساوجبلاغ', 'اشتهارد', 'فردیس', 'محمدشهر', 'هشتگرد'],
+            'ایلام': ['ایلام', 'دهلران', 'آبدانان', 'ایوان', 'مهران', 'دره‌شهر', 'شیروان چرداول'],
+            'بوشهر': ['بوشهر', 'برازجان', 'کنگان', 'گناوه', 'دیر', 'جم', 'دیلم', 'عسلویه'],
+            'تهران': ['تهران', 'اسلام‌شهر', 'ورامین', 'شهریار', 'ری', 'رباط‌کریم', 'دماوند', 'پاکدشت', 'بهارستان', 'ملارد', 'قرچک', 'پردیس', 'شمیرانات', 'فیروزکوه'],
+            'چهارمحال و بختیاری': ['شهرکرد', 'بروجن', 'فارسان', 'لردگان', 'اردل', 'سامان', 'کیار'],
+            'خراسان جنوبی': ['بیرجند', 'قائن', 'فردوس', 'طبس', 'نهبندان', 'سرایان', 'سربیشه', 'بشرویه'],
+            'خراسان رضوی': ['مشهد', 'نیشابور', 'سبزوار', 'تربت حیدریه', 'تربت جام', 'قوچان', 'گناباد', 'کاشمر', 'چناران', 'خواف', 'درگز', 'سرخس', 'فریمان', 'بجستان'],
+            'خراسان شمالی': ['بجنورد', 'شیروان', 'اسفراین', 'جاجرم', 'آشخانه', 'گرمه', 'فاروج'],
+            'خوزستان': ['اهواز', 'آبادان', 'خرمشهر', 'دزفول', 'اندیمشک', 'شوشتر', 'بهبهان', 'ماهشهر', 'ایذه', 'رامهرمز', 'شادگان', 'سوسنگرد', 'امیدیه', 'هویزه', 'آغاجاری'],
+            'زنجان': ['زنجان', 'ابهر', 'خدابنده', 'خرمدره', 'قیدار', 'ماهنشان', 'ایجرود'],
+            'سمنان': ['سمنان', 'شاهرود', 'دامغان', 'گرمسار', 'مهدی‌شهر', 'سرخه', 'میامی'],
+            'سیستان و بلوچستان': ['زاهدان', 'زابل', 'چابهار', 'ایرانشهر', 'خاش', 'سراوان', 'نیکشهر', 'کنارک', 'سرباز', 'میرجاوه', 'قصرقند'],
+            'فارس': ['شیراز', 'مرودشت', 'کازرون', 'جهرم', 'فسا', 'لار', 'آباده', 'داراب', 'نی‌ریز', 'استهبان', 'اقلید', 'فیروزآباد', 'سپیدان', 'ممسنی', 'لامرد'],
+            'قزوین': ['قزوین', 'تاکستان', 'آبیک', 'بوئین‌زهرا', 'الوند', 'آوج'],
+            'قم': ['قم'],
+            'کردستان': ['سنندج', 'سقز', 'مریوان', 'بانه', 'قروه', 'بیجار', 'کامیاران', 'دیواندره'],
+            'کرمان': ['کرمان', 'رفسنجان', 'بم', 'سیرجان', 'جیرفت', 'زرند', 'شهربابک', 'کهنوج', 'بافت', 'راور', 'انار', 'بردسیر'],
+            'کرمانشاه': ['کرمانشاه', 'اسلام‌آباد غرب', 'پاوه', 'جوانرود', 'قصرشیرین', 'سنقر', 'صحنه', 'هرسین', 'کنگاور', 'گیلان غرب', 'سرپل ذهاب'],
+            'کهگیلویه و بویراحمد': ['یاسوج', 'دهدشت', 'دوگنبدان', 'سی‌سخت', 'لیکک', 'چرام', 'گچساران'],
+            'گلستان': ['گرگان', 'گنبد کاووس', 'بندر ترکمن', 'علی‌آباد', 'آق‌قلا', 'مینودشت', 'کردکوی', 'کلاله', 'آزادشهر', 'رامیان', 'بندر گز'],
+            'گیلان': ['رشت', 'بندر انزلی', 'لاهیجان', 'لنگرود', 'رودسر', 'آستارا', 'تالش', 'صومعه‌سرا', 'فومن', 'ماسال', 'شفت', 'رودبار', 'املش'],
+            'لرستان': ['خرم‌آباد', 'بروجرد', 'دورود', 'الیگودرز', 'ازنا', 'کوهدشت', 'پلدختر', 'نورآباد', 'الشتر'],
+            'مازندران': ['ساری', 'بابل', 'آمل', 'قائم‌شهر', 'بهشهر', 'تنکابن', 'چالوس', 'نوشهر', 'نکا', 'رامسر', 'نور', 'فریدونکنار', 'بابلسر', 'محمودآباد', 'جویبار', 'سوادکوه'],
+            'مرکزی': ['اراک', 'ساوه', 'خمین', 'محلات', 'دلیجان', 'تفرش', 'آشتیان', 'شازند'],
+            'هرمزگان': ['بندرعباس', 'قشم', 'کیش', 'میناب', 'بندر لنگه', 'جاسک', 'حاجی‌آباد', 'رودان', 'بستک', 'بندر خمیر', 'ابوموسی', 'پارسیان'],
+            'همدان': ['همدان', 'ملایر', 'نهاوند', 'تویسرکان', 'اسدآباد', 'بهار', 'رزن', 'کبودرآهنگ'],
+            'یزد': ['یزد', 'اردکان', 'میبد', 'مهریز', 'تفت', 'بافق', 'ابرکوه', 'هرات', 'خاتم']
+        },
 
         // Bank Card Form Data
         cardForm: {
+            id: null,
             card_number: '',
-            bank_name: '',
             is_default: false
         },
 
-        // Security Form Data
-        securityForm: {
-            current_password: '',
-            new_password: '',
-            confirm_password: ''
+        // Security Form Data - PIN Management
+        hasPinCode: false,
+        settingPin: false,
+        changingPin: false,
+        
+        pinForm: {
+            pin: '',
+            confirm_pin: ''
         },
-
-        changingPassword: false,
+        
+        changePinForm: {
+            current_pin: '',
+            new_pin: '',
+            confirm_pin: ''
+        },
 
         // Initialize component
         init() {
+            // Load initial data from Django if available
+            if (window.dashboardInitData) {
+                if (window.dashboardInitData.userData) {
+                    this.userData = { ...this.userData, ...window.dashboardInitData.userData };
+                }
+                if (window.dashboardInitData.walletData) {
+                    this.walletData = { ...this.walletData, ...window.dashboardInitData.walletData };
+                }
+            }
+            
+            // Check PIN status
+            this.checkPinStatus();
+            
             // Check URL hash and switch to appropriate tab
             this.checkHashAndSwitchTab();
             
@@ -201,8 +260,108 @@ function dashboard() {
                 this.showNotification('❌ کد پستی باید ۱۰ رقم باشد', 'error');
                 return;
             }
+            
+            // Check if trying to remove default when there are multiple addresses
+            // This check happens on the backend, but we add a warning here too
+            if (this.addressForm.id && !this.addressForm.is_default) {
+                // User is editing and unchecking default
+                if (!confirm('آیا مطمئن هستید که می‌خواهید این آدرس را از حالت پیش‌فرض خارج کنید؟\nحداقل یک آدرس باید به عنوان آدرس پیش‌فرض انتخاب شود.')) {
+                    return;
+                }
+            }
 
             this.submittingAddress = true;
+
+            try {
+                const csrfToken = this.getCSRFToken();
+                
+                // Determine action based on whether we're editing or adding
+                const action = this.addressForm.id ? 'update_address' : 'add_address';
+                
+                const response = await fetch(window.dashboardUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        action: action,
+                        ...this.addressForm
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const message = this.addressForm.id ? '✅ آدرس با موفقیت بروزرسانی شد' : '✅ آدرس با موفقیت ذخیره شد';
+                    this.showNotification(message, 'success');
+                    this.showAddAddressForm = false;
+                    this.resetAddressForm();
+                    // Reload to show updated address
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    this.showNotification('❌ ' + (data.message || 'خطا در ذخیره آدرس'), 'error');
+                }
+            } catch (error) {
+                console.error('Address error:', error);
+                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
+            } finally {
+                this.submittingAddress = false;
+            }
+        },
+
+        // Reset address form
+        resetAddressForm() {
+            this.addressForm = {
+                id: null,
+                title: '',
+                recipient_name: '',
+                recipient_phone: '',
+                province: '',
+                city: '',
+                postal_code: '',
+                full_address: '',
+                is_default: false
+            };
+        },
+
+        // Edit address - populate form with address data
+        editAddress(address) {
+            this.addressForm = { ...address };
+            // Update cities for the selected province
+            this.updateCities();
+            this.showAddAddressForm = true;
+            // Scroll to form
+            setTimeout(() => {
+                const form = document.querySelector('form');
+                if (form) {
+                    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        },
+        
+        // Update available cities based on selected province
+        updateCities() {
+            const province = this.addressForm.province;
+            if (province && this.citiesData[province]) {
+                this.availableCities = this.citiesData[province];
+                // If current city is not in the new province, clear it
+                if (!this.availableCities.includes(this.addressForm.city)) {
+                    this.addressForm.city = '';
+                }
+            } else {
+                this.availableCities = [];
+                this.addressForm.city = '';
+            }
+        },
+
+        // Delete address
+        async deleteAddress(addressId) {
+            if (!confirm('آیا از حذف این آدرس اطمینان دارید؟')) {
+                return;
+            }
 
             try {
                 const csrfToken = this.getCSRFToken();
@@ -216,37 +375,23 @@ function dashboard() {
                     },
                     credentials: 'same-origin',
                     body: JSON.stringify({
-                        action: 'add_address',
-                        ...this.addressForm
+                        action: 'delete_address',
+                        address_id: addressId
                     })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    this.showNotification('✅ آدرس با موفقیت ذخیره شد', 'success');
-                    this.showAddAddressModal = false;
-                    // Reset form
-                    this.addressForm = {
-                        title: '',
-                        recipient_name: '',
-                        recipient_phone: '',
-                        province: '',
-                        city: '',
-                        postal_code: '',
-                        full_address: '',
-                        is_default: false
-                    };
-                    // Reload to show new address
+                    this.showNotification('✅ آدرس با موفقیت حذف شد', 'success');
+                    // Reload to update address list
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
-                    this.showNotification('❌ ' + (data.message || 'خطا در ذخیره آدرس'), 'error');
+                    this.showNotification('❌ ' + (data.message || 'خطا در حذف آدرس'), 'error');
                 }
             } catch (error) {
-                console.error('Address error:', error);
+                console.error('Delete address error:', error);
                 this.showNotification('❌ خطا در ارتباط با سرور', 'error');
-            } finally {
-                this.submittingAddress = false;
             }
         },
 
@@ -262,6 +407,9 @@ function dashboard() {
 
             try {
                 const csrfToken = this.getCSRFToken();
+                
+                // Determine action based on whether we're editing or adding
+                const action = this.cardForm.id ? 'update_bank_card' : 'add_bank_card';
 
                 const response = await fetch(window.dashboardUrl, {
                     method: 'POST',
@@ -272,7 +420,7 @@ function dashboard() {
                     },
                     credentials: 'same-origin',
                     body: JSON.stringify({
-                        action: 'add_bank_card',
+                        action: action,
                         ...this.cardForm
                     })
                 });
@@ -280,15 +428,16 @@ function dashboard() {
                 const data = await response.json();
 
                 if (data.success) {
-                    this.showNotification('✅ کارت بانکی با موفقیت ذخیره شد', 'success');
-                    this.showAddCardModal = false;
+                    const message = this.cardForm.id ? '✅ کارت بانکی با موفقیت بروزرسانی شد' : '✅ کارت بانکی با موفقیت ذخیره شد';
+                    this.showNotification(message, 'success');
+                    this.showCardForm = false;
                     // Reset form
                     this.cardForm = {
+                        id: null,
                         card_number: '',
-                        bank_name: '',
                         is_default: false
                     };
-                    // Reload to show new card
+                    // Reload to show updated card
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
                     this.showNotification('❌ ' + (data.message || 'خطا در ذخیره کارت'), 'error');
@@ -298,6 +447,57 @@ function dashboard() {
                 this.showNotification('❌ خطا در ارتباط با سرور', 'error');
             } finally {
                 this.submittingCard = false;
+            }
+        },
+
+        // Edit Bank Card
+        editBankCard(id, cardNumber, isDefault) {
+            this.cardForm = {
+                id: id,
+                card_number: cardNumber,
+                is_default: isDefault
+            };
+            this.showCardForm = true;
+            // Scroll to form
+            setTimeout(() => {
+                document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        },
+
+        // Delete Bank Card
+        async deleteBankCard(cardId) {
+            if (!confirm('آیا از حذف این کارت بانکی اطمینان دارید؟')) {
+                return;
+            }
+
+            try {
+                const csrfToken = this.getCSRFToken();
+
+                const response = await fetch(window.dashboardUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        action: 'delete_bank_card',
+                        card_id: cardId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.showNotification('✅ کارت بانکی با موفقیت حذف شد', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    this.showNotification('❌ ' + (data.message || 'خطا در حذف کارت'), 'error');
+                }
+            } catch (error) {
+                console.error('Delete card error:', error);
+                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
             }
         },
 
@@ -370,25 +570,44 @@ function dashboard() {
             alert(message);
         },
 
-        // Change Password
-        async changePassword() {
-            // Validate passwords match
-            if (this.securityForm.new_password !== this.securityForm.confirm_password) {
-                this.showNotification('❌ رمز عبور جدید و تکرار آن یکسان نیستند', 'error');
+        // Check PIN status
+        async checkPinStatus() {
+            try {
+                const response = await fetch('/wallet/api/pin/status/', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                const data = await response.json();
+                this.hasPinCode = data.has_pin || false;
+            } catch (error) {
+                console.error('Check PIN status error:', error);
+            }
+        },
+
+        // Setup PIN
+        async setupPin() {
+            // Validate PIN
+            if (!this.pinForm.pin || !this.pinForm.confirm_pin) {
+                this.showNotification('❌ لطفاً رمز را وارد کنید', 'error');
                 return;
             }
 
-            // Validate password length
-            if (this.securityForm.new_password.length < 8) {
-                this.showNotification('❌ رمز عبور باید حداقل 8 کاراکتر باشد', 'error');
+            if (this.pinForm.pin !== this.pinForm.confirm_pin) {
+                this.showNotification('❌ رمزها مطابقت ندارند', 'error');
                 return;
             }
 
-            this.changingPassword = true;
+            if (!/^\d{4}$/.test(this.pinForm.pin)) {
+                this.showNotification('❌ رمز باید ۴ رقم باشد', 'error');
+                return;
+            }
+
+            this.settingPin = true;
 
             try {
                 const csrfToken = this.getCSRFToken();
-                const response = await fetch(window.dashboardUrl, {
+                const response = await fetch('/wallet/api/pin/setup/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -396,30 +615,77 @@ function dashboard() {
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     credentials: 'same-origin',
-                    body: JSON.stringify({
-                        action: 'change_password',
-                        ...this.securityForm
-                    })
+                    body: JSON.stringify(this.pinForm)
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    this.showNotification('✅ رمز عبور با موفقیت تغییر کرد', 'success');
-                    // Reset form
-                    this.securityForm = {
-                        current_password: '',
-                        new_password: '',
-                        confirm_password: ''
-                    };
+                    this.showNotification('✅ رمز امنیتی با موفقیت تنظیم شد', 'success');
+                    this.pinForm = { pin: '', confirm_pin: '' };
+                    this.hasPinCode = true;
                 } else {
-                    this.showNotification('❌ ' + (data.message || 'خطا در تغییر رمز عبور'), 'error');
+                    this.showNotification('❌ ' + (data.message || 'خطا در تنظیم رمز'), 'error');
                 }
             } catch (error) {
-                console.error('Change password error:', error);
+                console.error('Setup PIN error:', error);
                 this.showNotification('❌ خطا در ارتباط با سرور', 'error');
             } finally {
-                this.changingPassword = false;
+                this.settingPin = false;
+            }
+        },
+
+        // Change PIN
+        async changePin() {
+            // Validate
+            if (!this.changePinForm.current_pin || !this.changePinForm.new_pin || !this.changePinForm.confirm_pin) {
+                this.showNotification('❌ لطفاً تمام فیلدها را پر کنید', 'error');
+                return;
+            }
+
+            if (this.changePinForm.new_pin !== this.changePinForm.confirm_pin) {
+                this.showNotification('❌ رمز جدید و تکرار آن مطابقت ندارند', 'error');
+                return;
+            }
+
+            if (!/^\d{4}$/.test(this.changePinForm.new_pin)) {
+                this.showNotification('❌ رمز جدید باید ۴ رقم باشد', 'error');
+                return;
+            }
+
+            if (this.changePinForm.current_pin === this.changePinForm.new_pin) {
+                this.showNotification('❌ رمز جدید نباید با رمز فعلی یکسان باشد', 'error');
+                return;
+            }
+
+            this.changingPin = true;
+
+            try {
+                const csrfToken = this.getCSRFToken();
+                const response = await fetch('/wallet/api/pin/change/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(this.changePinForm)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.showNotification('✅ رمز امنیتی با موفقیت تغییر کرد', 'success');
+                    this.changePinForm = { current_pin: '', new_pin: '', confirm_pin: '' };
+                } else {
+                    this.showNotification('❌ ' + (data.message || 'خطا در تغییر رمز'), 'error');
+                }
+            } catch (error) {
+                console.error('Change PIN error:', error);
+                this.showNotification('❌ خطا در ارتباط با سرور', 'error');
+            } finally {
+                this.changingPin = false;
             }
         }
     };

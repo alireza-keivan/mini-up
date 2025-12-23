@@ -735,6 +735,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     }, status=400)
                 
                 try:
+                    # Check if this is the first address - if yes, force it to be default
+                    existing_addresses_count = Address.objects.filter(user=user).count()
+                    is_default = data.get('is_default', False)
+                    
+                    if existing_addresses_count == 0:
+                        # First address must be default
+                        is_default = True
+                    
                     # Create address
                     address = Address.objects.create(
                         user=user,
@@ -745,7 +753,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                         city=data.get('city').strip(),
                         postal_code=postal_code,
                         full_address=data.get('full_address').strip(),
-                        is_default=data.get('is_default', False)
+                        is_default=is_default
                     )
                     
                     logger.info(f"Address created: {address.id} for user {user.phone}")
@@ -815,6 +823,171 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     return JsonResponse({
                         'success': False,
                         'message': 'خطا در ذخیره کارت'
+                    }, status=500)
+            
+            # ═══════════════════════════════════════════════════════════
+            # UPDATE PROFILE
+            # ═══════════════════════════════════════════════════════════
+            elif action == 'update_profile':
+                from .models import Profile
+                
+                try:
+                    # Update user basic info
+                    first_name = data.get('first_name', '').strip()
+                    last_name = data.get('last_name', '').strip()
+                    
+                    if first_name:
+                        user.first_name = first_name
+                    if last_name:
+                        user.last_name = last_name
+                    
+                    user.save(update_fields=['first_name', 'last_name'])
+                    
+                    # Update or create profile for national_code
+                    national_code = data.get('national_code', '').strip()
+                    if national_code:
+                        profile, created = Profile.objects.get_or_create(user=user)
+                        profile.national_code = national_code
+                        profile.save(update_fields=['national_code'])
+                    
+                    logger.info(f"Profile updated for user {user.phone}")
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'تغییرات با موفقیت ذخیره شد',
+                        'user': {
+                            'first_name': user.first_name,
+                            'last_name': user.last_name,
+                            'national_code': profile.national_code if hasattr(user, 'profile') else ''
+                        }
+                    })
+                except Exception as e:
+                    logger.error(f"Profile update error: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'خطا در ذخیره اطلاعات'
+                    }, status=500)
+            
+            # ═══════════════════════════════════════════════════════
+            # DELETE ADDRESS
+            # ═══════════════════════════════════════════════════════
+            elif action == 'delete_address':
+                from .models import Address
+                
+                address_id = data.get('address_id')
+                
+                if not address_id:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'شناسه آدرس یافت نشد'
+                    }, status=400)
+                
+                try:
+                    address = Address.objects.get(id=address_id, user=user)
+                    address.delete()
+                    
+                    logger.info(f"Address {address_id} deleted for user {user.phone}")
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'آدرس با موفقیت حذف شد'
+                    })
+                except Address.DoesNotExist:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'آدرس یافت نشد'
+                    }, status=404)
+                except Exception as e:
+                    logger.error(f"Address deletion error: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'خطا در حذف آدرس'
+                    }, status=500)
+            
+            # ═══════════════════════════════════════════════════════
+            # UPDATE ADDRESS
+            # ═══════════════════════════════════════════════════════
+            elif action == 'update_address':
+                from .models import Address
+                
+                address_id = data.get('id')
+                
+                if not address_id:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'شناسه آدرس یافت نشد'
+                    }, status=400)
+                
+                # Validate required fields
+                required_fields = ['title', 'recipient_name', 'recipient_phone', 'province', 'city', 'postal_code', 'full_address']
+                for field in required_fields:
+                    if not data.get(field):
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'فیلد {field} الزامی است'
+                        }, status=400)
+                
+                # Validate phone number
+                phone = data.get('recipient_phone', '').strip()
+                if not phone.startswith('09') or len(phone) != 11:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'شماره تماس باید با ۰۹ شروع شده و ۱۱ رقم باشد'
+                    }, status=400)
+                
+                # Validate postal code
+                postal_code = data.get('postal_code', '').strip()
+                if not postal_code.isdigit() or len(postal_code) != 10:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'کد پستی باید ۱۰ رقم باشد'
+                    }, status=400)
+                
+                try:
+                    address = Address.objects.get(id=address_id, user=user)
+                    
+                    # Check if trying to uncheck default when this is the only/current default address
+                    is_default = data.get('is_default', False)
+                    
+                    # If the address was default and user is trying to uncheck it
+                    if address.is_default and not is_default:
+                        # Check if there are other addresses
+                        other_addresses_count = Address.objects.filter(user=user).exclude(id=address_id).count()
+                        
+                        if other_addresses_count == 0:
+                            # This is the only address, must remain default
+                            return JsonResponse({
+                                'success': False,
+                                'message': 'حداقل یک آدرس باید به عنوان آدرس پیش‌فرض انتخاب شود'
+                            }, status=400)
+                    
+                    # Update address fields
+                    address.title = data.get('title').strip()
+                    address.recipient_name = data.get('recipient_name').strip()
+                    address.recipient_phone = phone
+                    address.province = data.get('province').strip()
+                    address.city = data.get('city').strip()
+                    address.postal_code = postal_code
+                    address.full_address = data.get('full_address').strip()
+                    address.is_default = is_default
+                    address.save()
+                    
+                    logger.info(f"Address {address_id} updated for user {user.phone}")
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'آدرس با موفقیت بروزرسانی شد'
+                    })
+                except Address.DoesNotExist:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'آدرس یافت نشد'
+                    }, status=404)
+                except Exception as e:
+                    logger.error(f"Address update error: {e}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'خطا در بروزرسانی آدرس'
                     }, status=500)
             
             return JsonResponse({

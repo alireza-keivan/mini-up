@@ -265,38 +265,56 @@
                         کارت‌های بانکی من
                     </h3>
                     
+                    <!-- Existing Bank Cards -->
                     {% if bank_cards %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         {% for card in bank_cards %}
-                        <div class="bank-card-item {% if card.is_default %}default{% endif %}">
+                        <div class="bank-card-item {% if card.is_default %}default{% endif %}" style="max-width: 380px; position: relative;">
                             {% if card.is_default %}
                             <span class="default-badge">پیش‌فرض</span>
                             {% endif %}
                             
-                            <div style="position: relative; width: 100%; padding-bottom: 63%; background-image: url('{% static 'images/cards/bank.png' %}'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border-radius: 16px; overflow: hidden;">
+                            <!-- Edit and Delete Buttons -->
+                            <div style="position: absolute; top: 8px; left: 8px; z-index: 10; display: flex; flex-direction: column; gap: 6px;">
+                                <button @click="editBankCard({{ card.id }}, '{{ card.card_number }}', {{ card.is_default|lower }})" 
+                                        class="btn-icon-small" 
+                                        style="background: rgba(59, 130, 246, 0.9); color: white; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);" 
+                                        title="ویرایش کارت">
+                                    <i class="fas fa-edit" style="font-size: 0.7rem;"></i>
+                                </button>
+                                <button @click="deleteBankCard({{ card.id }})" 
+                                        class="btn-icon-small" 
+                                        style="background: rgba(239, 68, 68, 0.9); color: white; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);" 
+                                        title="حذف کارت">
+                                    <i class="fas fa-trash" style="font-size: 0.7rem;"></i>
+                                </button>
+                            </div>
+                            
+                            <div style="position: relative; width: 100%; padding-bottom: 63%; background-image: url('{% static 'images/cards/bank.png' %}'); background-size: cover; background-position: center; background-repeat: no-repeat; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
                                 <!-- Bank Name -->
-                                <div style="position: absolute; top: 8%; right: 6%; color: white; font-size: 0.95rem; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                                    <i class="fas {{ card.bank_logo_icon }}" style="color: {{ card.bank_color }}; margin-left: 0.3rem;"></i>
+                                <div style="position: absolute; top: 8%; right: 6%; color: white; font-size: 0.7rem; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                    <i class="fas {{ card.bank_logo_icon }}" style="color: {{ card.bank_color }}; margin-left: 0.3rem; font-size: 0.65rem;"></i>
                                     {{ card.bank_full_name|default:"بانک" }}
                                 </div>
                                 
                                 <!-- Card Number -->
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-family: 'Courier New', monospace; font-size: 1.1rem; letter-spacing: 0.2rem; font-weight: 600; text-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-family: 'Courier New', monospace; font-size: 0.65rem; letter-spacing: 0.1rem; font-weight: 600; text-shadow: 0 2px 6px rgba(0,0,0,0.4); white-space: nowrap;">
                                     {{ card.masked_number }}
                                 </div>
                                 
                                 <!-- User Name -->
-                                <div style="position: absolute; bottom: 12%; right: 6%; color: white; font-size: 0.85rem; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                <div style="position: absolute; top: 12%; left: 6%; color: white; font-size: 0.6rem; font-weight: 500; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
                                     {{ user.get_full_name|default:user.phone }}
                                 </div>
                                 
                                 <!-- Status Badge -->
-                                <div style="position: absolute; bottom: 8%; left: 6%; font-size: 0.7rem;">
+                                <div style="position: absolute; bottom: 8%; left: 6%; font-size: 0.55rem;">
                                     {% if card.is_verified %}
-                                        <span style="background: rgba(0, 255, 136, 0.2); color: #00ff88; padding: 0.2rem 0.5rem; border-radius: 4px; backdrop-filter: blur(10px);">
+                                        <span style="background: rgba(0, 255, 136, 0.2); color: #00ff88; padding: 0.15rem 0.4rem; border-radius: 4px; backdrop-filter: blur(10px);">
                                             <i class="fas fa-check-circle"></i> تایید شده
                                         </span>
                                     {% else %}
-                                        <span style="background: rgba(255, 193, 7, 0.2); color: #ffc107; padding: 0.2rem 0.5rem; border-radius: 4px; backdrop-filter: blur(10px);">
+                                        <span style="background: rgba(255, 193, 7, 0.2); color: #ffc107; padding: 0.15rem 0.4rem; border-radius: 4px; backdrop-filter: blur(10px);">
                                             <i class="fas fa-clock"></i> در انتظار
                                         </span>
                                     {% endif %}
@@ -304,90 +322,206 @@
                             </div>
                         </div>
                         {% endfor %}
-                    {% else %}
-                        <div class="empty-state" style="padding: 2rem 1rem;">
-                            <i class="fas fa-credit-card"></i>
-                            <p>هنوز کارت بانکی ثبت نکرده‌اید</p>
                         </div>
                     {% endif %}
+
+                    <!-- Add Bank Card Form (Inline) -->
+                    <div class="form-section" x-show="{% if not bank_cards %}true{% else %}showCardForm{% endif %}">
+                        <form @submit.prevent="submitBankCard()" class="space-y-2">
+                            <input type="hidden" x-model="cardForm.id">
+                            <div>
+                                <label class="form-label text-xs">شماره کارت</label>
+                                <input type="text" 
+                                       class="form-input text-xs py-1.5 px-2" 
+                                       x-model="cardForm.card_number"
+                                       placeholder="۱۶ رقم شماره کارت"
+                                       maxlength="16"
+                                       dir="ltr"
+                                       @input="cardForm.card_number = cardForm.card_number.replace(/\D/g, '')"
+                                       required>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" 
+                                       id="default-card"
+                                       class="w-4 h-4" 
+                                       x-model="cardForm.is_default">
+                                <label for="default-card" class="text-xs text-gray-300">
+                                    تنظیم به عنوان کارت پیش‌فرض
+                                </label>
+                            </div>
+
+                            <div class="flex gap-2 pt-1">
+                                <button type="submit" 
+                                        class="btn btn-success text-xs py-1.5 px-3"
+                                        :disabled="submittingCard">
+                                    <span x-show="!submittingCard">
+                                        <i class="fas fa-save"></i>
+                                        ذخیره کارت
+                                    </span>
+                                    <span x-show="submittingCard">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        در حال ذخیره...
+                                    </span>
+                                </button>
+                                {% if bank_cards %}
+                                <button type="button" 
+                                        class="btn btn-cancel text-xs py-1.5 px-3" 
+                                        @click="showCardForm = false; cardForm = {card_number: '', is_default: false}">
+                                    انصراف
+                                </button>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
                     
-                <div class="flex justify-center">    
-                    <button type="button" 
-                            class="btn btn-neon-border small gradient-pink-purple" 
-                            @click="showAddCardModal = true">
-                        <i class="fas fa-plus"></i>
-                        <span>افزودن کارت جدید</span>
-                    </button>
-                </div>
+                    <!-- Add New Card Button (shown when cards exist and form is hidden) -->
+                    {% if bank_cards %}
+                    <div class="flex justify-center" x-show="!showCardForm">    
+                        <button type="button" 
+                                class="btn btn-neon-border small gradient-pink-purple" 
+                                @click="showCardForm = true">
+                            <i class="fas fa-plus"></i>
+                            <span>افزودن کارت جدید</span>
+                        </button>
+                    </div>
+                    {% endif %}
                 </div>
 
                 <!-- ═══════════════════════════════════════════════════════
                      TAB 3: SECURITY (امنیت حساب)
                      ═══════════════════════════════════════════════════════ -->
                 <div x-show="activeTab === 'security'" x-transition:enter="transition ease-out duration-200">
-                    <h2 class="text-xl font-bold text-white mb-4">امنیت حساب</h2>
+                    <h2 class="text-xl font-bold text-white mb-4">امنیت کیف پول</h2>
                     
-                    <!-- Password Change Section -->
-                    <h3 class="section-title">
-                        <i class="fas fa-lock"></i>
-                        تغییر رمز عبور
-                    </h3>
-                    
-                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                        <form @submit.prevent="changePassword()">
-                            <div class="form-group">
-                                <label class="form-label">رمز عبور فعلی</label>
-                                <input type="password" 
-                                       class="form-input" 
-                                       x-model="securityForm.current_password"
-                                       placeholder="رمز عبور فعلی"
-                                       required>
+                    <div class="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-blue-400 text-lg mt-0.5"></i>
+                            <div class="text-sm text-gray-300">
+                                <p class="font-semibold text-blue-400 mb-1">رمز امنیتی کیف پول</p>
+                                <p>برای افزایش امنیت خریدهای شما، یک رمز ۴ رقمی تنظیم کنید. این رمز هنگام خرید از کیف پول درخواست می‌شود.</p>
                             </div>
-
-                            <div class="form-group">
-                                <label class="form-label">رمز عبور جدید</label>
-                                <input type="password" 
-                                       class="form-input" 
-                                       x-model="securityForm.new_password"
-                                       placeholder="رمز عبور جدید"
-                                       minlength="8"
-                                       required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">تکرار رمز عبور جدید</label>
-                                <input type="password" 
-                                       class="form-input" 
-                                       x-model="securityForm.confirm_password"
-                                       placeholder="تکرار رمز عبور جدید"
-                                       minlength="8"
-                                       required>
-                            </div>
-                         <div class="flex justify-center">      
-                            <button type="submit" 
-                                    class="btn btn-neon-border small danger"
-                                    :disabled="changingPassword">
-                                <span x-show="!changingPassword">
-                                    <i class="fas fa-key"></i>
-                                    <span>تغییر رمز عبور</span>
-                                </span>
-                                <span x-show="changingPassword">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <span>در حال تغییر...</span>
-                                </span>
-                            </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
-
-                    <!-- Login History -->\n                    <h3 class="section-title">
-                        <i class="fas fa-history"></i>
-                        تاریخچه ورود به سیستم
-                    </h3>
                     
-                    <div class="empty-state">
-                        <i class="fas fa-history"></i>
-                        <p>تاریخچه ورودی در حال توسعه است</p>
+                    <!-- PIN Setup/Change Section -->
+                    <div x-show="!hasPinCode">
+                        <h3 class="section-title">
+                            <i class="fas fa-shield-alt"></i>
+                            تنظیم رمز امنیتی
+                        </h3>
+                        
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                            <form @submit.prevent="setupPin()">
+                                <div class="form-group mb-3">
+                                    <label class="form-label text-sm">رمز ۴ رقمی</label>
+                                    <input type="password" 
+                                           class="form-input text-center text-lg tracking-widest"
+                                           x-model="pinForm.pin"
+                                           placeholder="****"
+                                           maxlength="4"
+                                           pattern="[0-9]{4}"
+                                           inputmode="numeric"
+                                           dir="ltr"
+                                           required>
+                                    <p class="text-xs text-gray-400 mt-1">فقط اعداد ۰ تا ۹</p>
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label class="form-label text-sm">تکرار رمز</label>
+                                    <input type="password" 
+                                           class="form-input text-center text-lg tracking-widest"
+                                           x-model="pinForm.confirm_pin"
+                                           placeholder="****"
+                                           maxlength="4"
+                                           pattern="[0-9]{4}"
+                                           inputmode="numeric"
+                                           dir="ltr"
+                                           required>
+                                </div>
+                             
+                                <div class="flex justify-center">      
+                                    <button type="submit" 
+                                            class="btn btn-neon-border small gradient-pink-purple"
+                                            :disabled="settingPin">
+                                        <span x-show="!settingPin">
+                                            <i class="fas fa-check"></i>
+                                            <span>تنظیم رمز امنیتی</span>
+                                        </span>
+                                        <span x-show="settingPin">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                            <span>در حال تنظیم...</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Change PIN Section -->
+                    <div x-show="hasPinCode">
+                        <h3 class="section-title">
+                            <i class="fas fa-key"></i>
+                            تغییر رمز امنیتی
+                        </h3>
+                        
+                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                            <form @submit.prevent="changePin()">
+                                <div class="form-group mb-3">
+                                    <label class="form-label text-sm">رمز فعلی</label>
+                                    <input type="password" 
+                                           class="form-input text-center text-lg tracking-widest"
+                                           x-model="changePinForm.current_pin"
+                                           placeholder="****"
+                                           maxlength="4"
+                                           pattern="[0-9]{4}"
+                                           inputmode="numeric"
+                                           dir="ltr"
+                                           required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label text-sm">رمز جدید</label>
+                                    <input type="password" 
+                                           class="form-input text-center text-lg tracking-widest"
+                                           x-model="changePinForm.new_pin"
+                                           placeholder="****"
+                                           maxlength="4"
+                                           pattern="[0-9]{4}"
+                                           inputmode="numeric"
+                                           dir="ltr"
+                                           required>
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label class="form-label text-sm">تکرار رمز جدید</label>
+                                    <input type="password" 
+                                           class="form-input text-center text-lg tracking-widest"
+                                           x-model="changePinForm.confirm_pin"
+                                           placeholder="****"
+                                           maxlength="4"
+                                           pattern="[0-9]{4}"
+                                           inputmode="numeric"
+                                           dir="ltr"
+                                           required>
+                                </div>
+                             
+                                <div class="flex justify-center">      
+                                    <button type="submit" 
+                                            class="btn btn-neon-border small danger"
+                                            :disabled="changingPin">
+                                        <span x-show="!changingPin">
+                                            <i class="fas fa-key"></i>
+                                            <span>تغییر رمز امنیتی</span>
+                                        </span>
+                                        <span x-show="changingPin">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                            <span>در حال تغییر...</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
@@ -397,104 +531,104 @@
                 <div x-show="activeTab === 'addresses'" x-transition:enter="transition ease-out duration-200">
                     <h2 class="text-xl font-bold text-white mb-4">آدرس‌های من</h2>
                     
-                    <!-- Addresses Section -->
-                    <h3 class="section-title">
-                        <i class="fas fa-map-marker-alt"></i>
-                        لیست آدرس‌ها
-                    </h3>
-                    
+                    <!-- Existing Addresses List -->
                     {% if addresses %}
-                        {% for address in addresses %}
-                        <div class="address-card {% if address.is_default %}default{% endif %}">
-                            {% if address.is_default %}
-                            <span class="default-badge">پیش‌فرض</span>
-                            {% endif %}
-                            
-                            <div class="flex items-start justify-between mb-2">
-                                <div>
-                                    <h4 class="text-white font-semibold mb-1">{{ address.title }}</h4>
-                                    <p class="text-sm text-gray-400">{{ address.recipient_name }} - {{ address.recipient_phone }}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {% for address in addresses %}
+                            <div class="address-card {% if address.is_default %}default{% endif %} relative">
+                                
+                                <div class="flex items-start gap-3 mb-3">
+                                    <!-- Action Buttons - Left Side -->
+                                    <div class="flex flex-col gap-2.5">
+                                        <button type="button"
+                                                @click="editAddress({
+                                                    id: {{ address.id }},
+                                                    title: '{{ address.title }}',
+                                                    recipient_name: '{{ address.recipient_name }}',
+                                                    recipient_phone: '{{ address.recipient_phone }}',
+                                                    province: '{{ address.province }}',
+                                                    city: '{{ address.city }}',
+                                                    postal_code: '{{ address.postal_code }}',
+                                                    full_address: '{{ address.full_address }}',
+                                                    is_default: {{ address.is_default|yesno:'true,false' }}
+                                                })"
+                                                class="text-blue-500 hover:text-blue-400 transition p-2.5 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg"
+                                                title="ویرایش">
+                                            <i class="fas fa-edit text-sm"></i>
+                                        </button>
+                                        <button type="button"
+                                                @click="deleteAddress({{ address.id }})"
+                                                class="text-red-500 hover:text-red-400 transition p-2.5 bg-red-500/10 hover:bg-red-500/20 rounded-lg"
+                                                title="حذف">
+                                            <i class="fas fa-trash text-sm"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Address Content -->
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <h4 class="text-white font-semibold">{{ address.title }}</h4>
+                                            {% if address.is_default %}
+                                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/30">
+                                                پیش‌فرض
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <p class="text-sm text-gray-400">{{ address.recipient_name }} - {{ address.recipient_phone }}</p>
+                                    </div>
                                 </div>
+                                
+                                <p class="text-sm text-gray-300 mb-2">
+                                    {{ address.province }}، {{ address.city }}
+                                </p>
+                                <p class="text-sm text-gray-400 mb-2">
+                                    {{ address.full_address }}
+                                </p>
+                                <p class="text-xs text-gray-500" dir="ltr">
+                                    کد پستی: {{ address.postal_code }}
+                                </p>
                             </div>
-                            
-                            <p class="text-sm text-gray-300 mb-2">
-                                {{ address.province }}، {{ address.city }}
-                            </p>
-                            <p class="text-sm text-gray-400 mb-2">
-                                {{ address.full_address }}
-                            </p>
-                            <p class="text-xs text-gray-500" dir="ltr">
-                                کد پستی: {{ address.postal_code }}
-                            </p>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state" style="padding: 2rem 1rem;">
-                            <i class="fas fa-map-marked-alt"></i>
-                            <p>هنوز آدرسی ثبت نکرده‌اید</p>
+                            {% endfor %}
                         </div>
                     {% endif %}
-                    <div class="flex justify-center">
-                        <button type="button" 
-                                class="btn btn-neon-border small gradient-pink-purple" 
-                                @click="showAddAddressModal = true">
-                            <i class="fas fa-plus"></i>
-                            <span>افزودن آدرس جدید</span>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-            
-            <!-- ═══════════════════════════════════════════════════════
-                 MODALS - خارج از Tab Content (در سطح dashboard-card)
-                 ═══════════════════════════════════════════════════════ -->
-            
-            <!-- Add Address Modal -->
-            <div x-show="showAddAddressModal" 
-                 class="modal-overlay" 
-                 @click.self="showAddAddressModal = false"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 style="display: none;">
-                <div class="modal-content">
-                    <button class="modal-close" @click="showAddAddressModal = false">
-                        <i class="fas fa-times"></i>
-                    </button>
                     
-                    <div class="modal-header">
-                        <h3 class="modal-title">
+                    <!-- Add New Address Form (shown when no addresses OR when adding) -->
+                    <div x-show="{% if addresses %}showAddAddressForm{% else %}true{% endif %}" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform scale-95"
+                         x-transition:enter-end="opacity-100 transform scale-100">
+                        
+                        <h3 class="section-title">
                             <i class="fas fa-map-marker-alt"></i>
-                            افزودن آدرس جدید
+                            {% if addresses %}افزودن آدرس جدید{% else %}افزودن اولین آدرس{% endif %}
                         </h3>
-                    </div>
-                    
-                    <div class="modal-body">
-                        <form @submit.prevent="submitAddress()">
-                            <div class="form-group">
-                                <label class="form-label">عنوان آدرس</label>
+                        
+                        <form @submit.prevent="submitAddress()" class="space-y-2">
+                            <!-- Title -->
+                            <div class="form-group mb-2">
+                                <label class="form-label text-xs">عنوان آدرس</label>
                                 <input type="text" 
-                                       class="form-input" 
+                                       class="form-input text-xs py-1.5 px-2" 
                                        x-model="addressForm.title"
                                        placeholder="مثال: خانه، محل کار"
                                        required>
                             </div>
 
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">نام گیرنده</label>
+                            <!-- Recipient Info Row -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <div class="form-group mb-0">
+                                    <label class="form-label text-xs">نام گیرنده</label>
                                     <input type="text" 
-                                           class="form-input" 
+                                           class="form-input text-xs py-1.5 px-2" 
                                            x-model="addressForm.recipient_name"
                                            placeholder="نام و نام خانوادگی"
                                            required>
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="form-label">شماره تماس گیرنده</label>
+                                <div class="form-group mb-0">
+                                    <label class="form-label text-xs">شماره تماس گیرنده</label>
                                     <input type="tel" 
-                                           class="form-input" 
+                                           class="form-input text-xs py-1.5 px-2" 
                                            x-model="addressForm.recipient_phone"
                                            placeholder="09xxxxxxxxx"
                                            maxlength="11"
@@ -503,67 +637,110 @@
                                 </div>
                             </div>
 
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label">استان</label>
-                                    <input type="text" 
-                                           class="form-input" 
-                                           x-model="addressForm.province"
-                                           placeholder="مثال: تهران"
-                                           required>
+                            <!-- Location Row -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <div class="form-group mb-0">
+                                    <label class="form-label text-xs">استان</label>
+                                    <select class="form-input text-xs py-1.5 px-2" 
+                                            x-model="addressForm.province"
+                                            @change="updateCities()"
+                                            required>
+                                        <option value="">انتخاب استان</option>
+                                        <option value="آذربایجان شرقی">آذربایجان شرقی</option>
+                                        <option value="آذربایجان غربی">آذربایجان غربی</option>
+                                        <option value="اردبیل">اردبیل</option>
+                                        <option value="اصفهان">اصفهان</option>
+                                        <option value="البرز">البرز</option>
+                                        <option value="ایلام">ایلام</option>
+                                        <option value="بوشهر">بوشهر</option>
+                                        <option value="تهران">تهران</option>
+                                        <option value="چهارمحال و بختیاری">چهارمحال و بختیاری</option>
+                                        <option value="خراسان جنوبی">خراسان جنوبی</option>
+                                        <option value="خراسان رضوی">خراسان رضوی</option>
+                                        <option value="خراسان شمالی">خراسان شمالی</option>
+                                        <option value="خوزستان">خوزستان</option>
+                                        <option value="زنجان">زنجان</option>
+                                        <option value="سمنان">سمنان</option>
+                                        <option value="سیستان و بلوچستان">سیستان و بلوچستان</option>
+                                        <option value="فارس">فارس</option>
+                                        <option value="قزوین">قزوین</option>
+                                        <option value="قم">قم</option>
+                                        <option value="کردستان">کردستان</option>
+                                        <option value="کرمان">کرمان</option>
+                                        <option value="کرمانشاه">کرمانشاه</option>
+                                        <option value="کهگیلویه و بویراحمد">کهگیلویه و بویراحمد</option>
+                                        <option value="گلستان">گلستان</option>
+                                        <option value="گیلان">گیلان</option>
+                                        <option value="لرستان">لرستان</option>
+                                        <option value="مازندران">مازندران</option>
+                                        <option value="مرکزی">مرکزی</option>
+                                        <option value="هرمزگان">هرمزگان</option>
+                                        <option value="همدان">همدان</option>
+                                        <option value="یزد">یزد</option>
+                                    </select>
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="form-label">شهر</label>
+                                <div class="form-group mb-0">
+                                    <label class="form-label text-xs">شهر</label>
+                                    <select class="form-input text-xs py-1.5 px-2" 
+                                            x-model="addressForm.city"
+                                            required>
+                                        <option value="">ابتدا استان را انتخاب کنید</option>
+                                        <template x-for="city in availableCities" :key="city">
+                                            <option :value="city" x-text="city"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group mb-0">
+                                    <label class="form-label text-xs">کد پستی</label>
                                     <input type="text" 
-                                           class="form-input" 
-                                           x-model="addressForm.city"
-                                           placeholder="مثال: تهران"
+                                           class="form-input text-xs py-1.5 px-2" 
+                                           x-model="addressForm.postal_code"
+                                           placeholder="کد پستی ۱۰ رقمی"
+                                           maxlength="10"
+                                           dir="ltr"
                                            required>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label">کد پستی</label>
-                                <input type="text" 
-                                       class="form-input" 
-                                       x-model="addressForm.postal_code"
-                                       placeholder="کد پستی ۱۰ رقمی"
-                                       maxlength="10"
-                                       dir="ltr"
-                                       required>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">آدرس کامل</label>
-                                <textarea class="form-textarea" 
+                            <!-- Full Address -->
+                            <div class="form-group mb-2">
+                                <label class="form-label text-xs">آدرس کامل</label>
+                                <textarea class="form-textarea text-xs py-1.5 px-2" 
                                           x-model="addressForm.full_address"
                                           placeholder="آدرس کامل را وارد کنید..."
+                                          rows="2"
+                                          style="min-height: 60px; max-height: 100px;"
                                           required></textarea>
                             </div>
 
-                            <div class="checkbox-group">
+                            <!-- Default Checkbox -->
+                            <div class="checkbox-group mb-2">
                                 <input type="checkbox" 
                                        id="default-address"
                                        class="checkbox-input" 
                                        x-model="addressForm.is_default">
-                                <label for="default-address" class="checkbox-label">
+                                <label for="default-address" class="checkbox-label text-xs">
                                     تنظیم به عنوان آدرس پیش‌فرض
                                 </label>
                             </div>
 
-                            <div class="modal-footer">
+                            <!-- Form Buttons -->
+                            <div class="flex gap-3 justify-end">
+                                {% if addresses %}
                                 <button type="button" 
-                                        class="btn-cancel" 
-                                        @click="showAddAddressModal = false">
+                                        class="btn btn-cancel"
+                                        @click="showAddAddressForm = false; resetAddressForm()">
                                     انصراف
                                 </button>
+                                {% endif %}
                                 <button type="submit" 
-                                        class="btn btn-success"
+                                        class="btn btn-neon-border small gradient-pink-purple"
                                         :disabled="submittingAddress">
                                     <span x-show="!submittingAddress">
                                         <i class="fas fa-save"></i>
-                                        <span>ذخیره آدرس</span>
+                                        <span x-text="addressForm.id ? 'بروزرسانی آدرس' : 'ذخیره آدرس'"></span>
                                     </span>
                                     <span x-show="submittingAddress">
                                         <i class="fas fa-spinner fa-spin"></i>
@@ -573,99 +750,25 @@
                             </div>
                         </form>
                     </div>
-                </div>
-            </div>
-
-            <!-- Add Bank Card Modal -->
-            <div x-show="showAddCardModal" 
-                 class="modal-overlay" 
-                 @click.self="showAddCardModal = false"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 style="display: none;">
-                <div class="modal-content">
-                    <button class="modal-close" @click="showAddCardModal = false">
-                        <i class="fas fa-times"></i>
-                    </button>
                     
-                    <div class="modal-header">
-                        <h3 class="modal-title">
-                            <i class="fas fa-credit-card"></i>
-                            افزودن کارت بانکی
-                        </h3>
+                    <!-- Add Address Button (shown only when there are existing addresses and form is hidden) -->
+                    {% if addresses %}
+                    <div x-show="!showAddAddressForm" class="flex justify-center mt-6">
+                        <button type="button" 
+                                class="btn btn-neon-border small gradient-pink-purple" 
+                                @click="showAddAddressForm = true">
+                            <i class="fas fa-plus"></i>
+                            <span>افزودن آدرس جدید</span>
+                        </button>
                     </div>
-                    
-                    <div class="modal-body">
-                        <form @submit.prevent="submitBankCard()">
-                            <div class="form-group">
-                                <label class="form-label">شماره کارت</label>
-                                <input type="text" 
-                                       class="form-input" 
-                                       x-model="cardForm.card_number"
-                                       placeholder="۱۶ رقم شماره کارت"
-                                       maxlength="16"
-                                       dir="ltr"
-                                       @input="cardForm.card_number = cardForm.card_number.replace(/\D/g, '')"
-                                       required>
-                                <p class="text-xs text-gray-400 mt-1">
-                                    شماره کارت باید ۱۶ رقم باشد
-                                </p>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">نام بانک</label>
-                                <select class="form-select" 
-                                        x-model="cardForm.bank_name"
-                                        required>
-                                    <option value="">انتخاب بانک</option>
-                                    <option value="ملی">بانک ملی ایران</option>
-                                    <option value="ملت">بانک ملت</option>
-                                    <option value="تجارت">بانک تجارت</option>
-                                    <option value="صادرات">بانک صادرات</option>
-                                    <option value="سپه">بانک سپه</option>
-                                    <option value="پاسارگاد">بانک پاسارگاد</option>
-                                    <option value="پارسیان">بانک پارسیان</option>
-                                    <option value="سامان">بانک سامان</option>
-                                    <option value="کشاورزی">بانک کشاورزی</option>
-                                    <option value="آینده">بانک آینده</option>
-                                    <option value="سایر">سایر</option>
-                                </select>
-                            </div>
-
-                            <div class="checkbox-group">
-                                <input type="checkbox" 
-                                       id="default-card"
-                                       class="checkbox-input" 
-                                       x-model="cardForm.is_default">
-                                <label for="default-card" class="checkbox-label">
-                                    تنظیم به عنوان کارت پیش‌فرض
-                                </label>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" 
-                                        class="btn-cancel" 
-                                        @click="showAddCardModal = false">
-                                    انصراف
-                                </button>
-                                <button type="submit" 
-                                        class="btn btn-success"
-                                        :disabled="submittingCard">
-                                    <span x-show="!submittingCard">
-                                        <i class="fas fa-save"></i>
-                                        <span>ذخیره کارت</span>
-                                    </span>
-                                    <span x-show="submittingCard">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                        <span>در حال ذخیره...</span>
-                                    </span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    {% endif %}
                 </div>
+
             </div>
+            
+            <!-- ═══════════════════════════════════════════════════════
+                 MODALS - Removed (using inline forms instead)
+                 ═══════════════════════════════════════════════════════ -->
 
         </div>
     </div>
@@ -673,27 +776,26 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
 <script>
 // Set Django URLs and data for JavaScript
 window.dashboardUrl = '{% url "accounts:dashboard" %}';
 
-// Initialize dashboard component with Django data
-document.addEventListener('DOMContentLoaded', function() {
-    // Set user data from Django template
-    const dashboardComponent = Alpine.$data(document.querySelector('[x-data="dashboard()"]'));
-    if (dashboardComponent) {
-        dashboardComponent.userData = {
+// Initialize dashboard component with Django data after Alpine is ready
+document.addEventListener('alpine:init', function() {
+    // Data will be set via the init() function in dashboard.js
+    window.dashboardInitData = {
+        userData: {
             first_name: '{{ user.first_name|default:"" }}',
             last_name: '{{ user.last_name|default:"" }}',
             national_code: '{% if profile %}{{ profile.national_code|default:"" }}{% endif %}'
-        };
-        dashboardComponent.walletData = {
+        },
+        walletData: {
             balance: {{ wallet.total_balance|default:0 }},
             gift_balance: {{ wallet.gift_balance|default:0 }}
-        };
-    }
+        }
+    };
 });
 </script>
-<script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
  
