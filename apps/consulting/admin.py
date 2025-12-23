@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from .models import (
-    ConsultingCategory,
+    # ConsultingCategory,  # Removed - not used anymore
     SupportTicket,
     TicketMessage,
     TicketAttachment
@@ -15,24 +15,24 @@ from .models import (
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# CATEGORY ADMIN
+# CATEGORY ADMIN - REMOVED (Not used anymore)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-@admin.register(ConsultingCategory)
-class ConsultingCategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'icon', 'is_active', 'ticket_count_display', 'order']
-    list_editable = ['is_active', 'order']
-    list_filter = ['is_active']
-    search_fields = ['name', 'slug']
-    prepopulated_fields = {'slug': ('name',)}
-    ordering = ['order', 'name']
-    
-    @admin.display(description='تعداد تیکت‌ها')
-    def ticket_count_display(self, obj):
-        count = obj.ticket_count
-        if count > 0:
-            return format_html('<strong style="color: #28a745;">{}</strong>', count)
-        return count
+# @admin.register(ConsultingCategory)
+# class ConsultingCategoryAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'slug', 'icon', 'is_active', 'ticket_count_display', 'order']
+#     list_editable = ['is_active', 'order']
+#     list_filter = ['is_active']
+#     search_fields = ['name', 'slug']
+#     prepopulated_fields = {'slug': ('name',)}
+#     ordering = ['order', 'name']
+#     
+#     @admin.display(description='تعداد تیکت‌ها')
+#     def ticket_count_display(self, obj):
+#         count = obj.ticket_count
+#         if count > 0:
+#             return format_html('<strong style="color: #28a745;">{}</strong>', count)
+#         return count
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -41,7 +41,7 @@ class ConsultingCategoryAdmin(admin.ModelAdmin):
 
 class TicketAttachmentInline(admin.TabularInline):
     model = TicketAttachment
-    extra = 0
+    extra = 1
     fields = ['file', 'file_size_display', 'uploaded_at']
     readonly_fields = ['file_size_display', 'uploaded_at']
     can_delete = True
@@ -56,7 +56,7 @@ class TicketAttachmentInline(admin.TabularInline):
 class TicketMessageInline(admin.StackedInline):
     model = TicketMessage
     extra = 0
-    fields = ['sender', 'message', 'is_staff_reply', 'is_read', 'created_at']
+    fields = ['message', 'is_staff_reply', 'is_read', 'sender', 'created_at']
     readonly_fields = ['sender', 'created_at']
     can_delete = False
     ordering = ['created_at']
@@ -76,14 +76,12 @@ class SupportTicketAdmin(admin.ModelAdmin):
         'ticket_id_display',
         'subject',
         'user_display',
-        'category',
         'status_display',
-        'priority_display',
         'message_count',
         'created_at',
         'last_response_at'
     ]
-    list_filter = ['status', 'priority', 'category', 'created_at']
+    list_filter = ['status', 'created_at']
     search_fields = ['ticket_id', 'subject', 'user__phone', 'user__email', 'user__first_name', 'user__last_name']
     readonly_fields = [
         'ticket_id',
@@ -97,10 +95,10 @@ class SupportTicketAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('اطلاعات تیکت', {
-            'fields': ('ticket_id', 'user', 'category', 'subject', 'initial_message')
+            'fields': ('ticket_id', 'user', 'subject', 'initial_message')
         }),
         ('وضعیت', {
-            'fields': ('status', 'priority', 'assigned_to')
+            'fields': ('status', 'assigned_to')
         }),
         ('آمار و زمان‌بندی', {
             'fields': (
@@ -118,6 +116,15 @@ class SupportTicketAdmin(admin.ModelAdmin):
     inlines = [TicketMessageInline]
     
     actions = ['close_tickets', 'reopen_tickets', 'mark_as_in_progress']
+    
+    def save_formset(self, request, form, formset, change):
+        """Automatically set sender for new ticket messages"""
+        instances = formset.save(commit=False)
+        for instance in instances:
+            if isinstance(instance, TicketMessage) and not instance.sender_id:
+                instance.sender = request.user
+            instance.save()
+        formset.save_m2m()
     
     @admin.display(description='شماره تیکت')
     def ticket_id_display(self, obj):

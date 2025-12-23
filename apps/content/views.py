@@ -13,6 +13,13 @@ class ArticleListPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Get published articles ordered by publish date
+        articles = Article.objects.filter(
+            status='published'
+        ).select_related('category', 'author').order_by('-published_at')
+        
+        context["articles"] = articles
         context["categories"] = ArticleCategory.objects.filter(parent__isnull=True)
         return context
 

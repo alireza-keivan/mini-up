@@ -1,18 +1,63 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django import forms
 from .models import (
     Category, Brand, Product, ProductImage, 
     GameCurrencyRate, ProductReview, RecentlyViewed
 )
 
 
+# ============================================
+# Custom Forms for Product Type Filtering
+# ============================================
+class VirtualProductForm(forms.ModelForm):
+    """Form for virtual products with limited sub_type choices"""
+    class Meta:
+        model = Product
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Limit sub_type choices to virtual product options only
+        if 'sub_type' in self.fields:
+            self.fields['sub_type'].choices = [
+                ('', '---------'),
+                (Product.ProductSubType.VIRTUAL_SERVICE, 'خدمات مجازی'),
+                (Product.ProductSubType.MINI_APP, 'مینی گیم'),
+            ]
+        # Add SKU validation help text
+        if 'sku' in self.fields:
+            self.fields['sku'].help_text = '⚠️ کد محصول باید دقیقاً 5 رقم باشد (مثال: 12345). اگر خالی بگذارید، به صورت خودکار تولید می‌شود.'
+
+
+class PhysicalProductForm(forms.ModelForm):
+    """Form for physical products with limited sub_type choices"""
+    class Meta:
+        model = Product
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Limit sub_type choices to physical product options only
+        if 'sub_type' in self.fields:
+            self.fields['sub_type'].choices = [
+                ('', '---------'),
+                (Product.ProductSubType.GAMING, 'خدمات گیمینگ'),
+                (Product.ProductSubType.ACCESSORY, 'محصولات جانبی'),
+            ]
+        # Add SKU validation help text
+        if 'sku' in self.fields:
+            self.fields['sku'].help_text = '⚠️ کد محصول باید دقیقاً 5 رقم باشد (مثال: 12345). اگر خالی بگذارید، به صورت خودکار تولید می‌شود.'
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'parent', 'slug', 'is_active')
-    list_filter = ('is_active', 'parent')
-    search_fields = ('name', 'slug')
-    prepopulated_fields = {'slug': ('name',)}
+    list_display = ('name', 'slug', 'is_active', 'sort_order')
+    list_filter = ('is_active', 'is_featured')
+    search_fields = ('name', 'name_en', 'slug')
+    prepopulated_fields = {'slug': ('name_en',)}
+    list_editable = ('sort_order',)
 
 
 @admin.register(Brand)
@@ -76,6 +121,31 @@ class BaseProductAdmin(admin.ModelAdmin):
     
     readonly_fields = ('view_count', 'sales_count', 'created_at', 'updated_at')
     
+    def save_model(self, request, obj, form, change):
+        """Override to validate and generate SKU"""
+        from django.core.exceptions import ValidationError
+        import random
+        
+        # If SKU is provided, validate it
+        if obj.sku:
+            # Remove any whitespace
+            obj.sku = obj.sku.strip()
+            
+            # Check if it's exactly 5 digits
+            if not obj.sku.isdigit() or len(obj.sku) != 5:
+                from django.contrib import messages
+                messages.error(request, 'کد محصول باید دقیقاً 5 رقم باشد')
+                raise ValidationError('کد محصول باید دقیقاً 5 رقم باشد')
+        else:
+            # Generate a unique 5-digit SKU
+            while True:
+                sku = str(random.randint(10000, 99999))
+                if not Product.objects.filter(sku=sku).exists():
+                    obj.sku = sku
+                    break
+        
+        super().save_model(request, obj, form, change)
+    
     def get_queryset(self, request):
         """Override in child classes to filter by product_type"""
         return super().get_queryset(request)
@@ -96,6 +166,7 @@ class VirtualProductProxy(Product):
 class VirtualProductAdmin(BaseProductAdmin):
     """Admin for virtual products (mini-games and virtual services)"""
     
+    form = VirtualProductForm
     list_display = ('name', 'category', 'price', 'is_active', 'is_featured', 'sales_count')
     list_filter = ('is_active', 'is_featured', 'is_new', 'category')
     inlines = [ProductImageInline, GameCurrencyRateInline]
@@ -157,6 +228,7 @@ class PhysicalProductProxy(Product):
 class PhysicalProductAdmin(BaseProductAdmin):
     """Admin for physical products (gaming products and accessories)"""
     
+    form = PhysicalProductForm
     list_display = ('name', 'category', 'brand', 'price', 'stock', 'stock_status', 'is_active', 'sales_count')
     list_filter = ('brand', 'is_active', 'is_featured', 'is_new', 'category', 'track_stock', 'sub_type')
     

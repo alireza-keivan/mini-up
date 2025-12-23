@@ -33,6 +33,14 @@ class Cart(models.Model):
         verbose_name='کلید نشست'
     )
     
+    # Applied coupon
+    applied_coupon_code = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        verbose_name='کد تخفیف اعمال شده'
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='آخرین بروزرسانی')
     

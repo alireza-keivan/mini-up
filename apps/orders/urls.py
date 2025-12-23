@@ -2,7 +2,7 @@
 
 from django.urls import path
 from django.views.generic import RedirectView
-from . import api_views
+from . import api_views, views
 from apps.accounts.views import OrdersView
 
 app_name = 'orders'
@@ -12,8 +12,23 @@ urlpatterns = [
     # CART URLs
     # ═══════════════════════════════════════════════════════════════════════════
     
-    # سبد خرید - مشاهده و خالی کردن
-    path('cart/', api_views.CartAPIView.as_view(), name='cart'),
+    # صفحه سبد خرید (HTML)
+    path('cart/', views.cart_view, name='cart'),
+    
+    # بروزرسانی تعداد آیتم سبد
+    path('cart/update/<int:item_id>/', views.update_cart_item, name='cart_update_item'),
+    
+    # حذف آیتم از سبد
+    path('cart/remove/<int:item_id>/', views.remove_cart_item, name='cart_remove_item'),
+    
+    # اعمال کد تخفیف
+    path('cart/apply-coupon/', views.apply_coupon, name='cart_apply_coupon'),
+    
+    # حذف کد تخفیف
+    path('cart/remove-coupon/', views.remove_coupon, name='cart_remove_coupon'),
+    
+    # API سبد خرید (JSON)
+    path('api/cart/', api_views.CartAPIView.as_view(), name='cart_api'),
     
     # افزودن به سبد
     path('cart/add/', api_views.CartAddItemAPIView.as_view(), name='cart_add'),

@@ -66,8 +66,8 @@ class CartAddItemAPIView(APIView):
         
         data = serializer.validated_data
         
-        # دریافت محصول
-        product = get_object_or_404(Product, id=data['product_id'], is_active=True)
+        # دریافت محصول (استفاده از uuid به جای id)
+        product = get_object_or_404(Product, uuid=data['product_id'], is_active=True)
         
         # دریافت واریانت (اختیاری)
         variant = None

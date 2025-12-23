@@ -1,602 +1,417 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
 
-{% block title %}مینی گیم | Mini-up{% endblock %}
+{% block title %}مینی گیم | Mini-Up{% endblock %}
 
 {% block content %}
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     MINI-GAME PAGE
-     Dark Neon Gaming Theme | RTL | Fully Dynamic
-     ═══════════════════════════════════════════════════════════════════════════ -->
-
-<!-- Hero Section -->
-<section class="mg-hero relative overflow-hidden py-16 md:py-24">
-    <!-- Animated Background -->
-    <div class="absolute inset-0 pointer-events-none">
-        <div class="mg-orb mg-orb-1"></div>
-        <div class="mg-orb mg-orb-2"></div>
-        <div class="mg-orb mg-orb-3"></div>
-        <div class="mg-grid-overlay"></div>
+<!-- Hero Section with Background Image -->
+<section class="mg-hero relative w-auto overflow-hidden mb-16 -mt-1">
+    <!-- Background Image -->
+    <div class="relative z-0 w-full bg-black">
+        <img src="{% static 'images/backgrounds/blur.jpg' %}" 
+             alt="Mini Game Background"
+             class="w-full h-auto">
+        <!-- Dark Overlay for better text readability -->
+        <div class="absolute inset-0 bg-black/40"></div>
     </div>
     
-    <div class="container mx-auto px-4 relative z-10">
-        <div class="text-center max-w-3xl mx-auto">
-            <!-- Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 mb-6">
-                <i class="fas fa-gamepad text-yellow-400 animate-pulse"></i>
-                <span class="text-yellow-300 text-sm font-medium">مارکت‌پلیس گیمینگ</span>
-            </div>
-            
-            <!-- Title -->
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
-                <span class="mg-title-gradient">مینی گیم</span>
-            </h1>
-            
-            <!-- Subtitle -->
-            <p class="text-gray-400 text-lg md:text-xl leading-relaxed mb-8">
-                خرید آیتم‌های درون بازی با بهترین قیمت و تحویل فوری
-            </p>
-            
-            <!-- Stats Row -->
-            <div class="flex flex-wrap justify-center gap-6 md:gap-10">
-                <div class="mg-stat-item flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-                        <i class="fas fa-bolt text-yellow-400 text-xl"></i>
-                    </div>
-                    <div class="text-right">
-                        <span class="block text-xl font-bold text-white">فوری</span>
-                        <span class="text-gray-500 text-sm">تحویل آنی</span>
-                    </div>
-                </div>
-                <div class="mg-stat-item flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                        <i class="fas fa-shield-halved text-emerald-400 text-xl"></i>
-                    </div>
-                    <div class="text-right">
-                        <span class="block text-xl font-bold text-white">۱۰۰٪</span>
-                        <span class="text-gray-500 text-sm">تضمین اصالت</span>
-                    </div>
-                </div>
-                <div class="mg-stat-item flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
-                        <i class="fas fa-headset text-pink-400 text-xl"></i>
-                    </div>
-                    <div class="text-right">
-                        <span class="block text-xl font-bold text-white">۲۴/۷</span>
-                        <span class="text-gray-500 text-sm">پشتیبانی</span>
-                    </div>
-                </div>
-            </div>
+    <!-- Hero Content (Positioned absolutely over the image) -->
+    <div class="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 md:px-8 py-16 text-center">
+        <h1 class="hero-title">
+            مینی گیم
+        </h1>
+        <p class="text-gray-200 text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto leading-relaxed mb-8 drop-shadow-lg">
+            خرید آیتم‌های درون بازی با بهترین قیمت و تحویل فوری
+        </p>
+        <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto drop-shadow-md">
+            از اعتبار بازی‌های محبوب تا آیتم‌های خاص و کمیاب. همه چیز برای تجربه گیمینگ بهتر شما
+        </p>
+        
+        <!-- Scroll Down Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+            <svg class="w-8 h-8 text-neon-cyan drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+            </svg>
         </div>
     </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     MAIN CONTENT - DYNAMIC CATEGORIES
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<main class="mg-main pb-20">
-    <div class="container mx-auto px-4">
-        
-        <!-- Categories Container -->
-        <div id="mg-categories-container" class="space-y-16">
-            
-            {% if categories %}
-                {% for category in categories %}
-                <!-- ═══════════════════════════════════════════════════════════
-                     CATEGORY SECTION (Dynamic)
-                     ═══════════════════════════════════════════════════════════ -->
-                <section class="mg-category-section" 
-                         data-category-id="{{ category.id }}" 
-                         data-category-slug="{{ category.slug }}">
-                    
-                    <!-- Category Header -->
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-                        <div class="flex items-center gap-4">
-                            <!-- Category Icon -->
-                            <div class="mg-category-icon w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
-                                 style="background: linear-gradient(135deg, {{ category.color|default:'#f59e0b' }}20, {{ category.color|default:'#f59e0b' }}10); 
-                                        color: {{ category.color|default:'#f59e0b' }};
-                                        box-shadow: 0 0 20px {{ category.color|default:'#f59e0b' }}30;">
-                                <i class="{{ category.icon|default:'fas fa-gamepad' }}"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-2xl md:text-3xl font-bold text-white">{{ category.name }}</h2>
-                                {% if category.description %}
-                                <p class="text-gray-500 text-sm mt-1">{{ category.description }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <!-- Plans Count -->
-                        <div class="flex items-center gap-3">
-                            <span class="text-gray-500 text-sm">
-                                <i class="fas fa-box-open ml-1"></i>
-                                {{ category.plans.count }} پلن
-                            </span>
-                        </div>
+<main class="mg-page min-h-screen px-4 md:px-8 pb-16">
+
+    <!-- Categories -->
+    <div class="mg-categories-container space-y-16">
+        {% for category in categories %}
+        <section class="mg-category-section">
+            <!-- Category Header -->
+            <div class="mg-section-header flex items-center justify-between mb-6 px-2">
+                <div class="flex items-center gap-4">
+                    <div class="mg-accent-line w-1 h-12 rounded-full bg-gradient-to-b from-neon-pink to-neon-purple"></div>
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-white">{{ category.name }}</h2>
+                        {% if category.description %}
+                        <p class="text-gray-500 text-sm mt-1">{{ category.description }}</p>
+                        {% endif %}
                     </div>
-                    
-                    <!-- Horizontal Scroll Widget -->
-                    <div class="mg-scroll-wrapper group relative">
-                        <!-- Navigation Arrows -->
-                        <button class="mg-nav-btn mg-nav-right absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-gray-900/90 border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gray-800 hover:border-white/20 -mr-5"
-                                aria-label="قبلی">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <button class="mg-nav-btn mg-nav-left absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-gray-900/90 border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gray-800 hover:border-white/20 -ml-5"
-                                aria-label="بعدی">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        
-                        <!-- Scroll Container -->
-                        <div class="mg-scroll-container flex gap-5 overflow-x-auto pb-4 scroll-smooth"
-                             style="scrollbar-width: none; -ms-overflow-style: none;">
-                            
-                            {% for plan in category.plans.all %}
-                            <!-- ═══════════════════════════════════════════════
-                                 PLAN CARD (Dynamic Content)
-                                 ═══════════════════════════════════════════════ -->
-                            <article class="mg-plan-card group/card flex-shrink-0 w-[280px] md:w-[300px] relative"
-                                     data-plan-id="{{ plan.id }}">
+                </div>
+            </div>
+            
+            <!-- Horizontal Scrolling Carousel -->
+            <div class="mg-scroll-container relative overflow-hidden">
+                <!-- Left Fade Mask -->
+                <div class="absolute left-0 top-0 bottom-4 w-24 bg-gradient-to-r from-black via-black/60 to-transparent pointer-events-none z-10"></div>
+                
+                <!-- Right Fade Mask -->
+                <div class="absolute right-0 top-0 bottom-4 w-24 bg-gradient-to-l from-black via-black/60 to-transparent pointer-events-none z-10"></div>
+                
+                <!-- Navigation Arrows -->
+                <button class="mg-scroll-btn mg-scroll-prev absolute right-0 top-1/2 -translate-y-1/2 z-20
+                               w-12 h-12 rounded-full bg-dark-800/90 border border-gray-700
+                               flex items-center justify-center text-gray-400
+                               hover:bg-neon-pink hover:border-neon-pink hover:text-white
+                               transition-all duration-300 opacity-0 hover:opacity-100 -mr-6 cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                
+                <button class="mg-scroll-btn mg-scroll-next absolute left-0 top-1/2 -translate-y-1/2 z-20
+                               w-12 h-12 rounded-full bg-dark-800/90 border border-gray-700
+                               flex items-center justify-center text-gray-400
+                               hover:bg-neon-cyan hover:border-neon-cyan hover:text-white
+                               transition-all duration-300 opacity-0 hover:opacity-100 -ml-6 cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+                
+                <!-- Scrollable Wrapper -->
+                <div class="mg-scroll-wrapper flex gap-5 overflow-x-auto scroll-smooth
+                            pb-4 px-2 -mx-2 scrollbar-thin scrollbar-thumb-gray-700 
+                            scrollbar-track-transparent">
+                    {% for product in category.active_products %}
+                        <!-- Simple Neon Card -->
+                        <article class="neon-product-card flex-shrink-0 w-64 relative bg-black/80 backdrop-blur-sm rounded-xl border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)] overflow-hidden transition-all duration-300 group
+                                       hover:shadow-[0_0_30px_rgba(34,211,238,0.9)] hover:border-cyan-300">
+                            <div class="neon-card-image relative h-48 overflow-hidden bg-gray-900">
+                                {% if product.main_image %}
+                                <img src="{{ product.main_image.url }}" 
+                                     alt="{{ product.name }}"
+                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 group-hover:brightness-110"
+                                     loading="lazy">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"></div>
+                                {% else %}
+                                <div class="absolute inset-0 flex items-center justify-center group-hover:bg-gray-800 transition-colors duration-300">
+                                    <svg class="w-16 h-16 text-gray-700 group-hover:text-gray-600 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                {% endif %}
                                 
-                                <!-- Glow Effect -->
-                                <div class="mg-card-glow absolute inset-0 rounded-2xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none"
-                                     style="background: radial-gradient(circle at center, {{ category.color|default:'#f59e0b' }}20, transparent 70%);"></div>
-                                
-                                <!-- Card Content -->
-                                <div class="mg-card-inner relative z-10 p-5 rounded-2xl bg-gradient-to-br from-gray-900/90 to-gray-950/90 border border-white/10 backdrop-blur-sm transition-all duration-300 group-hover/card:border-white/20 group-hover/card:translate-y-[-4px]"
-                                     style="--card-accent: {{ category.color|default:'#f59e0b' }};">
-                                    
-                                    <!-- Top Row: Badge & Popular -->
-                                    <div class="flex items-start justify-between mb-4">
-                                        {% if plan.badge %}
-                                        <span class="px-3 py-1 rounded-lg text-xs font-bold"
-                                              style="background: {{ category.color|default:'#f59e0b' }}20; 
-                                                     color: {{ category.color|default:'#f59e0b' }};">
-                                            {{ plan.badge }}
+                                <!-- Wishlist/Favorite Button - Hidden by default, shown on card hover -->
+                                <button type="button"
+                                        class="wishlist-btn absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-all duration-300
+                                               border border-cyan-400 bg-cyan-500/20 hover:bg-red-500/40 hover:border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)] hover:scale-110
+                                               opacity-0 group-hover:opacity-100"
+                                        data-product-id="{{ product.id }}"
+                                        data-wishlist-toggle
+                                        aria-label="افزودن به علاقه‌مندی‌ها">
+                                    <svg class="wishlist-heart w-5 h-5 text-white transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="neon-card-content p-4 group-hover:bg-black/60 transition-colors duration-300">{
+                                <div class="flex items-center gap-1 mb-2">
+                                    {% for i in "12345" %}
+                                    <svg class="w-3 h-3 fill-cyan-400 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    {% endfor %}
+                                    <span class="ml-1 text-gray-400 text-xs">(5.0)</span>
+                                </div>
+                                <h3 class="text-cyan-400 text-base font-bold mb-2 line-clamp-2 group-hover:text-cyan-300 transition-colors">{{ product.name }}</h3>
+                                <p class="text-gray-300 text-xs line-clamp-2 mb-3">{{ product.short_description|default:"آیتم‌های بازی" }}</p>
+                                <div class="flex items-center justify-between pt-3 border-t border-gray-800">
+                                    <div class="flex flex-col">
+                                        <span class="text-lg font-bold text-cyan-400">
+                                            {{ product.price|intcomma }}
+                                            <span class="text-xs font-normal">تومان</span>
                                         </span>
-                                        {% endif %}
-                                        
-                                        {% if plan.is_popular %}
-                                        <span class="flex items-center gap-1 px-2 py-1 rounded-lg bg-rose-500/20 text-rose-400 text-xs font-medium">
-                                            <i class="fas fa-fire text-[10px]"></i>
-                                            پرفروش
-                                        </span>
-                                        {% endif %}
                                     </div>
-                                    
-                                    <!-- Icon/Image -->
-                                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-                                         style="background: linear-gradient(135deg, {{ category.color|default:'#f59e0b' }}30, {{ category.color|default:'#f59e0b' }}10);">
-                                        {% if plan.image %}
-                                        <img src="{{ plan.image.url }}" alt="{{ plan.name }}" class="w-10 h-10 object-contain">
-                                        {% else %}
-                                        <i class="{{ category.icon|default:'fas fa-coins' }} text-2xl" style="color: {{ category.color|default:'#f59e0b' }};"></i>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Plan Name -->
-                                    <h3 class="text-lg font-bold text-white text-center mb-2">{{ plan.name }}</h3>
-                                    
-                                    <!-- Amount -->
-                                    {% if plan.amount %}
-                                    <div class="text-center mb-3">
-                                        <span class="text-3xl font-black" style="color: {{ category.color|default:'#f59e0b' }};">{{ plan.amount }}</span>
-                                        <span class="text-sm text-gray-500 mr-1">{{ plan.unit|default:'عدد' }}</span>
-                                    </div>
-                                    {% endif %}
-                                    
-                                    <!-- Features -->
-                                    {% if plan.features_list %}
-                                    <ul class="space-y-2 mb-4">
-                                        {% for feature in plan.features_list %}
-                                        <li class="flex items-center gap-2 text-gray-400 text-sm">
-                                            <i class="fas fa-check text-emerald-500 text-xs"></i>
-                                            <span>{{ feature }}</span>
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% endif %}
-                                    
-                                    <!-- Price -->
-                                    <div class="pt-4 border-t border-white/10">
-                                        {% if plan.original_price and plan.original_price > plan.price %}
-                                        <div class="flex items-center justify-center gap-2 mb-1">
-                                            <span class="text-gray-500 line-through text-sm">{{ plan.original_price|intcomma }}</span>
-                                            <span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 text-xs font-bold">
-                                                {{ plan.discount_percent }}٪
-                                            </span>
-                                        </div>
-                                        {% endif %}
-                                        <div class="text-center">
-                                            <span class="text-2xl font-bold text-white">{{ plan.price|intcomma }}</span>
-                                            <span class="text-sm text-gray-500 mr-1">تومان</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Buy Button -->
-                                    <button class="mg-buy-btn w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm transition-all duration-300"
-                                            data-plan-id="{{ plan.id }}"
-                                            data-plan-name="{{ plan.name }}"
-                                            data-plan-price="{{ plan.price }}"
-                                            style="background: linear-gradient(135deg, {{ category.color|default:'#f59e0b' }}, {{ category.color|default:'#f59e0b' }}cc);
-                                                   color: #000;">
-                                        <i class="fas fa-shopping-cart ml-2"></i>
-                                        خرید
+                                    <button type="button" 
+                                            class="add-to-cart-btn flex items-center gap-1 px-4 py-2 rounded-lg border border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/40 hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] transition-all text-sm"
+                                            data-product-uuid="{{ product.uuid }}">
+                                        <span class="font-medium">افزودن</span>
                                     </button>
                                 </div>
-                            </article>
-                            {% empty %}
-                            <!-- Empty State for Category -->
-                            <div class="flex-shrink-0 w-full py-16 text-center">
-                                <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-800/50 flex items-center justify-center">
-                                    <i class="fas fa-box-open text-3xl text-gray-600"></i>
-                                </div>
-                                <p class="text-gray-500">پلنی در این دسته‌بندی ثبت نشده است</p>
                             </div>
-                            {% endfor %}
-                            
-                        </div>
-                        
-                        <!-- Scroll Progress -->
-                        <div class="mg-scroll-progress h-1 mt-4 rounded-full bg-gray-800 overflow-hidden">
-                            <div class="mg-scroll-progress-bar h-full rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-150" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                </section>
-                {% endfor %}
-                
-            {% else %}
-            <!-- ═══════════════════════════════════════════════════════════════
-                 EMPTY STATE - No Categories
-                 ═══════════════════════════════════════════════════════════════ -->
-            <section class="mg-empty-state py-20">
-                <div class="text-center max-w-md mx-auto">
-                    <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                        <i class="fas fa-gamepad text-4xl text-gray-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3">محصولی یافت نشد</h3>
-                    <p class="text-gray-500 mb-6">در حال حاضر محصولی برای نمایش وجود ندارد. به زودی آیتم‌های جدید اضافه می‌شوند.</p>
-                    <a href="{% url 'core:home' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/20">
-                        <i class="fas fa-home"></i>
-                        بازگشت به خانه
-                    </a>
-                </div>
-            </section>
-            {% endif %}
-            
-        </div>
-        
-        <!-- ═══════════════════════════════════════════════════════════════════
-             HOW IT WORKS SECTION
-             ═══════════════════════════════════════════════════════════════════ -->
-        <section class="mg-how-it-works mt-20 py-16 rounded-3xl bg-gradient-to-br from-gray-900/50 to-gray-950/50 border border-white/5">
-            <div class="px-6 md:px-12">
-                <div class="text-center mb-12">
-                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">
-                        <i class="fas fa-question-circle text-yellow-400 ml-2"></i>
-                        چگونه خرید کنیم؟
-                    </h2>
-                    <p class="text-gray-500">در چند قدم ساده آیتم خود را دریافت کنید</p>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <!-- Step 1 -->
-                    <div class="mg-step-card relative p-6 rounded-2xl bg-gray-900/50 border border-white/5 text-center group hover:border-yellow-500/30 transition-all duration-300">
-                        <div class="absolute -top-3 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-yellow-500 text-black font-bold flex items-center justify-center text-sm">۱</div>
-                        <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors">
-                            <i class="fas fa-mouse-pointer text-xl text-yellow-400"></i>
-                        </div>
-                        <h4 class="font-bold text-white mb-2">انتخاب پلن</h4>
-                        <p class="text-gray-500 text-sm">پلن مورد نظر خود را انتخاب کنید</p>
-                    </div>
-                    
-                    <!-- Step 2 -->
-                    <div class="mg-step-card relative p-6 rounded-2xl bg-gray-900/50 border border-white/5 text-center group hover:border-emerald-500/30 transition-all duration-300">
-                        <div class="absolute -top-3 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-emerald-500 text-black font-bold flex items-center justify-center text-sm">۲</div>
-                        <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
-                            <i class="fas fa-id-card text-xl text-emerald-400"></i>
-                        </div>
-                        <h4 class="font-bold text-white mb-2">وارد کردن اطلاعات</h4>
-                        <p class="text-gray-500 text-sm">آیدی بازی خود را وارد کنید</p>
-                    </div>
-                    
-                    <!-- Step 3 -->
-                    <div class="mg-step-card relative p-6 rounded-2xl bg-gray-900/50 border border-white/5 text-center group hover:border-blue-500/30 transition-all duration-300">
-                        <div class="absolute -top-3 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-blue-500 text-black font-bold flex items-center justify-center text-sm">۳</div>
-                        <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                            <i class="fas fa-credit-card text-xl text-blue-400"></i>
-                        </div>
-                        <h4 class="font-bold text-white mb-2">پرداخت امن</h4>
-                        <p class="text-gray-500 text-sm">از درگاه امن پرداخت کنید</p>
-                    </div>
-                    
-                    <!-- Step 4 -->
-                    <div class="mg-step-card relative p-6 rounded-2xl bg-gray-900/50 border border-white/5 text-center group hover:border-pink-500/30 transition-all duration-300">
-                        <div class="absolute -top-3 right-1/2 translate-x-1/2 w-8 h-8 rounded-full bg-pink-500 text-black font-bold flex items-center justify-center text-sm">۴</div>
-                        <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-pink-500/10 flex items-center justify-center group-hover:bg-pink-500/20 transition-colors">
-                            <i class="fas fa-check-circle text-xl text-pink-400"></i>
-                        </div>
-                        <h4 class="font-bold text-white mb-2">دریافت آیتم</h4>
-                        <p class="text-gray-500 text-sm">آیتم فوری به اکانت اضافه می‌شود</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- ═══════════════════════════════════════════════════════════════════
-             FAQ SECTION
-             ═══════════════════════════════════════════════════════════════════ -->
-        <section class="mg-faq mt-16">
-            <div class="text-center mb-10">
-                <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">
-                    <i class="fas fa-comments text-yellow-400 ml-2"></i>
-                    سوالات متداول
-                </h2>
-            </div>
-            
-            <div class="max-w-3xl mx-auto space-y-4">
-                {% if faqs %}
-                    {% for faq in faqs %}
-                    <div class="mg-faq-item rounded-2xl bg-gray-900/50 border border-white/5 overflow-hidden">
-                        <button class="mg-faq-toggle w-full flex items-center justify-between p-5 text-right">
-                            <span class="font-bold text-white">{{ faq.question }}</span>
-                            <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
-                        </button>
-                        <div class="mg-faq-answer hidden px-5 pb-5">
-                            <p class="text-gray-400 leading-relaxed">{{ faq.answer }}</p>
-                        </div>
+                        </article>
+                    {% empty %}
+                    <div class="w-full text-center py-12">
+                        <p class="text-gray-500">محصولی در این دسته‌بندی موجود نیست</p>
                     </div>
                     {% endfor %}
-                {% else %}
-                <!-- Default FAQs (Placeholder) -->
-                <div class="mg-faq-item rounded-2xl bg-gray-900/50 border border-white/5 overflow-hidden">
-                    <button class="mg-faq-toggle w-full flex items-center justify-between p-5 text-right">
-                        <span class="font-bold text-white">آیا خرید از این سایت امن است؟</span>
-                        <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
-                    </button>
-                    <div class="mg-faq-answer hidden px-5 pb-5">
-                        <p class="text-gray-400 leading-relaxed">بله، تمامی تراکنش‌ها از طریق درگاه‌های پرداخت معتبر انجام می‌شود و اطلاعات شما کاملاً محفوظ است.</p>
-                    </div>
                 </div>
-                <div class="mg-faq-item rounded-2xl bg-gray-900/50 border border-white/5 overflow-hidden">
-                    <button class="mg-faq-toggle w-full flex items-center justify-between p-5 text-right">
-                        <span class="font-bold text-white">زمان تحویل چقدر است؟</span>
-                        <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
-                    </button>
-                    <div class="mg-faq-answer hidden px-5 pb-5">
-                        <p class="text-gray-400 leading-relaxed">اکثر سفارشات بلافاصله پس از پرداخت تحویل داده می‌شوند. حداکثر زمان تحویل ۱۵ دقیقه است.</p>
-                    </div>
-                </div>
-                <div class="mg-faq-item rounded-2xl bg-gray-900/50 border border-white/5 overflow-hidden">
-                    <button class="mg-faq-toggle w-full flex items-center justify-between p-5 text-right">
-                        <span class="font-bold text-white">اگر آیتم دریافت نشد چه کنم؟</span>
-                        <i class="fas fa-chevron-down text-gray-500 transition-transform duration-300"></i>
-                    </button>
-                    <div class="mg-faq-answer hidden px-5 pb-5">
-                        <p class="text-gray-400 leading-relaxed">پشتیبانی ۲۴ ساعته ما آماده کمک به شماست. از طریق چت آنلاین یا تیکت با ما در ارتباط باشید.</p>
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </section>
-        
+        {% empty %}
+        <section class="mg-empty-state text-center py-20">
+            <p class="text-gray-500">خدمتی موجود نیست</p>
+        </section>
+        {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="mg-pagination flex justify-center items-center gap-3 mt-16 mb-8">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" 
+           class="px-5 py-2.5 rounded-lg bg-dark-800/80 border border-gray-700 text-white hover:bg-neon-cyan hover:border-neon-cyan hover:text-black transition-all duration-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.5)]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        {% endif %}
+        
+        <div class="flex items-center gap-2">
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="px-4 py-2 rounded-lg bg-neon-cyan text-black font-bold shadow-[0_0_20px_rgba(34,211,238,0.6)]">
+                    {{ num }}
+                </span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}" 
+                   class="px-4 py-2 rounded-lg bg-dark-800/80 border border-gray-700 text-white hover:bg-neon-cyan hover:border-neon-cyan hover:text-black transition-all duration-300">
+                    {{ num }}
+                </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" 
+           class="px-5 py-2.5 rounded-lg bg-dark-800/80 border border-gray-700 text-white hover:bg-neon-cyan hover:border-neon-cyan hover:text-black transition-all duration-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.5)]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
 </main>
 
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     PURCHASE MODAL (Dynamic)
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<div id="mg-purchase-modal" class="fixed inset-0 z-50 hidden">
-    <!-- Backdrop -->
-    <div class="mg-modal-backdrop absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-    
-    <!-- Modal Content -->
-    <div class="mg-modal-container relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div class="mg-modal-content w-full max-w-md rounded-3xl bg-gradient-to-br from-gray-900 to-gray-950 border border-white/10 overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
-            
-            <!-- Modal Header -->
-            <div class="mg-modal-header p-6 border-b border-white/10">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-xl font-bold text-white">تکمیل خرید</h3>
-                    <button class="mg-modal-close w-10 h-10 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Modal Body -->
-            <div class="mg-modal-body p-6">
-                <!-- Selected Plan Info -->
-                <div class="mg-selected-plan p-4 rounded-2xl bg-gray-800/50 border border-white/5 mb-6">
-                    <div class="flex items-center gap-4">
-                        <div class="mg-plan-icon w-14 h-14 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-                            <i class="fas fa-coins text-2xl text-yellow-400"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-white mg-plan-name">نام پلن</h4>
-                            <p class="text-sm text-gray-500 mg-plan-category">دسته‌بندی</p>
-                        </div>
-                        <div class="text-left">
-                            <span class="text-xl font-bold text-yellow-400 mg-plan-price">۰</span>
-                            <span class="text-sm text-gray-500">تومان</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Form -->
-                <form id="mg-purchase-form" class="space-y-4">
-                    <input type="hidden" name="plan_id" id="mg-plan-id">
-                    
-                                        <!-- Game ID Input -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">
-                            <i class="fas fa-id-badge ml-1 text-yellow-400"></i>
-                            آیدی بازی
-                        </label>
-                        <input type="text" 
-                               name="game_id" 
-                               id="mg-game-id"
-                               class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-white/10 text-white placeholder-gray-500 focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none transition-all duration-300"
-                               placeholder="آیدی پلیر خود را وارد کنید"
-                               required>
-                        <p class="mt-2 text-xs text-gray-500">
-                            <i class="fas fa-info-circle ml-1"></i>
-                            آیدی را از بخش پروفایل بازی کپی کنید
-                        </p>
-                    </div>
-                    
-                    <!-- Server/Zone Selection (Optional - Dynamic) -->
-                    <div class="mg-server-section hidden">
-                        <label class="block text-sm font-medium text-gray-300 mb-2">
-                            <i class="fas fa-server ml-1 text-emerald-400"></i>
-                            انتخاب سرور
-                        </label>
-                        <select name="server" 
-                                id="mg-server"
-                                class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-white/10 text-white focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none transition-all duration-300 appearance-none cursor-pointer">
-                            <option value="">انتخاب کنید...</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Email for Receipt -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">
-                            <i class="fas fa-envelope ml-1 text-blue-400"></i>
-                            ایمیل (اختیاری)
-                        </label>
-                        <input type="email" 
-                               name="email" 
-                               id="mg-email"
-                               class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-white/10 text-white placeholder-gray-500 focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none transition-all duration-300"
-                               placeholder="برای دریافت رسید">
-                    </div>
-                    
-                    <!-- Promo Code -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">
-                            <i class="fas fa-ticket ml-1 text-pink-400"></i>
-                            کد تخفیف
-                        </label>
-                        <div class="flex gap-2">
-                            <input type="text" 
-                                   name="promo_code" 
-                                   id="mg-promo-code"
-                                   class="flex-1 px-4 py-3 rounded-xl bg-gray-800 border border-white/10 text-white placeholder-gray-500 focus:border-yellow-500/50 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none transition-all duration-300"
-                                   placeholder="کد تخفیف دارید؟">
-                            <button type="button" 
-                                    id="mg-apply-promo"
-                                    class="px-4 py-3 rounded-xl bg-gray-700 text-white font-medium hover:bg-gray-600 transition-colors">
-                                اعمال
-                            </button>
-                        </div>
-                        <p class="mg-promo-message mt-2 text-xs hidden"></p>
-                    </div>
-                    
-                    <!-- Price Summary -->
-                    <div class="mg-price-summary p-4 rounded-2xl bg-gray-800/50 border border-white/5 space-y-3">
-                        <div class="flex items-center justify-between text-sm">
-                            <span class="text-gray-400">قیمت پلن:</span>
-                            <span class="text-white mg-base-price">۰ تومان</span>
-                        </div>
-                        <div class="mg-discount-row flex items-center justify-between text-sm hidden">
-                            <span class="text-gray-400">تخفیف:</span>
-                            <span class="text-emerald-400 mg-discount-amount">- ۰ تومان</span>
-                        </div>
-                        <div class="border-t border-white/10 pt-3 flex items-center justify-between">
-                            <span class="font-bold text-white">مبلغ قابل پرداخت:</span>
-                            <span class="text-xl font-bold text-yellow-400 mg-final-price">۰ تومان</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Terms Checkbox -->
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" 
-                               id="mg-terms" 
-                               name="terms"
-                               class="w-5 h-5 mt-0.5 rounded border-gray-600 bg-gray-800 text-yellow-500 focus:ring-yellow-500/20 cursor-pointer"
-                               required>
-                        <label for="mg-terms" class="text-sm text-gray-400 cursor-pointer">
-                            <a href="{% url 'core:terms' %}" target="_blank" class="text-yellow-400 hover:text-yellow-300">قوانین و مقررات</a>
-                            را مطالعه کرده و می‌پذیرم.
-                        </label>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Modal Footer -->
-            <div class="mg-modal-footer p-6 border-t border-white/10 bg-gray-900/50">
-                <div class="flex gap-3">
-                    <button type="button" 
-                            class="mg-modal-cancel flex-1 py-3 px-4 rounded-xl bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors">
-                        انصراف
-                    </button>
-                    <button type="submit" 
-                            form="mg-purchase-form"
-                            class="mg-submit-btn flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span class="mg-btn-text">
-                            <i class="fas fa-lock ml-2"></i>
-                            پرداخت امن
-                        </span>
-                        <span class="mg-btn-loading hidden">
-                            <i class="fas fa-spinner fa-spin ml-2"></i>
-                            در حال پردازش...
-                        </span>
-                    </button>
-                </div>
-                
-                <!-- Security Badge -->
-                <div class="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-white/5">
-                    <span class="flex items-center gap-1 text-xs text-gray-500">
-                        <i class="fas fa-shield-halved text-emerald-500"></i>
-                        پرداخت امن
-                    </span>
-                    <span class="flex items-center gap-1 text-xs text-gray-500">
-                        <i class="fas fa-lock text-blue-500"></i>
-                        رمزگذاری SSL
-                    </span>
-                    <span class="flex items-center gap-1 text-xs text-gray-500">
-                        <i class="fas fa-check-circle text-yellow-500"></i>
-                        تضمین بازگشت
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════
-     TOAST NOTIFICATION (For Mini-Game Page)
-     ═══════════════════════════════════════════════════════════════════════════ -->
-<div id="mg-toast" class="fixed bottom-6 left-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="flex items-center gap-3 px-5 py-4 rounded-2xl bg-gray-900 border border-white/10 shadow-2xl">
-        <div class="mg-toast-icon w-10 h-10 rounded-full flex items-center justify-center">
-            <i class="fas fa-check"></i>
-        </div>
-        <div>
-            <p class="mg-toast-title font-bold text-white">عنوان</p>
-            <p class="mg-toast-message text-sm text-gray-400">پیام</p>
-        </div>
-        <button class="mg-toast-close mr-2 text-gray-500 hover:text-white transition-colors">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-</div>
-
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/pages/mini_game.js' %}"></script>
-{% endblock %}
-
-{% block inline_js %}
+<!-- Carousel Navigation & Wishlist Script -->
 <script>
-    // Initialize Mini-Game Page
-    document.addEventListener('DOMContentLoaded', function() {
-        // Mini-game page functionality will be automatically initialized
-        // The JavaScript file handles its own initialization
-        console.log('Mini-game page loaded');
+document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================
+    // Horizontal Carousel Scrolling
+    // ==========================================
+    document.querySelectorAll('.mg-scroll-container').forEach(container => {
+        const wrapper = container.querySelector('.mg-scroll-wrapper');
+        const prevBtn = container.querySelector('.mg-scroll-prev');
+        const nextBtn = container.querySelector('.mg-scroll-next');
+        
+        if (prevBtn && nextBtn && wrapper) {
+            // Scroll on button click
+            prevBtn.addEventListener('click', () => {
+                wrapper.scrollBy({ left: -350, behavior: 'smooth' });
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                wrapper.scrollBy({ left: 350, behavior: 'smooth' });
+            });
+            
+            // Mouse drag scrolling
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            
+            wrapper.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - wrapper.offsetLeft;
+                scrollLeft = wrapper.scrollLeft;
+            });
+            
+            wrapper.addEventListener('mouseleave', () => {
+                isDown = false;
+            });
+            
+            wrapper.addEventListener('mouseup', () => {
+                isDown = false;
+            });
+            
+            wrapper.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - wrapper.offsetLeft;
+                const walk = (x - startX) * 2;
+                wrapper.scrollLeft = scrollLeft - walk;
+            });
+        }
     });
+    
+    // ==========================================
+    // Wishlist/Favorite Functionality
+    // ==========================================
+    document.querySelectorAll('[data-wishlist-toggle]').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productId = this.dataset.productId;
+            const heartIcon = this.querySelector('.wishlist-heart');
+            const button = this;
+            
+            // Toggle visual state immediately for better UX
+            const isCurrentlyFavorited = heartIcon.getAttribute('fill') === 'currentColor';
+            
+            if (isCurrentlyFavorited) {
+                // Remove from favorites
+                heartIcon.setAttribute('fill', 'none');
+                heartIcon.classList.remove('text-red-500');
+                heartIcon.classList.add('text-white');
+                button.classList.remove('bg-red-500/40', 'border-red-400', '!opacity-100');
+                button.classList.add('bg-cyan-500/20', 'border-cyan-400');
+            } else {
+                // Add to favorites
+                heartIcon.setAttribute('fill', 'currentColor');
+                heartIcon.classList.add('text-red-500');
+                heartIcon.classList.remove('text-white');
+                button.classList.add('bg-red-500/40', 'border-red-400', '!opacity-100');
+                button.classList.remove('bg-cyan-500/20', 'border-cyan-400');
+                
+                // Animation effect
+                button.classList.add('scale-125');
+                setTimeout(() => button.classList.remove('scale-125'), 200);
+            }
+            
+            // Send to backend (optional - works even if backend doesn't exist yet)
+            try {
+                const response = await fetch('/wishlist/toggle/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ product_id: productId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.message) {
+                        showNotification(data.message, 'success');
+                    }
+                }
+            } catch (error) {
+                // Silently fail - visual toggle already happened
+                console.log('Wishlist backend not available');
+            }
+        });
+    });
+    
+    // ==========================================
+    // Add to Cart Functionality
+    // ==========================================
+    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productUuid = this.dataset.productUuid;
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.innerHTML = '<span class="font-medium">در حال افزودن...</span>';
+            
+            try {
+                const response = await fetch('/orders/cart/add/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ 
+                        product_id: productUuid,
+                        quantity: 1
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Success animation
+                    button.innerHTML = '<span class="font-medium">✓ اضافه شد</span>';
+                    button.classList.add('bg-green-500/40', 'border-green-400');
+                    button.classList.remove('bg-cyan-500/20', 'border-cyan-400');
+                    
+                    // Update cart count in navbar (if exists)
+                    const cartBadge = document.querySelector('.navbar-action-badge');
+                    if (cartBadge) {
+                        const currentCount = parseInt(cartBadge.textContent) || 0;
+                        cartBadge.textContent = currentCount + 1;
+                    }
+                    
+                    // Show success notification
+                    showNotification(data.message || 'محصول به سبد خرید اضافه شد', 'success');
+                    
+                    // Reset button after 2 seconds
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.classList.remove('bg-green-500/40', 'border-green-400');
+                        button.classList.add('bg-cyan-500/20', 'border-cyan-400');
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || 'خطا در افزودن به سبد خرید');
+                }
+            } catch (error) {
+                console.error('Cart error:', error);
+                showNotification(error.message || 'خطا در ارتباط با سرور', 'error');
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
+    });
+    
+    // ==========================================
+    // Helper Functions
+    // ==========================================
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    function showNotification(message, type = 'info') {
+        // Simple notification (you can replace with your notification system)
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 ${
+            type === 'success' ? 'bg-green-500 text-white' : 
+            type === 'error' ? 'bg-red-500 text-white' : 
+            'bg-blue-500 text-white'
+        }`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+});
 </script>
-{% endblock %}
+{% endblock content %}

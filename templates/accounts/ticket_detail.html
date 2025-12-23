@@ -1,5 +1,6 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
+{% load jalali_tags %}
 
 {% block title %}تیکت #{{ ticket.ticket_id }} | مینی‌آپ{% endblock %}
 
@@ -290,17 +291,19 @@
     .chat-input-wrapper {
         display: flex;
         gap: 12px;
-        align-items: flex-end;
+        align-items: flex-start;
     }
 
     .input-group {
         flex: 1;
-        position: relative;
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
     }
 
     .chat-input {
-        width: 100%;
-        padding: 12px 16px 12px 50px;
+        flex: 1;
+        padding: 12px 16px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
@@ -320,12 +323,10 @@
     }
 
     .attachment-btn {
-        position: absolute;
-        right: 12px;
-        bottom: 10px;
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        border-radius: 12px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: #999;
@@ -348,6 +349,7 @@
 
     .send-btn {
         padding: 12px 24px;
+        height: 44px;
         background: linear-gradient(135deg, #00f5ff, #8a2be2);
         border: none;
         border-radius: 12px;
@@ -356,6 +358,11 @@
         cursor: pointer;
         transition: all 0.3s ease;
         font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .send-btn:hover:not(:disabled) {
@@ -410,6 +417,24 @@
         .chat-input-form {
             padding: 16px;
         }
+
+        .chat-input-wrapper {
+            gap: 8px;
+        }
+
+        .send-btn {
+            padding: 12px 16px;
+            font-size: 13px;
+        }
+
+        .attachment-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        .chat-input {
+            min-height: 40px;
+        }
     }
 </style>
 {% endblock %}
@@ -420,7 +445,7 @@
         
         <!-- Back Button -->
         <div style="margin-bottom: 20px;">
-            <a href="{% url 'consulting:ticket_list' %}" class="action-btn">
+            <a href="{% url 'accounts:tickets' %}" class="action-btn">
                 <i class="fas fa-arrow-right"></i> بازگشت به لیست تیکت‌ها
             </a>
         </div>
@@ -437,14 +462,14 @@
                         {{ ticket.get_status_display }}
                     </span>
                     {% if not ticket.is_closed %}
-                    <form method="post" action="{% url 'consulting:ticket_close' ticket.ticket_id %}" style="display: inline;">
+                    <form method="post" action="{% url 'accounts:ticket_close' ticket.ticket_id %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="action-btn close" onclick="return confirm('آیا از بستن این تیکت اطمینان دارید؟')">
                             <i class="fas fa-times-circle"></i> بستن تیکت
                         </button>
                     </form>
                     {% else %}
-                    <form method="post" action="{% url 'consulting:ticket_reopen' ticket.ticket_id %}" style="display: inline;">
+                    <form method="post" action="{% url 'accounts:ticket_reopen' ticket.ticket_id %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="action-btn reopen">
                             <i class="fas fa-redo"></i> بازگشایی تیکت
@@ -456,27 +481,15 @@
 
             <div class="ticket-meta">
                 <div class="meta-item">
-                    <i class="fas fa-tag"></i>
-                    <span>{{ ticket.category.name }}</span>
-                </div>
-                <div class="meta-item">
-                    <i class="fas fa-flag"></i>
-                    <span>اولویت: {{ ticket.get_priority_display }}</span>
-                </div>
-                <div class="meta-item">
-                    <i class="fas fa-calendar"></i>
-                    <span>تاریخ ایجاد: {{ ticket.created_at|date:"Y/m/d - H:i" }}</span>
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>تاریخ ایجاد: {{ ticket.created_at|jalali }}</span>
                 </div>
                 {% if ticket.last_response_at %}
                 <div class="meta-item">
                     <i class="fas fa-reply"></i>
-                    <span>آخرین پاسخ: {{ ticket.last_response_at|date:"Y/m/d - H:i" }}</span>
+                    <span>آخرین پاسخ: {{ ticket.last_response_at|jalali }}</span>
                 </div>
                 {% endif %}
-                <div class="meta-item">
-                    <i class="fas fa-comments"></i>
-                    <span>{{ ticket.message_count }} پیام</span>
-                </div>
             </div>
         </div>
 
@@ -493,7 +506,7 @@
                     <div class="message-content">
                         <div class="message-header">
                             <span class="message-sender">شما</span>
-                            <span class="message-time">{{ ticket.created_at|date:"Y/m/d - H:i" }}</span>
+                            <span class="message-time">{{ ticket.created_at|jalali }}</span>
                         </div>
                         <div class="message-bubble">
                             {{ ticket.initial_message|linebreaks }}
@@ -520,7 +533,7 @@
                                     شما
                                 {% endif %}
                             </span>
-                            <span class="message-time">{{ message.created_at|date:"Y/m/d - H:i" }}</span>
+                            <span class="message-time">{{ message.created_at|jalali }}</span>
                         </div>
                         <div class="message-bubble">
                             {{ message.message|linebreaks }}
@@ -544,7 +557,7 @@
 
             <!-- Input Form -->
             {% if not ticket.is_closed %}
-            <form method="post" action="{% url 'consulting:ticket_message_create' ticket.ticket_id %}" enctype="multipart/form-data" class="chat-input-form">
+            <form method="post" action="{% url 'accounts:ticket_message_create' ticket.ticket_id %}" enctype="multipart/form-data" class="chat-input-form">
                 {% csrf_token %}
                 <div class="chat-input-wrapper">
                     <div class="input-group">
@@ -586,6 +599,17 @@
         textarea.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Handle Enter key: Submit on Enter, new line on Shift+Enter
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const form = this.closest('form');
+                if (form && this.value.trim()) {
+                    form.submit();
+                }
+            }
         });
     }
 

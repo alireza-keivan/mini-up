@@ -1,5 +1,6 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
+{% load jalali_tags %}
 
 {% block title %}تیکت‌های پشتیبانی | مینی‌آپ{% endblock %}
 
@@ -64,15 +65,16 @@
     .search-box {
         flex: 1;
         min-width: 250px;
-        position: relative;
+        display: flex;
+        gap: 0;
     }
 
     .search-box input {
-        width: 100%;
-        padding: 10px 40px 10px 16px;
+        flex: 1;
+        padding: 10px 16px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
+        border-radius: 12px 0 0 12px;
         color: #fff;
         font-size: 14px;
         transition: all 0.3s ease;
@@ -84,40 +86,20 @@
         background: rgba(0, 245, 255, 0.05);
     }
 
-    .search-box i {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #666;
-    }
-
-    .date-filter {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        min-width: 200px;
-    }
-
-    .date-filter input[type="date"] {
-        padding: 10px 16px;
-        background: rgba(255, 255, 255, 0.05);
+    .search-btn {
+        padding: 10px 20px;
+        background: rgba(0, 245, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        color: #fff;
-        font-size: 14px;
+        border-left: none;
+        border-radius: 0 12px 12px 0;
+        color: #00f5ff;
+        cursor: pointer;
         transition: all 0.3s ease;
     }
 
-    .date-filter input[type="date"]:focus {
-        outline: none;
-        border-color: #00f5ff;
-        background: rgba(0, 245, 255, 0.05);
-    }
-
-    .date-filter input[type="date"]::-webkit-calendar-picker-indicator {
-        filter: invert(1);
-        cursor: pointer;
+    .search-btn:hover {
+        background: rgba(0, 245, 255, 0.2);
+        color: #fff;
     }
 
     .create-ticket-btn {
@@ -330,14 +312,8 @@
 
         <div class="search-box">
             <input type="text" name="q" placeholder="جستجوی تیکت..." value="{{ search_query|default:'' }}">
-            <i class="fas fa-search"></i>
-        </div>
-
-        <div class="date-filter">
-            <input type="date" name="date_from" value="{{ date_from|default:'' }}" placeholder="از تاریخ">
-            <input type="date" name="date_to" value="{{ date_to|default:'' }}" placeholder="تا تاریخ">
-            <button type="submit" class="filter-btn">
-                <i class="fas fa-filter"></i> فیلتر
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i>
             </button>
         </div>
 
@@ -376,12 +352,12 @@
                 </div>
                 <div class="ticket-meta-item">
                     <i class="fas fa-calendar"></i>
-                    <span>{{ ticket.created_at|date:"Y/m/d - H:i" }}</span>
+                    <span>{{ ticket.created_at|jalali }}</span>
                 </div>
                 {% if ticket.last_response_at %}
                 <div class="ticket-meta-item">
                     <i class="fas fa-reply"></i>
-                    <span>آخرین پاسخ: {{ ticket.last_response_at|date:"Y/m/d - H:i" }}</span>
+                    <span>آخرین پاسخ: {{ ticket.last_response_at|jalali }}</span>
                 </div>
                 {% endif %}
             </div>

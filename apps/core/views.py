@@ -2,6 +2,7 @@
 
 from django.shortcuts import render
 from .models import ServiceDescription, SocialMediaLinks, YouTubeVideo
+from apps.content.models import Article
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -19,11 +20,19 @@ def home(request):
     # دریافت ویدیوی یوتیوب فعال
     youtube_video = YouTubeVideo.objects.filter(is_active=True).first()
     
+    # دریافت 4 مقاله ویژه (اگر کمتر از 4 باشد، همه را نمایش می‌دهد)
+    # مقالات بر اساس تاریخ انتشار (جدیدترین) مرتب می‌شوند
+    latest_articles = Article.objects.filter(
+        status='published',
+        is_featured=True
+    ).order_by('-published_at')[:4]
+    
     return render(request, 'core/home.html', {
         'title': 'صفحه اصلی',
         'service_descriptions': service_descriptions,
         'social_links': social_links,
         'youtube_video': youtube_video,
+        'latest_articles': latest_articles,
     })
 
 
@@ -35,74 +44,173 @@ def virtual_services(request):
     """
     from apps.products.models import Category, Product
     from django.db.models import Prefetch
+    from django.core.paginator import Paginator
     
-    # Get virtual service categories (top-level only)
+    # Get categories that have virtual service products only
     categories = Category.objects.filter(
-        category_type=Category.CategoryType.VIRTUAL,
-        parent__isnull=True,
-        is_active=True
-    ).prefetch_related(
+        is_active=True,
+        products__is_active=True,
+        products__sub_type=Product.ProductSubType.VIRTUAL_SERVICE
+    ).distinct().prefetch_related(
         Prefetch(
             'products',
             queryset=Product.objects.filter(
                 is_active=True,
-                product_type=Product.ProductType.VIRTUAL
+                sub_type=Product.ProductSubType.VIRTUAL_SERVICE
             ).select_related('category', 'brand').prefetch_related('images').order_by('-is_featured', '-created_at')[:12],
             to_attr='active_products'
         )
     ).order_by('sort_order', 'name')
     
     # Filter out categories with no products
-    categories_with_products = [cat for cat in categories if cat.active_products]
+    categories_with_products = []
+    for cat in categories:
+        if hasattr(cat, 'active_products') and cat.active_products:
+            categories_with_products.append(cat)
+    
+    # Pagination - 6 categories per page
+    paginator = Paginator(categories_with_products, 6)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
     
     # Get featured products for carousel (admin-controlled via is_featured flag)
     carousel_products = Product.objects.filter(
         is_active=True,
-        product_type=Product.ProductType.VIRTUAL,
+        sub_type=Product.ProductSubType.VIRTUAL_SERVICE,
         is_featured=True  # Only featured products appear in carousel
     ).select_related('category', 'brand').prefetch_related('images').order_by('-created_at')[:6]
     
     return render(request, 'core/virtual_services.html', {
         'title': 'خدمات مجازی',
-        'categories': categories_with_products,
+        'categories': page_obj.object_list,
+        'page_obj': page_obj,
         'carousel_products': carousel_products
     })
 
 
 def gaming_products(request):
     """
-    صفحه محصولات گیمینگ
-    Displays gaming product categories with their products in horizontal scrollable carousels.
+    صفحه محصولات گیمینگ با قابلیت فیلتر کردن
+    Displays gaming product categories with filtering options.
     """
-    from apps.products.models import Category, Brand
+    from apps.products.models import Category, Brand, Product
+    from django.db.models import Q, Min, Max
     
-    # Get active gaming categories with their active products
-    # Filter by category_type = 'gaming'
-    categories = Category.objects.filter(
+    # Get filter parameters from request
+    selected_categories = request.GET.getlist('category')
+    selected_brands = request.GET.getlist('brand')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    stock_filter = request.GET.get('stock')
+    is_new = request.GET.get('is_new')
+    is_bestseller = request.GET.get('is_bestseller')
+    is_featured = request.GET.get('is_featured')
+    sort_by = request.GET.get('sort', '-created_at')
+    
+    # Base queryset for gaming products
+    products = Product.objects.filter(
         is_active=True,
-        category_type='gaming',
-        products__is_active=True
-    ).prefetch_related(
-        'products__brand',
-        'products__images',
-        'products__variants'
-    ).select_related(
-        'parent'
+        sub_type=Product.ProductSubType.GAMING
+    ).select_related('category', 'brand').prefetch_related('images')
+    
+    # Apply filters
+    if selected_categories:
+        products = products.filter(category__id__in=selected_categories)
+    
+    if selected_brands:
+        products = products.filter(brand__id__in=selected_brands)
+    
+    if min_price:
+        try:
+            products = products.filter(price__gte=int(min_price))
+        except ValueError:
+            pass
+    
+    if max_price:
+        try:
+            products = products.filter(price__lte=int(max_price))
+        except ValueError:
+            pass
+    
+    if stock_filter == 'available':
+        products = products.filter(stock__gt=0)
+    elif stock_filter == 'out_of_stock':
+        products = products.filter(stock=0)
+    
+    if is_new == 'true':
+        products = products.filter(is_new=True)
+    
+    if is_bestseller == 'true':
+        products = products.filter(is_bestseller=True)
+    
+    if is_featured == 'true':
+        products = products.filter(is_featured=True)
+    
+    # Sorting
+    sort_options = {
+        'newest': '-created_at',
+        'oldest': 'created_at',
+        'price_low': 'price',
+        'price_high': '-price',
+        'name_asc': 'name',
+        'name_desc': '-name',
+        'popular': '-sales_count',
+    }
+    products = products.order_by(sort_options.get(sort_by, '-created_at'))
+    
+    # Get all categories that have gaming products
+    all_categories = Category.objects.filter(
+        is_active=True,
+        products__is_active=True,
+        products__sub_type=Product.ProductSubType.GAMING
     ).distinct().order_by('sort_order', 'name')
     
+    # Get all brands that have gaming products
+    all_brands = Brand.objects.filter(
+        products__sub_type=Product.ProductSubType.GAMING,
+        products__is_active=True,
+        is_active=True
+    ).distinct().order_by('name')
+    
+    # Get price range
+    price_range = products.aggregate(
+        min_price=Min('price'),
+        max_price=Max('price')
+    )
+    
+    # Group products by category for display
+    categories_with_products = []
+    for category in all_categories:
+        category_products = products.filter(category=category)
+        if category_products.exists():
+            # Attach filtered products to category
+            category.filtered_products = category_products
+            categories_with_products.append(category)
+    
     # Get total counts for stats
-    total_products = sum(cat.get_active_products_count() for cat in categories)
-    total_brands = Brand.objects.filter(
-        products__category__category_type='gaming',
-        products__is_active=True
-    ).distinct().count()
+    total_products = products.count()
+    total_brands = all_brands.count()
     
     context = {
         'title': 'محصولات گیمینگ',
-        'categories': categories,
+        'categories': categories_with_products,
+        'all_categories': all_categories,
+        'all_brands': all_brands,
+        'products': products,
         'total_products': total_products,
-        'total_categories': categories.count(),
+        'total_categories': all_categories.count(),
         'total_brands': total_brands,
+        'price_range': price_range,
+        # Filter states
+        'selected_categories': selected_categories,
+        'selected_brands': selected_brands,
+        'min_price': min_price,
+        'max_price': max_price,
+        'stock_filter': stock_filter,
+        'is_new': is_new,
+        'is_bestseller': is_bestseller,
+        'is_featured': is_featured,
+        'sort_by': sort_by,
     }
     
     return render(request, 'core/gaming_products.html', context)
@@ -110,38 +218,72 @@ def gaming_products(request):
 
 def buy_products(request):
     """
-    صفحه خرید محصولات
+    صفحه خرید محصولات - محصولات جانبی
     Displays product categories with their products in horizontal scrollable carousels.
+    Only shows ACCESSORY sub-type products.
     """
-    from apps.products.models import Category
+    from apps.products.models import Category, Product
+    from django.db.models import Prefetch
     
-    # Get active categories with their active products
-    # Using select_related and prefetch_related for optimal performance
+    # Get active categories with their active accessory products
+    # Using prefetch_related for optimal performance
     categories = Category.objects.filter(
         is_active=True,
-        products__is_active=True  # Only categories that have active products
+        products__is_active=True,
+        products__sub_type=Product.ProductSubType.ACCESSORY
     ).prefetch_related(
-        'products__brand',  # Prefetch brand for each product
-        'products__images',  # Prefetch product images
-    ).select_related(
-        'parent'  # If you want to show parent category info
+        Prefetch(
+            'products',
+            queryset=Product.objects.filter(
+                is_active=True,
+                sub_type=Product.ProductSubType.ACCESSORY
+            ).select_related('brand').prefetch_related('images').order_by('-is_featured', '-created_at'),
+            to_attr='active_products'
+        )
     ).distinct().order_by('sort_order', 'name')
     
-    # Filter products per category to only show active ones
-    # This is already handled by the template with category.products.all
-    # but we're ensuring the queryset is optimized
+    # Filter out categories with no products
+    categories_with_products = [cat for cat in categories if cat.active_products]
     
     context = {
         'title': 'خرید محصولات',
-        'categories': categories,
+        'categories': categories_with_products,
     }
     
     return render(request, 'core/buy_products.html', context)
 
 
 def mini_game(request):
-    """صفحه مینی گیم"""
-    return render(request, 'core/mini_game.html', {'title': 'مینی گیم'})
+    """
+    صفحه مینی گیم
+    Displays mini app products
+    """
+    from apps.products.models import Product, Category
+    from django.db.models import Prefetch
+    
+    # Get categories that have mini app products
+    categories = Category.objects.filter(
+        is_active=True,
+        products__is_active=True,
+        products__sub_type=Product.ProductSubType.MINI_APP
+    ).distinct().prefetch_related(
+        Prefetch(
+            'products',
+            queryset=Product.objects.filter(
+                is_active=True,
+                sub_type=Product.ProductSubType.MINI_APP
+            ).select_related('category', 'brand').prefetch_related('images').order_by('-is_featured', '-created_at'),
+            to_attr='active_products'
+        )
+    ).order_by('sort_order', 'name')
+    
+    # Filter out categories with no products
+    categories_with_products = [cat for cat in categories if cat.active_products]
+    
+    return render(request, 'core/mini_game.html', {
+        'title': 'مینی گیم',
+        'categories': categories_with_products
+    })
 
 
 def contact(request):
@@ -533,3 +675,21 @@ def category_view(request, slug):
         'featured_products': featured_products,
     }
     return render(request, 'core/category.html', context)
+
+
+def neon_products_demo(request):
+    """
+    Demo page for neon-themed product cards
+    Showcases the new card design with proper 2:1 proportions
+    """
+    from apps.products.models import Product
+    
+    # Get sample products (first 8 active products)
+    products = Product.objects.filter(
+        is_active=True
+    ).select_related('category', 'brand')[:8]
+    
+    return render(request, 'core/neon_products_demo.html', {
+        'title': 'نمایش کارت‌های نئون',
+        'products': products,
+    })

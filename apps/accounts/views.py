@@ -165,169 +165,51 @@ class LoginView(View):
 
 
 class GoogleLoginView(View):
-    """شروع فرآیند ورود با گوگل"""
+    """شروع فرآیند ورود با گوگل - استفاده از django-allauth"""
     
     def get(self, request):
         if request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL or '/')
         
-        # TODO: Redirect to Google OAuth URL
-        # از کتابخانه‌هایی مثل social-auth-app-django استفاده کنید
-        # یا OAuth flow را دستی پیاده‌سازی کنید
-        
-        google_client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', None)
-        if not google_client_id:
-            return JsonResponse({
-                'success': False,
-                'message': 'ورود با گوگل فعال نیست'
-            }, status=400)
-        
-        # Build Google OAuth URL
-        redirect_uri = request.build_absolute_uri(reverse('accounts:google_callback'))
-        scope = 'openid email profile'
-        
-        google_auth_url = (
-            f"https://accounts.google.com/o/oauth2/v2/auth?"
-            f"client_id={google_client_id}&"
-            f"redirect_uri={redirect_uri}&"
-            f"response_type=code&"
-            f"scope={scope}&"
-            f"access_type=offline&"
-            f"prompt=consent"
-        )
-        
-        return redirect(google_auth_url)
-
-class GoogleCallbackView(View):
-    """دریافت callback از گوگل و ایجاد/ورود کاربر"""
-    
-    def get(self, request):
-        code = request.GET.get('code')
-        error = request.GET.get('error')
-        
-        if error:
-            logger.warning(f"Google OAuth error: {error}")
-            return redirect(f"{reverse('accounts:login')}?error=google_denied")
-        
-        if not code:
-            return redirect(f"{reverse('accounts:login')}?error=google_failed")
-        
         try:
-            # Exchange code for tokens
-            google_data = self._exchange_code_for_user_info(request, code)
+            # Check if Google Social App is configured
+            from allauth.socialaccount.models import SocialApp
+            from django.contrib.sites.models import Site
             
-            if not google_data:
-                return redirect(f"{reverse('accounts:login')}?error=google_failed")
+            current_site = Site.objects.get_current()
+            google_app = SocialApp.objects.filter(
+                provider='google',
+                sites=current_site
+            ).first()
             
-            # Find or create user
-            user, created = self._get_or_create_google_user(google_data)
+            if not google_app:
+                # Social app not configured - show error
+                return JsonResponse({
+                    'success': False,
+                    'message': 'لطفاً ابتدا Google Social App را در پنل ادمین تنظیم کنید (/admin/socialaccount/socialapp/)'
+                }, status=400)
             
-            # Login user
-            login(request, user)
-            
-            logger.info(f"Google login successful for: {user.email}")
-            
-            # Redirect
-            next_url = request.session.pop('next', None) or settings.LOGIN_REDIRECT_URL or '/'
-            return redirect(next_url)
+            # Redirect to allauth's Google login URL
+            # The URL pattern is provided by allauth.socialaccount.providers.oauth2.urls
+            from allauth.socialaccount.providers.google.views import oauth2_login
+            return oauth2_login(request)
             
         except Exception as e:
-            logger.error(f"Google OAuth callback error: {e}")
-            return redirect(f"{reverse('accounts:login')}?error=google_failed")
-    
-    def _exchange_code_for_user_info(self, request, code):
-        """Exchange authorization code for user info"""
-        import requests
-        
-        client_id = settings.GOOGLE_OAUTH_CLIENT_ID
-        client_secret = settings.GOOGLE_OAUTH_CLIENT_SECRET
-        redirect_uri = request.build_absolute_uri(reverse('accounts:google_callback'))
-        
-        # Get tokens
-        token_response = requests.post(
-            'https://oauth2.googleapis.com/token',
-            data={
-                'code': code,
-                'client_id': client_id,
-                'client_secret': client_secret,
-                'redirect_uri': redirect_uri,
-                'grant_type': 'authorization_code',
-            },
-            timeout=10
-        )
-        
-        if not token_response.ok:
-            logger.error(f"Google token exchange failed: {token_response.text}")
-            return None
-        
-        tokens = token_response.json()
-        access_token = tokens.get('access_token')
-        
-        # Get user info
-        userinfo_response = requests.get(
-            'https://www.googleapis.com/oauth2/v2/userinfo',
-            headers={'Authorization': f'Bearer {access_token}'},
-            timeout=10
-        )
-        
-        if not userinfo_response.ok:
-            logger.error(f"Google userinfo failed: {userinfo_response.text}")
-            return None
-        
-        return userinfo_response.json()
-    
-    def _get_or_create_google_user(self, google_data):
-        """Find existing user or create new one from Google data"""
-        google_id = google_data.get('id')
-        email = google_data.get('email')
-        
-        # Try to find by google_id first
-        user = User.objects.filter(google_id=google_id).first()
-        if user:
-            # Update info if needed
-            self._update_google_user_info(user, google_data)
-            return user, False
-        
-        # Try to find by email
-        if email:
-            user = User.objects.filter(email=email).first()
-            if user:
-                # Link Google account to existing user
-                user.google_id = google_id
-                user.avatar_url = google_data.get('picture', '')
-                if not user.is_email_verified:
-                    user.is_email_verified = google_data.get('verified_email', False)
-                user.save()
-                return user, False
-        
-        # Create new user
-        user = User.objects.create_google_user(
-            email=email,
-            google_id=google_id,
-            first_name=google_data.get('given_name', ''),
-            last_name=google_data.get('family_name', ''),
-            avatar_url=google_data.get('picture', ''),
-            is_email_verified=google_data.get('verified_email', False),
-        )
-        
-        return user, True
-    
-    def _update_google_user_info(self, user, google_data):
-        """به‌روزرسانی اطلاعات کاربر گوگل در ورودهای بعدی"""
-        updated = False
+            logger.error(f"Google login error: {e}")
+            return JsonResponse({
+                'success': False,
+                'message': f'خطا در ورود با گوگل: {str(e)}'
+            }, status=500)
 
-        if user.avatar_url != google_data.get('picture', ''):
-            user.avatar_url = google_data.get('picture', '')
-            updated = True
+class GoogleCallbackView(View):
+    """Callback از گوگل - allauth handles this automatically"""
+    
+    def get(self, request):
+        # This view is kept for backward compatibility
+        # but allauth handles the callback at /accounts/google/login/callback/
+        # Redirect to home or login page
+        return redirect(settings.LOGIN_REDIRECT_URL or '/')
 
-        if not user.is_email_verified and google_data.get('verified_email', False):
-            user.is_email_verified = True
-            updated = True
-
-        if updated:
-            user.save()
-            logger.info(f"Updated Google user info for: {user.email or user.id}")
-        return user
 
 # ============================================================================
 # VERIFY VIEW
@@ -885,6 +767,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # ═══════════════════════════════════════════════════════════
             elif action == 'add_bank_card':
                 from .models import BankCard
+                from .bank_utils import detect_bank_from_card_number
                 
                 # Validate card number
                 card_number = data.get('card_number', '').strip()
@@ -894,11 +777,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                         'message': 'شماره کارت باید ۱۶ رقم باشد'
                     }, status=400)
                 
-                # Validate bank name
-                if not data.get('bank_name'):
+                # Auto-detect bank from card number
+                bank_info = detect_bank_from_card_number(card_number)
+                bank_name = bank_info['name'] if bank_info else data.get('bank_name', '').strip()
+                
+                if not bank_name:
                     return JsonResponse({
                         'success': False,
-                        'message': 'نام بانک الزامی است'
+                        'message': 'بانک قابل تشخیص نیست. لطفا دوباره تلاش کنید'
                     }, status=400)
                 
                 # Check if card already exists
@@ -909,15 +795,15 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     }, status=400)
                 
                 try:
-                    # Create bank card
+                    # Create bank card (bank_name will be auto-detected in model's save method)
                     bank_card = BankCard.objects.create(
                         user=user,
                         card_number=card_number,
-                        bank_name=data.get('bank_name').strip(),
+                        bank_name=bank_name,
                         is_default=data.get('is_default', False)
                     )
                     
-                    logger.info(f"Bank card created: {bank_card.id} for user {user.phone}")
+                    logger.info(f"Bank card created: {bank_card.id} ({bank_card.bank_full_name}) for user {user.phone}")
                     
                     return JsonResponse({
                         'success': True,
@@ -1159,7 +1045,7 @@ def ticket_create_view(request):
     """
     ایجاد تیکت جدید
     """
-    from apps.consulting.models import ConsultingCategory, SupportTicket, TicketMessage, TicketAttachment
+    from apps.consulting.models import SupportTicket, TicketMessage, TicketAttachment
     
     if request.method == 'POST':
         subject = request.POST.get('subject')
@@ -1171,24 +1057,20 @@ def ticket_create_view(request):
             messages.error(request, 'لطفا تمام فیلدهای ضروری را پر کنید.')
             return render(request, 'accounts/ticket_create.html', {})
         
-        # Get or create default category
-        default_category, _ = ConsultingCategory.objects.get_or_create(
-            slug='general',
-            defaults={
-                'name': 'عمومی',
-                'icon': 'fas fa-question-circle',
-                'is_active': True,
-                'order': 0
-            }
-        )
+        # بررسی حجم فایل (حداکثر 5 مگابایت)
+        if attachment:
+            max_size = 5 * 1024 * 1024  # 5 MB in bytes
+            if attachment.size > max_size:
+                messages.error(request, 'حجم فایل نباید بیشتر از 5 مگابایت باشد.')
+                return render(request, 'accounts/ticket_create.html', {})
         
-        # ایجاد تیکت
+        # ایجاد تیکت بدون دسته‌بندی و اولویت
         ticket = SupportTicket.objects.create(
             user=request.user,
-            category=default_category,
+            category=None,
             subject=subject,
             initial_message=initial_message,
-            priority='medium'
+            priority=None
         )
         
         # Handle attachment if provided
@@ -1235,6 +1117,9 @@ def ticket_detail_view(request, ticket_id):
     for msg in unread_staff_messages:
         msg.mark_as_read()
     
+    # بروزرسانی تعداد پیام‌ها
+    ticket.refresh_from_db()
+    
     context = {
         'ticket': ticket,
         'ticket_messages': messages_qs,
@@ -1280,6 +1165,12 @@ def ticket_message_create_view(request, ticket_id):
     # آپلود فایل (در صورت وجود)
     uploaded_file = request.FILES.get('attachment')
     if uploaded_file:
+        # بررسی حجم فایل (حداکثر 5 مگابایت)
+        max_size = 5 * 1024 * 1024  # 5 MB in bytes
+        if uploaded_file.size > max_size:
+            messages.error(request, 'حجم فایل نباید بیشتر از 5 مگابایت باشد.')
+            return redirect('accounts:ticket_detail', ticket_id=ticket.ticket_id)
+        
         try:
             TicketAttachment.objects.create(
                 message=message,

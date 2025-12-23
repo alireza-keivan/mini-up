@@ -5,15 +5,24 @@ db.sqlite3
 .env
 *.log
 
+# Media files (user uploads)
+media/
+
 # Node / Tailwind
 node_modules/
 package-lock.json
-
+venv/
+Scripts/
+bin/
+lib/
+pyvenv.cfg
 # IDE / OS
 .vscode/
 .idea/
 .DS_Store
 .bin/
+./.gitignore
 # Compiled static assets
-static/css/main.css
+/static/css/main.css
 static/js/*.min.js
+templates/core/*backup*.html

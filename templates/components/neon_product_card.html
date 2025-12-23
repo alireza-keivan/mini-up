@@ -1,0 +1,145 @@
+{% load static %}
+{% load humanize %}
+
+<!-- 
+  Neon Product Card Component
+  Proportions: 2:1 ratio (height to width)
+  - Image section: 1:1 (square)
+  - Content section: 1:1 (same height as image)
+  Usage: {% include 'components/neon_product_card.html' with product=product neon_color='cyan' %}
+-->
+
+<article class="neon-product-card relative bg-black/80 backdrop-blur-sm rounded-xl border-2 overflow-hidden group transition-all duration-300
+                {% if neon_color == 'cyan' or not neon_color %}border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:shadow-[0_0_25px_rgba(34,211,238,0.8)]
+                {% elif neon_color == 'pink' %}border-pink-400 shadow-[0_0_15px_rgba(244,114,182,0.5)] hover:shadow-[0_0_25px_rgba(244,114,182,0.8)]
+                {% elif neon_color == 'purple' %}border-purple-400 shadow-[0_0_15px_rgba(192,132,252,0.5)] hover:shadow-[0_0_25px_rgba(192,132,252,0.8)]
+                {% elif neon_color == 'green' %}border-green-400 shadow-[0_0_15px_rgba(74,222,128,0.5)] hover:shadow-[0_0_25px_rgba(74,222,128,0.8)]
+                {% endif %}"
+     data-product-id="{{ product.id }}">
+    
+    <!-- Image Container - 1:1 Aspect Ratio -->
+    <div class="neon-card-image relative aspect-square overflow-hidden">
+        <!-- Product Image -->
+        {% if product.primary_image %}
+        <img src="{{ product.primary_image.url }}" 
+             alt="{{ product.name }}"
+             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+             loading="lazy">
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center bg-gray-900">
+            <svg class="w-20 h-20 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" 
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+        </div>
+        {% endif %}
+        
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60"></div>
+        
+        <!-- Wishlist/Like Button -->
+        <button type="button"
+                class="neon-like-btn absolute top-4 right-4 p-2 rounded-full backdrop-blur-sm transition-all duration-300
+                       {% if neon_color == 'cyan' %}border border-cyan-400 bg-cyan-500/20 hover:bg-cyan-500/30 hover:shadow-[0_0_20px_rgba(34,211,238,0.6)]
+                       {% elif neon_color == 'pink' %}border border-pink-400 bg-pink-500/20 hover:bg-pink-500/30 hover:shadow-[0_0_20px_rgba(244,114,182,0.6)]
+                       {% elif neon_color == 'purple' %}border border-purple-400 bg-purple-500/20 hover:bg-purple-500/30 hover:shadow-[0_0_20px_rgba(192,132,252,0.6)]
+                       {% elif neon_color == 'green' %}border border-green-400 bg-green-500/20 hover:bg-green-500/30 hover:shadow-[0_0_20px_rgba(74,222,128,0.6)]
+                       {% endif %}"
+                data-wishlist="{{ product.id }}"
+                aria-label="افزودن به علاقه‌مندی‌ها">
+            <svg class="w-5 h-5 text-white transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Content Container - 1:1 Aspect Ratio (same height as image) -->
+    <div class="neon-card-content aspect-square p-6 flex flex-col justify-between">
+        
+        <!-- Rating Stars -->
+        <div class="flex items-center gap-1 mb-3">
+            {% for i in "12345" %}
+            <svg class="w-4 h-4 fill-cyan-400 text-cyan-400"
+                 fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            {% endfor %}
+            <span class="ml-2 text-gray-400 text-sm">(5.0)</span>
+        </div>
+
+        <!-- Product Title -->
+        <h3 class="text-cyan-400 transition-all duration-300 mb-3 line-clamp-2">
+            {{ product.name }}
+        </h3>
+
+        <!-- Description -->
+        <p class="text-gray-300 text-sm line-clamp-2 mb-4 flex-grow">
+            {{ product.description|default:"محصول با کیفیت بالا و طراحی مدرن برای تجربه‌ای بهتر" }}
+        </p>
+
+        <!-- Price and Add to Cart Button -->
+        <div class="flex items-center justify-between pt-4 mt-auto">
+            <!-- Price -->
+            <div class="flex flex-col">
+                {% if product.discount_percent > 0 %}
+                <!-- Original Price (crossed out) -->
+                <span class="text-sm text-gray-500 line-through">
+                    {{ product.price|intcomma }}
+                </span>
+                <!-- Discounted Price -->
+                <span class="text-xl font-bold
+                            {% if neon_color == 'cyan' %}text-cyan-400
+                            {% elif neon_color == 'pink' %}text-pink-400
+                            {% elif neon_color == 'purple' %}text-purple-400
+                            {% elif neon_color == 'green' %}text-green-400
+                            {% endif %}">
+                    {{ product.final_price|intcomma }}
+                    <span class="text-sm font-normal">تومان</span>
+                </span>
+                {% else %}
+                <!-- Regular Price -->
+                <span class="text-xl font-bold
+                            {% if neon_color == 'cyan' %}text-cyan-400
+                            {% elif neon_color == 'pink' %}text-pink-400
+                            {% elif neon_color == 'purple' %}text-purple-400
+                            {% elif neon_color == 'green' %}text-green-400
+                            {% endif %}">
+                    {{ product.price|intcomma }}
+                    <span class="text-sm font-normal">تومان</span>
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Add to Cart Button -->
+            {% if product.stock > 0 %}
+            <button type="button"
+                    class="neon-cart-btn flex items-center gap-2 px-6 py-3 rounded-lg border-2 transition-all duration-300
+                           {% if neon_color == 'cyan' %}border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 hover:shadow-[0_0_20px_rgba(34,211,238,0.6)]
+                           {% elif neon_color == 'pink' %}border-pink-400 bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 hover:shadow-[0_0_20px_rgba(244,114,182,0.6)]
+                           {% elif neon_color == 'purple' %}border-purple-400 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 hover:shadow-[0_0_20px_rgba(192,132,252,0.6)]
+                           {% elif neon_color == 'green' %}border-green-400 bg-green-500/20 text-green-400 hover:bg-green-500/30 hover:shadow-[0_0_20px_rgba(74,222,128,0.6)]
+                           {% endif %}"
+                    data-add-cart="{{ product.id }}"
+                    aria-label="افزودن به سبد خرید">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <span class="font-medium">افزودن</span>
+            </button>
+            {% else %}
+            <!-- Out of Stock -->
+            <button type="button"
+                    class="flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-gray-600 bg-gray-800/20 text-gray-400 cursor-not-allowed"
+                    disabled>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                <span class="font-medium">ناموجود</span>
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</article>

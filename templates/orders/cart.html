@@ -13,22 +13,113 @@
     }
 
     .page-header {
-        background: linear-gradient(135deg, rgba(191, 0, 255, 0.1) 0%, rgba(255, 0, 85, 0.1) 100%);
-        border: 1px solid var(--neon-purple);
+        background: rgba(191, 0, 255, 0.05);
+        border: 1px solid rgba(191, 0, 255, 0.3);
         border-radius: 12px;
         padding: 2rem;
         margin-bottom: 2rem;
-        box-shadow: 0 0 20px rgba(191, 0, 255, 0.2);
+        box-shadow: 0 0 20px rgba(191, 0, 255, 0.1);
     }
 
     .page-header h1 {
-        color: var(--neon-cyan);
+        color: var(--neon-purple);
         font-size: 2rem;
         margin: 0;
-        text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        text-shadow: 0 0 10px rgba(191, 0, 255, 0.5);
         display: flex;
         align-items: center;
         gap: 1rem;
+    }
+
+    .user-info-banner {
+        background: rgba(20, 20, 35, 0.8);
+        border: 1px solid rgba(191, 0, 255, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .wallet-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .wallet-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(191, 0, 255, 0.1);
+        border: 2px solid var(--neon-purple);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: var(--neon-purple);
+    }
+
+    .wallet-details h3 {
+        color: #ccc;
+        font-size: 0.9rem;
+        margin: 0 0 0.25rem 0;
+        font-weight: normal;
+    }
+
+    .wallet-balance {
+        color: var(--neon-purple);
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .btn-signin {
+        background: transparent;
+        border: 2px solid var(--neon-purple);
+        color: var(--neon-purple);
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-signin:hover {
+        background: rgba(191, 0, 255, 0.1);
+        box-shadow: 0 0 15px rgba(191, 0, 255, 0.3);
+    }
+
+    .profile-incomplete-alert {
+        background: rgba(234, 179, 8, 0.1);
+        border: 1px solid rgba(234, 179, 8, 0.3);
+        border-radius: 8px;
+        padding: 1rem;
+        color: #fbbf24;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .profile-incomplete-alert i {
+        font-size: 1.25rem;
+    }
+
+    .profile-incomplete-alert a {
+        color: var(--neon-purple);
+        text-decoration: underline;
+        margin-right: 0.25rem;
+    }
+
+    .profile-incomplete-alert a:hover {
+        color: white;
     }
 
     .cart-container {
@@ -106,7 +197,7 @@
     }
 
     .cart-item-price {
-        color: var(--neon-cyan);
+        color: white;
         font-size: 1.2rem;
         font-weight: bold;
     }
@@ -151,7 +242,7 @@
         border: none;
         border-radius: 6px;
         background: rgba(191, 0, 255, 0.2);
-        color: var(--neon-cyan);
+        color: var(--neon-purple);
         cursor: pointer;
         transition: all 0.3s;
         font-size: 1.2rem;
@@ -173,9 +264,9 @@
     }
 
     .btn-remove {
-        background: rgba(255, 0, 85, 0.1);
-        border: 1px solid var(--neon-pink);
-        color: var(--neon-pink);
+        background: transparent;
+        border: 1px solid rgba(239, 68, 68, 0.5);
+        color: rgba(239, 68, 68, 0.8);
         padding: 0.5rem 1rem;
         border-radius: 8px;
         cursor: pointer;
@@ -186,8 +277,9 @@
     }
 
     .btn-remove:hover {
-        background: var(--neon-pink);
-        color: white;
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.8);
+        color: rgba(239, 68, 68, 1);
     }
 
     .cart-summary {
@@ -201,7 +293,7 @@
     }
 
     .cart-summary h2 {
-        color: var(--neon-pink);
+        color: var(--neon-purple);
         font-size: 1.5rem;
         margin-bottom: 1.5rem;
         padding-bottom: 1rem;
@@ -236,12 +328,12 @@
 
     .summary-row.total .summary-label {
         font-size: 1.2rem;
-        color: var(--neon-cyan);
+        color: var(--neon-purple);
     }
 
     .summary-row.total .summary-value {
         font-size: 1.5rem;
-        color: var(--neon-cyan);
+        color: var(--neon-purple);
     }
 
     .summary-row.discount .summary-value {
@@ -250,8 +342,8 @@
 
     .coupon-section {
         margin: 1.5rem 0;
-        padding: 1.5rem;
-        background: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(191, 0, 255, 0.2);
         border-radius: 8px;
     }
@@ -263,7 +355,7 @@
 
     .coupon-input {
         flex: 1;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.3);
         border: 1px solid rgba(191, 0, 255, 0.3);
         border-radius: 8px;
         padding: 0.75rem;
@@ -273,11 +365,25 @@
 
     .coupon-input:focus {
         outline: none;
-        border-color: var(--neon-cyan);
+        border-color: var(--neon-purple);
+        box-shadow: 0 0 10px rgba(191, 0, 255, 0.2);
     }
 
     .btn-apply-coupon {
-        background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
+        background: transparent;
+        border: 2px solid var(--neon-purple);
+        color: var(--neon-purple);
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: bold;
+    }
+
+    .btn-apply-coupon:hover {
+        background: rgba(191, 0, 255, 0.1);
+        box-shadow: 0 0 15px rgba(191, 0, 255, 0.3);
+    }
         border: none;
         border-radius: 8px;
         color: white;
@@ -327,10 +433,10 @@
 
     .btn-checkout {
         width: 100%;
-        background: linear-gradient(135deg, var(--neon-purple) 0%, var(--neon-pink) 100%);
-        border: none;
+        background: transparent;
+        border: 2px solid var(--neon-cyan);
         border-radius: 12px;
-        color: white;
+        color: var(--neon-cyan);
         padding: 1.25rem;
         font-size: 1.2rem;
         font-weight: bold;
@@ -345,8 +451,8 @@
     }
 
     .btn-checkout:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(191, 0, 255, 0.6);
+        background: rgba(191, 0, 255, 0.1);
+        box-shadow: 0 0 20px rgba(191, 0, 255, 0.5);
     }
 
     .empty-cart {
@@ -427,6 +533,35 @@
         <h1><i class="fas fa-shopping-cart"></i> سبد خرید</h1>
     </div>
 
+    <!-- User Info Banner -->
+    <div class="user-info-banner">
+        {% if user.is_authenticated %}
+            <div class="wallet-info">
+                <div class="wallet-icon">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <div class="wallet-details">
+                    <h3>موجودی کیف پول</h3>
+                    <p class="wallet-balance">
+                        {% if user.wallet %}
+                            {{ user.wallet.balance|intcomma }} تومان
+                        {% else %}
+                            0 تومان
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        {% else %}
+            <div>
+                <i class="fas fa-info-circle" style="color: var(--neon-purple); margin-left: 0.5rem;"></i>
+                <span style="color: #ccc;">برای مشاهده اطلاعات کیف پول و تکمیل خرید، لطفاً وارد شوید</span>
+            </div>
+            <a href="#" class="btn-signin" onclick="openAuthModal(); return false;">
+                <i class="fas fa-sign-in-alt"></i> ورود / ثبت‌نام
+            </a>
+        {% endif %}
+    </div>
+
     <div class="cart-container">
         {% if cart_items %}
         <div class="cart-items">
@@ -502,9 +637,35 @@
                 <span class="summary-value">{{ total|intcomma }} تومان</span>
             </div>
 
-            <a href="{% url 'orders:checkout' %}" class="btn-checkout">
-                <i class="fas fa-credit-card"></i> ادامه و تسویه حساب
-            </a>
+            {% if user.is_authenticated %}
+                <!-- Profile Incomplete Alert (if needed) -->
+                {% if not user.first_name or not user.last_name or not user.phone or not user.email or not user.addresses.exists %}
+                <div class="profile-incomplete-alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>
+                        برای تکمیل خرید، لطفاً 
+                        <a href="{% url 'accounts:profile' %}">اطلاعات پروفایل</a>
+                        خود را تکمیل کنید
+                        (نام، نام خانوادگی، شماره موبایل، ایمیل و آدرس)
+                    </span>
+                </div>
+                {% endif %}
+
+                <button 
+                    onclick="handleCheckout(event)" 
+                    class="btn-checkout"
+                    data-has-firstname="{{ user.first_name|yesno:'true,false' }}"
+                    data-has-lastname="{{ user.last_name|yesno:'true,false' }}"
+                    data-has-phone="{{ user.phone|yesno:'true,false' }}"
+                    data-has-email="{{ user.email|yesno:'true,false' }}"
+                    data-has-address="{{ user.addresses.exists|yesno:'true,false' }}">
+                    <i class="fas fa-credit-card"></i> ادامه و تسویه حساب
+                </button>
+            {% else %}
+                <button onclick="openAuthModal(); return false;" class="btn-checkout">
+                    <i class="fas fa-sign-in-alt"></i> ورود برای تکمیل خرید
+                </button>
+            {% endif %}
         </div>
 
         {% else %}
@@ -535,7 +696,7 @@ function getCookie(name) {
 }
 
 function updateQuantity(itemId, newQuantity) {
-    fetch(`/cart/update/${itemId}/`, {
+    fetch(`/orders/cart/update/${itemId}/`, {
         method: 'POST',
         headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
         body: JSON.stringify({ quantity: newQuantity })
@@ -564,7 +725,7 @@ function decreaseQuantity(itemId) {
 
 function removeItem(itemId) {
     if (confirm('آیا از حذف این محصول اطمینان دارید؟')) {
-        fetch(`/cart/remove/${itemId}/`, {
+        fetch(`/orders/cart/remove/${itemId}/`, {
             method: 'POST',
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         })
@@ -587,7 +748,7 @@ function applyCoupon(event) {
         alert('لطفاً کد تخفیف را وارد کنید');
         return;
     }
-    fetch('/cart/apply-coupon/', {
+    fetch('/orders/cart/apply-coupon/', {
         method: 'POST',
         headers: {'X-CSRFToken': getCookie('csrftoken'), 'Content-Type': 'application/json'},
         body: JSON.stringify({ coupon_code: couponCode })
@@ -605,7 +766,7 @@ function applyCoupon(event) {
 
 function removeCoupon() {
     if (confirm('آیا از حذف کد تخفیف اطمینان دارید؟')) {
-        fetch('/cart/remove-coupon/', {
+        fetch('/orders/cart/remove-coupon/', {
             method: 'POST',
             headers: {'X-CSRFToken': getCookie('csrftoken')}
         })
@@ -620,5 +781,34 @@ function removeCoupon() {
         });
     }
 }
+
+function handleCheckout(event) {
+    const button = event.currentTarget;
+    const hasFirstname = button.dataset.hasFirstname === 'true';
+    const hasLastname = button.dataset.hasLastname === 'true';
+    const hasPhone = button.dataset.hasPhone === 'true';
+    const hasEmail = button.dataset.hasEmail === 'true';
+    const hasAddress = button.dataset.hasAddress === 'true';
+    
+    const missingFields = [];
+    if (!hasFirstname) missingFields.push('نام');
+    if (!hasLastname) missingFields.push('نام خانوادگی');
+    if (!hasPhone) missingFields.push('شماره موبایل');
+    if (!hasEmail) missingFields.push('ایمیل');
+    if (!hasAddress) missingFields.push('آدرس');
+    
+    if (missingFields.length > 0) {
+        const message = `لطفاً ابتدا اطلاعات زیر را در پروفایل خود تکمیل کنید:\n\n${missingFields.join('، ')}\n\nآیا می‌خواهید به صفحه پروفایل بروید؟`;
+        if (confirm(message)) {
+            window.location.href = '{% url "accounts:profile" %}';
+        }
+        return false;
+    }
+    
+    // All required fields are filled, proceed to checkout
+    window.location.href = '{% url "orders:checkout" %}';
+    return false;
+}
 </script>
 {% endblock %}
+

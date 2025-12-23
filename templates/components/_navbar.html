@@ -40,17 +40,16 @@
             <div class="navbar-actions">
                 
                 <!-- Cart Button -->
-                <button type="button" 
-                        class="navbar-action-btn" 
-                        id="cartToggle"
-                        data-cart-open
-                        aria-label="سبد خرید"
-                        title="سبد خرید">
+                <a href="/orders/cart/" 
+                   class="navbar-action-btn" 
+                   id="cartToggle"
+                   aria-label="سبد خرید"
+                   title="سبد خرید">
                     <i class="fas fa-shopping-cart"></i>
                     {% if cart_count and cart_count > 0 %}
                         <span class="navbar-action-badge">{{ cart_count }}</span>
                     {% endif %}
-                </button>
+                </a>
                 
                 <!-- Notifications -->
                 {% if user.is_authenticated %}
@@ -471,8 +470,7 @@
                     <a href="{% url 'core:buy_products' %}" 
                        class="navbar-menu-link {% if request.resolver_match.url_name == 'buy_products' %}active{% endif %}">
                         <i class="fas fa-shopping-bag"></i>
-                        خرید محصولات
-                        <i class="fas fa-chevron-down nav-arrow"></i>
+                        محصولات جانبی                        <i class="fas fa-chevron-down nav-arrow"></i>
                     </a>
                     
                     <div class="mega-menu mega-menu--compact">
@@ -637,6 +635,15 @@
                        class="navbar-menu-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
                         <i class="fas fa-info-circle"></i>
                         درباره ما
+                    </a>
+                </div>
+                
+                <!-- Articles -->
+                <div class="navbar-menu-item">
+                    <a href="/blog/articles/" 
+                       class="navbar-menu-link {% if 'articles' in request.path %}active{% endif %}">
+                        <i class="fas fa-newspaper"></i>
+                        مقالات ما
                     </a>
                 </div>
                 
