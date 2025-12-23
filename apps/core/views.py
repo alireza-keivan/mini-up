@@ -20,8 +20,12 @@ def home(request):
     # دریافت ویدیوی یوتیوب فعال
     youtube_video = YouTubeVideo.objects.filter(is_active=True).first()
     
-    # دریافت آخرین مقالات منتشر شده
-    latest_articles = Article.objects.filter(status='published').order_by('-published_at')[:8]
+    # دریافت 4 مقاله ویژه (اگر کمتر از 4 باشد، همه را نمایش می‌دهد)
+    # مقالات بر اساس تاریخ انتشار (جدیدترین) مرتب می‌شوند
+    latest_articles = Article.objects.filter(
+        status='published',
+        is_featured=True
+    ).order_by('-published_at')[:4]
     
     return render(request, 'core/home.html', {
         'title': 'صفحه اصلی',
