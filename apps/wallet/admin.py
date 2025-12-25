@@ -55,25 +55,28 @@ class WalletAdmin(admin.ModelAdmin):
     user_display.short_description = 'کاربر'
 
     def balance_display(self, obj):
+        formatted_amount = f"{int(obj.balance):,}"
         return format_html(
-            '<span style="color: green; font-weight: bold;">{:,}</span> تومان',
-            int(obj.balance)
+            '<span style="color: green; font-weight: bold;">{}</span> تومان',
+            formatted_amount
         )
     balance_display.short_description = 'موجودی'
 
     def gift_balance_display(self, obj):
         if obj.gift_balance > 0:
+            formatted_amount = f"{int(obj.gift_balance):,}"
             return format_html(
-                '<span style="color: purple; font-weight: bold;">{:,}</span> تومان',
-                int(obj.gift_balance)
+                '<span style="color: purple; font-weight: bold;">{}</span> تومان',
+                formatted_amount
             )
         return '-'
     gift_balance_display.short_description = 'اعتبار هدیه'
 
     def total_balance_display(self, obj):
+        formatted_amount = f"{int(obj.total_balance):,}"
         return format_html(
-            '<span style="color: blue; font-weight: bold;">{:,}</span> تومان',
-            int(obj.total_balance)
+            '<span style="color: blue; font-weight: bold;">{}</span> تومان',
+            formatted_amount
         )
     total_balance_display.short_description = 'موجودی کل'
 
@@ -188,15 +191,16 @@ class WalletTransactionAdmin(admin.ModelAdmin):
     transaction_type_display.short_description = 'نوع'
 
     def amount_display(self, obj):
+        formatted_amount = f"{int(obj.amount):,}"
         if obj.amount > 0:
             return format_html(
-                '<span style="color: green; font-weight: bold;">+{:,}</span>',
-                int(obj.amount)
+                '<span style="color: green; font-weight: bold;">+{}</span>',
+                formatted_amount
             )
         else:
             return format_html(
-                '<span style="color: red; font-weight: bold;">{:,}</span>',
-                int(obj.amount)
+                '<span style="color: red; font-weight: bold;">{}</span>',
+                formatted_amount
             )
     amount_display.short_description = 'مبلغ (تومان)'
 
@@ -293,9 +297,10 @@ class WalletDepositRequestAdmin(admin.ModelAdmin):
     wallet_user.short_description = 'کاربر'
 
     def amount_display(self, obj):
+        formatted_amount = f"{int(obj.amount):,}"
         return format_html(
-            '<span style="font-weight: bold;">{:,}</span> تومان',
-            int(obj.amount)
+            '<span style="font-weight: bold;">{}</span> تومان',
+            formatted_amount
         )
     amount_display.short_description = 'مبلغ'
 

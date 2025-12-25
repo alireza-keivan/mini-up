@@ -463,9 +463,10 @@ class BankCard(models.Model):
     
     @property
     def masked_number(self):
-        """Return masked card number (e.g., 6037-99**-****-1234)."""
+        """Return masked card number (e.g., 1234 - **** - **** - 6037)."""
         if len(self.card_number) == 16:
-            return f'{self.card_number[:4]}-{self.card_number[4:6]}**-****-{self.card_number[-4:]}'
+            # Format: Last 4 digits - **** - **** - First 4 digits
+            return f'{self.card_number[-4:]} - **** - **** - {self.card_number[:4]}'
         return self.card_number
     
     @property

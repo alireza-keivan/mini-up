@@ -28,13 +28,13 @@ class WalletDashboardView(LoginRequiredMixin, TemplateView):
             from .models import Wallet, WalletTransaction
             wallet, created = Wallet.objects.get_or_create(user=user)
             
-            # آخرین تراکنش‌ها
-            recent_transactions = WalletTransaction.objects.filter(
+            # همه تراکنش‌ها (بدون محدودیت)
+            transactions = WalletTransaction.objects.filter(
                 wallet=wallet
-            ).order_by('-created_at')[:10]
+            ).order_by('-created_at')
             
             context['wallet'] = wallet
-            context['recent_transactions'] = recent_transactions
+            context['transactions'] = transactions
             
         except Exception as e:
             # اگر مدل‌ها هنوز migrate نشده‌اند
@@ -42,8 +42,16 @@ class WalletDashboardView(LoginRequiredMixin, TemplateView):
                 'balance': 0,
                 'gift_balance': 0,
             }
-            context['recent_transactions'] = []
+            context['transactions'] = []
             context['error'] = str(e)
+        
+        # دریافت کارت‌های بانکی کاربر
+        try:
+            from apps.accounts.models import BankCard
+            bank_cards = BankCard.objects.filter(user=user)
+            context['bank_cards'] = bank_cards
+        except Exception:
+            context['bank_cards'] = []
         
         return context
 
@@ -83,7 +91,61 @@ class WalletDepositView(LoginRequiredMixin, TemplateView):
         context['min_deposit'] = getattr(settings, 'MIN_WALLET_TOPUP', 10000)
         context['max_deposit'] = getattr(settings, 'MAX_WALLET_TOPUP', 50000000)
         
+        # Bank cards
+        try:
+            from apps.accounts.models import BankCard
+            bank_cards = BankCard.objects.filter(user=user)
+            context['bank_cards'] = bank_cards
+        except Exception:
+            context['bank_cards'] = []
+        
         return context
+    
+    def post(self, request):
+        """Handle deposit form submission from modal"""
+        try:
+            # دریافت داده‌ها
+            amount = int(request.POST.get('amount', 0))
+            gateway = request.POST.get('gateway', 'zarinpal')
+            bank_card_id = request.POST.get('bank_card', '')
+            
+            # اعتبارسنجی مبلغ
+            from django.conf import settings
+            min_amount = getattr(settings, 'MIN_WALLET_TOPUP', 10000)
+            max_amount = getattr(settings, 'MAX_WALLET_TOPUP', 50000000)
+            
+            if amount < min_amount:
+                messages.error(request, f'حداقل مبلغ شارژ {min_amount:,} ریال است')
+                return redirect('wallet:dashboard')
+            
+            if amount > max_amount:
+                messages.error(request, f'حداکثر مبلغ شارژ {max_amount:,} ریال است')
+                return redirect('wallet:dashboard')
+            
+            # ایجاد درخواست شارژ
+            from .models import Wallet, WalletDepositRequest
+            wallet, _ = Wallet.objects.get_or_create(user=request.user)
+            
+            deposit_request = WalletDepositRequest.objects.create(
+                wallet=wallet,
+                amount=amount,
+                gateway=gateway,
+                status='pending'
+            )
+            
+            # TODO: اتصال به درگاه پرداخت (زرین پال یا ایدی پی)
+            # For now, just show success message
+            messages.success(request, f'درخواست شارژ {amount:,} ریال ثبت شد. در حال انتقال به درگاه پرداخت...')
+            
+            # Redirect to appropriate gateway
+            return redirect('wallet:dashboard')
+                
+        except ValueError:
+            messages.error(request, 'مبلغ وارد شده معتبر نیست')
+            return redirect('wallet:dashboard')
+        except Exception as e:
+            messages.error(request, f'خطا در ثبت درخواست: {str(e)}')
+            return redirect('wallet:dashboard')
 
 
 class WalletTransactionsView(LoginRequiredMixin, TemplateView):

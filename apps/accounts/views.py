@@ -949,13 +949,30 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                     # Update user basic info
                     first_name = data.get('first_name', '').strip()
                     last_name = data.get('last_name', '').strip()
+                    email = data.get('email', '').strip()
+                    
+                    update_fields = []
                     
                     if first_name:
                         user.first_name = first_name
+                        update_fields.append('first_name')
                     if last_name:
                         user.last_name = last_name
+                        update_fields.append('last_name')
                     
-                    user.save(update_fields=['first_name', 'last_name'])
+                    # Only allow email update if user is not logged in with Google
+                    if email and not user.google_id:
+                        # Check if email is already taken by another user
+                        if User.objects.filter(email=email).exclude(id=user.id).exists():
+                            return JsonResponse({
+                                'success': False,
+                                'message': 'این ایمیل قبلاً استفاده شده است'
+                            }, status=400)
+                        user.email = email
+                        update_fields.append('email')
+                    
+                    if update_fields:
+                        user.save(update_fields=update_fields)
                     
                     # Update or create profile for national_code
                     national_code = data.get('national_code', '').strip()
@@ -972,6 +989,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                         'user': {
                             'first_name': user.first_name,
                             'last_name': user.last_name,
+                            'email': user.email,
                             'national_code': profile.national_code if hasattr(user, 'profile') else ''
                         }
                     })
@@ -1130,19 +1148,62 @@ class OrdersView(LoginRequiredMixin, TemplateView):
     login_url = '/accounts/login/'
     
     def get_context_data(self, **kwargs):
-        from apps.orders.models import Order
-        from django.db.models import Count, Q
+        from apps.orders.models import Order, OrderItem
+        from django.db.models import Count, Q, Sum
+        from datetime import datetime
         
         context = super().get_context_data(**kwargs)
         
         # Get user's orders
-        orders = Order.objects.filter(user=self.request.user).order_by('-created_at')
+        orders = Order.objects.filter(user=self.request.user).select_related(
+            'user'
+        ).prefetch_related(
+            'items__product'
+        ).order_by('-created_at')
+        
+        # Apply filters
+        status_filter = self.request.GET.get('status', '')
+        if status_filter:
+            # Handle multiple statuses separated by comma
+            if ',' in status_filter:
+                statuses = [s.strip() for s in status_filter.split(',')]
+                orders = orders.filter(status__in=statuses)
+            else:
+                orders = orders.filter(status=status_filter)
+        
+        date_from = self.request.GET.get('date_from', '')
+        if date_from:
+            try:
+                from_date = datetime.strptime(date_from, '%Y-%m-%d')
+                orders = orders.filter(created_at__gte=from_date)
+            except ValueError:
+                pass
+        
+        date_to = self.request.GET.get('date_to', '')
+        if date_to:
+            try:
+                to_date = datetime.strptime(date_to, '%Y-%m-%d')
+                orders = orders.filter(created_at__lte=to_date)
+            except ValueError:
+                pass
+        
+        # Calculate stats for summary
+        total_amount = orders.aggregate(Sum('total'))['total__sum'] or 0
+        total_discount = orders.aggregate(Sum('discount_amount'))['discount_amount__sum'] or 0
+        
+        # Count total items across all orders
+        total_items = OrderItem.objects.filter(order__in=orders).aggregate(
+            total=Sum('quantity')
+        )['total'] or 0
         
         # Calculate stats
         context['orders'] = orders
         context['orders_count'] = orders.count()
         context['completed_count'] = orders.filter(status='completed').count()
         context['processing_count'] = orders.filter(status='processing').count()
+        context['total_amount'] = total_amount
+        context['total_discount'] = total_discount
+        context['total_items'] = total_items
         context['page_title'] = 'سفارشات من'
         
         return context

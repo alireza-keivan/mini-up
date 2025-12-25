@@ -1,66 +1,552 @@
 {% extends 'base.html' %}
 {% load humanize %}
 {% load static %}
+{% load custom_filters %}
+{% load jalali_tags %}
 
 {% block title %}کیف پول | Mini-Up{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/wallet.css' %}">
+<style>
+    .wallet-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .wallet-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: rgba(20, 20, 35, 0.8);
+        border: 1px solid rgba(191, 0, 255, 0.2);
+        border-radius: 12px;
+    }
+
+    .balance-info h2 {
+        color: #999;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        font-weight: normal;
+    }
+
+    .balance-amount {
+        color: white;
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+
+    .btn-charge {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        padding: 0.75rem 2rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-charge:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+    }
+
+    .transactions-table {
+        background: rgba(20, 20, 35, 0.8);
+        border: 1px solid rgba(191, 0, 255, 0.2);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        background: rgba(191, 0, 255, 0.1);
+        border-bottom: 1px solid rgba(191, 0, 255, 0.2);
+    }
+
+    .table-row {
+        display: grid;
+        grid-template-columns: 2fr 1.5fr 1fr 1fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        align-items: center;
+    }
+
+    .table-header .table-row {
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .table-body .table-row {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: #ccc;
+        font-size: 0.85rem;
+        transition: background 0.3s;
+    }
+
+    .table-body .table-row:hover {
+        background: rgba(191, 0, 255, 0.05);
+    }
+
+    .table-body .table-row:last-child {
+        border-bottom: none;
+    }
+
+    .transaction-type {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .type-deposit {
+        background: rgba(0, 255, 136, 0.1);
+        color: #00ff88;
+    }
+
+    .type-withdraw {
+        background: rgba(255, 0, 85, 0.1);
+        color: #ff0055;
+    }
+
+    .amount-positive {
+        color: #00ff88;
+        font-weight: 600;
+    }
+
+    .amount-negative {
+        color: #ff0055;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #999;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: rgba(191, 0, 255, 0.3);
+        margin-bottom: 1rem;
+    }
+
+    /* Charge Modal */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: rgba(20, 20, 35, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-header h3 {
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: #999;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s;
+    }
+
+    .modal-close:hover {
+        color: white;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        color: white;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .form-input, .form-select {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+
+    .form-input:focus, .form-select:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .form-select option {
+        background: #1a1a2e;
+        color: white;
+    }
+
+    .amount-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .amount-btn {
+        flex: 1;
+        min-width: 100px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        color: white;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .amount-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .current-balance-display {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .current-balance-display .label {
+        color: #999;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .current-balance-display .value {
+        color: white;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .submit-charge {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        padding: 0.9rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 1rem;
+    }
+
+    .submit-charge:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .wallet-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .table-row {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .table-header {
+            display: none;
+        }
+
+        .table-body .table-row > div::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: white;
+            margin-left: 0.5rem;
+        }
+
+        .modal-content {
+            padding: 1.5rem;
+        }
+
+        .amount-buttons {
+            flex-direction: column;
+        }
+
+        .amount-btn {
+            min-width: 100%;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<main class="min-h-screen bg-gradient-to-b from-dark-900 via-dark-800 to-dark-900 py-6 px-4 sm:px-6 lg:px-8" dir="rtl">
+<div class="wallet-container">
     
-    <!-- ═══════════════════════════════════════════════════════════════════
-         WALLET PAGE CONTAINER
-         ═══════════════════════════════════════════════════════════════════ -->
-    <div class="max-w-6xl mx-auto space-y-6 lg:space-y-8">
-        
-        <!-- Page Title -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-l from-neon-cyan via-neon-purple to-neon-pink animate-gradient-x">
-                💳 کیف پول من
-            </h1>
-            <p class="text-dark-300 mt-2 text-sm sm:text-base">
-                مدیریت موجودی و تراکنش‌های شما
-            </p>
-        </header>
-
-        <!-- ═══════════════════════════════════════════════════════════════════
-             WALLET HEADER - BALANCE DISPLAY
-             ═══════════════════════════════════════════════════════════════════ -->
-        {% include 'partials/_wallet_header.html' %}
-
-        <!-- ═══════════════════════════════════════════════════════════════════
-             TOP-UP SECTION
-             ═══════════════════════════════════════════════════════════════════ -->
-        {% include 'partials/_wallet_topup.html' %}
-
-        <!-- ═══════════════════════════════════════════════════════════════════
-             FILTERS
-             ═══════════════════════════════════════════════════════════════════ -->
-        {% include 'partials/_wallet_filters.html' %}
-
-        <!-- ═══════════════════════════════════════════════════════════════════
-             TRANSACTIONS SECTION
-             ═══════════════════════════════════════════════════════════════════ -->
-        {% include 'partials/_wallet_transactions.html' with transactions=recent_transactions transactions_count=recent_transactions.count %}
-
-        <!-- ═══════════════════════════════════════════════════════════════════
-             SECURITY SECTION
-             ═══════════════════════════════════════════════════════════════════ -->
-        {% include 'partials/_wallet_security.html' %}
-
+    <!-- Header: Balance + Charge Button -->
+    <div class="wallet-header">
+        <div class="balance-info">
+            <h2>ارزش کل</h2>
+            <div class="balance-amount">{{ wallet.total_balance|floatformat:0|intcomma }} ریال</div>
+        </div>
+        <button class="btn-charge" onclick="openChargeModal()">
+            <i class="fas fa-plus"></i> شارژ کیف پول
+        </button>
     </div>
-</main>
 
-<!-- Toast Notifications Container -->
-<div id="toast-container" 
-     class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-50 space-y-2">
+    <!-- Transactions Table -->
+    <div class="transactions-table">
+        <div class="table-header">
+            <div class="table-row">
+                <div>تاریخ</div>
+                <div>نوع تراکنش</div>
+                <div>مبلغ</div>
+                <div>وضعیت</div>
+            </div>
+        </div>
+        
+        <div class="table-body">
+            {% if transactions %}
+                {% for transaction in transactions %}
+                <div class="table-row">
+                    <div data-label="تاریخ: ">
+                        {{ transaction.created_at|jalali }}
+                    </div>
+                    <div data-label="نوع: ">
+                        {% if transaction.transaction_type == 'deposit' %}
+                            <span class="transaction-type type-deposit">شارژ کیف پول</span>
+                        {% elif transaction.transaction_type == 'withdraw' %}
+                            <span class="transaction-type type-withdraw">برداشت</span>
+                        {% elif transaction.transaction_type == 'purchase' %}
+                            <span class="transaction-type type-withdraw">خرید</span>
+                        {% elif transaction.transaction_type == 'refund' %}
+                            <span class="transaction-type type-deposit">استرداد</span>
+                        {% elif transaction.transaction_type == 'gift' %}
+                            <span class="transaction-type type-deposit">هدیه</span>
+                        {% elif transaction.transaction_type == 'cashback' %}
+                            <span class="transaction-type type-deposit">کش‌بک</span>
+                        {% else %}
+                            <span class="transaction-type type-withdraw">{{ transaction.get_transaction_type_display }}</span>
+                        {% endif %}
+                    </div>
+                    <div data-label="مبلغ: ">
+                        {% if transaction.transaction_type == 'deposit' or transaction.transaction_type == 'refund' or transaction.transaction_type == 'gift' or transaction.transaction_type == 'cashback' or transaction.transaction_type == 'transfer_in' %}
+                            <span class="amount-positive">+{{ transaction.amount|floatformat:0|intcomma }}</span>
+                        {% else %}
+                            <span class="amount-negative">-{{ transaction.amount|floatformat:0|intcomma }}</span>
+                        {% endif %}
+                    </div>
+                    <div data-label="وضعیت: ">
+                        {% if transaction.status == 'completed' %}
+                            <span style="color: #00ff88;">✓ تکمیل شده</span>
+                        {% elif transaction.status == 'pending' %}
+                            <span style="color: #ffc107;">⏳ در انتظار</span>
+                        {% elif transaction.status == 'failed' %}
+                            <span style="color: #ff0055;">✗ ناموفق</span>
+                        {% elif transaction.status == 'cancelled' %}
+                            <span style="color: #ff0055;">✗ لغو شده</span>
+                        {% else %}
+                            <span style="color: #999;">{{ transaction.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <p>هیچ تراکنشی یافت نشد</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<!-- Charge Modal -->
+<div class="modal-overlay" id="chargeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>شارژ کیف پول</h3>
+            <button class="modal-close" onclick="closeChargeModal()">×</button>
+        </div>
+
+        <form method="POST" action="{% url 'wallet:deposit' %}" id="chargeForm">
+            {% csrf_token %}
+            
+            <!-- Current Balance Display -->
+            <div class="current-balance-display">
+                <div class="label">موجودی فعلی</div>
+                <div class="value">{{ wallet.total_balance|floatformat:0|intcomma }} ریال</div>
+            </div>
+
+            <!-- Amount Input -->
+            <div class="form-group">
+                <label class="form-label">مبلغ شارژ (ریال)</label>
+                <input type="text" 
+                       name="amount" 
+                       id="chargeAmount" 
+                       class="form-input" 
+                       placeholder="مبلغ مورد نظر را وارد کنید"
+                       required>
+                
+                <!-- Quick Amount Buttons -->
+                <div class="amount-buttons">
+                    <button type="button" class="amount-btn" onclick="setAmount(2000000)">
+                        ۲۰۰,۰۰۰ تومان
+                    </button>
+                    <button type="button" class="amount-btn" onclick="setAmount(5000000)">
+                        ۵۰۰,۰۰۰ تومان
+                    </button>
+                    <button type="button" class="amount-btn" onclick="setAmount(10000000)">
+                        ۱,۰۰۰,۰۰۰ تومان
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bank Card Selection -->
+            <div class="form-group">
+                <label class="form-label">انتخاب کارت بانکی</label>
+                <select name="bank_card" class="form-select" required>
+                    <option value="">یک کارت بانکی انتخاب کنید</option>
+                    {% for card in bank_cards %}
+                    <option value="{{ card.id }}">
+                        {{ card.bank_name }} - {{ card.card_number|slice:"-4:" }}
+                    </option>
+                    {% endfor %}
+                    {% if not bank_cards %}
+                    <option value="">هیچ کارت بانکی ثبت نشده است</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- Payment Gateway Selection -->
+            <div class="form-group">
+                <label class="form-label">انتخاب درگاه پرداخت</label>
+                <select name="gateway" class="form-select" required>
+                    <option value="">یک درگاه انتخاب کنید</option>
+                    <option value="zarinpal">زرین پال</option>
+                    <option value="idpay">ایدی پی</option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-charge">
+                <i class="fas fa-credit-card"></i> پرداخت و شارژ کیف پول
+            </button>
+        </form>
+    </div>
 </div>
 
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/wallet.js' %}"></script>
+<script>
+    // Open charge modal
+    function openChargeModal() {
+        document.getElementById('chargeModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Close charge modal
+    function closeChargeModal() {
+        document.getElementById('chargeModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('chargeModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeChargeModal();
+        }
+    });
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeChargeModal();
+        }
+    });
+
+    // Set quick amount
+    function setAmount(amount) {
+        const input = document.getElementById('chargeAmount');
+        input.value = amount.toLocaleString('fa-IR');
+        input.focus();
+    }
+
+    // Format number input with commas
+    document.getElementById('chargeAmount').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/[^\d]/g, '');
+        if (value) {
+            e.target.value = parseInt(value).toLocaleString('fa-IR');
+        }
+    });
+
+    // Form submission - clean the amount value
+    document.getElementById('chargeForm').addEventListener('submit', function(e) {
+        const amountInput = document.getElementById('chargeAmount');
+        const cleanValue = amountInput.value.replace(/[^\d]/g, '');
+        amountInput.value = cleanValue;
+    });
+</script>
 {% endblock %}

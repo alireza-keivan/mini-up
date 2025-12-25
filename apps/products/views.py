@@ -1132,5 +1132,313 @@ class VariantPriceAjaxView(View):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# PHYSICAL PRODUCT PAGES (Gaming & Peripherals)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class GamingProductsView(WishlistContextMixin, FilterMixin, ListView):
+    """
+    Gaming products listing page with comprehensive filtering.
+    Similar to Digikala product listing.
+    
+    URL: /gaming-products/
+    Template: products/gaming_products.html
+    """
+    model = Product
+    template_name = 'products/gaming_products.html'
+    context_object_name = 'products'
+    paginate_by = 24
+    
+    def get_queryset(self):
+        # Get gaming products only
+        queryset = Product.objects.filter(
+            is_active=True,
+            product_type=Product.ProductType.PHYSICAL,
+            sub_type=Product.ProductSubType.GAMING
+        ).select_related(
+            'category', 'brand'
+        ).prefetch_related(
+            'images'
+        ).annotate(
+            avg_rating=Avg('reviews__rating'),
+            review_count=Count('reviews', filter=Q(reviews__is_approved=True))
+        )
+        
+        # Apply filters
+        filters = self.get_filter_params()
+        
+        # Brand filter
+        if filters.get('brand'):
+            brand_slugs = self.request.GET.getlist('brand')
+            if brand_slugs:
+                queryset = queryset.filter(brand__slug__in=brand_slugs)
+        
+        # Price range
+        if filters.get('min_price'):
+            try:
+                min_price = int(filters['min_price'])
+                queryset = queryset.filter(price__gte=min_price)
+            except:
+                pass
+        
+        if filters.get('max_price'):
+            try:
+                max_price = int(filters['max_price'])
+                queryset = queryset.filter(price__lte=max_price)
+            except:
+                pass
+        
+        # In stock filter
+        if filters.get('in_stock'):
+            queryset = queryset.filter(stock__gt=0)
+        
+        # Has discount filter
+        if filters.get('has_discount'):
+            queryset = queryset.filter(original_price__isnull=False, original_price__gt=0)
+        
+        # Search in specifications
+        spec_filters = {}
+        for key in self.request.GET.keys():
+            if key.startswith('spec_'):
+                spec_key = key.replace('spec_', '')
+                spec_values = self.request.GET.getlist(key)
+                if spec_values:
+                    # Filter by specifications JSON field
+                    for value in spec_values:
+                        queryset = queryset.filter(
+                            specifications__has_key=spec_key
+                        )
+        
+        # Search query
+        search_query = self.get_search_query()
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(name_en__icontains=search_query) |
+                Q(short_description__icontains=search_query) |
+                Q(brand__name__icontains=search_query)
+            ).distinct()
+        
+        # Apply sorting
+        sort_option = self.get_sort_option()
+        if sort_option == 'newest':
+            queryset = queryset.order_by('-created_at')
+        elif sort_option == 'price_asc':
+            queryset = queryset.order_by('price')
+        elif sort_option == 'price_desc':
+            queryset = queryset.order_by('-price')
+        elif sort_option == 'popular':
+            queryset = queryset.order_by('-sales_count', '-view_count')
+        elif sort_option == 'rating':
+            queryset = queryset.order_by('-avg_rating')
+        else:
+            queryset = queryset.order_by('-created_at')
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get all gaming brands for filter
+        context['brands'] = Brand.objects.filter(
+            products__sub_type=Product.ProductSubType.GAMING,
+            is_active=True
+        ).distinct().order_by('name')
+        
+        # Get price range
+        price_range = Product.objects.filter(
+            is_active=True,
+            product_type=Product.ProductType.PHYSICAL,
+            sub_type=Product.ProductSubType.GAMING
+        ).aggregate(
+            min_price=Min('price'),
+            max_price=Max('price')
+        )
+        context['min_price'] = price_range['min_price'] or 0
+        context['max_price'] = price_range['max_price'] or 100000000
+        
+        # Get all unique specification keys for filtering
+        all_products = Product.objects.filter(
+            is_active=True,
+            product_type=Product.ProductType.PHYSICAL,
+            sub_type=Product.ProductSubType.GAMING
+        )
+        
+        # Collect all specification keys and their values
+        spec_filters = {}
+        for product in all_products:
+            if product.specifications:
+                for key, value in product.specifications.items():
+                    if key not in spec_filters:
+                        spec_filters[key] = set()
+                    spec_filters[key].add(str(value))
+        
+        # Convert sets to sorted lists
+        context['spec_filters'] = {k: sorted(list(v)) for k, v in spec_filters.items()}
+        
+        # Current filters
+        context['current_filters'] = self.get_filter_params()
+        context['current_sort'] = self.get_sort_option()
+        context['search_query'] = self.get_search_query()
+        
+        # Page title
+        context['page_title'] = 'محصولات گیمینگ'
+        context['page_description'] = 'تجهیزات و لوازم گیمینگ حرفه‌ای'
+        
+        return context
+
+
+class BuyProductsView(WishlistContextMixin, FilterMixin, ListView):
+    """
+    Peripheral/accessory products listing page with comprehensive filtering.
+    Similar to Digikala product listing.
+    
+    URL: /buy-products/
+    Template: products/buy_products.html
+    """
+    model = Product
+    template_name = 'products/buy_products.html'
+    context_object_name = 'products'
+    paginate_by = 24
+    
+    def get_queryset(self):
+        # Get peripheral products only
+        queryset = Product.objects.filter(
+            is_active=True,
+            product_type=Product.ProductType.PHYSICAL,
+            sub_type=Product.ProductSubType.ACCESSORY
+        ).select_related(
+            'category', 'brand'
+        ).prefetch_related(
+            'images'
+        ).annotate(
+            avg_rating=Avg('reviews__rating'),
+            review_count=Count('reviews', filter=Q(reviews__is_approved=True))
+        )
+        
+        # Apply filters
+        filters = self.get_filter_params()
+        
+        # Brand filter
+        if filters.get('brand'):
+            brand_slugs = self.request.GET.getlist('brand')
+            if brand_slugs:
+                queryset = queryset.filter(brand__slug__in=brand_slugs)
+        
+        # Price range
+        if filters.get('min_price'):
+            try:
+                min_price = int(filters['min_price'])
+                queryset = queryset.filter(price__gte=min_price)
+            except:
+                pass
+        
+        if filters.get('max_price'):
+            try:
+                max_price = int(filters['max_price'])
+                queryset = queryset.filter(price__lte=max_price)
+            except:
+                pass
+        
+        # In stock filter
+        if filters.get('in_stock'):
+            queryset = queryset.filter(stock__gt=0)
+        
+        # Has discount filter
+        if filters.get('has_discount'):
+            queryset = queryset.filter(original_price__isnull=False, original_price__gt=0)
+        
+        # Search in specifications
+        spec_filters = {}
+        for key in self.request.GET.keys():
+            if key.startswith('spec_'):
+                spec_key = key.replace('spec_', '')
+                spec_values = self.request.GET.getlist(key)
+                if spec_values:
+                    # Filter by specifications JSON field
+                    for value in spec_values:
+                        queryset = queryset.filter(
+                            specifications__has_key=spec_key
+                        )
+        
+        # Search query
+        search_query = self.get_search_query()
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(name_en__icontains=search_query) |
+                Q(short_description__icontains=search_query) |
+                Q(brand__name__icontains=search_query)
+            ).distinct()
+        
+        # Apply sorting
+        sort_option = self.get_sort_option()
+        if sort_option == 'newest':
+            queryset = queryset.order_by('-created_at')
+        elif sort_option == 'price_asc':
+            queryset = queryset.order_by('price')
+        elif sort_option == 'price_desc':
+            queryset = queryset.order_by('-price')
+        elif sort_option == 'popular':
+            queryset = queryset.order_by('-sales_count', '-view_count')
+        elif sort_option == 'rating':
+            queryset = queryset.order_by('-avg_rating')
+        else:
+            queryset = queryset.order_by('-created_at')
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get all peripheral brands for filter
+        context['brands'] = Brand.objects.filter(
+            products__sub_type=Product.ProductSubType.ACCESSORY,
+            is_active=True
+        ).distinct().order_by('name')
+        
+        # Get price range
+        price_range = Product.objects.filter(
+            is_active=True,
+            product_type=Product.ProductType.PHYSICAL,
+            sub_type=Product.ProductSubType.ACCESSORY
+        ).aggregate(
+            min_price=Min('price'),
+            max_price=Max('price')
+        )
+        context['min_price'] = price_range['min_price'] or 0
+        context['max_price'] = price_range['max_price'] or 100000000
+        
+        # Get all unique specification keys for filtering
+        all_products = Product.objects.filter(
+            is_active=True,
+            product_type=Product.ProductType.PHYSICAL,
+            sub_type=Product.ProductSubType.ACCESSORY
+        )
+        
+        # Collect all specification keys and their values
+        spec_filters = {}
+        for product in all_products:
+            if product.specifications:
+                for key, value in product.specifications.items():
+                    if key not in spec_filters:
+                        spec_filters[key] = set()
+                    spec_filters[key].add(str(value))
+        
+        # Convert sets to sorted lists
+        context['spec_filters'] = {k: sorted(list(v)) for k, v in spec_filters.items()}
+        
+        # Current filters
+        context['current_filters'] = self.get_filter_params()
+        context['current_sort'] = self.get_sort_option()
+        context['search_query'] = self.get_search_query()
+        
+        # Page title
+        context['page_title'] = 'محصولات جانبی'
+        context['page_description'] = 'لوازم جانبی کامپیوتر و موبایل'
+        
+        return context
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # END OF FILE
 # ═══════════════════════════════════════════════════════════════════════════════

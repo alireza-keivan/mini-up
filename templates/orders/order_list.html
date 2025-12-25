@@ -1,664 +1,576 @@
 {% extends "base.html" %}
 {% load static %}
 {% load humanize %}
+{% load jalali_tags %}
 
 {% block title %}سفارش‌های من{% endblock %}
 
 {% block content %}
 <style>
-    /* Orders Page Styles with Neon Gaming Theme */
-    .orders-container {
-        max-width: 1400px;
-        margin: 0 auto;
+    /* Modern Neon Orders Table */
+    .orders-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%);
         padding: 2rem 1rem;
     }
-    
+
+    .orders-container {
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
     /* Page Header */
     .orders-header {
-        background: linear-gradient(135deg, rgba(191, 0, 255, 0.1) 0%, rgba(255, 0, 85, 0.1) 100%);
-        border: 1px solid rgba(255, 0, 85, 0.2);
-        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(191, 0, 255, 0.15), rgba(255, 0, 85, 0.15));
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        border-radius: 20px;
         padding: 2rem;
         margin-bottom: 2rem;
         position: relative;
         overflow: hidden;
     }
-    
+
     .orders-header::before {
         content: '';
         position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(191, 0, 255, 0.1) 0%, transparent 70%);
-        animation: pulse 4s ease-in-out infinite;
+        inset: 0;
+        border-radius: 20px;
+        padding: 2px;
+        background: linear-gradient(135deg, #bf00ff, #ff0055);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
     }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-    }
-    
-    .orders-header-content {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    
+
     .orders-title {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        color: #fff;
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #bf00ff, #ff0055, #00f5ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin: 0;
-    }
-    
-    .orders-title i {
-        width: 60px;
-        height: 60px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #bf00ff, #ff0055);
-        border-radius: 12px;
-        font-size: 1.75rem;
-        box-shadow: 0 4px 16px rgba(255, 0, 85, 0.4);
-    }
-    
-    .orders-stats {
-        display: flex;
-        gap: 2rem;
-        flex-wrap: wrap;
-    }
-    
-    .stat-item {
-        text-align: center;
-    }
-    
-    .stat-value {
-        display: block;
-        font-size: 2rem;
-        font-weight: 700;
-        color: #00f5ff;
-        text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
-    }
-    
-    .stat-label {
-        display: block;
-        font-size: 0.875rem;
-        color: rgba(255, 255, 255, 0.6);
-        margin-top: 0.25rem;
-    }
-    
-    /* Filters */
-    .orders-filters {
-        display: flex;
         gap: 1rem;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
     }
-    
-    .filter-btn {
-        padding: 0.75rem 1.5rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        color: rgba(255, 255, 255, 0.6);
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .filter-btn:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.2);
-        color: #fff;
-    }
-    
-    .filter-btn.active {
+
+    .orders-title i {
         background: linear-gradient(135deg, #bf00ff, #ff0055);
-        border-color: transparent;
-        color: #fff;
-        box-shadow: 0 4px 16px rgba(255, 0, 85, 0.3);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
-    
-    /* Orders Grid */
-    .orders-grid {
-        display: grid;
-        gap: 1.5rem;
-    }
-    
-    /* Order Card */
-    .order-card {
-        background: linear-gradient(135deg, rgba(10, 10, 10, 0.9) 0%, rgba(26, 26, 26, 0.9) 100%);
-        border: 1px solid rgba(255, 0, 85, 0.2);
+
+    /* Filters Section */
+    .filters-section {
+        background: rgba(20, 20, 30, 0.8);
+        border: 1px solid rgba(191, 0, 255, 0.3);
         border-radius: 16px;
         padding: 1.5rem;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
     }
-    
-    .order-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #00f5ff, #bf00ff, #ff0055);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .order-card:hover {
-        border-color: rgba(255, 0, 85, 0.4);
-        box-shadow: 0 8px 32px rgba(255, 0, 85, 0.2);
-        transform: translateY(-4px);
-    }
-    
-    .order-card:hover::before {
-        opacity: 1;
-    }
-    
-    .order-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .order-info {
-        flex: 1;
-    }
-    
-    .order-number {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #00f5ff;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .order-date {
-        font-size: 0.875rem;
-        color: rgba(255, 255, 255, 0.5);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .order-status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.875rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .order-status-badge.pending {
-        background: rgba(255, 191, 0, 0.1);
-        border: 1px solid #ffbf00;
-        color: #ffbf00;
-    }
-    
-    .order-status-badge.processing {
-        background: rgba(0, 245, 255, 0.1);
-        border: 1px solid #00f5ff;
-        color: #00f5ff;
-    }
-    
-    .order-status-badge.completed {
-        background: rgba(0, 255, 136, 0.1);
-        border: 1px solid #00ff88;
-        color: #00ff88;
-    }
-    
-    .order-status-badge.cancelled {
-        background: rgba(255, 0, 85, 0.1);
-        border: 1px solid #ff0055;
-        color: #ff0055;
-    }
-    
-    /* Order Items */
-    .order-items {
-        display: flex;
-        flex-direction: column;
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1rem;
-        margin-bottom: 1.5rem;
+        align-items: end;
     }
-    
-    .order-item {
-        display: flex;
-        gap: 1rem;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        transition: all 0.3s ease;
-    }
-    
-    .order-item:hover {
-        background: rgba(255, 255, 255, 0.04);
-        border-color: rgba(255, 0, 85, 0.2);
-    }
-    
-    .order-item-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 8px;
-        overflow: hidden;
-        flex-shrink: 0;
-        background: rgba(255, 255, 255, 0.05);
-    }
-    
-    .order-item-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .order-item-details {
-        flex: 1;
+
+    .filter-group {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
-    
-    .order-item-name {
-        font-size: 1rem;
+
+    .filter-label {
+        color: #00f5ff;
+        font-size: 0.875rem;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-select {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(191, 0, 255, 0.4);
+        border-radius: 8px;
         color: #fff;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
-    
-    .order-item-meta {
-        font-size: 0.875rem;
-        color: rgba(255, 255, 255, 0.5);
+
+    .filter-select[type="text"] {
+        direction: rtl;
+        text-align: right;
     }
-    
-    .order-item-pricing {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.25rem;
+
+    .filter-select:hover,
+    .filter-select:focus {
+        border-color: #bf00ff;
+        box-shadow: 0 0 15px rgba(191, 0, 255, 0.4);
+        outline: none;
     }
-    
-    .order-item-price {
-        font-size: 1.125rem;
-        font-weight: 700;
-        color: #00ff88;
-    }
-    
-    .order-item-quantity {
-        font-size: 0.875rem;
-        color: rgba(255, 255, 255, 0.6);
-    }
-    
-    /* Order Footer */
-    .order-card-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .order-total {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    
-    .order-total-label {
-        font-size: 0.875rem;
-        color: rgba(255, 255, 255, 0.6);
-    }
-    
-    .order-total-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #ff0055;
-    }
-    
-    .order-actions {
-        display: flex;
-        gap: 0.75rem;
-    }
-    
-    .btn-order {
-        padding: 0.75rem 1.5rem;
+
+    .filter-button {
+        background: transparent;
+        border: 2px solid #bf00ff;
         border-radius: 8px;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
         font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .filter-button:hover {
+        box-shadow: 0 0 15px rgba(191, 0, 255, 0.4);
+        border-color: #ff0055;
+    }
+
+    .clear-filters-btn {
+        background: transparent;
+        border: none;
+        color: #f44336;
+        padding: 0.5rem;
+        font-size: 1.125rem;
         cursor: pointer;
         transition: all 0.3s ease;
         text-decoration: none;
         display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        border: none;
-    }
-    
-    .btn-view {
-        background: linear-gradient(135deg, #bf00ff, #ff0055);
-        color: #fff;
-    }
-    
-    .btn-view:hover {
-        box-shadow: 0 4px 16px rgba(255, 0, 85, 0.4);
-        transform: translateY(-2px);
-    }
-    
-    .btn-reorder {
-        background: rgba(0, 245, 255, 0.1);
-        border: 1px solid #00f5ff;
-        color: #00f5ff;
-    }
-    
-    .btn-reorder:hover {
-        background: rgba(0, 245, 255, 0.2);
-        box-shadow: 0 4px 16px rgba(0, 245, 255, 0.3);
-    }
-    
-    /* Empty State */
-    .empty-orders {
-        text-align: center;
-        padding: 5rem 2rem;
-        background: linear-gradient(135deg, rgba(10, 10, 10, 0.6) 0%, rgba(26, 26, 26, 0.6) 100%);
-        border: 2px dashed rgba(255, 0, 85, 0.3);
-        border-radius: 16px;
-    }
-    
-    .empty-orders-icon {
-        width: 120px;
-        height: 120px;
-        margin: 0 auto 2rem;
-        background: linear-gradient(135deg, rgba(191, 0, 255, 0.1) 0%, rgba(255, 0, 85, 0.1) 100%);
-        border-radius: 50%;
-        display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px dashed rgba(255, 0, 85, 0.3);
     }
-    
-    .empty-orders-icon i {
-        font-size: 4rem;
-        color: #ff0055;
-        opacity: 0.5;
+
+    .clear-filters-btn:hover {
+        color: #ff5252;
+        transform: scale(1.1);
     }
-    
-    .empty-orders-title {
-        font-size: 2rem;
+
+    /* Orders Table */
+    .orders-table-wrapper {
+        background: rgba(20, 20, 30, 0.6);
+        border: 1px solid rgba(191, 0, 255, 0.3);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .orders-table thead {
+        background: linear-gradient(135deg, rgba(191, 0, 255, 0.2), rgba(255, 0, 85, 0.2));
+    }
+
+    .orders-table th {
+        padding: 1.25rem 1rem;
+        text-align: right;
+        color: #00f5ff;
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid rgba(191, 0, 255, 0.5);
+    }
+
+    .orders-table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .orders-table tbody tr:hover {
+        background: rgba(191, 0, 255, 0.1);
+        transform: scale(1.005);
+    }
+
+    .orders-table td {
+        padding: 1.5rem 1rem;
+        color: #fff;
+        vertical-align: middle;
+    }
+
+    /* Order Item Cells */
+    .order-date {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.875rem;
+        direction: ltr;
+        text-align: right;
+    }
+
+    .order-number {
+        font-family: 'Courier New', monospace;
+        color: #00f5ff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+    }
+
+    .order-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 2px solid rgba(191, 0, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .order-image:hover {
+        transform: scale(1.05);
+    }
+
+    .order-status {
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        vertical-align: middle;
+    }
+
+    .orders-table td {
+        vertical-align: middle;
+    }
+
+    .status-icon {
+        color: #4caf50;
+        font-size: 1rem;
+    }
+
+    .order-price {
+        font-size: 1.125rem;
         font-weight: 700;
         color: #fff;
-        margin-bottom: 1rem;
     }
-    
-    .empty-orders-text {
-        font-size: 1.125rem;
-        color: rgba(255, 255, 255, 0.6);
-        margin-bottom: 2rem;
+
+    .order-profit {
+        color: #fff;
+        font-weight: 500;
+        font-size: 0.875rem;
     }
-    
-    .btn-shop {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1rem 2rem;
-        background: linear-gradient(135deg, #00f5ff, #00ff88);
-        border: none;
+
+    .order-counter {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .product-link {
+        display: block;
         border-radius: 12px;
-        color: #000;
+        overflow: hidden;
+    }
+
+    /* Summary Box */
+    .summary-box {
+        background: rgba(20, 20, 30, 0.6);
+        border: 1px solid rgba(191, 0, 255, 0.3);
+        border-radius: 16px;
+        padding: 1.25rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .summary-title {
         font-size: 1.125rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .summary-title i {
+        color: #fff;
+        font-size: 1.25rem;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .summary-item {
+        text-align: center;
+    }
+
+    .summary-value {
+        display: block;
+        font-size: 1.5rem;
         font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
+        color: #fff;
+        margin-bottom: 0.25rem;
     }
-    
-    .btn-shop:hover {
-        box-shadow: 0 8px 24px rgba(0, 245, 255, 0.4);
-        transform: translateY(-3px);
+
+    .summary-label {
+        display: block;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.875rem;
+        font-weight: 400;
     }
-    
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: rgba(191, 0, 255, 0.3);
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
     /* Responsive */
+    @media (max-width: 1024px) {
+        .orders-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+
     @media (max-width: 768px) {
-        .orders-header-content {
-            flex-direction: column;
-            align-items: flex-start;
+        .orders-title {
+            font-size: 1.75rem;
         }
-        
-        .orders-stats {
-            width: 100%;
-            justify-content: space-between;
+
+        .filters-grid {
+            grid-template-columns: 1fr;
         }
-        
-        .order-card-header,
-        .order-card-footer {
-            flex-direction: column;
-            gap: 1rem;
-            align-items: flex-start;
-        }
-        
-        .order-actions {
-            width: 100%;
-            flex-direction: column;
-        }
-        
-        .btn-order {
-            width: 100%;
-            justify-content: center;
+
+        .summary-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
 
-<div class="orders-container">
-    
-    <!-- Header -->
-    <div class="orders-header">
-        <div class="orders-header-content">
+<div class="orders-page">
+    <div class="orders-container">
+        <!-- Header -->
+        <div class="orders-header">
             <h1 class="orders-title">
                 <i class="fas fa-shopping-bag"></i>
                 سفارش‌های من
             </h1>
-            
-            <div class="orders-stats">
-                <div class="stat-item">
-                    <span class="stat-value">{{ orders_count|default:0 }}</span>
-                    <span class="stat-label">کل سفارشات</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value">{{ completed_count|default:0 }}</span>
-                    <span class="stat-label">تحویل شده</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value">{{ processing_count|default:0 }}</span>
-                    <span class="stat-label">در حال پردازش</span>
-                </div>
-            </div>
         </div>
-    </div>
-    
-    <!-- Filters -->
-    <div class="orders-filters">
-        <button class="filter-btn active" data-filter="all">
-            <i class="fas fa-th"></i>
-            همه سفارشات
-        </button>
-        <button class="filter-btn" data-filter="processing">
-            <i class="fas fa-spinner"></i>
-            در حال پردازش
-        </button>
-        <button class="filter-btn" data-filter="completed">
-            <i class="fas fa-check-circle"></i>
-            تحویل شده
-        </button>
-        <button class="filter-btn" data-filter="cancelled">
-            <i class="fas fa-times-circle"></i>
-            لغو شده
-        </button>
-    </div>
-    
-    <!-- Orders List -->
-    {% if orders %}
-        <div class="orders-grid">
-            {% for order in orders %}
-                <div class="order-card" data-status="{{ order.status }}">
-                    
-                    <!-- Header -->
-                    <div class="order-card-header">
-                        <div class="order-info">
-                            <div class="order-number">
-                                <i class="fas fa-receipt"></i>
-                                سفارش #{{ order.order_number }}
-                            </div>
-                            <div class="order-date">
-                                <i class="far fa-calendar-alt"></i>
-                                {{ order.created_at|date:"Y/m/d - H:i" }}
-                            </div>
-                        </div>
-                        
-                        <span class="order-status-badge {{ order.status }}">
-                            {% if order.status == 'pending' %}
-                                <i class="fas fa-clock"></i>
-                                در انتظار پرداخت
-                            {% elif order.status == 'processing' %}
-                                <i class="fas fa-spinner fa-spin"></i>
-                                در حال پردازش
-                            {% elif order.status == 'completed' %}
-                                <i class="fas fa-check-circle"></i>
-                                تحویل شده
-                            {% elif order.status == 'cancelled' %}
-                                <i class="fas fa-times-circle"></i>
-                                لغو شده
-                            {% else %}
-                                {{ order.get_status_display }}
-                            {% endif %}
-                        </span>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <form method="get" action="{% url 'orders:order_list' %}">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label class="filter-label">وضعیت سفارش</label>
+                        <select name="status" class="filter-select">
+                            <option value="">همه سفارش‌ها</option>
+                            <option value="delivered,shipped,completed" {% if request.GET.status == 'delivered,shipped,completed' %}selected{% endif %}>تحویل داده شده</option>
+                            <option value="processing,confirmed,preparing" {% if request.GET.status == 'processing,confirmed,preparing' %}selected{% endif %}>در حال پردازش</option>
+                            <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>لغو شده</option>
+                            <option value="refunded" {% if request.GET.status == 'refunded' %}selected{% endif %}>برگشت وجه</option>
+                        </select>
                     </div>
-                    
-                    <!-- Items -->
-                    <div class="order-items">
-                        {% for item in order.items.all|slice:":3" %}
-                            <div class="order-item">
-                                <div class="order-item-image">
-                                    {% if item.product.image %}
-                                        <img src="{{ item.product.image.url }}" 
-                                             alt="{{ item.product.name }}">
-                                    {% else %}
-                                        <img src="{% static 'images/no-image.jpg' %}" 
-                                             alt="بدون تصویر">
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="order-item-details">
-                                    <div class="order-item-name">{{ item.product.name }}</div>
-                                    <div class="order-item-meta">
-                                        {% if item.variant %}
-                                            {{ item.variant.name }}: {{ item.variant.value }}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="order-item-pricing">
-                                    <div class="order-item-price">
-                                        {{ item.total_price|intcomma }} تومان
-                                    </div>
-                                    <div class="order-item-quantity">
-                                        تعداد: {{ item.quantity }}
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                        
-                        {% if order.items.count > 3 %}
-                            <div style="color: rgba(255, 255, 255, 0.5); font-size: 0.875rem; padding: 0.5rem 1rem;">
-                                <i class="fas fa-ellipsis-h"></i>
-                                و {{ order.items.count|add:"-3" }} محصول دیگر...
-                            </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">از تاریخ</label>
+                        <input type="text" name="date_from" class="filter-select persian-date" placeholder="۱۴۰۰/۰۱/۰۱" value="{{ request.GET.date_from }}">
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">تا تاریخ</label>
+                        <input type="text" name="date_to" class="filter-select persian-date" placeholder="۱۴۰۰/۱۲/۲۹" value="{{ request.GET.date_to }}">
+                    </div>
+
+                    <div class="filter-group" style="display: flex; gap: 0.5rem; align-items: end;">
+                        <button type="submit" class="filter-button">
+                            <i class="fas fa-filter"></i> فیلتر
+                        </button>
+                        {% if request.GET.status or request.GET.date_from or request.GET.date_to %}
+                        <a href="{% url 'orders:order_list' %}" class="clear-filters-btn" title="حذف فیلتر">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
                         {% endif %}
                     </div>
-                    
-                    <!-- Footer -->
-                    <div class="order-card-footer">
-                        <div class="order-total">
-                            <span class="order-total-label">مجموع سفارش:</span>
-                            <span class="order-total-value">
-                                {{ order.total_price|intcomma }} تومان
-                            </span>
-                        </div>
-                        
-                        <div class="order-actions">
-                            <a href="{% url 'orders:detail' order.id %}" class="btn-order btn-view">
-                                <i class="fas fa-eye"></i>
-                                جزئیات سفارش
-                            </a>
-                            {% if order.status == 'completed' %}
-                                <button class="btn-order btn-reorder" data-order-id="{{ order.id }}">
-                                    <i class="fas fa-redo"></i>
-                                    سفارش مجدد
-                                </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
                 </div>
-            {% endfor %}
+            </form>
         </div>
-    {% else %}
-        <!-- Empty State -->
-        <div class="empty-orders">
-            <div class="empty-orders-icon">
-                <i class="fas fa-shopping-bag"></i>
+
+        <!-- Orders Table -->
+        {% if orders %}
+        <div class="orders-table-wrapper">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>تصویر محصول</th>
+                        <th>تاریخ</th>
+                        <th>وضعیت</th>
+                        <th>مبلغ</th>
+                        <th>سود شما</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="order-counter">{{ forloop.counter }}</td>
+                        <td>
+                            {% if order.items.first %}
+                                <a href="#" class="product-link">
+                                    {% if order.items.first.product.image %}
+                                        <img src="{{ order.items.first.product.image.url }}" alt="{{ order.items.first.product.name }}" class="order-image">
+                                    {% else %}
+                                        <img src="{% static 'images/placeholder.jpg' %}" alt="محصول" class="order-image">
+                                    {% endif %}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="order-date">
+                            {{ order.created_at|jalali:"%Y/%m/%d" }}<br>
+                            <small style="color: rgba(255,255,255,0.5)">{{ order.created_at|jalali:"%H:%M" }}</small>
+                        </td>
+                        <td class="order-status">
+                            {% if order.status == 'shipped' %}
+                                <i class="fas fa-check-circle status-icon"></i>
+                            {% endif %}
+                            {{ order.get_status_display }}
+                        </td>
+                        <td class="order-price">{{ order.total|intcomma }} تومان</td>
+                        <td class="order-profit">
+                            {% if order.discount_amount > 0 %}
+                                {{ order.discount_amount|intcomma }} تومان
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary Box -->
+        <div class="summary-box">
+            <h2 class="summary-title">
+                <i class="fas fa-chart-pie"></i>
+                خلاصه سفارش‌ها
+            </h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-value">{{ orders.count }}</span>
+                    <span class="summary-label">تعداد سفارش‌ها</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">
+                        {% widthratio total_amount 1 1 %}
+                    </span>
+                    <span class="summary-label">مجموع پرداختی (تومان)</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">{{ total_items }}</span>
+                    <span class="summary-label">تعداد محصولات خریداری شده</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">
+                        {% widthratio total_discount 1 1 %}
+                    </span>
+                    <span class="summary-label">مجموع تخفیف (تومان)</span>
+                </div>
             </div>
-            <h2 class="empty-orders-title">هنوز سفارشی ثبت نکرده‌اید</h2>
-            <p class="empty-orders-text">
-                محصولات مورد علاقه خود را کشف کنید و اولین سفارش خود را ثبت کنید
-            </p>
-            <a href="{% url 'products:list' %}" class="btn-shop">
-                <i class="fas fa-shopping-cart"></i>
-                شروع خرید
-            </a>
         </div>
-    {% endif %}
-    
+
+        {% else %}
+        <!-- Empty State -->
+        <div class="orders-table-wrapper">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>هیچ سفارشی یافت نشد</h3>
+                <p>شما هنوز سفارشی ثبت نکرده‌اید یا فیلتر انتخابی نتیجه‌ای ندارد.</p>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
 </div>
 
+<!-- Persian Date Picker -->
+<link rel="stylesheet" href="https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+<script src="https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js"></script>
+<script src="https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+
 <script>
-// Filter orders
-document.addEventListener('DOMContentLoaded', function() {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const orderCards = document.querySelectorAll('.order-card');
-    
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const filter = this.dataset.filter;
-            
-            // Update active button
-            filterBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Filter cards
-            orderCards.forEach(card => {
-                if (filter === 'all' || card.dataset.status === filter) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
+// Initialize Persian Date Picker
+$(document).ready(function() {
+    $('.persian-date').persianDatepicker({
+        format: 'YYYY/MM/DD',
+        initialValue: false,
+        autoClose: true,
+        persianDigit: true,
+        viewMode: 'day',
+        calendar: {
+            persian: {
+                locale: 'fa',
+                showHint: true,
+                leapYearMode: 'algorithmic'
+            }
+        },
+        navigator: {
+            enabled: true,
+            scroll: {
+                enabled: true
+            },
+            text: {
+                btnNextText: '<',
+                btnPrevText: '>'
+            }
+        },
+        toolbox: {
+            enabled: true,
+            calendarSwitch: {
+                enabled: false
+            },
+            todayButton: {
+                enabled: true,
+                text: {
+                    fa: 'امروز'
                 }
-            });
-        });
+            },
+            submitButton: {
+                enabled: true,
+                text: {
+                    fa: 'تایید'
+                }
+            }
+        },
+        timePicker: {
+            enabled: false
+        },
+        dayPicker: {
+            enabled: true,
+            titleFormat: 'YYYY MMMM'
+        },
+        monthPicker: {
+            enabled: true,
+            titleFormat: 'YYYY'
+        },
+        yearPicker: {
+            enabled: true,
+            titleFormat: 'YYYY'
+        }
     });
 });
 </script>

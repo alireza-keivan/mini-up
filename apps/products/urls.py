@@ -48,6 +48,16 @@ urlpatterns = [
     path('search/', views.ProductSearchView.as_view(), name='search'),
     
     # ═══════════════════════════════════════════════════════════════════════════
+    # PHYSICAL PRODUCT PAGES
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    # Gaming products page
+    path('gaming-products/', views.GamingProductsView.as_view(), name='gaming_products'),
+    
+    # Peripheral/accessory products page
+    path('buy-products/', views.BuyProductsView.as_view(), name='buy_products'),
+    
+    # ═══════════════════════════════════════════════════════════════════════════
     # WISHLIST (HTML)
     # ═══════════════════════════════════════════════════════════════════════════
     

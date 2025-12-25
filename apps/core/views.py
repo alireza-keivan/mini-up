@@ -90,14 +90,11 @@ def virtual_services(request):
 
 def gaming_products(request):
     """
-    صفحه محصولات گیمینگ با قابلیت فیلتر کردن
-    Displays gaming product categories with filtering options.
+    Redirect to new product listing page without carousels.
+    Old carousel-based template is deprecated.
     """
-    from apps.products.models import Category, Brand, Product
-    from django.db.models import Q, Min, Max
-    
-    # Get filter parameters from request
-    selected_categories = request.GET.getlist('category')
+    from django.shortcuts import redirect
+    return redirect('products:gaming_products', permanent=True)
     selected_brands = request.GET.getlist('brand')
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
@@ -218,39 +215,11 @@ def gaming_products(request):
 
 def buy_products(request):
     """
-    صفحه خرید محصولات - محصولات جانبی
-    Displays product categories with their products in horizontal scrollable carousels.
-    Only shows ACCESSORY sub-type products.
+    Redirect to new product listing page without carousels.
+    Old carousel-based template is deprecated.
     """
-    from apps.products.models import Category, Product
-    from django.db.models import Prefetch
-    
-    # Get active categories with their active accessory products
-    # Using prefetch_related for optimal performance
-    categories = Category.objects.filter(
-        is_active=True,
-        products__is_active=True,
-        products__sub_type=Product.ProductSubType.ACCESSORY
-    ).prefetch_related(
-        Prefetch(
-            'products',
-            queryset=Product.objects.filter(
-                is_active=True,
-                sub_type=Product.ProductSubType.ACCESSORY
-            ).select_related('brand').prefetch_related('images').order_by('-is_featured', '-created_at'),
-            to_attr='active_products'
-        )
-    ).distinct().order_by('sort_order', 'name')
-    
-    # Filter out categories with no products
-    categories_with_products = [cat for cat in categories if cat.active_products]
-    
-    context = {
-        'title': 'خرید محصولات',
-        'categories': categories_with_products,
-    }
-    
-    return render(request, 'core/buy_products.html', context)
+    from django.shortcuts import redirect
+    return redirect('products:buy_products', permanent=True)
 
 
 def mini_game(request):
