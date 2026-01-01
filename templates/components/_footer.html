@@ -14,11 +14,40 @@
 
     <div style="max-width: 1400px; margin: 0 auto; padding: 3rem 1rem 1.5rem; position: relative; z-index: 1;">
         
+        <!-- Mobile: Description + Social at top -->
+        <div class="footer-mobile-top" style="display: none;">
+            <p style="color: #999; line-height: 1.6; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;">
+                پلتفرم پیشرو خدمات دیجیتال و گیمینگ در ایران
+            </p>
+            <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
+                {% if social_links.telegram %}
+                <a href="https://t.me/{{ social_links.telegram }}" target="_blank" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(191, 0, 255, 0.1); border: 1px solid rgba(191, 0, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-purple); text-decoration: none;">
+                    <i class="fab fa-telegram"></i>
+                </a>
+                {% endif %}
+                {% if social_links.instagram %}
+                <a href="https://instagram.com/{{ social_links.instagram }}" target="_blank" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(0, 245, 255, 0.1); border: 1px solid rgba(0, 245, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-cyan); text-decoration: none;">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                {% endif %}
+                {% if social_links.twitter %}
+                <a href="https://twitter.com/{{ social_links.twitter }}" target="_blank" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-pink); text-decoration: none;">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                {% endif %}
+                {% if social_links.youtube %}
+                <a href="https://youtube.com/@{{ social_links.youtube }}" target="_blank" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(191, 0, 255, 0.1); border: 1px solid rgba(191, 0, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-purple); text-decoration: none;">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
         <!-- Main Footer Content -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 3rem;">
+        <div class="footer-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 3rem; margin-bottom: 3rem;">
             
             <!-- About Section -->
-            <div>
+            <div class="footer-about">
                 <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
                     <i class="fas fa-gamepad" style="font-size: 2rem; background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
                     <h3 style="color: var(--neon-cyan); font-size: 1.5rem; font-weight: 700; margin: 0;">مینی‌آپ</h3>
@@ -176,7 +205,7 @@
                         <i class="fas fa-envelope" style="color: var(--neon-cyan); margin-top: 0.25rem; font-size: 0.9rem;"></i>
                         <div>
                             <div style="color: #ccc; font-size: 0.85rem; margin-bottom: 0.25rem;">ایمیل</div>
-                            <a href="mailto:support@mini-up.ir" style="color: #fff; text-decoration: none; direction: ltr; display: block; font-weight: 600;"
+                            <a href="mailto:support@mini-up.ir" style="color: #fff; text-decoration: none; direction: ltr; display: block; font-weight: 600; word-break: keep-all; white-space: nowrap; font-size: 0.85rem;"
                                onmouseover="this.style.color='var(--neon-cyan)';"
                                onmouseout="this.style.color='#fff';">
                                 support@mini-up.ir
@@ -198,7 +227,7 @@
         </div>
 
         <!-- Trust Badges -->
-        <div style="padding: 2rem 0; border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 2rem;">
+        <div class="footer-trust-badges" style="padding: 2rem 0; border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 2rem;">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
                 <div>
                     <div style="width: 60px; height: 60px; margin: 0 auto 1rem; background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 245, 255, 0.1)); border: 2px solid rgba(0, 255, 136, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
@@ -265,5 +294,47 @@
 @keyframes pulse {
     0%, 100% { transform: scale(1); opacity: 0.03; }
     50% { transform: scale(1.1); opacity: 0.06; }
+}
+
+@media (max-width: 768px) {
+    .footer-mobile-top {
+        display: block !important;
+    }
+    
+    .footer-about {
+        display: none !important;
+    }
+    
+    .footer-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1rem !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    .footer-grid > div {
+        font-size: 0.8rem;
+    }
+    
+    .footer-grid h4 {
+        font-size: 0.9rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .footer-grid ul {
+        gap: 0.5rem !important;
+    }
+    
+    .footer-grid li a,
+    .footer-grid a {
+        font-size: 0.75rem !important;
+    }
+    
+    .footer-trust-badges {
+        display: none !important;
+    }
+    
+    footer > div {
+        padding-bottom: 6rem !important;
+    }
 }
 </style>
