@@ -641,6 +641,14 @@
                 <i class="fas fa-shopping-bag"></i>
                 <span>لوازم جانبی</span>
             </a>
+            <a href="{% url 'core:mini_game' %}" class="mobile-menu-item">
+                <i class="fas fa-dice"></i>
+                <span>مینی گیم</span>
+            </a>
+            <a href="{% url 'content:article_list' %}" class="mobile-menu-item">
+                <i class="fas fa-newspaper"></i>
+                <span>مقالات ما</span>
+            </a>
             <a href="{% url 'products:wishlist' %}" class="mobile-menu-item">
                 <i class="fas fa-heart"></i>
                 <span>علاقه‌مندی‌ها</span>
@@ -854,11 +862,22 @@
     text-decoration: none;
     border-radius: 8px;
     margin-bottom: 4px;
-    transition: background 0.2s;
+    transition: all 0.3s;
+    position: relative;
 }
 
 .mobile-menu-item:hover {
     background: rgba(255,255,255,0.05);
+}
+
+.mobile-menu-item.active {
+    background: rgba(191, 0, 255, 0.15);
+    border-right: 3px solid #bf00ff;
+    color: #bf00ff;
+}
+
+.mobile-menu-item.active i {
+    color: #bf00ff;
 }
 
 .mobile-menu-item i {
@@ -938,6 +957,37 @@
             e.stopPropagation();
         }, { passive: false });
     }
+    
+    // Highlight active menu item based on current URL
+    function highlightActiveMenuItem() {
+        const currentPath = window.location.pathname;
+        const menuItems = document.querySelectorAll('.mobile-menu-item');
+        
+        menuItems.forEach(item => {
+            const itemPath = new URL(item.href, window.location.origin).pathname;
+            
+            // Exact match or starts with (for category pages)
+            if (currentPath === itemPath || 
+                (itemPath !== '/' && currentPath.startsWith(itemPath))) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+    
+    // Run on page load
+    highlightActiveMenuItem();
+    
+    // Run when sidebar opens
+    document.querySelector('.navbar-container').addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            const rect = this.getBoundingClientRect();
+            if (e.clientX < 50) {
+                setTimeout(highlightActiveMenuItem, 50);
+            }
+        }
+    });
 })();
 </script>
 

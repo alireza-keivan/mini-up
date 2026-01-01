@@ -8,6 +8,16 @@
 <style>
     /* Mobile responsive product cards - one per row, horizontal layout */
     @media (max-width: 768px) {
+        /* Hide only subtitle/description paragraphs on mobile, keep main title */
+        .vs-hero .absolute.inset-0.z-10 p {
+            display: none !important;
+        }
+        
+        /* Keep scroll indicator */
+        .vs-hero .absolute.bottom-8 {
+            display: block !important;
+        }
+        
         .vs-scroll-wrapper {
             display: flex !important;
             flex-direction: column !important;
