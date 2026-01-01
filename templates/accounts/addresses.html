@@ -324,27 +324,27 @@
     }
 
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .form-group label {
         display: block;
-        color: var(--neon-pink);
-        font-weight: bold;
+        color: #fff;
+        font-weight: 600;
         margin-bottom: 0.5rem;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
 
     .form-group input,
     .form-group textarea,
     .form-group select {
         width: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        border: 1px solid rgba(191, 0, 255, 0.3);
-        border-radius: 8px;
-        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1.5px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 0.875rem 1rem;
         color: white;
-        font-size: 1rem;
+        font-size: 0.95rem;
         transition: all 0.3s;
     }
 
@@ -352,8 +352,9 @@
     .form-group textarea:focus,
     .form-group select:focus {
         outline: none;
-        border-color: var(--neon-cyan);
-        box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
     }
 
     .form-group textarea {
@@ -365,6 +366,7 @@
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+        margin-bottom: 1rem;
     }
 
     .form-actions {
@@ -524,52 +526,65 @@
                 {% csrf_token %}
                 <input type="hidden" id="addressId" name="address_id">
 
-                <div class="form-group">
-                    <label for="title">عنوان آدرس <span style="color: var(--neon-pink);">*</span></label>
-                    <input type="text" id="title" name="title" placeholder="مثال: خانه، محل کار" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="title">عنوان آدرس</label>
+                        <input type="text" id="title" name="title" placeholder="مثال: خانه، محل کار" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="first_name">نام</label>
+                        <input type="text" id="first_name" name="first_name" placeholder="نام" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last_name">نام خانوادگی</label>
+                        <input type="text" id="last_name" name="last_name" placeholder="نام خانوادگی" required>
+                    </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="recipient_name">نام گیرنده <span style="color: var(--neon-pink);">*</span></label>
-                        <input type="text" id="recipient_name" name="recipient_name" placeholder="نام و نام خانوادگی" required>
+                        <label for="province">استان</label>
+                        <input type="text" id="province" name="province" placeholder="ابتدا استان را انتخاب کنید" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="phone">شماره تماس <span style="color: var(--neon-pink);">*</span></label>
-                        <input type="tel" id="phone" name="phone" placeholder="09123456789" pattern="09[0-9]{9}" required>
+                        <label for="city">شهر</label>
+                        <input type="text" id="city" name="city" placeholder="سپس شهر را انتخاب کنید" required>
                     </div>
                 </div>
 
-                <div class="form-row">
+                <div class="form-row" style="grid-template-columns: 2fr 1fr;">
                     <div class="form-group">
-                        <label for="province">استان <span style="color: var(--neon-pink);">*</span></label>
-                        <input type="text" id="province" name="province" placeholder="مثال: تهران" required>
+                        <label for="postal_code">کد پستی</label>
+                        <input type="text" id="postal_code" name="postal_code" placeholder="کد پستی ده رقمی" pattern="[0-9]{10}" maxlength="10" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="city">شهر <span style="color: var(--neon-pink);">*</span></label>
-                        <input type="text" id="city" name="city" placeholder="مثال: تهران" required>
+                        <label for="phone">شماره تماس</label>
+                        <input type="tel" id="phone" name="phone" placeholder="09xxxxxxxxx" pattern="09[0-9]{9}" required>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="full_address">آدرس کامل <span style="color: var(--neon-pink);">*</span></label>
-                    <textarea id="full_address" name="full_address" placeholder="خیابان، کوچه، پلاک، واحد" required></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="postal_code">کد پستی <span style="color: var(--neon-pink);">*</span></label>
-                    <input type="text" id="postal_code" name="postal_code" placeholder="1234567890" pattern="[0-9]{10}" maxlength="10" required>
+                    <label for="full_address">آدرس کامل</label>
+                    <textarea id="full_address" name="full_address" placeholder="آدرس کامل را وارد کنید..." required></textarea>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+                        <input type="checkbox" id="subscribe_sms" name="subscribe_sms" style="width: auto; margin: 0;">
+                        <span>تنظیم به عنوان آدرس پیش‌فرض</span>
+                    </label>
                 </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">
-                        <i class="fas fa-check"></i>
+                        <i class="fas fa-save"></i>
                         ذخیره آدرس
                     </button>
                     <button type="button" onclick="closeAddressModal()" class="btn-cancel">
-                        <i class="fas fa-times"></i>
                         انصراف
                     </button>
                 </div>
@@ -588,7 +603,12 @@ function openAddressModal(addressData = null) {
         modalTitle.textContent = 'ویرایش آدرس';
         document.getElementById('addressId').value = addressData.id;
         document.getElementById('title').value = addressData.title;
-        document.getElementById('recipient_name').value = addressData.recipient_name;
+        // Split recipient_name into first and last name if it exists
+        if (addressData.recipient_name) {
+            const names = addressData.recipient_name.split(' ');
+            document.getElementById('first_name').value = names[0] || '';
+            document.getElementById('last_name').value = names.slice(1).join(' ') || '';
+        }
         document.getElementById('phone').value = addressData.phone;
         document.getElementById('province').value = addressData.province;
         document.getElementById('city').value = addressData.city;

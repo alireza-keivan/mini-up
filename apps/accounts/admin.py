@@ -307,11 +307,7 @@ class ProfileInline(admin.StackedInline):
         # کاربر جدید - سیگنال خودش می‌سازه
         return False
     fields = (
-        'bio',
         'birth_date',
-        'address',
-        'city',
-        'postal_code',
         'national_id',
     )
 
@@ -584,11 +580,10 @@ class ProfileAdmin(admin.ModelAdmin):
         'user',
         'get_user_phone',
         'get_user_email',
-        'city',
         'birth_date',
     )
     
-    list_filter = ('city',)
+    list_filter = ('birth_date',)
     
     search_fields = (
         'user__phone',
@@ -596,7 +591,6 @@ class ProfileAdmin(admin.ModelAdmin):
         'user__first_name',
         'user__last_name',
         'national_id',
-        'city',
     )
     
     raw_id_fields = ('user',)
@@ -608,10 +602,7 @@ class ProfileAdmin(admin.ModelAdmin):
             'fields': ('user',),
         }),
         (_('اطلاعات شخصی'), {
-            'fields': ('bio', 'birth_date', 'national_id'),
-        }),
-        (_('آدرس'), {
-            'fields': ('address', 'city', 'postal_code'),
+            'fields': ( 'birth_date', 'national_id'),
         }),
     )
     

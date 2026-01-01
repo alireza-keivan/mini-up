@@ -1,0 +1,218 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Input های Neon با استایل Tab Button
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.input-neon {
+    position: relative;
+    padding: 0.75em 1.2em;
+    font-size: 0.95rem;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    width: 100%;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    outline: none;
+}
+
+.input-neon::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+}
+
+/* حالت Focus - مثل active tab */
+.input-neon:focus {
+    border-color: #ff0055;
+    background: linear-gradient(90deg, rgba(255, 0, 85, 0.1), rgba(191, 0, 255, 0.1));
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.3),
+                0 0 30px rgba(191, 0, 255, 0.2),
+                inset 0 0 10px rgba(255, 0, 85, 0.1);
+}
+
+/* افکت Glow برای Input */
+.input-neon-wrapper {
+    position: relative;
+    display: block;
+}
+
+.input-neon-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 12px;
+    padding: 2px;
+    background: linear-gradient(90deg, #ff0055, #bf00ff);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.input-neon-wrapper:focus-within::before {
+    opacity: 1;
+    filter: blur(15px);
+}
+
+/* Input غیرفعال */
+.input-neon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* حالت خطا */
+.input-neon.error {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.input-neon.error:focus {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3),
+                0 0 30px rgba(239, 68, 68, 0.2);
+}
+
+/* Input کوچک */
+.input-neon.small {
+    padding: 0.6em 1em;
+    font-size: 0.85rem;
+    border-radius: 10px;
+}
+
+.input-neon-wrapper.small::before {
+    border-radius: 10px;
+}
+
+/* Input بزرگ */
+.input-neon.large {
+    padding: 0.9em 1.5em;
+    font-size: 1.05rem;
+    border-radius: 14px;
+}
+
+.input-neon-wrapper.large::before {
+    border-radius: 14px;
+}
+
+/* Label برای Input */
+.input-neon-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.3s ease;
+}
+
+.input-neon-wrapper:focus-within .input-neon-label {
+    color: #ff0055;
+    text-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+}
+
+/* Container برای Form */
+.form-neon-container {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.form-neon-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+/* Textarea */
+.textarea-neon {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.6;
+}
+
+/* Select Dropdown */
+.select-neon {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ff0055' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: left 1em center;
+    padding-left: 2.5em;
+    cursor: pointer;
+}
+
+[dir="ltr"] .select-neon {
+    background-position: right 1em center;
+    padding-left: 1.2em;
+    padding-right: 2.5em;
+}
+
+/* Icon داخل Input */
+.input-neon-icon-wrapper {
+    position: relative;
+}
+
+.input-neon-icon-wrapper .input-neon {
+    padding-right: 3em;
+}
+
+[dir="ltr"] .input-neon-icon-wrapper .input-neon {
+    padding-left: 3em;
+    padding-right: 1.2em;
+}
+
+.input-neon-icon {
+    position: absolute;
+    right: 1em;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.1em;
+    pointer-events: none;
+    transition: color 0.3s ease;
+}
+
+[dir="ltr"] .input-neon-icon {
+    left: 1em;
+    right: auto;
+}
+
+.input-neon-icon-wrapper:focus-within .input-neon-icon {
+    color: #ff0055;
+    text-shadow: 0 0 10px rgba(255, 0, 85, 0.8);
+}
+
+/* پیام خطا */
+.input-error-message {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #ef4444;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-neon-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .input-neon {
+        font-size: 0.9rem;
+        padding: 0.65em 1em;
+    }
+}

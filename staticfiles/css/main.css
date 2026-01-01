@@ -606,7 +606,6 @@ body.modal-open {
   }
 }
 
-/* @import './components/_toast.css'; */
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    FOOTER — Site Footer Styles
@@ -6810,6 +6809,8 @@ html {
   -o-tab-size: 4;
      tab-size: 4;
   -moz-tab-size: 4;
+  height: 100%;
+  overflow-y: auto;
 }
 
 body {
@@ -6819,7 +6820,9 @@ body {
   color: var(--text-primary);
   line-height: 1.7;
   overflow-x: hidden;
+  overflow-y: auto;
   min-height: 100vh;
+  height: auto;
   text-rendering: optimizeLegibility;
 }
 

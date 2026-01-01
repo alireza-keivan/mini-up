@@ -4,6 +4,115 @@
 
 {% block title %}خدمات مجازی | Mini-Up{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Mobile responsive product cards - one per row, horizontal layout */
+    @media (max-width: 768px) {
+        .vs-scroll-wrapper {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0 !important;
+            overflow-x: visible !important;
+            padding: 0 !important;
+        }
+        
+        .neon-product-card {
+            width: 100% !important;
+            min-width: unset !important;
+            flex-direction: row !important;
+            display: flex !important;
+            height: auto !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5) !important;
+            padding: 0.75rem 0 !important;
+            border-radius: 0 !important;
+            border-left: none !important;
+            border-right: none !important;
+            border-top: none !important;
+            box-shadow: none !important;
+        }
+        
+        .neon-card-image {
+            width: 100px !important;
+            height: 100px !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .neon-card-content {
+            padding: 0.5rem 0.75rem !important;
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+        }
+        
+        /* Keep ratings visible on mobile - make smaller */
+        .neon-card-content > .flex.items-center.gap-1 {
+            margin-bottom: 0.25rem !important;
+        }
+        
+        .neon-card-content > .flex.items-center.gap-1 svg {
+            width: 0.7rem !important;
+            height: 0.7rem !important;
+        }
+        
+        .neon-card-content > .flex.items-center.gap-1 span {
+            font-size: 0.65rem !important;
+        }
+        
+        /* Smaller title */
+        .neon-card-content h3 {
+            font-size: 0.8rem !important;
+            line-height: 1.3 !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        /* Show description on mobile - smaller */
+        .neon-card-content p {
+            display: block !important;
+            font-size: 0.7rem !important;
+            line-height: 1.3 !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Hide add to cart button */
+        .add-to-cart-btn {
+            display: none !important;
+        }
+        
+        /* Simplify price area */
+        .neon-card-content .flex.items-center.justify-between {
+            padding-top: 0 !important;
+            border-top: none !important;
+            justify-content: flex-start !important;
+        }
+        
+        .neon-card-content .flex.items-center.justify-between > .flex.flex-col span {
+            font-size: 0.85rem !important;
+        }
+        
+        .neon-card-content .flex.items-center.justify-between > .flex.flex-col span span {
+            font-size: 0.7rem !important;
+        }
+        
+        /* Hide wishlist button on mobile */
+        .wishlist-btn {
+            display: none !important;
+        }
+        
+        /* Hide navigation arrows on mobile */
+        .vs-scroll-btn {
+            display: none !important;
+        }
+        
+        /* Hide fade masks on mobile */
+        .vs-scroll-container > .absolute.left-0,
+        .vs-scroll-container > .absolute.right-0 {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Hero Section with Background Image -->
 <section class="vs-hero relative w-auto overflow-hidden mb-16 -mt-1">
@@ -94,19 +203,21 @@
                         <article class="neon-product-card flex-shrink-0 w-64 relative bg-black/80 backdrop-blur-sm rounded-xl border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)] overflow-hidden transition-all duration-300 group
                                        hover:shadow-[0_0_30px_rgba(34,211,238,0.9)] hover:border-cyan-300">
                             <div class="neon-card-image relative h-48 overflow-hidden bg-gray-900">
-                                {% if product.main_image %}
-                                <img src="{{ product.main_image.url }}" 
-                                     alt="{{ product.name }}"
-                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 group-hover:brightness-110"
-                                     loading="lazy">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"></div>
-                                {% else %}
-                                <div class="absolute inset-0 flex items-center justify-center group-hover:bg-gray-800 transition-colors duration-300">
-                                    <svg class="w-16 h-16 text-gray-700 group-hover:text-gray-600 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                </div>
-                                {% endif %}
+                                <a href="{% url 'products:virtual_service_detail' product.slug %}" class="block w-full h-full cursor-pointer">
+                                    {% if product.main_image %}
+                                    <img src="{{ product.main_image.url }}" 
+                                         alt="{{ product.name }}"
+                                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 group-hover:brightness-110"
+                                         loading="lazy">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"></div>
+                                    {% else %}
+                                    <div class="absolute inset-0 flex items-center justify-center group-hover:bg-gray-800 transition-colors duration-300">
+                                        <svg class="w-16 h-16 text-gray-700 group-hover:text-gray-600 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                </a>
                                 
                                 <!-- Wishlist/Favorite Button - Hidden by default, shown on card hover -->
                                 <button type="button"
@@ -251,65 +362,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 wrapper.scrollLeft = scrollLeft - walk;
             });
         }
-    });
-    
-    // ==========================================
-    // Wishlist/Favorite Functionality
-    // ==========================================
-    document.querySelectorAll('[data-wishlist-toggle]').forEach(btn => {
-        btn.addEventListener('click', async function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const productId = this.dataset.productId;
-            const heartIcon = this.querySelector('.wishlist-heart');
-            const button = this;
-            
-            // Toggle visual state immediately for better UX
-            const isCurrentlyFavorited = heartIcon.getAttribute('fill') === 'currentColor';
-            
-            if (isCurrentlyFavorited) {
-                // Remove from favorites
-                heartIcon.setAttribute('fill', 'none');
-                heartIcon.classList.remove('text-red-500');
-                heartIcon.classList.add('text-white');
-                button.classList.remove('bg-red-500/40', 'border-red-400', '!opacity-100');
-                button.classList.add('bg-cyan-500/20', 'border-cyan-400');
-            } else {
-                // Add to favorites
-                heartIcon.setAttribute('fill', 'currentColor');
-                heartIcon.classList.add('text-red-500');
-                heartIcon.classList.remove('text-white');
-                button.classList.add('bg-red-500/40', 'border-red-400', '!opacity-100');
-                button.classList.remove('bg-cyan-500/20', 'border-cyan-400');
-                
-                // Animation effect
-                button.classList.add('scale-125');
-                setTimeout(() => button.classList.remove('scale-125'), 200);
-            }
-            
-            // Send to backend (optional - works even if backend doesn't exist yet)
-            try {
-                const response = await fetch('/wishlist/toggle/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify({ product_id: productId })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.message) {
-                        showNotification(data.message, 'success');
-                    }
-                }
-            } catch (error) {
-                // Silently fail - visual toggle already happened
-                console.log('Wishlist backend not available');
-            }
-        });
     });
     
     // ==========================================

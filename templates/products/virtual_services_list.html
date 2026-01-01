@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}خدمات مجازی | {{ site_name_fa|default:"مینی‌آپ" }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/buy_products.css' %}">
+<style>
+    /* Virtual Services Specific Styles */
+    .vs-hero {
+        background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+        padding: 60px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .vs-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(255, 0, 85, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(0, 217, 255, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .vs-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(255, 0, 85, 0.1);
+        border: 1px solid rgba(255, 0, 85, 0.3);
+        border-radius: 20px;
+        color: #ff0055;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="bp-page min-h-screen py-8 px-4 md:px-8">
+    
+    <!-- Hero Section -->
+    <div class="vs-hero -mx-4 md:-mx-8 mb-12">
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center max-w-3xl mx-auto">
+                <div class="vs-badge mx-auto">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                    </svg>
+                    <span>خدمات دیجیتال</span>
+                </div>
+                
+                <h1 class="text-4xl md:text-6xl font-black mb-6">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-l from-neon-pink via-neon-purple to-neon-cyan">
+                        خدمات مجازی
+                    </span>
+                </h1>
+                
+                <p class="text-gray-400 text-lg md:text-xl leading-relaxed">
+                    اشتراک‌های پریمیوم، فالوور و لایک، VPN و پروکسی، گیفت کارت و سایر خدمات دیجیتال با تحویل فوری
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Services -->
+    {% if featured_products %}
+    <section class="mb-16">
+        <div class="flex items-center justify-between mb-8 px-2">
+            <div class="flex items-center gap-4">
+                <div class="w-1 h-12 rounded-full bg-gradient-to-b from-neon-pink to-neon-purple"></div>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">خدمات ویژه</h2>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-dark-800/50 rounded-full border border-gray-800">
+                <span class="text-neon-cyan font-bold">{{ featured_products|length }}</span>
+                <span class="text-gray-500 text-sm">خدمت</span>
+            </div>
+        </div>
+        
+        <!-- Featured Carousel -->
+        <div class="bp-scroll-container relative group">
+            <button class="bp-scroll-btn bp-scroll-prev absolute right-0 top-1/2 -translate-y-1/2 z-20
+                           w-12 h-12 rounded-full bg-dark-800/90 border border-gray-700
+                           flex items-center justify-center text-gray-400
+                           hover:bg-neon-pink hover:border-neon-pink hover:text-white
+                           transition-all duration-300 opacity-0 group-hover:opacity-100
+                           -translate-x-2 group-hover:translate-x-0"
+                    data-direction="prev" aria-label="قبلی">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+            
+            <button class="bp-scroll-btn bp-scroll-next absolute left-0 top-1/2 -translate-y-1/2 z-20
+                           w-12 h-12 rounded-full bg-dark-800/90 border border-gray-700
+                           flex items-center justify-center text-gray-400
+                           hover:bg-neon-pink hover:border-neon-pink hover:text-white
+                           transition-all duration-300 opacity-0 group-hover:opacity-100
+                           translate-x-2 group-hover:translate-x-0"
+                    data-direction="next" aria-label="بعدی">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            
+            <div class="bp-scroll-wrapper flex gap-5 overflow-x-auto scroll-smooth pb-4 px-2 -mx-2
+                        scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent 
+                        cursor-grab active:cursor-grabbing">
+                
+                {% for product in featured_products %}
+                {% include 'products/_virtual_service_card.html' %}
+                {% endfor %}
+            </div>
+            
+            <div class="bp-scroll-progress mt-4 flex justify-center gap-1"></div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- All Services -->
+    <section>
+        <div class="flex items-center justify-between mb-8 px-2">
+            <div class="flex items-center gap-4">
+                <div class="w-1 h-12 rounded-full bg-gradient-to-b from-neon-cyan to-neon-purple"></div>
+                <h2 class="text-2xl md:text-3xl font-bold text-white">تمامی خدمات</h2>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-dark-800/50 rounded-full border border-gray-800">
+                <span class="text-neon-pink font-bold">{{ all_products|length }}</span>
+                <span class="text-gray-500 text-sm">خدمت</span>
+            </div>
+        </div>
+        
+        <!-- Services Carousel -->
+        <div class="bp-scroll-container relative group">
+            <button class="bp-scroll-btn bp-scroll-prev absolute right-0 top-1/2 -translate-y-1/2 z-20
+                           w-12 h-12 rounded-full bg-dark-800/90 border border-gray-700
+                           flex items-center justify-center text-gray-400
+                           hover:bg-neon-cyan hover:border-neon-cyan hover:text-white
+                           transition-all duration-300 opacity-0 group-hover:opacity-100
+                           -translate-x-2 group-hover:translate-x-0"
+                    data-direction="prev" aria-label="قبلی">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+            
+            <button class="bp-scroll-btn bp-scroll-next absolute left-0 top-1/2 -translate-y-1/2 z-20
+                           w-12 h-12 rounded-full bg-dark-800/90 border border-gray-700
+                           flex items-center justify-center text-gray-400
+                           hover:bg-neon-cyan hover:border-neon-cyan hover:text-white
+                           transition-all duration-300 opacity-0 group-hover:opacity-100
+                           translate-x-2 group-hover:translate-x-0"
+                    data-direction="next" aria-label="بعدی">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            
+            <div class="bp-scroll-wrapper flex gap-5 overflow-x-auto scroll-smooth pb-4 px-2 -mx-2
+                        scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent 
+                        cursor-grab active:cursor-grabbing">
+                
+                {% for product in all_products %}
+                {% include 'products/_virtual_service_card.html' %}
+                {% endfor %}
+            </div>
+            
+            <div class="bp-scroll-progress mt-4 flex justify-center gap-1"></div>
+        </div>
+    </section>
+
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/buy_products.js' %}"></script>
+{% endblock %}

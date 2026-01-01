@@ -21,10 +21,10 @@
 @import './components/_navbar.css';
 @import './components/_dropdown.css';
 @import './components/_buttons.css';
+@import './components/_inputs.css'; 
 @import './components/_cards.css';
 @import './components/_forms.css';
 @import './components/_modals.css';
-/* @import './components/_toast.css'; */
 
 @import './components/_footer.css';
 @import './components/_modals.css';

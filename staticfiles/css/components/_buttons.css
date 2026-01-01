@@ -264,3 +264,510 @@
         @apply transition-transform duration-300;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Glow Button (Gradient Border with Blur Effect)
+   این کلاس‌ها خارج از @layer components هستن تا همیشه کامپایل شوند
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn-glow-container {
+    position: relative;
+    padding: 3px;
+    background: linear-gradient(90deg, #00f5ff, #bf00ff, #ff0055);
+    border-radius: 0.9em;
+    transition: all 0.4s ease;
+    display: inline-block;
+}
+
+.btn-glow-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    border-radius: 0.9em;
+    z-index: -1;
+    filter: blur(0);
+    transition: filter 0.4s ease;
+}
+
+.btn-glow-container:hover::before {
+    background: linear-gradient(90deg, #00f5ff, #bf00ff, #ff0055);
+    filter: blur(1.2em);
+}
+
+.btn-glow-container:active::before {
+    filter: blur(0.2em);
+}
+
+.btn-glow {
+    font-size: 1.4em;
+    padding: 0.6em 0.8em;
+    border-radius: 0.7em;
+    border: none;
+    background-color: #000;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.7);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.btn-glow:hover {
+    background-color: #111;
+}
+
+.btn-glow:active {
+    transform: scale(0.98);
+}
+
+
+/* Variant: Pink Glow */
+.btn-glow-container.pink {
+    background: linear-gradient(90deg, #ff0055, #bf00ff);
+}
+
+.btn-glow-container.pink:hover::before {
+    background: linear-gradient(90deg, #ff0055, #bf00ff);
+}
+
+/* Variant: Cyan Glow */
+.btn-glow-container.cyan {
+    background: linear-gradient(90deg, #00f5ff, #00ff88);
+}
+
+.btn-glow-container.cyan:hover::before {
+    background: linear-gradient(90deg, #00f5ff, #00ff88);
+}
+
+/* Variant: Purple Glow */
+.btn-glow-container.purple {
+    background: linear-gradient(90deg, #bf00ff, #ff0055);
+}
+
+.btn-glow-container.purple:hover::before {
+    background: linear-gradient(90deg, #bf00ff, #ff0055);
+}
+
+
+/* Small Size */
+.btn-glow-container.small {
+    padding: 2px;
+}
+
+.btn-glow-container.small .btn-glow {
+    font-size: 1em;
+    padding: 0.5em 0.8em;
+}
+
+/* Large Size */
+.btn-glow-container.large {
+    padding: 4px;
+}
+
+.btn-glow-container.large .btn-glow {
+    font-size: 1.6em;
+    padding: 0.7em 1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Neon Border Buttons (مثل تصویر)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn-neon-border {
+    position: relative;
+    padding: 0.75em 2em;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid;
+    border-radius: 50px;
+    cursor: pointer;
+    overflow: visible;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    @apply inline-flex items-center justify-center gap-2;
+}
+
+.btn-neon-border:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* افکت Glow در Hover */
+.btn-neon-border:before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50px;
+    padding: 2px;
+    background: inherit;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    filter: blur(10px);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+    z-index: -1;
+}
+
+.btn-neon-border:hover:before {
+    opacity: 1;
+    filter: blur(15px);
+}
+
+.btn-neon-border:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px currentColor,
+                0 0 40px currentColor,
+                inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.btn-neon-border:active {
+    transform: translateY(0);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Variants - بر اساس تم اصلی سایت (Pink, Cyan, Purple)
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Pink Variant - صورتی (رنگ اصلی تم) */
+.btn-neon-border.pink {
+    border-color: #ff0055;
+    color: #ff0055;
+}
+
+.btn-neon-border.pink:before {
+    background: linear-gradient(90deg, #ff0055, #ff4081);
+}
+
+.btn-neon-border.pink:hover {
+    box-shadow: 0 0 20px #ff0055,
+                0 0 40px #ff0055,
+                0 0 60px rgba(255, 0, 85, 0.6),
+                inset 0 0 10px rgba(255, 0, 85, 0.2);
+}
+
+/* Cyan Variant - آبی سیان (رنگ اصلی تم) */
+.btn-neon-border.cyan {
+    border-color: #00f5ff;
+    color: #00f5ff;
+}
+
+.btn-neon-border.cyan:before {
+    background: linear-gradient(90deg, #00f5ff, #00d9ff);
+}
+
+.btn-neon-border.cyan:hover {
+    box-shadow: 0 0 20px #00f5ff,
+                0 0 40px #00f5ff,
+                0 0 60px rgba(0, 245, 255, 0.6),
+                inset 0 0 10px rgba(0, 245, 255, 0.2);
+}
+
+/* Purple Variant - بنفش (رنگ اصلی تم) */
+.btn-neon-border.purple {
+    border-color: #bf00ff;
+    color: #bf00ff;
+}
+
+.btn-neon-border.purple:before {
+    background: linear-gradient(90deg, #bf00ff, #d896ff);
+}
+
+.btn-neon-border.purple:hover {
+    box-shadow: 0 0 20px #bf00ff,
+                0 0 40px #bf00ff,
+                0 0 60px rgba(191, 0, 255, 0.6),
+                inset 0 0 10px rgba(191, 0, 255, 0.2);
+}
+
+/* Gradient Pink to Purple - ترکیب صورتی و بنفش */
+.btn-neon-border.gradient-pink-purple {
+    border-color: #ff0055;
+    color: #fff;
+    background: linear-gradient(90deg, rgba(255, 0, 85, 0.2), rgba(191, 0, 255, 0.2));
+}
+
+.btn-neon-border.gradient-pink-purple:before {
+    background: linear-gradient(90deg, #ff0055, #bf00ff);
+}
+
+.btn-neon-border.gradient-pink-purple:hover {
+    border-color: #bf00ff;
+    box-shadow: 0 0 20px #ff0055,
+                0 0 40px #bf00ff,
+                0 0 60px rgba(191, 0, 255, 0.5),
+                inset 0 0 15px rgba(255, 0, 85, 0.3);
+}
+
+/* Gradient Cyan to Purple - ترکیب آبی و بنفش */
+.btn-neon-border.gradient-cyan-purple {
+    border-color: #00f5ff;
+    color: #fff;
+    background: linear-gradient(90deg, rgba(0, 245, 255, 0.2), rgba(191, 0, 255, 0.2));
+}
+
+.btn-neon-border.gradient-cyan-purple:before {
+    background: linear-gradient(90deg, #00f5ff, #bf00ff);
+}
+
+.btn-neon-border.gradient-cyan-purple:hover {
+    border-color: #bf00ff;
+    box-shadow: 0 0 20px #00f5ff,
+                0 0 40px #bf00ff,
+                0 0 60px rgba(191, 0, 255, 0.5),
+                inset 0 0 15px rgba(0, 245, 255, 0.3);
+}
+
+/* Gradient Full Spectrum - تمام رنگ‌های تم */
+.btn-neon-border.gradient-full {
+    border-color: #ff0055;
+    color: #fff;
+    background: linear-gradient(90deg, rgba(0, 245, 255, 0.15), rgba(191, 0, 255, 0.15), rgba(255, 0, 85, 0.15));
+}
+
+.btn-neon-border.gradient-full:before {
+    background: linear-gradient(90deg, #00f5ff, #bf00ff, #ff0055);
+}
+
+.btn-neon-border.gradient-full:hover {
+    box-shadow: 0 0 20px #00f5ff,
+                0 0 30px #bf00ff,
+                0 0 40px #ff0055,
+                0 0 60px rgba(191, 0, 255, 0.4),
+                inset 0 0 15px rgba(255, 0, 85, 0.2);
+}
+
+/* Success (Green) - برای پیام‌های موفقیت */
+.btn-neon-border.success {
+    border-color: #00ff88;
+    color: #00ff88;
+}
+
+.btn-neon-border.success:before {
+    background: linear-gradient(90deg, #00ff88, #39ff14);
+}
+
+.btn-neon-border.success:hover {
+    box-shadow: 0 0 20px #00ff88,
+                0 0 40px #00ff88,
+                0 0 60px rgba(0, 255, 136, 0.5),
+                inset 0 0 10px rgba(0, 255, 136, 0.2);
+}
+
+/* Danger (Red) - برای اقدامات خطرناک */
+.btn-neon-border.danger {
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+.btn-neon-border.danger:before {
+    background: linear-gradient(90deg, #ff4444, #ff0000);
+}
+
+.btn-neon-border.danger:hover {
+    box-shadow: 0 0 20px #ff4444,
+                0 0 40px #ff4444,
+                0 0 60px rgba(255, 68, 68, 0.5),
+                inset 0 0 10px rgba(255, 68, 68, 0.2);
+}
+
+
+/* Size Variants */
+.btn-neon-border.small {
+    padding: 0.5em 1.5em;
+    font-size: 0.875rem;
+}
+
+.btn-neon-border.large {
+    padding: 1em 2.5em;
+    font-size: 1.125rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Fix برای دکمه‌های Glow موجود
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* غیرفعال کردن glow effect از container */
+.btn-glow-container.no-container-glow:before {
+    display: none !important;
+}
+
+.btn-glow-container.no-container-glow:hover {
+    background: transparent !important;
+}
+
+/* تنظیم عرض برای centered buttons */
+.btn-glow-container.centered {
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.btn-glow-container.auto-width .btn-glow {
+    width: auto;
+    padding: 0.5em 1.5em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Tab Navigation Buttons - با استایل Neon Border
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.btn-tab-neon {
+    position: relative;
+    padding: 0.75em 1.5em;
+    font-size: 1rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    overflow: visible;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-tab-neon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Icon داخل Tab */
+.btn-tab-neon i {
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+}
+
+/* افکت Glow برای Tab */
+.btn-tab-neon:before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 12px;
+    padding: 2px;
+    background: transparent;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 0.3s ease, filter 0.3s ease;
+    z-index: -1;
+}
+
+/* حالت Hover */
+.btn-tab-neon:hover {
+    border-color: rgba(255, 0, 85, 0.5);
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 0, 85, 0.05);
+}
+
+.btn-tab-neon:hover:before {
+    opacity: 0.3;
+    filter: blur(12px);
+}
+
+/* حالت Active - همیشه glow داره */
+.btn-tab-neon.active {
+    border-color: #ff0055;
+    color: #fff;
+    background: linear-gradient(90deg, rgba(255, 0, 85, 0.2), rgba(191, 0, 255, 0.2));
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.3),
+                0 0 30px rgba(191, 0, 255, 0.2),
+                inset 0 0 10px rgba(255, 0, 85, 0.1);
+}
+
+.btn-tab-neon.active:before {
+    background: linear-gradient(90deg, #ff0055, #bf00ff);
+    opacity: 1;
+    filter: blur(15px);
+}
+
+.btn-tab-neon.active i {
+    color: #ff0055;
+    text-shadow: 0 0 10px rgba(255, 0, 85, 0.8);
+}
+
+/* Variant Pink (برای active) */
+.btn-tab-neon.pink.active {
+    border-color: #ff0055;
+    background: linear-gradient(90deg, rgba(255, 0, 85, 0.2), rgba(191, 0, 255, 0.2));
+}
+
+.btn-tab-neon.pink.active:before {
+    background: linear-gradient(90deg, #ff0055, #bf00ff);
+}
+
+/* Variant Cyan */
+.btn-tab-neon.cyan.active {
+    border-color: #00f5ff;
+    background: linear-gradient(90deg, rgba(0, 245, 255, 0.2), rgba(191, 0, 255, 0.2));
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.3),
+                0 0 30px rgba(191, 0, 255, 0.2),
+                inset 0 0 10px rgba(0, 245, 255, 0.1);
+}
+
+.btn-tab-neon.cyan.active:before {
+    background: linear-gradient(90deg, #00f5ff, #bf00ff);
+}
+
+.btn-tab-neon.cyan.active i {
+    color: #00f5ff;
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.8);
+}
+
+/* Variant Purple */
+.btn-tab-neon.purple.active {
+    border-color: #bf00ff;
+    background: linear-gradient(90deg, rgba(191, 0, 255, 0.2), rgba(255, 0, 85, 0.2));
+    box-shadow: 0 0 15px rgba(191, 0, 255, 0.3),
+                0 0 30px rgba(255, 0, 85, 0.2),
+                inset 0 0 10px rgba(191, 0, 255, 0.1);
+}
+
+.btn-tab-neon.purple.active:before {
+    background: linear-gradient(90deg, #bf00ff, #ff0055);
+}
+
+.btn-tab-neon.purple.active i {
+    color: #bf00ff;
+    text-shadow: 0 0 10px rgba(191, 0, 255, 0.8);
+}
+
+/* Size کوچکتر برای Tab ها */
+.btn-tab-neon.small {
+    padding: 0.6em 1.2em;
+    font-size: 0.9rem;
+    border-radius: 10px;
+}
+
+/* Container برای Tab Navigation */
+.tab-nav-container {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+@media (max-width: 768px) {
+    .tab-nav-container {
+        gap: 0.75rem;
+    }
+    
+    .btn-tab-neon {
+        padding: 0.6em 1em;
+        font-size: 0.9rem;
+    }
+}
+

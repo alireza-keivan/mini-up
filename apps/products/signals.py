@@ -199,15 +199,7 @@ def review_post_save(sender, instance, created, **kwargs):
     """
     _invalidate_product_cache(instance.product)
 
-    avg_rating = instance.product.reviews.filter(
-        is_approved=True
-    ).aggregate(avg=Avg('rating'))['avg']
-
-    instance.product.average_rating = avg_rating or 0
-    instance.product.review_count = instance.product.reviews.filter(
-        is_approved=True
-    ).count()
-    instance.product.save(update_fields=['average_rating', 'review_count'])
+    
 
     if created:
         logger.info(f"[Review] New review added for product {instance.product.id}")

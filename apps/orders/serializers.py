@@ -45,7 +45,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = [
             'id', 'product', 'variant',
-            'quantity', 'game_user_id', 'currency_amount',
+            'quantity', 'game_user_id', 'currency_amount', 'custom_data',
             'unit_price', 'original_price', 'line_total', 'discount_amount',
             'is_available', 'created_at'
         ]

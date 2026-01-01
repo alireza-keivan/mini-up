@@ -55,6 +55,8 @@ CACHE_KEYS = {
     'bestsellers': 'products:bestsellers',
     'new_arrivals': 'products:new',
     'product_stats': 'product:stats:{}',
+    'recently_viewed_user': 'recently_viewed:user:{}',
+    'recently_viewed_session': 'recently_viewed:session:{}',
 }
 
 
@@ -1196,8 +1198,7 @@ class WishlistService:
         """
         wishlist_item, created = Wishlist.objects.get_or_create(
             user=user,
-            product=product,
-            defaults={'notify_price_drop': True}
+            product=product
         )
         
         if created:

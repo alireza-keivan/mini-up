@@ -14,9 +14,12 @@ urlpatterns = [
     path('', views.ProductListView.as_view(), name='list'),
     path('shop/', views.ProductListView.as_view(), name='shop'),
     
-    # Product detail page
-    path('product/<slug:slug>/', views.ProductDetailView.as_view(), name='detail'),
+    # Product detail page - supports Unicode slugs
+    re_path(r'^product/(?P<slug>[\w\-]+)/$', views.ProductDetailView.as_view(), name='detail'),
     path('product/<int:pk>/', views.ProductDetailView.as_view(), name='detail_by_id'),
+    
+    # Review submission - simple path with product ID
+    path('review/add/<int:product_id>/', views.AddReviewView.as_view(), name='add_review'),
     
     # ═══════════════════════════════════════════════════════════════════════════
     # CATEGORY PAGES
@@ -48,25 +51,22 @@ urlpatterns = [
     path('search/', views.ProductSearchView.as_view(), name='search'),
     
     # ═══════════════════════════════════════════════════════════════════════════
-    # PHYSICAL PRODUCT PAGES
-    # ═══════════════════════════════════════════════════════════════════════════
-    
-    # Gaming products page
-    path('gaming-products/', views.GamingProductsView.as_view(), name='gaming_products'),
-    
-    # Peripheral/accessory products page
-    path('buy-products/', views.BuyProductsView.as_view(), name='buy_products'),
-    
-    # ═══════════════════════════════════════════════════════════════════════════
     # WISHLIST (HTML)
     # ═══════════════════════════════════════════════════════════════════════════
     
     path('wishlist/', views.WishlistView.as_view(), name='wishlist'),
+    path('api/wishlist/toggle/', views.WishlistToggleView.as_view(), name='wishlist_toggle'),
     
     # ═══════════════════════════════════════════════════════════════════════════
     # COMPARE
     # ═══════════════════════════════════════════════════════════════════════════
     
     path('compare/', views.CompareView.as_view(), name='compare'),
-   # path('category/<slug:slug>/', views.category_view, name='category'),  # ✅ اضافه کن
+    
+    # ═══════════════════════════════════════════════════════════════════════════
+    # VIRTUAL SERVICES
+    # ═══════════════════════════════════════════════════════════════════════════
+    
+    path('virtual-services/', views.VirtualServicesListView.as_view(), name='virtual_services'),
+    re_path(r'^virtual-service/(?P<slug>[\w\-]+)/$', views.VirtualServiceDetailView.as_view(), name='virtual_service_detail'),
 ]

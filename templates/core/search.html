@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ page_title }} | Mini-Up{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-page {
+        max-width: 1600px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .search-header {
+        background: rgba(20, 20, 35, 0.8);
+        border: 1px solid rgba(191, 0, 255, 0.2);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .search-title {
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .search-query {
+        color: #bf00ff;
+        font-weight: 600;
+    }
+
+    .search-count {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1rem;
+    }
+
+    @media (max-width: 1400px) {
+        .products-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .products-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .product-card {
+        background: rgba(20, 20, 35, 0.8);
+        border: 1px solid rgba(191, 0, 255, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(191, 0, 255, 0.5);
+        box-shadow: 0 5px 20px rgba(191, 0, 255, 0.2);
+    }
+
+    .product-image-wrapper {
+        position: relative;
+        padding-top: 100%;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+    }
+
+    .product-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 0.5rem;
+    }
+
+    .product-info {
+        padding: 0.75rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .product-brand {
+        color: #999;
+        font-size: 0.7rem;
+        margin-bottom: 0;
+    }
+
+    .product-name {
+        color: white;
+        font-size: 0.8rem;
+        font-weight: 500;
+        line-height: 1.3;
+        min-height: 2.1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 0;
+    }
+
+    .product-footer {
+        padding: 0 0.75rem 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .product-price {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .price-original {
+        color: #999;
+        font-size: 0.65rem;
+        text-decoration: line-through;
+    }
+
+    .price-current {
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .price-currency {
+        font-size: 0.7rem;
+        color: #ccc;
+        margin-right: 0.25rem;
+    }
+
+    .product-stock {
+        font-size: 0.7rem;
+    }
+
+    .in-stock {
+        color: white;
+        background: transparent;
+        padding: 0.35rem 0.6rem;
+        border-radius: 6px;
+        border: 1.5px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.3),
+                    inset 0 0 8px rgba(255, 255, 255, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-weight: 500;
+    }
+
+    .out-of-stock {
+        color: #ff0055;
+        background: transparent;
+        padding: 0.35rem 0.6rem;
+        border-radius: 6px;
+        border: 1.5px solid rgba(255, 0, 85, 0.6);
+        box-shadow: 0 0 8px rgba(255, 0, 85, 0.3),
+                    inset 0 0 8px rgba(255, 0, 85, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-weight: 500;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #999;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: rgba(191, 0, 255, 0.3);
+        margin-bottom: 1rem;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 3rem;
+        padding: 2rem 0;
+    }
+
+    .page-link {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .page-link:hover {
+        background: rgba(191, 0, 255, 0.2);
+        border-color: rgba(191, 0, 255, 0.4);
+    }
+
+    .page-link.active {
+        background: rgba(191, 0, 255, 0.3);
+        border-color: rgba(191, 0, 255, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    
+    <!-- Search Header -->
+    <div class="search-header">
+        {% if query %}
+        <h1 class="search-title">
+            نتایج جستجو برای: <span class="search-query">"{{ query }}"</span>
+        </h1>
+        <p class="search-count">{{ total_count }} محصول یافت شد</p>
+        {% else %}
+        <h1 class="search-title">جستجو در محصولات</h1>
+        <p class="search-count">لطفاً عبارت مورد نظر خود را جستجو کنید</p>
+        {% endif %}
+    </div>
+
+    <!-- Products Grid -->
+    {% if products %}
+    <div class="products-grid">
+        {% for product in products %}
+        <div class="product-card" onclick="window.location.href='{% url 'products:detail' product.slug %}'">
+            
+            <div class="product-image-wrapper">
+                {% if product.main_image %}
+                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="product-image">
+                {% else %}
+                <div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #666; font-size: 0.9rem;">
+                    <i class="fas fa-image" style="font-size: 3rem;"></i>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="product-info">
+                {% if product.brand %}
+                <div class="product-brand">{{ product.brand.name }}</div>
+                {% endif %}
+                
+                <h3 class="product-name">{{ product.name }}</h3>
+            </div>
+            
+            <div class="product-footer">
+                <div class="product-price">
+                    {% if product.original_price %}
+                    <span class="price-original">{{ product.original_price|floatformat:0|intcomma }} تومان</span>
+                    {% endif %}
+                    <div class="price-current">
+                        {{ product.price|floatformat:0|intcomma }}
+                        <span class="price-currency">تومان</span>
+                    </div>
+                </div>
+                
+                <div class="product-stock">
+                    {% if product.stock > 0 %}
+                    <span class="in-stock"><i class="fas fa-check-circle"></i> موجود</span>
+                    {% else %}
+                    <span class="out-of-stock"><i class="fas fa-times-circle"></i> ناموجود</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?q={{ query }}&page=1" class="page-link">اولین</a>
+        <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" class="page-link">قبلی</a>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span class="page-link active">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?q={{ query }}&page={{ num }}" class="page-link">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+        <a href="?q={{ query }}&page={{ page_obj.next_page_number }}" class="page-link">بعدی</a>
+        <a href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}" class="page-link">آخرین</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <i class="fas fa-search"></i>
+        <h3>محصولی یافت نشد</h3>
+        {% if query %}
+        <p>متأسفانه محصولی با عبارت "{{ query }}" پیدا نشد</p>
+        {% else %}
+        <p>لطفاً عبارت مورد نظر خود را جستجو کنید</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+</div>
+{% endblock %}

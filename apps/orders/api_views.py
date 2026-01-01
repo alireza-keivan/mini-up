@@ -79,6 +79,13 @@ class CartAddItemAPIView(APIView):
                 is_active=True
             )
         
+        # استخراج داده‌های سفارشی از فرم (فیلدهایی که با custom_ شروع می‌شوند)
+        custom_data = {}
+        for key, value in request.data.items():
+            if key.startswith('custom_'):
+                field_name = key.replace('custom_', '')
+                custom_data[field_name] = value
+        
         # دریافت سبد
         cart = CartService.get_cart(request)
         
@@ -89,7 +96,8 @@ class CartAddItemAPIView(APIView):
                 variant=variant,
                 quantity=data.get('quantity', 1),
                 game_user_id=data.get('game_user_id', ''),
-                currency_amount=data.get('currency_amount')
+                currency_amount=data.get('currency_amount'),
+                custom_data=custom_data if custom_data else None
             )
             
             return Response({

@@ -1,0 +1,163 @@
+{% load humanize %}
+<!-- Virtual Service Card Component -->
+<article class="bp-product-card flex-shrink-0 w-72 md:w-80
+                bg-gradient-to-br from-dark-800 to-dark-900
+                rounded-2xl border border-gray-800/50
+                overflow-hidden transition-all duration-500
+                hover:border-neon-cyan/50 hover:shadow-[0_0_30px_rgba(0,217,255,0.3)]
+                group/card">
+    
+    <!-- Image Container -->
+    <div class="bp-card-image relative h-48 overflow-hidden bg-gradient-to-br from-dark-700 to-dark-800">
+        <a href="{% url 'products:virtual_service_detail' product.slug %}" class="block w-full h-full cursor-pointer">
+            {% if product.main_image and product.main_image.url %}
+            <img src="{{ product.main_image.url }}" 
+                 alt="{{ product.name }}"
+                 class="w-full h-full object-cover transition-transform duration-700
+                        group-hover/card:scale-110"
+                 loading="lazy">
+            {% else %}
+            <!-- Virtual Service Icon -->
+            <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-20 h-20 text-neon-cyan/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                          d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                </svg>
+            </div>
+            {% endif %}
+        </a>
+        
+        <!-- Overlay Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent 
+                    opacity-60 group-hover/card:opacity-40 transition-opacity duration-500"></div>
+        
+        <!-- Badges -->
+        <div class="absolute top-3 right-3 flex flex-col gap-2">
+            {% if product.is_featured %}
+            <span class="px-3 py-1 text-xs font-bold rounded-full
+                         bg-gradient-to-r from-neon-yellow to-orange-500 text-dark-900">
+                ویژه
+            </span>
+            {% endif %}
+            
+            {% if product.compare_price and product.compare_price > product.price %}
+            {% widthratio product.price product.compare_price 100 as discount_percent %}
+            <span class="px-3 py-1 text-xs font-bold rounded-full
+                         bg-gradient-to-r from-neon-pink to-red-500 text-white">
+                {{ 100|add:"-"|add:discount_percent }}% تخفیف
+            </span>
+            {% endif %}
+            
+            <!-- Instant Delivery Badge -->
+            <span class="px-3 py-1 text-xs font-bold rounded-full
+                         bg-gradient-to-r from-neon-cyan to-blue-500 text-white
+                         flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                تحویل فوری
+            </span>
+        </div>
+    </div>
+    
+    <!-- Card Content -->
+    <div class="bp-card-content p-5">
+        <!-- Product Name -->
+        <h3 class="text-lg font-bold text-white mb-2 
+                   line-clamp-2 min-h-[3.5rem] 
+                   group-hover/card:text-neon-cyan transition-colors duration-300">
+            <a href="{% url 'products:virtual_service_detail' product.slug %}"
+               class="hover:underline decoration-neon-cyan/50 underline-offset-4">
+                {{ product.name }}
+            </a>
+        </h3>
+        
+        <!-- Short Description -->
+        {% if product.short_description %}
+        <p class="text-gray-500 text-sm mb-4 line-clamp-2">
+            {{ product.short_description }}
+        </p>
+        {% endif %}
+        
+        <!-- Key Specifications (from JSON) -->
+        {% if product.specifications %}
+        <div class="mb-4 space-y-1">
+            {% for key, value in product.specifications.items %}
+                {% if forloop.counter <= 2 %}
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="w-2 h-2 rounded-full bg-neon-cyan/50"></span>
+                    <span class="text-gray-400">{{ key }}:</span>
+                    <span class="text-gray-300 font-semibold">{{ value }}</span>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Stock Status -->
+        <div class="mb-4">
+            {% if product.stock > 0 %}
+                {% if product.stock <= 5 %}
+                <span class="flex items-center gap-2 text-sm text-yellow-500">
+                    <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                    فقط {{ product.stock }} عدد باقی‌مانده
+                </span>
+                {% else %}
+                <span class="flex items-center gap-2 text-sm text-neon-green">
+                    <span class="w-2 h-2 rounded-full bg-neon-green"></span>
+                    موجود
+                </span>
+                {% endif %}
+            {% else %}
+            <span class="flex items-center gap-2 text-sm text-red-500">
+                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                ناموجود
+            </span>
+            {% endif %}
+        </div>
+        
+        <!-- Price Section -->
+        <div class="flex items-end justify-between mb-5">
+            <div>
+                {% if product.compare_price and product.compare_price > product.price %}
+                <span class="text-gray-500 text-sm line-through block mb-1">
+                    {{ product.compare_price|intcomma }} تومان
+                </span>
+                {% endif %}
+                <span class="text-2xl font-black text-white">
+                    {{ product.price|intcomma }}
+                    <span class="text-sm font-normal text-gray-400">تومان</span>
+                </span>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+            <button class="flex-1 py-3 px-4 rounded-xl font-bold text-sm
+                           bg-gradient-to-r from-neon-cyan to-blue-600 text-white
+                           hover:shadow-[0_0_20px_rgba(0,217,255,0.5)] transition-all duration-300
+                           disabled:opacity-50 disabled:cursor-not-allowed
+                           flex items-center justify-center gap-2"
+                    onclick="addToCart({{ product.id }}, '{{ product.name }}')"
+                    {% if product.stock <= 0 %}disabled{% endif %}>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <span>خرید خدمت</span>
+            </button>
+            
+            <a href="{% url 'products:virtual_service_detail' product.slug %}"
+               class="w-12 h-12 rounded-xl border border-gray-700
+                      flex items-center justify-center text-gray-400
+                      hover:bg-neon-cyan hover:border-neon-cyan hover:text-dark-900
+                      transition-all duration-300"
+               title="مشاهده جزئیات">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</article>

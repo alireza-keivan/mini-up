@@ -29,26 +29,34 @@
                 
                 <!-- Social Media -->
                 <div style="display: flex; gap: 1rem;">
-                    <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(191, 0, 255, 0.1); border: 1px solid rgba(191, 0, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-purple); transition: all 0.3s; text-decoration: none;"
+                    {% if social_links.telegram %}
+                    <a href="https://t.me/{{ social_links.telegram }}" target="_blank" rel="noopener noreferrer" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(191, 0, 255, 0.1); border: 1px solid rgba(191, 0, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-purple); transition: all 0.3s; text-decoration: none;"
                        onmouseover="this.style.background='rgba(191, 0, 255, 0.2)'; this.style.borderColor='var(--neon-purple)'; this.style.transform='translateY(-3px)';"
                        onmouseout="this.style.background='rgba(191, 0, 255, 0.1)'; this.style.borderColor='rgba(191, 0, 255, 0.3)'; this.style.transform='translateY(0)';">
                         <i class="fab fa-telegram"></i>
                     </a>
-                    <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(0, 245, 255, 0.1); border: 1px solid rgba(0, 245, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-cyan); transition: all 0.3s; text-decoration: none;"
+                    {% endif %}
+                    {% if social_links.instagram %}
+                    <a href="https://instagram.com/{{ social_links.instagram }}" target="_blank" rel="noopener noreferrer" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(0, 245, 255, 0.1); border: 1px solid rgba(0, 245, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-cyan); transition: all 0.3s; text-decoration: none;"
                        onmouseover="this.style.background='rgba(0, 245, 255, 0.2)'; this.style.borderColor='var(--neon-cyan)'; this.style.transform='translateY(-3px)';"
                        onmouseout="this.style.background='rgba(0, 245, 255, 0.1)'; this.style.borderColor='rgba(0, 245, 255, 0.3)'; this.style.transform='translateY(0)';">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-pink); transition: all 0.3s; text-decoration: none;"
+                    {% endif %}
+                    {% if social_links.twitter %}
+                    <a href="https://twitter.com/{{ social_links.twitter }}" target="_blank" rel="noopener noreferrer" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-pink); transition: all 0.3s; text-decoration: none;"
                        onmouseover="this.style.background='rgba(255, 0, 85, 0.2)'; this.style.borderColor='var(--neon-pink)'; this.style.transform='translateY(-3px)';"
                        onmouseout="this.style.background='rgba(255, 0, 85, 0.1)'; this.style.borderColor='rgba(255, 0, 85, 0.3)'; this.style.transform='translateY(0)';">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(191, 0, 255, 0.1); border: 1px solid rgba(191, 0, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-purple); transition: all 0.3s; text-decoration: none;"
+                    {% endif %}
+                    {% if social_links.youtube %}
+                    <a href="https://youtube.com/@{{ social_links.youtube }}" target="_blank" rel="noopener noreferrer" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(191, 0, 255, 0.1); border: 1px solid rgba(191, 0, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--neon-purple); transition: all 0.3s; text-decoration: none;"
                        onmouseover="this.style.background='rgba(191, 0, 255, 0.2)'; this.style.borderColor='var(--neon-purple)'; this.style.transform='translateY(-3px)';"
                        onmouseout="this.style.background='rgba(191, 0, 255, 0.1)'; this.style.borderColor='rgba(191, 0, 255, 0.3)'; this.style.transform='translateY(0)';">
                         <i class="fab fa-youtube"></i>
                     </a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -76,7 +84,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
+                        <a href="{% url 'core:terms' %}" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
                            onmouseover="this.style.color='var(--neon-cyan)'; this.style.paddingRight='0.5rem';"
                            onmouseout="this.style.color='#999'; this.style.paddingRight='0';">
                             <i class="fas fa-chevron-left" style="font-size: 0.7rem;"></i>
@@ -84,7 +92,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
+                        <a href="{% url 'core:privacy' %}" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
                            onmouseover="this.style.color='var(--neon-cyan)'; this.style.paddingRight='0.5rem';"
                            onmouseout="this.style.color='#999'; this.style.paddingRight='0';">
                             <i class="fas fa-chevron-left" style="font-size: 0.7rem;"></i>
@@ -92,7 +100,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
+                        <a href="{% url 'core:faq' %}" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
                            onmouseover="this.style.color='var(--neon-cyan)'; this.style.paddingRight='0.5rem';"
                            onmouseout="this.style.color='#999'; this.style.paddingRight='0';">
                             <i class="fas fa-chevron-left" style="font-size: 0.7rem;"></i>
@@ -110,15 +118,15 @@
                 </h4>
                 <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
                     <li>
-                        <a href="{% url 'products:list' %}" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
+                        <a href="{% url 'core:virtual_services' %}" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
                            onmouseover="this.style.color='var(--neon-cyan)'; this.style.paddingRight='0.5rem';"
                            onmouseout="this.style.color='#999'; this.style.paddingRight='0';">
                             <i class="fas fa-chevron-left" style="font-size: 0.7rem;"></i>
-                            خدمات دیجیتال
+                            خدمات مجازی
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'products:shop' %}" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
+                        <a href="{% url 'core:gaming_products' %}" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
                            onmouseover="this.style.color='var(--neon-cyan)'; this.style.paddingRight='0.5rem';"
                            onmouseout="this.style.color='#999'; this.style.paddingRight='0';">
                             <i class="fas fa-chevron-left" style="font-size: 0.7rem;"></i>
@@ -127,11 +135,11 @@
                     </li>
 
                     <li>
-                        <a href="#" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
+                        <a href="{% url 'core:buy_products' %}" style="color: #999; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; font-size: 0.9rem;"
                            onmouseover="this.style.color='var(--neon-cyan)'; this.style.paddingRight='0.5rem';"
                            onmouseout="this.style.color='#999'; this.style.paddingRight='0';">
                             <i class="fas fa-chevron-left" style="font-size: 0.7rem;"></i>
-                            کارت هدیه
+                            خرید محصولات
                         </a>
                     </li>
                     <li>
@@ -233,20 +241,20 @@
             </div>
             
             <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
-                <a href="#" style="color: #999; text-decoration: none; font-size: 0.85rem; transition: color 0.3s;"
+                <a href="{% url 'core:terms' %}" style="color: #999; text-decoration: none; font-size: 0.85rem; transition: color 0.3s;"
                    onmouseover="this.style.color='var(--neon-cyan)';"
                    onmouseout="this.style.color='#999';">
                     شرایط استفاده
                 </a>
-                <a href="#" style="color: #999; text-decoration: none; font-size: 0.85rem; transition: color 0.3s;"
+                <a href="{% url 'core:privacy' %}" style="color: #999; text-decoration: none; font-size: 0.85rem; transition: color 0.3s;"
                    onmouseover="this.style.color='var(--neon-cyan)';"
                    onmouseout="this.style.color='#999';">
                     حریم خصوصی
                 </a>
-                <a href="#" style="color: #999; text-decoration: none; font-size: 0.85rem; transition: color 0.3s;"
+                <a href="{% url 'core:faq' %}" style="color: #999; text-decoration: none; font-size: 0.85rem; transition: color 0.3s;"
                    onmouseover="this.style.color='var(--neon-cyan)';"
                    onmouseout="this.style.color='#999';">
-                    قوانین و مقررات
+                    سوالات متداول
                 </a>
             </div>
         </div>

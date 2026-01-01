@@ -40,10 +40,10 @@
 
     .filter-btn {
         padding: 10px 20px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
         border-radius: 12px;
-        color: #999;
+        color: #ccc;
         cursor: pointer;
         transition: all 0.3s ease;
         font-size: 14px;
@@ -51,20 +51,21 @@
     }
 
     .filter-btn:hover {
-        background: rgba(0, 245, 255, 0.1);
-        border-color: rgba(0, 245, 255, 0.3);
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.25);
         color: #fff;
     }
 
     .filter-btn.active {
-        background: linear-gradient(135deg, #00f5ff, #8a2be2);
-        border-color: transparent;
-        color: #fff;
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(255, 255, 255, 0.95);
+        color: #1a1a2e;
     }
 
     .search-box {
         flex: 1;
-        min-width: 250px;
+        min-width: 300px;
+        max-width: 400px;
         display: flex;
         gap: 0;
     }
@@ -104,10 +105,10 @@
 
     .create-ticket-btn {
         padding: 12px 24px;
-        background: linear-gradient(135deg, #00f5ff, #8a2be2);
+        background: rgba(255, 255, 255, 0.95);
         border: none;
         border-radius: 12px;
-        color: #fff;
+        color: #1a1a2e;
         font-weight: 600;
         cursor: pointer;
         text-decoration: none;
@@ -119,7 +120,8 @@
 
     .create-ticket-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0, 245, 255, 0.3);
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
     }
 
     .tickets-list {
@@ -300,14 +302,8 @@
         <a href="?status=pending" class="filter-btn {% if status_filter == 'pending' %}active{% endif %}">
             <i class="fas fa-clock"></i> در انتظار
         </a>
-        <a href="?status=in_progress" class="filter-btn {% if status_filter == 'in_progress' %}active{% endif %}">
-            <i class="fas fa-spinner"></i> در حال بررسی
-        </a>
         <a href="?status=answered" class="filter-btn {% if status_filter == 'answered' %}active{% endif %}">
             <i class="fas fa-check"></i> پاسخ داده شده
-        </a>
-        <a href="?status=closed" class="filter-btn {% if status_filter == 'closed' %}active{% endif %}">
-            <i class="fas fa-times-circle"></i> بسته شده
         </a>
 
         <div class="search-box">
@@ -345,10 +341,6 @@
                 <div class="ticket-meta-item">
                     <i class="fas fa-tag"></i>
                     <span>{{ ticket.category.name }}</span>
-                </div>
-                <div class="ticket-meta-item">
-                    <i class="fas fa-comments"></i>
-                    <span>{{ ticket.message_count }} پیام</span>
                 </div>
                 <div class="ticket-meta-item">
                     <i class="fas fa-calendar"></i>

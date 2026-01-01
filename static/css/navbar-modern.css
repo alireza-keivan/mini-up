@@ -658,40 +658,44 @@
 }
 
 @media (max-width: 768px) {
+    .navbar-top {
+        position: relative;
+    }
+    
     .navbar-container {
-        gap: 10px !important;
-        padding: 0 12px !important;
+        justify-content: center;
+        padding: 12px;
+    }
+    
+    /* Burger menu - top left */
+    .navbar-container::before {
+        content: '\f0c9';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 22px;
+        color: #fff;
+        cursor: pointer;
+        z-index: 100;
+    }
+    
+    /* Logo centered */
+    .navbar-logo {
+        margin: 0 auto;
     }
     
     .navbar-logo-text {
+        display: block !important;
+    }
+    
+    /* Hide everything else */
+    .navbar-search-box,
+    .navbar-actions,
+    .navbar-bottom {
         display: none !important;
-    }
-    
-    .navbar-logo-icon {
-        width: 36px !important;
-        height: 36px !important;
-        font-size: 18px !important;
-    }
-    
-    .navbar-cart span,
-    .navbar-user-name {
-        display: none !important;
-    }
-    
-    .navbar-cart,
-    .navbar-notification-trigger,
-    .navbar-user-trigger {
-        padding: 8px !important;
-        min-width: 40px !important;
-        justify-content: center !important;
-    }
-    
-    .navbar-auth-btn span {
-        display: none !important;
-    }
-    
-    .navbar-auth-btn {
-        padding: 8px 12px !important;
     }
 }
 

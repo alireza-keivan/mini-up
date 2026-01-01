@@ -1,6 +1,7 @@
 # apps/core/views.py
 
 from django.shortcuts import render
+from django.db import models
 from .models import ServiceDescription, SocialMediaLinks, YouTubeVideo
 from apps.content.models import Article
 
@@ -11,6 +12,8 @@ from apps.content.models import Article
 
 def home(request):
     """صفحه اصلی"""
+    from apps.products.models import Product
+    
     # دریافت توضیحات خدمات فعال
     service_descriptions = ServiceDescription.objects.filter(is_active=True).order_by('service_type')
     
@@ -20,12 +23,19 @@ def home(request):
     # دریافت ویدیوی یوتیوب فعال
     youtube_video = YouTubeVideo.objects.filter(is_active=True).first()
     
-    # دریافت 4 مقاله ویژه (اگر کمتر از 4 باشد، همه را نمایش می‌دهد)
+    # دریافت مقالات سنجاق شده
     # مقالات بر اساس تاریخ انتشار (جدیدترین) مرتب می‌شوند
     latest_articles = Article.objects.filter(
         status='published',
-        is_featured=True
+        is_pinned=True
     ).order_by('-published_at')[:4]
+    
+    # دریافت 10 محصول پرفروش (جدیدترین)
+    bestseller_products = Product.objects.filter(
+        is_active=True,
+        is_bestseller=True,
+        stock__gt=0  # فقط محصولات موجود
+    ).select_related('category', 'brand').order_by('-created_at')[:10]
     
     return render(request, 'core/home.html', {
         'title': 'صفحه اصلی',
@@ -33,6 +43,7 @@ def home(request):
         'social_links': social_links,
         'youtube_video': youtube_video,
         'latest_articles': latest_articles,
+        'bestseller_products': bestseller_products,
     })
 
 
@@ -90,19 +101,11 @@ def virtual_services(request):
 
 def gaming_products(request):
     """
-    Redirect to new product listing page without carousels.
-    Old carousel-based template is deprecated.
+    Gaming products page with filter sidebar
     """
-    from django.shortcuts import redirect
-    return redirect('products:gaming_products', permanent=True)
-    selected_brands = request.GET.getlist('brand')
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
-    stock_filter = request.GET.get('stock')
-    is_new = request.GET.get('is_new')
-    is_bestseller = request.GET.get('is_bestseller')
-    is_featured = request.GET.get('is_featured')
-    sort_by = request.GET.get('sort', '-created_at')
+    from apps.products.models import Product, Category, Brand
+    from django.db.models import Min, Max, Q
+    from django.core.paginator import Paginator
     
     # Base queryset for gaming products
     products = Product.objects.filter(
@@ -110,116 +113,162 @@ def gaming_products(request):
         sub_type=Product.ProductSubType.GAMING
     ).select_related('category', 'brand').prefetch_related('images')
     
-    # Apply filters
-    if selected_categories:
-        products = products.filter(category__id__in=selected_categories)
+    # Apply brand filter (using slug)
+    brand_slugs = request.GET.getlist('brand')
+    if brand_slugs:
+        products = products.filter(brand__slug__in=brand_slugs)
     
-    if selected_brands:
-        products = products.filter(brand__id__in=selected_brands)
-    
+    # Apply price range filter
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
     if min_price:
-        try:
-            products = products.filter(price__gte=int(min_price))
-        except ValueError:
-            pass
-    
+        products = products.filter(price__gte=min_price)
     if max_price:
-        try:
-            products = products.filter(price__lte=int(max_price))
-        except ValueError:
-            pass
+        products = products.filter(price__lte=max_price)
     
-    if stock_filter == 'available':
+    # Apply stock filter (template uses 'in_stock')
+    if request.GET.get('in_stock') == 'true':
         products = products.filter(stock__gt=0)
-    elif stock_filter == 'out_of_stock':
-        products = products.filter(stock=0)
     
-    if is_new == 'true':
-        products = products.filter(is_new=True)
+    # Apply discount filter (check if original_price exists and is greater than price)
+    if request.GET.get('has_discount') == 'true':
+        products = products.filter(original_price__isnull=False, original_price__gt=models.F('price'))
     
-    if is_bestseller == 'true':
-        products = products.filter(is_bestseller=True)
-    
-    if is_featured == 'true':
-        products = products.filter(is_featured=True)
-    
-    # Sorting
-    sort_options = {
+    # Apply sorting
+    sort_param = request.GET.get('sort', 'newest')
+    sort_mapping = {
         'newest': '-created_at',
-        'oldest': 'created_at',
-        'price_low': 'price',
-        'price_high': '-price',
-        'name_asc': 'name',
-        'name_desc': '-name',
-        'popular': '-sales_count',
+        'price_asc': 'price',
+        'price_desc': '-price',
+        'popular': '-created_at',  # fallback to newest if view_count doesn't exist
+        'rating': '-created_at'    # fallback to newest if avg_rating doesn't exist
     }
-    products = products.order_by(sort_options.get(sort_by, '-created_at'))
+    products = products.order_by(sort_mapping.get(sort_param, '-created_at'))
     
-    # Get all categories that have gaming products
-    all_categories = Category.objects.filter(
+    # Pagination
+    paginator = Paginator(products, 20)  # 20 items per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    # Get all categories for filter
+    categories = Category.objects.filter(
         is_active=True,
-        products__is_active=True,
         products__sub_type=Product.ProductSubType.GAMING
-    ).distinct().order_by('sort_order', 'name')
+    ).distinct()
     
-    # Get all brands that have gaming products
-    all_brands = Brand.objects.filter(
-        products__sub_type=Product.ProductSubType.GAMING,
-        products__is_active=True,
-        is_active=True
-    ).distinct().order_by('name')
+    # Get all brands for filter
+    brands = Brand.objects.filter(
+        is_active=True,
+        products__sub_type=Product.ProductSubType.GAMING
+    ).distinct()
     
     # Get price range
-    price_range = products.aggregate(
-        min_price=Min('price'),
-        max_price=Max('price')
-    )
-    
-    # Group products by category for display
-    categories_with_products = []
-    for category in all_categories:
-        category_products = products.filter(category=category)
-        if category_products.exists():
-            # Attach filtered products to category
-            category.filtered_products = category_products
-            categories_with_products.append(category)
-    
-    # Get total counts for stats
-    total_products = products.count()
-    total_brands = all_brands.count()
+    price_data = Product.objects.filter(
+        is_active=True,
+        sub_type=Product.ProductSubType.GAMING
+    ).aggregate(min_price=Min('price'), max_price=Max('price'))
     
     context = {
+        'products': page_obj,  # Changed to paginated object
+        'page_obj': page_obj,  # Template expects this
+        'categories': categories,
+        'brands': brands,
+        'min_price': price_data['min_price'] or 0,
+        'max_price': price_data['max_price'] or 0,
+        'current_sort': sort_param,
         'title': 'محصولات گیمینگ',
-        'categories': categories_with_products,
-        'all_categories': all_categories,
-        'all_brands': all_brands,
-        'products': products,
-        'total_products': total_products,
-        'total_categories': all_categories.count(),
-        'total_brands': total_brands,
-        'price_range': price_range,
-        # Filter states
-        'selected_categories': selected_categories,
-        'selected_brands': selected_brands,
-        'min_price': min_price,
-        'max_price': max_price,
-        'stock_filter': stock_filter,
-        'is_new': is_new,
-        'is_bestseller': is_bestseller,
-        'is_featured': is_featured,
-        'sort_by': sort_by,
+        'page_title': 'محصولات گیمینگ'
     }
     
-    return render(request, 'core/gaming_products.html', context)
+    return render(request, 'core/gaming-products.html', context)
 
 
 def buy_products(request):
     """
-    Redirect to new product listing page without carousels.
-    Old carousel-based template is deprecated.
+    Buy products (peripherals/accessories) page with filters
     """
-    from django.shortcuts import redirect
-    return redirect('products:buy_products', permanent=True)
+    from apps.products.models import Product, Category, Brand
+    from django.db.models import Min, Max, Q
+    from django.core.paginator import Paginator
+    
+    # Base queryset for peripheral products
+    products = Product.objects.filter(
+        is_active=True,
+        product_type=Product.ProductType.PHYSICAL,
+        sub_type=Product.ProductSubType.ACCESSORY
+    ).select_related('category', 'brand').prefetch_related('images')
+    
+    # Apply brand filter (using slug)
+    brand_slugs = request.GET.getlist('brand')
+    if brand_slugs:
+        products = products.filter(brand__slug__in=brand_slugs)
+    
+    # Apply price range filter
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    if min_price:
+        products = products.filter(price__gte=min_price)
+    if max_price:
+        products = products.filter(price__lte=max_price)
+    
+    # Apply stock filter (template uses 'in_stock')
+    if request.GET.get('in_stock') == 'true':
+        products = products.filter(stock__gt=0)
+    
+    # Apply discount filter (check if original_price exists and is greater than price)
+    if request.GET.get('has_discount') == 'true':
+        products = products.filter(original_price__isnull=False, original_price__gt=models.F('price'))
+    
+    # Apply sorting
+    sort_param = request.GET.get('sort', 'newest')
+    sort_mapping = {
+        'newest': '-created_at',
+        'price_asc': 'price',
+        'price_desc': '-price',
+        'popular': '-created_at',  # fallback to newest if view_count doesn't exist
+        'rating': '-created_at'    # fallback to newest if avg_rating doesn't exist
+    }
+    products = products.order_by(sort_mapping.get(sort_param, '-created_at'))
+    
+    # Pagination
+    paginator = Paginator(products, 20)  # 20 items per page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    # Get all categories for filter
+    categories = Category.objects.filter(
+        is_active=True,
+        products__product_type=Product.ProductType.PHYSICAL,
+        products__sub_type=Product.ProductSubType.ACCESSORY
+    ).distinct()
+    
+    # Get all brands for filter
+    brands = Brand.objects.filter(
+        is_active=True,
+        products__product_type=Product.ProductType.PHYSICAL,
+        products__sub_type=Product.ProductSubType.ACCESSORY
+    ).distinct()
+    
+    # Get price range
+    price_data = Product.objects.filter(
+        is_active=True,
+        product_type=Product.ProductType.PHYSICAL,
+        sub_type=Product.ProductSubType.ACCESSORY
+    ).aggregate(min_price=Min('price'), max_price=Max('price'))
+    
+    context = {
+        'products': page_obj,  # Changed to paginated object
+        'page_obj': page_obj,  # Template expects this
+        'categories': categories,
+        'brands': brands,
+        'min_price': price_data['min_price'] or 0,
+        'max_price': price_data['max_price'] or 0,
+        'current_sort': sort_param,
+        'title': 'خرید محصولات',
+        'page_title': 'خرید محصولات'
+    }
+    
+    return render(request, 'products/buy_products.html', context)
 
 
 def mini_game(request):
@@ -355,10 +404,7 @@ def search_view(request):
     if category_slug:
         try:
             selected_category = Category.objects.get(slug=category_slug, is_active=True)
-            # Include products from this category and all subcategories
-            category_ids = [selected_category.id]
-            category_ids.extend([child.id for child in selected_category.get_all_children()])
-            products = products.filter(category_id__in=category_ids)
+            products = products.filter(category=selected_category)
         except Category.DoesNotExist:
             pass
     
@@ -405,7 +451,7 @@ def search_view(request):
     page_obj = paginator.get_page(page_number)
     
     # Get filter options for sidebar
-    all_categories = Category.objects.filter(is_active=True, parent__isnull=True).prefetch_related('children')
+    all_categories = Category.objects.filter(is_active=True).order_by('sort_order', 'name')
     all_brands = Brand.objects.filter(is_active=True, products__is_active=True).distinct().order_by('name')
     
     # Price range suggestions (based on all active products)

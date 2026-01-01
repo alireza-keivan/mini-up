@@ -174,6 +174,14 @@ class CartItem(models.Model):
         verbose_name='مقدار ارز بازی'
     )
     
+    # Custom order data for virtual services
+    custom_data = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name='داده‌های سفارشی سفارش',
+        help_text='داده‌های فیلدهای سفارشی برای خدمات مجازی'
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ افزودن')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='آخرین بروزرسانی')
     

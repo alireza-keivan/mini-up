@@ -20,8 +20,7 @@
         debounceDelay: 100,          // Debounce delay for scroll events
         apiEndpoints: {
             addToCart: '/api/cart/add/',
-            quickView: '/api/products/{id}/quick-view/',
-            wishlist: '/api/wishlist/toggle/'
+            quickView: '/api/products/{id}/quick-view/'
         }
     };
 
@@ -34,7 +33,8 @@
         isDragging: false,
         startX: 0,
         scrollLeft: 0,
-        currentWrapper: null
+        currentWrapper: null,
+        hasMoved: false
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -162,7 +162,13 @@
         });
 
         wrapper.addEventListener('mousedown', (e) => {
+            // Don't interfere with links and buttons
+            if (e.target.closest('a') || e.target.closest('button')) {
+                return;
+            }
+            
             state.isDragging = true;
+            state.hasMoved = false;
             wrapper.classList.add('is-dragging');
             state.startX = e.pageX - wrapper.offsetLeft;
             state.scrollLeft = wrapper.scrollLeft;
@@ -172,20 +178,29 @@
         wrapper.addEventListener('mouseleave', () => {
             isHovering = false;
             state.isDragging = false;
+            state.hasMoved = false;
             wrapper.classList.remove('is-dragging');
         });
 
         wrapper.addEventListener('mouseup', () => {
             state.isDragging = false;
+            state.hasMoved = false;
             wrapper.classList.remove('is-dragging');
         });
 
         wrapper.addEventListener('mousemove', (e) => {
             if (!state.isDragging) return;
-            e.preventDefault();
+            
             const x = e.pageX - wrapper.offsetLeft;
-            const walk = (x - state.startX) * 1.5;
-            wrapper.scrollLeft = state.scrollLeft - walk;
+            const walk = Math.abs(x - state.startX);
+            
+            // Only start dragging if moved more than threshold
+            if (walk > CONFIG.dragThreshold) {
+                state.hasMoved = true;
+                e.preventDefault();
+                const scrollAmount = (x - state.startX) * 1.5;
+                wrapper.scrollLeft = state.scrollLeft - scrollAmount;
+            }
         });
 
         // Touch Swipe
@@ -346,44 +361,6 @@
     // Close modal on ESC
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
-    });
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // WISHLIST HANDLER
-    // ═══════════════════════════════════════════════════════════════════════════
-
-    async function toggleWishlist(button, id) {
-        try {
-            const response = await fetch(CONFIG.apiEndpoints.wishlist, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken()
-                },
-                body: JSON.stringify({ product_id: id })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                button.classList.toggle('active');
-                window.showToast(data.message || 'به‌روزرسانی شد', 'success');
-            } else {
-                window.showToast(data.message || 'خطا در عملیات', 'error');
-            }
-
-        } catch (err) {
-            console.error(err);
-            window.showToast('خطا در اتصال به سرور', 'error');
-        }
-    }
-
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-action="wishlist"]');
-        if (!btn) return;
-
-        const id = btn.dataset.product;
-        toggleWishlist(btn, id);
     });
 
 })();

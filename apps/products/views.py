@@ -8,6 +8,8 @@ from django.db.models import Q, Prefetch, Avg, Count, Min, Max
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from decimal import Decimal
 
 from .models import (
@@ -82,10 +84,10 @@ class ProductListView(WishlistContextMixin, FilterMixin, ListView):
     Main shop/catalog page with filtering, sorting, and pagination.
     
     URL: /products/ or /products/shop/
-    Template: products/product_list.html
+    Template: products/list.html
     """
     model = Product
-    template_name = 'products/product_list.html'
+    template_name = 'products/list.html'
     context_object_name = 'products'
     paginate_by = 24
     
@@ -136,8 +138,8 @@ class ProductListView(WishlistContextMixin, FilterMixin, ListView):
             try:
                 min_price = Decimal(filters['min_price'])
                 queryset = queryset.filter(
-                    Q(final_price__gte=min_price) | 
-                    Q(variants__final_price__gte=min_price)
+                    Q(price__gte=min_price) | 
+                    Q(variants__price__gte=min_price)
                 ).distinct()
             except:
                 pass
@@ -146,8 +148,8 @@ class ProductListView(WishlistContextMixin, FilterMixin, ListView):
             try:
                 max_price = Decimal(filters['max_price'])
                 queryset = queryset.filter(
-                    Q(final_price__lte=max_price) | 
-                    Q(variants__final_price__lte=max_price)
+                    Q(price__lte=max_price) | 
+                    Q(variants__price__lte=max_price)
                 ).distinct()
             except:
                 pass
@@ -205,8 +207,8 @@ class ProductListView(WishlistContextMixin, FilterMixin, ListView):
         sorting_map = {
             'newest': '-created_at',
             'oldest': 'created_at',
-            'price_low': 'final_price',
-            'price_high': '-final_price',
+            'price_low': 'price',
+            'price_high': '-price',
             'rating': '-avg_rating',
             'popular': '-view_count',
             'bestseller': '-sold_count',
@@ -234,8 +236,8 @@ class ProductListView(WishlistContextMixin, FilterMixin, ListView):
         
         # Price range for slider
         price_stats = Product.objects.filter(is_active=True).aggregate(
-            min_price=Min('final_price'),
-            max_price=Max('final_price')
+            min_price=Min('price'),
+            max_price=Max('price')
         )
         context['price_range'] = {
             'min': int(price_stats['min_price'] or 0),
@@ -280,15 +282,16 @@ class ProductListView(WishlistContextMixin, FilterMixin, ListView):
 # PRODUCT DETAIL VIEW
 # ═══════════════════════════════════════════════════════════════════════════════
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class ProductDetailView(WishlistContextMixin, DetailView):
     """
     Product detail page.
     
     URL: /products/product/<slug>/
-    Template: products/product_detail.html
+    Template: products/detail.html
     """
     model = Product
-    template_name = 'products/product_detail.html'
+    template_name = 'products/detail.html'
     context_object_name = 'product'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
@@ -301,12 +304,11 @@ class ProductDetailView(WishlistContextMixin, DetailView):
         ).prefetch_related(
             'images',
             'variants__attribute_values__attribute',
-            'tags',
             Prefetch(
                 'reviews',
                 queryset=ProductReview.objects.filter(
                     is_approved=True
-                ).select_related('user').order_by('-created_at')[:5]
+                ).select_related('user').order_by('-created_at')
             )
         )
     
@@ -326,8 +328,7 @@ class ProductDetailView(WishlistContextMixin, DetailView):
             session_key=session_key
         )
         
-        # Increment view count (async would be better)
-        ProductService.increment_view_count(obj)
+        return obj
         
         return obj
     
@@ -336,7 +337,7 @@ class ProductDetailView(WishlistContextMixin, DetailView):
         product = self.object
         
         # All product images
-        context['images'] = product.images.all().order_by('order', '-is_primary')
+        context['images'] = product.images.all().order_by('sort_order')
         
         # Product variants with their attributes
         context['variants'] = product.variants.filter(
@@ -366,8 +367,14 @@ class ProductDetailView(WishlistContextMixin, DetailView):
         )
         context['review_stats'] = review_stats
         
+        # All approved reviews for display
+        context['reviews'] = ProductReview.objects.filter(
+            product=product,
+            is_approved=True
+        ).select_related('user').order_by('-created_at')
+        
         # Recent reviews (already prefetched)
-        context['recent_reviews'] = product.reviews.all()[:5]
+        context['recent_reviews'] = context['reviews'][:5]
         
         # User's review (if exists)
         if self.request.user.is_authenticated:
@@ -376,25 +383,24 @@ class ProductDetailView(WishlistContextMixin, DetailView):
                 user=self.request.user
             ).first()
             
-            # Can user review this product?
-            context['can_review'] = ReviewService.can_user_review(
-                self.request.user, product
-            )
+            # Can user review this product? (has purchased but not reviewed yet)
+            context['can_review'] = not context['user_review']
         
         # Related products
         context['related_products'] = ProductService.get_related_products(
-            product_id=product.id,
+            product=product,
             limit=8
         )
         
         # Recently viewed (excluding current)
         session_key = self.request.session.session_key
-        context['recently_viewed'] = RecentlyViewedService.get_recently_viewed(
+        recently_viewed = RecentlyViewedService.get_recently_viewed(
             user=self.request.user if self.request.user.is_authenticated else None,
             session_key=session_key,
-            exclude_product_id=product.id,
-            limit=6
+            limit=7  # Get 7 to exclude current and show 6
         )
+        # Exclude current product
+        context['recently_viewed'] = [p for p in recently_viewed if p.id != product.id][:6]
         
         # Breadcrumbs
         context['breadcrumbs'] = self._build_breadcrumbs(product)
@@ -417,62 +423,35 @@ class ProductDetailView(WishlistContextMixin, DetailView):
     def _get_stock_status(self, product):
         """Get stock status for product."""
         if product.product_type == 'physical':
-            try:
-                inventory = product.physical_inventory
-                return {
-                    'in_stock': inventory.quantity > 0,
-                    'quantity': inventory.quantity,
-                    'low_stock': 0 < inventory.quantity <= inventory.low_stock_threshold,
-                    'allow_backorder': inventory.allow_backorder,
-                    'max_per_order': inventory.max_per_order,
-                }
-            except:
-                return {
-                    'in_stock': False,
-                    'quantity': 0,
-                    'low_stock': False,
-                    'allow_backorder': False,
-                    'max_per_order': 1,
-                }
+            return {
+                'in_stock': product.is_in_stock,
+                'quantity': product.stock,
+                'low_stock': product.is_low_stock,
+                'allow_backorder': False,
+                'max_per_order': 10,
+            }
         else:  # digital
-            try:
-                inventory = product.digital_inventory
-                return {
-                    'in_stock': inventory.is_available,
-                    'quantity': None,  # Unlimited for digital
-                    'low_stock': False,
-                    'allow_backorder': False,
-                    'max_per_order': inventory.max_per_order,
-                }
-            except:
-                return {
-                    'in_stock': True,
-                    'quantity': None,
-                    'low_stock': False,
-                    'allow_backorder': False,
-                    'max_per_order': 1,
-                }
+            return {
+                'in_stock': True,  # Digital products always available
+                'quantity': None,  # Unlimited for digital
+                'low_stock': False,
+                'allow_backorder': False,
+                'max_per_order': 1,
+            }
     
     def _build_breadcrumbs(self, product):
         """Build breadcrumb trail for product."""
         breadcrumbs = [
             {'name': 'خانه', 'url': reverse('core:home')},
-            {'name': 'فروشگاه', 'url': reverse('products:product_list')},
+            {'name': 'فروشگاه', 'url': reverse('products:list')},
         ]
         
-        # Add category hierarchy
+        # Add category (flat structure, no hierarchy)
         if product.category:
-            ancestors = []
-            category = product.category
-            while category:
-                ancestors.insert(0, category)
-                category = category.parent
-            
-            for cat in ancestors:
-                breadcrumbs.append({
-                    'name': cat.name,
-                    'url': reverse('products:category_detail', kwargs={'slug': cat.slug})
-                })
+            breadcrumbs.append({
+                'name': product.category.name,
+                'url': reverse('products:category_detail', kwargs={'slug': product.category.slug})
+            })
         
         # Add current product (no URL - current page)
         breadcrumbs.append({
@@ -522,10 +501,10 @@ class CategoryDetailView(WishlistContextMixin, FilterMixin, ListView):
     Products in a specific category.
     
     URL: /products/category/<slug>/
-    Template: products/category_detail.html
+    Template: products/category.html
     """
     model = Product
-    template_name = 'products/category_detail.html'
+    template_name = 'products/category.html'
     context_object_name = 'products'
     paginate_by = 24
     
@@ -559,13 +538,13 @@ class CategoryDetailView(WishlistContextMixin, FilterMixin, ListView):
         
         if filters.get('min_price'):
             try:
-                queryset = queryset.filter(final_price__gte=Decimal(filters['min_price']))
+                queryset = queryset.filter(price__gte=Decimal(filters['min_price']))
             except:
                 pass
         
         if filters.get('max_price'):
             try:
-                queryset = queryset.filter(final_price__lte=Decimal(filters['max_price']))
+                queryset = queryset.filter(price__lte=Decimal(filters['max_price']))
             except:
                 pass
         
@@ -584,8 +563,8 @@ class CategoryDetailView(WishlistContextMixin, FilterMixin, ListView):
         sort_option = self.get_sort_option()
         sorting_map = {
             'newest': '-created_at',
-            'price_low': 'final_price',
-            'price_high': '-final_price',
+            'price_low': 'price',
+            'price_high': '-price',
             'rating': '-avg_rating',
             'popular': '-view_count',
             'bestseller': '-sold_count',
@@ -628,8 +607,8 @@ class CategoryDetailView(WishlistContextMixin, FilterMixin, ListView):
             is_active=True,
             category_id__in=category_ids
         ).aggregate(
-            min_price=Min('final_price'),
-            max_price=Max('final_price')
+            min_price=Min('price'),
+            max_price=Max('price')
         )
         context['price_range'] = {
             'min': int(price_stats['min_price'] or 0),
@@ -770,13 +749,13 @@ class BrandDetailView(WishlistContextMixin, FilterMixin, ListView):
         
         if filters.get('min_price'):
             try:
-                queryset = queryset.filter(final_price__gte=Decimal(filters['min_price']))
+                queryset = queryset.filter(price__gte=Decimal(filters['min_price']))
             except:
                 pass
         
         if filters.get('max_price'):
             try:
-                queryset = queryset.filter(final_price__lte=Decimal(filters['max_price']))
+                queryset = queryset.filter(price__lte=Decimal(filters['max_price']))
             except:
                 pass
         
@@ -784,8 +763,8 @@ class BrandDetailView(WishlistContextMixin, FilterMixin, ListView):
         sort_option = self.get_sort_option()
         sorting_map = {
             'newest': '-created_at',
-            'price_low': 'final_price',
-            'price_high': '-final_price',
+            'price_low': 'price',
+            'price_high': '-price',
             'rating': '-avg_rating',
             'popular': '-view_count',
         }
@@ -816,8 +795,8 @@ class BrandDetailView(WishlistContextMixin, FilterMixin, ListView):
             is_active=True,
             brand=self.brand
         ).aggregate(
-            min_price=Min('final_price'),
-            max_price=Max('final_price')
+            min_price=Min('price'),
+            max_price=Max('price')
         )
         context['price_range'] = {
             'min': int(price_stats['min_price'] or 0),
@@ -884,13 +863,13 @@ class TagDetailView(WishlistContextMixin, FilterMixin, ListView):
 
         if filters.get('min_price'):
             try:
-                queryset = queryset.filter(final_price__gte=Decimal(filters['min_price']))
+                queryset = queryset.filter(price__gte=Decimal(filters['min_price']))
             except:
                 pass
 
         if filters.get('max_price'):
             try:
-                queryset = queryset.filter(final_price__lte=Decimal(filters['max_price']))
+                queryset = queryset.filter(price__lte=Decimal(filters['max_price']))
             except:
                 pass
 
@@ -903,8 +882,8 @@ class TagDetailView(WishlistContextMixin, FilterMixin, ListView):
         sort_option = self.get_sort_option()
         sorting_map = {
             'newest': '-created_at',
-            'price_low': 'final_price',
-            'price_high': '-final_price',
+            'price_low': 'price',
+            'price_high': '-price',
             'rating': '-avg_rating',
             'popular': '-view_count',
         }
@@ -979,21 +958,21 @@ class ProductSearchView(WishlistContextMixin, FilterMixin, ListView):
 
         if filters.get('min_price'):
             try:
-                queryset = queryset.filter(final_price__gte=Decimal(filters['min_price']))
+                queryset = queryset.filter(price__gte=Decimal(filters['min_price']))
             except:
                 pass
 
         if filters.get('max_price'):
             try:
-                queryset = queryset.filter(final_price__lte=Decimal(filters['max_price']))
+                queryset = queryset.filter(price__lte=Decimal(filters['max_price']))
             except:
                 pass
 
         sort_option = self.get_sort_option()
         sorting_map = {
             'newest': '-created_at',
-            'price_low': 'final_price',
-            'price_high': '-final_price',
+            'price_low': 'price',
+            'price_high': '-price',
             'rating': '-avg_rating',
         }
 
@@ -1023,7 +1002,7 @@ class ProductSearchView(WishlistContextMixin, FilterMixin, ListView):
 # WISHLIST VIEW (HTML PAGE)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class WishlistView(LoginRequiredMixin, TemplateView):
+class WishlistView(TemplateView):
     """
     User wishlist page.
     
@@ -1035,12 +1014,81 @@ class WishlistView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        wishlist_products = WishlistService.get_user_wishlist(self.request.user)
-
-        context['wishlist_products'] = wishlist_products
+        if self.request.user.is_authenticated:
+            wishlist_data = WishlistService.get_user_wishlist(self.request.user)
+            # get_user_wishlist returns a dict with 'items' key
+            wishlist_items = wishlist_data.get('items', [])
+            
+            # Filter out products with empty, invalid, or None slugs
+            valid_wishlist = []
+            for item in wishlist_items:
+                if hasattr(item, 'product') and item.product and hasattr(item.product, 'slug'):
+                    if item.product.slug and item.product.slug.strip():
+                        valid_wishlist.append(item)
+            context['wishlist_products'] = valid_wishlist
+        else:
+            context['wishlist_products'] = []
+        
         context['page_title'] = 'لیست علاقه‌مندی‌ها'
 
         return context
+
+
+class WishlistToggleView(View):
+    """
+    API endpoint to toggle product in wishlist.
+    
+    URL: /products/api/wishlist/toggle/
+    Method: POST
+    Body: { "product_id": <int> }
+    Response: { "success": true, "added": true/false }
+    """
+    
+    def post(self, request, *args, **kwargs):
+        import json
+        from django.http import JsonResponse
+        from .models import Product, Wishlist
+        
+        if not request.user.is_authenticated:
+            return JsonResponse({'success': False, 'error': 'Authentication required'}, status=401)
+        
+        try:
+            data = json.loads(request.body)
+            product_id = data.get('product_id')
+            
+            if not product_id:
+                return JsonResponse({'success': False, 'error': 'Product ID required'}, status=400)
+            
+            product = Product.objects.get(id=product_id, is_active=True)
+            
+            # Check if item already exists in wishlist
+            wishlist_item = Wishlist.objects.filter(
+                user=request.user,
+                product=product
+            ).first()
+            
+            if wishlist_item:
+                # Remove from wishlist
+                wishlist_item.delete()
+                added = False
+            else:
+                # Add to wishlist
+                Wishlist.objects.create(
+                    user=request.user,
+                    product=product
+                )
+                added = True
+            
+            return JsonResponse({
+                'success': True,
+                'added': added,
+                'message': 'به لیست علاقه‌مندی‌ها اضافه شد' if added else 'از لیست علاقه‌مندی‌ها حذف شد'
+            })
+            
+        except Product.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -1080,8 +1128,65 @@ class CompareView(TemplateView):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# AJAX ENDPOINTS (NON-API, for frontend usage)
+# REVIEW SUBMISSION
 # ═══════════════════════════════════════════════════════════════════════════════
+
+class AddReviewView(LoginRequiredMixin, View):
+    """
+    Handle product review submissions
+    Simple POST-only view using product ID
+    """
+    login_url = '/accounts/login/'
+    
+    def post(self, request, product_id):
+        """Handle review submission"""
+        try:
+            # Get the product
+            product = Product.objects.get(id=product_id, is_active=True)
+        except Product.DoesNotExist:
+            messages.error(request, 'محصول مورد نظر یافت نشد.')
+            return redirect('products:list')
+        
+        # Get form data
+        rating = request.POST.get('rating', '').strip()
+        comment = request.POST.get('comment', '').strip()
+        
+        # Validate rating
+        try:
+            rating_value = int(rating)
+            if not (1 <= rating_value <= 5):
+                raise ValueError()
+        except (ValueError, TypeError):
+            messages.error(request, 'لطفاً امتیاز معتبر (۱ تا ۵) را انتخاب کنید.')
+            return redirect('products:detail', slug=product.slug)
+        
+        # Validate comment
+        if not comment or len(comment) < 10:
+            messages.error(request, 'لطفاً نظر خود را با حداقل ۱۰ کاراکتر وارد کنید.')
+            return redirect('products:detail', slug=product.slug)
+        
+        # Check for duplicate review
+        existing_review = ProductReview.objects.filter(
+            product=product,
+            user=request.user
+        ).first()
+        
+        if existing_review:
+            messages.warning(request, 'شما قبلاً برای این محصول نظر ثبت کرده‌اید.')
+            return redirect('products:detail', slug=product.slug)
+        
+        # Create new review
+        ProductReview.objects.create(
+            product=product,
+            user=request.user,
+            rating=rating_value,
+            comment=comment,
+            is_approved=False
+        )
+        
+        messages.success(request, 'نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد.')
+        return redirect('products:detail', slug=product.slug)
+
 
 class ToggleWishlistAjaxView(LoginRequiredMixin, View):
     """
@@ -1122,7 +1227,7 @@ class VariantPriceAjaxView(View):
 
             return JsonResponse({
                 'success': True,
-                'price': variant.final_price,
+                'price': variant.price,
                 'stock': variant.stock,
                 'sku': variant.sku,
             })
@@ -1132,309 +1237,116 @@ class VariantPriceAjaxView(View):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# PHYSICAL PRODUCT PAGES (Gaming & Peripherals)
+# VIRTUAL SERVICES
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class GamingProductsView(WishlistContextMixin, FilterMixin, ListView):
+class VirtualServicesListView(WishlistContextMixin, ListView):
     """
-    Gaming products listing page with comprehensive filtering.
-    Similar to Digikala product listing.
-    
-    URL: /gaming-products/
-    Template: products/gaming_products.html
+    Display all virtual services with carousel layout.
     """
     model = Product
-    template_name = 'products/gaming_products.html'
+    template_name = 'products/virtual_services_list.html'
     context_object_name = 'products'
-    paginate_by = 24
     
     def get_queryset(self):
-        # Get gaming products only
-        queryset = Product.objects.filter(
-            is_active=True,
-            product_type=Product.ProductType.PHYSICAL,
-            sub_type=Product.ProductSubType.GAMING
-        ).select_related(
-            'category', 'brand'
-        ).prefetch_related(
-            'images'
-        ).annotate(
-            avg_rating=Avg('reviews__rating'),
-            review_count=Count('reviews', filter=Q(reviews__is_approved=True))
-        )
-        
-        # Apply filters
-        filters = self.get_filter_params()
-        
-        # Brand filter
-        if filters.get('brand'):
-            brand_slugs = self.request.GET.getlist('brand')
-            if brand_slugs:
-                queryset = queryset.filter(brand__slug__in=brand_slugs)
-        
-        # Price range
-        if filters.get('min_price'):
-            try:
-                min_price = int(filters['min_price'])
-                queryset = queryset.filter(price__gte=min_price)
-            except:
-                pass
-        
-        if filters.get('max_price'):
-            try:
-                max_price = int(filters['max_price'])
-                queryset = queryset.filter(price__lte=max_price)
-            except:
-                pass
-        
-        # In stock filter
-        if filters.get('in_stock'):
-            queryset = queryset.filter(stock__gt=0)
-        
-        # Has discount filter
-        if filters.get('has_discount'):
-            queryset = queryset.filter(original_price__isnull=False, original_price__gt=0)
-        
-        # Search in specifications
-        spec_filters = {}
-        for key in self.request.GET.keys():
-            if key.startswith('spec_'):
-                spec_key = key.replace('spec_', '')
-                spec_values = self.request.GET.getlist(key)
-                if spec_values:
-                    # Filter by specifications JSON field
-                    for value in spec_values:
-                        queryset = queryset.filter(
-                            specifications__has_key=spec_key
-                        )
-        
-        # Search query
-        search_query = self.get_search_query()
-        if search_query:
-            queryset = queryset.filter(
-                Q(name__icontains=search_query) |
-                Q(name_en__icontains=search_query) |
-                Q(short_description__icontains=search_query) |
-                Q(brand__name__icontains=search_query)
-            ).distinct()
-        
-        # Apply sorting
-        sort_option = self.get_sort_option()
-        if sort_option == 'newest':
-            queryset = queryset.order_by('-created_at')
-        elif sort_option == 'price_asc':
-            queryset = queryset.order_by('price')
-        elif sort_option == 'price_desc':
-            queryset = queryset.order_by('-price')
-        elif sort_option == 'popular':
-            queryset = queryset.order_by('-sales_count', '-view_count')
-        elif sort_option == 'rating':
-            queryset = queryset.order_by('-avg_rating')
-        else:
-            queryset = queryset.order_by('-created_at')
-        
-        return queryset
+        return Product.objects.filter(
+            product_type='virtual',
+            is_active=True
+        ).select_related('category').order_by('-is_featured', '-created_at')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        all_products = self.get_queryset()
         
-        # Get all gaming brands for filter
-        context['brands'] = Brand.objects.filter(
-            products__sub_type=Product.ProductSubType.GAMING,
-            is_active=True
-        ).distinct().order_by('name')
-        
-        # Get price range
-        price_range = Product.objects.filter(
-            is_active=True,
-            product_type=Product.ProductType.PHYSICAL,
-            sub_type=Product.ProductSubType.GAMING
-        ).aggregate(
-            min_price=Min('price'),
-            max_price=Max('price')
-        )
-        context['min_price'] = price_range['min_price'] or 0
-        context['max_price'] = price_range['max_price'] or 100000000
-        
-        # Get all unique specification keys for filtering
-        all_products = Product.objects.filter(
-            is_active=True,
-            product_type=Product.ProductType.PHYSICAL,
-            sub_type=Product.ProductSubType.GAMING
-        )
-        
-        # Collect all specification keys and their values
-        spec_filters = {}
-        for product in all_products:
-            if product.specifications:
-                for key, value in product.specifications.items():
-                    if key not in spec_filters:
-                        spec_filters[key] = set()
-                    spec_filters[key].add(str(value))
-        
-        # Convert sets to sorted lists
-        context['spec_filters'] = {k: sorted(list(v)) for k, v in spec_filters.items()}
-        
-        # Current filters
-        context['current_filters'] = self.get_filter_params()
-        context['current_sort'] = self.get_sort_option()
-        context['search_query'] = self.get_search_query()
-        
-        # Page title
-        context['page_title'] = 'محصولات گیمینگ'
-        context['page_description'] = 'تجهیزات و لوازم گیمینگ حرفه‌ای'
+        context['featured_products'] = all_products.filter(is_featured=True)
+        context['all_products'] = all_products
+        context['page_title'] = 'خدمات مجازی'
         
         return context
 
 
-class BuyProductsView(WishlistContextMixin, FilterMixin, ListView):
+class VirtualServiceDetailView(WishlistContextMixin, DetailView):
     """
-    Peripheral/accessory products listing page with comprehensive filtering.
-    Similar to Digikala product listing.
-    
-    URL: /buy-products/
-    Template: products/buy_products.html
+    Detail view for a single virtual service.
+    Similar to ProductDetailView but without colors and technical specs.
     """
     model = Product
-    template_name = 'products/buy_products.html'
-    context_object_name = 'products'
-    paginate_by = 24
+    template_name = 'products/virtual_service_detail.html'
+    context_object_name = 'product'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
     
     def get_queryset(self):
-        # Get peripheral products only
-        queryset = Product.objects.filter(
-            is_active=True,
-            product_type=Product.ProductType.PHYSICAL,
-            sub_type=Product.ProductSubType.ACCESSORY
+        return Product.objects.filter(
+            product_type='virtual',
+            is_active=True
         ).select_related(
-            'category', 'brand'
+            'category'
         ).prefetch_related(
-            'images'
-        ).annotate(
-            avg_rating=Avg('reviews__rating'),
-            review_count=Count('reviews', filter=Q(reviews__is_approved=True))
+            'images',
+            Prefetch(
+                'reviews',
+                queryset=ProductReview.objects.filter(is_approved=True).select_related('user').order_by('-created_at')
+            )
         )
-        
-        # Apply filters
-        filters = self.get_filter_params()
-        
-        # Brand filter
-        if filters.get('brand'):
-            brand_slugs = self.request.GET.getlist('brand')
-            if brand_slugs:
-                queryset = queryset.filter(brand__slug__in=brand_slugs)
-        
-        # Price range
-        if filters.get('min_price'):
-            try:
-                min_price = int(filters['min_price'])
-                queryset = queryset.filter(price__gte=min_price)
-            except:
-                pass
-        
-        if filters.get('max_price'):
-            try:
-                max_price = int(filters['max_price'])
-                queryset = queryset.filter(price__lte=max_price)
-            except:
-                pass
-        
-        # In stock filter
-        if filters.get('in_stock'):
-            queryset = queryset.filter(stock__gt=0)
-        
-        # Has discount filter
-        if filters.get('has_discount'):
-            queryset = queryset.filter(original_price__isnull=False, original_price__gt=0)
-        
-        # Search in specifications
-        spec_filters = {}
-        for key in self.request.GET.keys():
-            if key.startswith('spec_'):
-                spec_key = key.replace('spec_', '')
-                spec_values = self.request.GET.getlist(key)
-                if spec_values:
-                    # Filter by specifications JSON field
-                    for value in spec_values:
-                        queryset = queryset.filter(
-                            specifications__has_key=spec_key
-                        )
-        
-        # Search query
-        search_query = self.get_search_query()
-        if search_query:
-            queryset = queryset.filter(
-                Q(name__icontains=search_query) |
-                Q(name_en__icontains=search_query) |
-                Q(short_description__icontains=search_query) |
-                Q(brand__name__icontains=search_query)
-            ).distinct()
-        
-        # Apply sorting
-        sort_option = self.get_sort_option()
-        if sort_option == 'newest':
-            queryset = queryset.order_by('-created_at')
-        elif sort_option == 'price_asc':
-            queryset = queryset.order_by('price')
-        elif sort_option == 'price_desc':
-            queryset = queryset.order_by('-price')
-        elif sort_option == 'popular':
-            queryset = queryset.order_by('-sales_count', '-view_count')
-        elif sort_option == 'rating':
-            queryset = queryset.order_by('-avg_rating')
-        else:
-            queryset = queryset.order_by('-created_at')
-        
-        return queryset
+    
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # Increment view count
+        Product.objects.filter(pk=obj.pk).update(view_count=obj.view_count + 1)
+        return obj
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        product = self.object
         
-        # Get all peripheral brands for filter
-        context['brands'] = Brand.objects.filter(
-            products__sub_type=Product.ProductSubType.ACCESSORY,
+        # Related products (same category)
+        context['related_products'] = Product.objects.filter(
+            category=product.category,
+            product_type='virtual',
             is_active=True
-        ).distinct().order_by('name')
+        ).exclude(
+            id=product.id
+        ).order_by('-is_featured', '-created_at')[:8]
         
-        # Get price range
-        price_range = Product.objects.filter(
-            is_active=True,
-            product_type=Product.ProductType.PHYSICAL,
-            sub_type=Product.ProductSubType.ACCESSORY
-        ).aggregate(
-            min_price=Min('price'),
-            max_price=Max('price')
-        )
-        context['min_price'] = price_range['min_price'] or 0
-        context['max_price'] = price_range['max_price'] or 100000000
+        # Reviews
+        context['reviews'] = product.reviews.filter(is_approved=True).order_by('-created_at')
+        context['reviews_count'] = context['reviews'].count()
         
-        # Get all unique specification keys for filtering
-        all_products = Product.objects.filter(
-            is_active=True,
-            product_type=Product.ProductType.PHYSICAL,
-            sub_type=Product.ProductSubType.ACCESSORY
-        )
+        # Rating statistics
+        if context['reviews_count'] > 0:
+            rating_counts = {i: 0 for i in range(1, 6)}
+            for review in context['reviews']:
+                rating_counts[review.rating] += 1
+            
+            context['review_stats'] = {
+                'total': context['reviews_count'],
+                'average': product.average_rating,
+                'rating_5': rating_counts[5],
+                'rating_4': rating_counts[4],
+                'rating_3': rating_counts[3],
+                'rating_2': rating_counts[2],
+                'rating_1': rating_counts[1],
+            }
         
-        # Collect all specification keys and their values
-        spec_filters = {}
-        for product in all_products:
-            if product.specifications:
-                for key, value in product.specifications.items():
-                    if key not in spec_filters:
-                        spec_filters[key] = set()
-                    spec_filters[key].add(str(value))
+        # Recently viewed
+        if self.request.user.is_authenticated:
+            RecentlyViewedService.add_viewed_product(
+                user=self.request.user,
+                product=product
+            )
+        else:
+            session_key = self.request.session.session_key
+            if not session_key:
+                self.request.session.create()
+                session_key = self.request.session.session_key
+            RecentlyViewedService.add_viewed_product(
+                user=None,
+                product=product,
+                session_key=session_key
+            )
         
-        # Convert sets to sorted lists
-        context['spec_filters'] = {k: sorted(list(v)) for k, v in spec_filters.items()}
-        
-        # Current filters
-        context['current_filters'] = self.get_filter_params()
-        context['current_sort'] = self.get_sort_option()
-        context['search_query'] = self.get_search_query()
-        
-        # Page title
-        context['page_title'] = 'محصولات جانبی'
-        context['page_description'] = 'لوازم جانبی کامپیوتر و موبایل'
+        context['page_title'] = product.name
         
         return context
 

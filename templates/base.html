@@ -72,7 +72,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-dark-900 text-white font-vazir min-h-screen flex flex-col antialiased">
+<body class="bg-dark-900 text-white font-vazir min-h-screen flex flex-col antialiased" data-user-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
     
     <!-- ========================================
          Skip Link for Accessibility
@@ -130,7 +130,7 @@
     {% include 'components/_search_modal.html' %}
     
     <!-- Toast Notifications Container -->
-    {% include 'components/_toast.html' %}
+
 
     <!-- ========================================
          JavaScript
@@ -138,6 +138,9 @@
     
     <!-- Alpine.js (for reactive components) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Persian Numbers Converter (must load early) -->
+    <script src="{% static 'js/persian-numbers.js' %}"></script>
     
     <!-- Core Utilities (must load first) -->
     <script src="{% static 'js/utils.js' %}"></script>
@@ -148,6 +151,7 @@
     <script src="{% static 'js/auth.js' %}"></script>
     <script src="{% static 'js/toast.js' %}"></script>
     <script src="{% static 'js/cart.js' %}"></script>
+    <script src="{% static 'js/wishlist.js' %}"></script>
     <script src="{% static 'js/user_dropdown.js' %}"></script>
     
     <!-- Page-specific JS (optional) -->

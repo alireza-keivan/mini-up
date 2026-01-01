@@ -11,7 +11,7 @@ from decimal import Decimal
 
 from .models import (
     Category, Brand, Product, #ProductVariant, ProductImage,
-    ProductReview, #Wishlist, #DigitalInventory
+    ProductReview, Wishlist, #DigitalInventory
 )
 from .serializers import (
     CategorySerializer, CategoryTreeSerializer, CategoryDetailSerializer,
@@ -491,9 +491,26 @@ class WishlistAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        items = WishlistService.get_user_wishlist(request.user)
-        serializer = WishlistSerializer(items, many=True)
-        return Response({'success': True, 'data': serializer.data})
+        # Get wishlist items directly without pagination
+        wishlist_items = Wishlist.objects.filter(user=request.user).select_related(
+            'product', 'product__category', 'product__brand'
+        ).order_by('-created_at')
+        
+        # Serialize the items - return simple product IDs for the JavaScript
+        data = []
+        for item in wishlist_items:
+            data.append({
+                'id': item.id,
+                'product_id': item.product.id,
+                'product': {
+                    'id': item.product.id,
+                    'name': item.product.name,
+                    'slug': item.product.slug,
+                    'price': str(item.product.price),
+                }
+            })
+        
+        return Response({'success': True, 'data': data})
 
 
 class WishlistAddAPIView(APIView):
@@ -501,8 +518,17 @@ class WishlistAddAPIView(APIView):
 
     def post(self, request):
         product_id = request.data.get('product_id')
-        entry = WishlistService.add_to_wishlist(request.user, product_id)
-        return Response({'success': True, 'data': WishlistSerializer(entry).data})
+        try:
+            from .models import Product
+            product = Product.objects.get(id=product_id)
+            wishlist_item, created = WishlistService.add_to_wishlist(request.user, product)
+            return Response({
+                'success': True, 
+                'message': 'محصول به علاقه‌مندی‌ها اضافه شد',
+                'data': {'product_id': product.id, 'created': created}
+            })
+        except Product.DoesNotExist:
+            return Response({'success': False, 'message': 'محصول یافت نشد'}, status=404)
 
 
 class WishlistRemoveAPIView(APIView):
@@ -510,8 +536,17 @@ class WishlistRemoveAPIView(APIView):
 
     def post(self, request):
         product_id = request.data.get('product_id')
-        WishlistService.remove_from_wishlist(request.user, product_id)
-        return Response({'success': True, 'message': 'Removed'})
+        try:
+            from .models import Product
+            product = Product.objects.get(id=product_id)
+            removed = WishlistService.remove_from_wishlist(request.user, product)
+            return Response({
+                'success': True, 
+                'message': 'محصول از علاقه‌مندی‌ها حذف شد',
+                'data': {'product_id': product.id, 'removed': removed}
+            })
+        except Product.DoesNotExist:
+            return Response({'success': False, 'message': 'محصول یافت نشد'}, status=404)
 
 
 class WishlistToggleAPIView(APIView):
@@ -519,8 +554,13 @@ class WishlistToggleAPIView(APIView):
 
     def post(self, request):
         product_id = request.data.get('product_id')
-        result = WishlistService.toggle_wishlist(request.user, product_id)
-        return Response({'success': True, 'data': result})
+        try:
+            from .models import Product
+            product = Product.objects.get(id=product_id)
+            result = WishlistService.toggle_wishlist(request.user, product)
+            return Response({'success': True, 'data': result})
+        except Product.DoesNotExist:
+            return Response({'success': False, 'message': 'محصول یافت نشد'}, status=404)
 
 
 class WishlistClearAPIView(APIView):

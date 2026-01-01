@@ -34,7 +34,8 @@
         isDragging: false,
         startX: 0,
         scrollLeft: 0,
-        currentWrapper: null
+        currentWrapper: null,
+        hasMoved: false
     };
 
     // ═══════════════════════════════════════════════════════════════════════════
@@ -162,7 +163,13 @@
         });
 
         wrapper.addEventListener('mousedown', (e) => {
+            // Don't interfere with links and buttons
+            if (e.target.closest('a') || e.target.closest('button')) {
+                return;
+            }
+            
             state.isDragging = true;
+            state.hasMoved = false;
             wrapper.classList.add('is-dragging');
             state.startX = e.pageX - wrapper.offsetLeft;
             state.scrollLeft = wrapper.scrollLeft;
@@ -172,20 +179,29 @@
         wrapper.addEventListener('mouseleave', () => {
             isHovering = false;
             state.isDragging = false;
+            state.hasMoved = false;
             wrapper.classList.remove('is-dragging');
         });
 
         wrapper.addEventListener('mouseup', () => {
             state.isDragging = false;
+            state.hasMoved = false;
             wrapper.classList.remove('is-dragging');
         });
 
         wrapper.addEventListener('mousemove', (e) => {
             if (!state.isDragging) return;
-            e.preventDefault();
+            
             const x = e.pageX - wrapper.offsetLeft;
-            const walk = (x - state.startX) * 1.5;
-            wrapper.scrollLeft = state.scrollLeft - walk;
+            const walk = Math.abs(x - state.startX);
+            
+            // Only start dragging if moved more than threshold
+            if (walk > CONFIG.dragThreshold) {
+                state.hasMoved = true;
+                e.preventDefault();
+                const scrollAmount = (x - state.startX) * 1.5;
+                wrapper.scrollLeft = state.scrollLeft - scrollAmount;
+            }
         });
 
         // Touch Swipe

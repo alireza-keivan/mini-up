@@ -24,7 +24,7 @@ class CartService:
 
     @staticmethod
     @transaction.atomic
-    def add_item(cart, product, variant=None, quantity=1, game_user_id='', currency_amount=None):
+    def add_item(cart, product, variant=None, quantity=1, game_user_id='', currency_amount=None, custom_data=None):
         """
         افزودن آیتم به سبد خرید
         
@@ -62,6 +62,8 @@ class CartService:
                     raise ValidationError(f'موجودی کافی نیست. حداکثر قابل سفارش: {stock}')
             
             existing.quantity = new_quantity
+            if custom_data:
+                existing.custom_data = custom_data
             existing.save()
             return existing
 
@@ -71,6 +73,7 @@ class CartService:
             product=product,
             variant=variant,
             quantity=quantity,
+            custom_data=custom_data or {},
             game_user_id=game_user_id,
             currency_amount=currency_amount
         )

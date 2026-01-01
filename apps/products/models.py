@@ -182,6 +182,13 @@ class Product(models.Model):
         'فرمت JSON برای مشخصات فنی. مثال: {"وزن": "200g", "رنگ": "مشکی", "cpu": "Intel i5"}. '
         'برای محصولات مجازی می‌تواند شامل اطلاعاتی مثل {"duration": "1 ماه", "platform": "PC"} باشد.'
     )
+    # Custom order form fields (for virtual services)
+    order_form_fields = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name='فیلدهای فرم سفارش',
+        help_text='فیلدهای سفارشی برای فرم خرید. مثال: [{"name": "phone", "label": "شماره تلفن", "type": "text", "required": true, "placeholder": "09123456789"}]'
+    )
     # Pricing
     price = models.PositiveIntegerField(verbose_name='قیمت (تومان)')
     original_price = models.PositiveIntegerField(

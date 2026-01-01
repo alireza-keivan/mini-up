@@ -39,10 +39,18 @@
             <!-- Actions -->
             <div class="navbar-actions">
                 
-                <!-- Cart Button -->
-                <a href="/orders/cart/" 
+                <!-- Wishlist Button -->
+                <a href="{% url 'products:wishlist' %}"
                    class="navbar-action-btn" 
-                   id="cartToggle"
+                   aria-label="علاقه‌مندی‌ها"
+                   title="علاقه‌مندی‌ها">
+                    <i class="fas fa-heart"></i>
+                    <span class="navbar-action-badge" id="wishlistCount" style="display: none;">0</span>
+                </a>
+                
+                <!-- Cart Button -->
+                <a href="{% url 'orders:cart' %}"
+                   class="navbar-action-btn" 
                    aria-label="سبد خرید"
                    title="سبد خرید">
                     <i class="fas fa-shopping-cart"></i>
@@ -50,85 +58,6 @@
                         <span class="navbar-action-badge">{{ cart_count }}</span>
                     {% endif %}
                 </a>
-                
-                <!-- Notifications -->
-                {% if user.is_authenticated %}
-                <div class="navbar-action-dropdown">
-                    <button type="button" 
-                            class="navbar-action-btn" 
-                            id="notificationToggle"
-                            aria-label="اعلان‌ها"
-                            title="اعلان‌ها"
-                            aria-expanded="false"
-                            aria-haspopup="true">
-                        <i class="fas fa-bell"></i>
-                        {% if unread_notifications_count and unread_notifications_count > 0 %}
-                            <span class="navbar-action-badge pulse">{{ unread_notifications_count }}</span>
-                        {% endif %}
-                    </button>
-                    
-                    <div class="navbar-notification-dropdown" id="notificationDropdown">
-                        <div class="navbar-notification-header">
-                            <span class="navbar-notification-title">
-                                <i class="fas fa-bell"></i>
-                                اعلان‌ها
-                            </span>
-                            {% if unread_notifications_count and unread_notifications_count > 0 %}
-                                <button type="button" class="navbar-notification-mark-read" data-action="mark-all-read">
-                                    خواندن همه
-                                </button>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="navbar-notification-body">
-                            {% if notifications %}
-                                {% for notification in notifications|slice:":5" %}
-                                    <a href="{{ notification.url }}" 
-                                       class="navbar-notification-item {% if not notification.is_read %}unread{% endif %}"
-                                       data-notification-id="{{ notification.id }}">
-                                        <div class="navbar-notification-item-icon {{ notification.type }}">
-                                            {% if notification.type == 'order' %}
-                                                <i class="fas fa-shopping-bag"></i>
-                                            {% elif notification.type == 'wallet' %}
-                                                <i class="fas fa-wallet"></i>
-                                            {% elif notification.type == 'promo' %}
-                                                <i class="fas fa-gift"></i>
-                                            {% else %}
-                                                <i class="fas fa-info-circle"></i>
-                                            {% endif %}
-                                        </div>
-                                        <div class="navbar-notification-item-content">
-                                            <div class="navbar-notification-item-title">{{ notification.title }}</div>
-                                            <div class="navbar-notification-item-desc">{{ notification.message|truncatewords:10 }}</div>
-                                            <div class="navbar-notification-item-time">
-                                                <i class="fas fa-clock"></i>
-                                                {{ notification.created_at|timesince }} پیش
-                                            </div>
-                                        </div>
-                                        {% if not notification.is_read %}
-                                            <span class="navbar-notification-item-dot"></span>
-                                        {% endif %}
-                                    </a>
-                                {% endfor %}
-                            {% else %}
-                                <div class="navbar-notification-empty">
-                                    <i class="fas fa-bell-slash"></i>
-                                    <span>اعلان جدیدی ندارید</span>
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        {% if notifications %}
-                            <div class="navbar-notification-footer">
-                                <a href="{% url 'accounts:notifications' %}" class="navbar-notification-view-all">
-                                    مشاهده همه اعلان‌ها
-                                    <i class="fas fa-arrow-left"></i>
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
                 
                 <!-- User Menu -->
                 {% if user.is_authenticated %}
@@ -653,6 +582,556 @@
     
 </nav>
 
+<!-- Mobile Search Bar (Bottom) -->
+<div class="mobile-search-bar">
+    <form class="mobile-search-form" action="{% url 'core:search' %}" method="get" autocomplete="off">
+        <button type="submit" class="mobile-search-btn">
+            <i class="fas fa-search"></i>
+        </button>
+        <input 
+            type="text" 
+            name="q"
+            class="mobile-search-input" 
+            placeholder="جستجو در محصولات..."
+            autocomplete="off"
+        >
+    </form>
+</div>
+
+<!-- Mobile Sidebar Menu -->
+<div class="mobile-sidebar" id="mobileSidebar">
+    <div class="mobile-sidebar-header">
+        <h3>منو</h3>
+        <button class="mobile-sidebar-close" id="closeMobileSidebar">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="mobile-sidebar-content">
+        {% if user.is_authenticated %}
+        <a href="{% url 'accounts:dashboard' %}" class="mobile-user-section">
+            <div class="mobile-user-avatar">
+                {% if user.profile and user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:'کاربر' }}">
+                {% else %}
+                    <i class="fas fa-user"></i>
+                {% endif %}
+            </div>
+            <div class="mobile-user-info">
+                <div class="mobile-user-name">{{ user.get_full_name|default:"کاربر" }}</div>
+                <div class="mobile-user-phone">{{ user.phone }}</div>
+            </div>
+        </a>
+        {% endif %}
+        
+        <div class="mobile-menu-list">
+            <a href="{% url 'core:home' %}" class="mobile-menu-item">
+                <i class="fas fa-home"></i>
+                <span>خانه</span>
+            </a>
+            <a href="{% url 'core:virtual_services' %}" class="mobile-menu-item">
+                <i class="fas fa-cloud"></i>
+                <span>خدمات مجازی</span>
+            </a>
+            <a href="{% url 'core:gaming_products' %}" class="mobile-menu-item">
+                <i class="fas fa-gamepad"></i>
+                <span>محصولات گیمینگ</span>
+            </a>
+            <a href="{% url 'core:buy_products' %}" class="mobile-menu-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>لوازم جانبی</span>
+            </a>
+            <a href="{% url 'products:wishlist' %}" class="mobile-menu-item">
+                <i class="fas fa-heart"></i>
+                <span>علاقه‌مندی‌ها</span>
+            </a>
+            <a href="{% url 'orders:cart' %}" class="mobile-menu-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>سبد خرید</span>
+                {% if cart_count and cart_count > 0 %}
+                    <span class="mobile-badge">{{ cart_count }}</span>
+                {% endif %}
+            </a>
+            
+            {% if user.is_authenticated %}
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 12px 0;">
+            <a href="/orders/" class="mobile-menu-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>سفارش‌ها</span>
+            </a>
+            <a href="/wallet/" class="mobile-menu-item">
+                <i class="fas fa-wallet"></i>
+                <span>کیف پول</span>
+            </a>
+            <a href="{% url 'accounts:dashboard' %}" class="mobile-menu-item">
+                <i class="fas fa-user-edit"></i>
+                <span>پروفایل</span>
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="mobile-menu-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>خروج</span>
+            </a>
+            {% else %}
+            <a href="{% url 'accounts:login' %}" class="mobile-menu-item">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>ورود / ثبت نام</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="mobile-sidebar-overlay" id="mobileSidebarOverlay"></div>
+
+<style>
+/* Mobile Search Bar - Bottom */
+.mobile-search-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0a0a0f;
+    padding: 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    z-index: 9000;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+}
+
+.mobile-search-form {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 0 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.mobile-search-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 18px;
+    padding: 12px 8px 12px 0;
+    cursor: pointer;
+}
+
+.mobile-search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 14px 12px;
+    font-size: 16px;
+    outline: none;
+}
+
+.mobile-search-input::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+.mobile-search-input:focus {
+    outline: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-search-bar {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-search-bar {
+        display: none !important;
+    }
+}
+
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100vh;
+    background: #0a0a0f;
+    z-index: 9999;
+    transition: right 0.3s;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mobile-sidebar.active {
+    right: 0;
+}
+
+.mobile-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: sticky;
+    top: 0;
+    background: #0a0a0f;
+    z-index: 1;
+}
+
+.mobile-sidebar-header h3 {
+    color: #fff;
+    font-size: 18px;
+    margin: 0;
+}
+
+.mobile-sidebar-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.mobile-sidebar-content {
+    padding: 16px;
+    padding-bottom: 120px;
+}
+
+.mobile-user-section {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.mobile-user-section:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+.mobile-user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.mobile-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mobile-user-avatar i {
+    color: #fff;
+    font-size: 24px;
+}
+
+.mobile-user-info {
+    flex: 1;
+}
+
+.mobile-user-name {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.mobile-user-phone {
+    color: rgba(255,255,255,0.6);
+    font-size: 14px;
+}
+
+.mobile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: background 0.2s;
+}
+
+.mobile-menu-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.mobile-menu-item i {
+    width: 20px;
+}
+
+.mobile-badge {
+    margin-left: auto;
+    background: #ff0055;
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 9998;
+    display: none;
+}
+
+.mobile-sidebar-overlay.active {
+    display: block;
+}
+
+@media (min-width: 769px) {
+    .mobile-sidebar,
+    .mobile-sidebar-overlay {
+        display: none !important;
+    }
+}
+</style>
+
+<script>
+(function() {
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    const closeBtn = document.getElementById('closeMobileSidebar');
+    
+    // Close sidebar function
+    function closeSidebar() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Open sidebar on burger click (navbar container left area)
+    document.querySelector('.navbar-container').addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            const rect = this.getBoundingClientRect();
+            if (e.clientX < 50) {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    });
+    
+    // Close on close button click
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeSidebar);
+    }
+    
+    // Close on overlay click
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+    
+    // Prevent sidebar scroll from affecting body
+    if (sidebar) {
+        sidebar.addEventListener('touchmove', function(e) {
+            e.stopPropagation();
+        }, { passive: false });
+    }
+})();
+</script>
+
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+
+<!-- Mobile Menu Drawer -->
+<div class="mobile-menu-drawer" id="mobileMenuDrawer">
+    <div class="mobile-menu-header">
+        <h3 class="mobile-menu-title">
+            <i class="fas fa-bars"></i>
+            منو
+        </h3>
+        <button type="button" class="mobile-menu-close" id="mobileMenuClose">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="mobile-menu-content">
+        <!-- User Profile Section (for authenticated users) -->
+        {% if user.is_authenticated %}
+        <div class="mobile-menu-user-section">
+            <div class="mobile-menu-user-info">
+                <div class="mobile-menu-user-avatar">
+                    {% if user.profile and user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name|default:'کاربر' }}">
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+                <div class="mobile-menu-user-details">
+                    <div class="mobile-menu-user-name">{{ user.get_full_name|default:"کاربر" }}</div>
+                    <div class="mobile-menu-user-phone">{{ user.phone }}</div>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-user-links">
+                <a href="{% url 'accounts:dashboard' %}" class="mobile-menu-user-link">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>سفارش‌ها</span>
+                </a>
+                <a href="{% url 'accounts:tickets' %}" class="mobile-menu-user-link">
+                    <i class="fas fa-headset"></i>
+                    <span>تیکت‌های پشتیبانی</span>
+                </a>
+                <a href="{% url 'accounts:dashboard' %}" class="mobile-menu-user-link">
+                    <i class="fas fa-wallet"></i>
+                    <span>کیف پول</span>
+                </a>
+                <a href="{% url 'accounts:dashboard' %}" class="mobile-menu-user-link">
+                    <i class="fas fa-user-edit"></i>
+                    <span>پروفایل</span>
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="mobile-menu-auth-section">
+            <a href="{% url 'accounts:login' %}" class="mobile-menu-auth-btn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>ورود / ثبت نام</span>
+            </a>
+        </div>
+        {% endif %}
+        
+        <!-- Navigation Links -->
+        <div class="mobile-menu-nav">
+            <a href="{% url 'core:home' %}" class="mobile-menu-nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>خانه</span>
+            </a>
+            
+            <div class="mobile-menu-nav-group">
+                <button type="button" class="mobile-menu-nav-item mobile-menu-nav-toggle" data-toggle="virtualServices">
+                    <div class="mobile-menu-nav-item-content">
+                        <i class="fas fa-cloud"></i>
+                        <span>خدمات مجازی</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="mobile-menu-nav-submenu" id="virtualServices">
+                    <a href="{% url 'core:virtual_services' %}" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-list"></i>
+                        مشاهده همه خدمات
+                    </a>
+                    <a href="{% url 'core:virtual_services' %}?category=telegram" class="mobile-menu-nav-subitem">
+                        <i class="fab fa-telegram-plane"></i>
+                        پرمیوم تلگرام
+                    </a>
+                    <a href="{% url 'core:virtual_services' %}?category=instagram" class="mobile-menu-nav-subitem">
+                        <i class="fab fa-instagram"></i>
+                        فالوور اینستاگرام
+                    </a>
+                    <a href="{% url 'core:virtual_services' %}?category=spotify" class="mobile-menu-nav-subitem">
+                        <i class="fab fa-spotify"></i>
+                        اشتراک اسپاتیفای
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-nav-group">
+                <button type="button" class="mobile-menu-nav-item mobile-menu-nav-toggle" data-toggle="gamingProducts">
+                    <div class="mobile-menu-nav-item-content">
+                        <i class="fas fa-gamepad"></i>
+                        <span>محصولات گیمینگ</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="mobile-menu-nav-submenu" id="gamingProducts">
+                    <a href="{% url 'core:gaming_products' %}" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-list"></i>
+                        مشاهده همه محصولات
+                    </a>
+                    <a href="{% url 'core:gaming_products' %}?category_detail=fan" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-wind"></i>
+                        فن گیمینگ
+                    </a>
+                    <a href="{% url 'core:gaming_products' %}?category_detail=trigger" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-bullseye"></i>
+                        تریگر و کنترلر
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-nav-group">
+                <button type="button" class="mobile-menu-nav-item mobile-menu-nav-toggle" data-toggle="buyProducts">
+                    <div class="mobile-menu-nav-item-content">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>خرید محصولات</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="mobile-menu-nav-submenu" id="buyProducts">
+                    <a href="{% url 'core:buy_products' %}" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-list"></i>
+                        مشاهده همه محصولات
+                    </a>
+                    <a href="{% url 'core:buy_products' %}?category=case" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-shield-alt"></i>
+                        کاور و قاب
+                    </a>
+                    <a href="{% url 'core:buy_products' %}?category=glass" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-mobile-alt"></i>
+                        گلس و محافظ صفحه
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-nav-group">
+                <button type="button" class="mobile-menu-nav-item mobile-menu-nav-toggle" data-toggle="miniGame">
+                    <div class="mobile-menu-nav-item-content">
+                        <i class="fas fa-trophy"></i>
+                        <span>مینی گیم</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="mobile-menu-nav-submenu" id="miniGame">
+                    <a href="{% url 'core:mini_game' %}" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-list"></i>
+                        همه بازی‌ها
+                    </a>
+                    <a href="{% url 'core:mini_game' %}?game=pubg" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-crosshairs"></i>
+                        یوسی پابجی
+                    </a>
+                    <a href="{% url 'core:mini_game' %}?game=freefire" class="mobile-menu-nav-subitem">
+                        <i class="fas fa-fire"></i>
+                        جم فری فایر
+                    </a>
+                </div>
+            </div>
+            
+            <a href="{% url 'core:about' %}" class="mobile-menu-nav-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+                <i class="fas fa-info-circle"></i>
+                <span>درباره ما</span>
+            </a>
+            
+            <a href="/blog/articles/" class="mobile-menu-nav-item {% if 'articles' in request.path %}active{% endif %}">
+                <i class="fas fa-newspaper"></i>
+                <span>مقالات ما</span>
+            </a>
+        </div>
+        
+        <!-- Logout Button (for authenticated users) -->
+        {% if user.is_authenticated %}
+        <div class="mobile-menu-footer">
+            <a href="{% url 'accounts:logout' %}" class="mobile-menu-logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>خروج از حساب کاربری</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 <div class="navbar-spacer"></div>
 
 <style>
@@ -670,9 +1149,427 @@
 .navbar-bottom {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
+
+/* ==================== MOBILE MENU STYLES ==================== */
+/* Hide mobile menu elements on desktop */
+.mobile-menu-overlay,
+.mobile-menu-drawer {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* Hide user dropdown on mobile - it's in burger menu now */
+    .navbar-user {
+        display: none !important;
+    }
+    
+    /* Hide auth buttons on mobile - they're in burger menu now */
+    .navbar-auth-buttons {
+        display: none !important;
+    }
+    
+    /* Hide navbar bottom menu on mobile */
+    .navbar-bottom {
+        display: none !important;
+    }
+    
+    /* Show mobile menu elements */
+    .mobile-menu-overlay,
+    .mobile-menu-drawer {
+        display: block;
+    }
+    
+    /* Mobile Menu Overlay */
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        z-index: 9998;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Mobile Menu Drawer */
+    .mobile-menu-drawer {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 85%;
+        max-width: 320px;
+        height: 100vh;
+        background: linear-gradient(135deg, rgba(20, 20, 30, 0.98), rgba(30, 30, 45, 0.98));
+        backdrop-filter: blur(20px);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 9999;
+        overflow-y: auto;
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
+    }
+    
+    .mobile-menu-drawer.active {
+        right: 0;
+    }
+    
+    /* Mobile Menu Header */
+    .mobile-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 0, 85, 0.1);
+    }
+    
+    .mobile-menu-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .mobile-menu-title i {
+        color: #ff0055;
+    }
+    
+    .mobile-menu-close {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-menu-close:hover {
+        background: rgba(255, 0, 85, 0.3);
+        transform: rotate(90deg);
+    }
+    
+    /* Mobile Menu Content */
+    .mobile-menu-content {
+        padding: 20px;
+    }
+    
+    /* User Section */
+    .mobile-menu-user-section {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .mobile-menu-user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: linear-gradient(135deg, rgba(255, 0, 85, 0.1), rgba(138, 43, 226, 0.1));
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .mobile-menu-user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 24px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    
+    .mobile-menu-user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .mobile-menu-user-details {
+        flex: 1;
+    }
+    
+    .mobile-menu-user-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+    
+    .mobile-menu-user-phone {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .mobile-menu-user-links {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .mobile-menu-user-link {
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #fff;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+        font-size: 12px;
+    }
+    
+    .mobile-menu-user-link i {
+        font-size: 18px;
+        color: #ff0055;
+    }
+    
+    .mobile-menu-user-link:hover {
+        background: rgba(255, 0, 85, 0.2);
+        border-color: rgba(255, 0, 85, 0.5);
+        transform: translateY(-2px);
+    }
+    
+    /* Auth Section */
+    .mobile-menu-auth-section {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .mobile-menu-auth-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 15px;
+        background: linear-gradient(135deg, #ff0055, #8a2be2);
+        border-radius: 12px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4);
+    }
+    
+    .mobile-menu-auth-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 0, 85, 0.6);
+    }
+    
+    /* Navigation */
+    .mobile-menu-nav {
+        margin-bottom: 20px;
+    }
+    
+    .mobile-menu-nav-group {
+        margin-bottom: 5px;
+    }
+    
+    .mobile-menu-nav-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-align: right;
+        cursor: pointer;
+        gap: 10px;
+    }
+    
+    .mobile-menu-nav-item-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .mobile-menu-nav-item i {
+        color: #ff0055;
+        font-size: 16px;
+    }
+    
+    .mobile-menu-nav-item.active {
+        background: linear-gradient(135deg, rgba(255, 0, 85, 0.2), rgba(138, 43, 226, 0.2));
+        border-color: rgba(255, 0, 85, 0.3);
+    }
+    
+    .mobile-menu-nav-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateX(-5px);
+    }
+    
+    .mobile-menu-nav-toggle {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .mobile-menu-nav-toggle .fa-chevron-down {
+        transition: transform 0.3s ease;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .mobile-menu-nav-toggle.active .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+    
+    .mobile-menu-nav-submenu {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        padding-right: 20px;
+    }
+    
+    .mobile-menu-nav-submenu.active {
+        max-height: 500px;
+        margin-bottom: 10px;
+    }
+    
+    .mobile-menu-nav-subitem {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.02);
+        border-right: 2px solid rgba(255, 0, 85, 0.3);
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-size: 13px;
+        margin-bottom: 5px;
+        border-radius: 0 6px 6px 0;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-menu-nav-subitem i {
+        font-size: 14px;
+        color: #00f5ff;
+    }
+    
+    .mobile-menu-nav-subitem:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-right-color: #ff0055;
+        transform: translateX(-3px);
+    }
+    
+    /* Footer */
+    .mobile-menu-footer {
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .mobile-menu-logout-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 15px;
+        background: rgba(220, 38, 38, 0.2);
+        border: 1px solid rgba(220, 38, 38, 0.4);
+        border-radius: 12px;
+        color: #ff4444;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-menu-logout-btn:hover {
+        background: rgba(220, 38, 38, 0.3);
+        border-color: rgba(220, 38, 38, 0.6);
+        transform: translateY(-2px);
+    }
+    
+    /* Scrollbar for mobile menu */
+    .mobile-menu-drawer::-webkit-scrollbar {
+        width: 5px;
+    }
+    
+    .mobile-menu-drawer::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .mobile-menu-drawer::-webkit-scrollbar-thumb {
+        background: rgba(255, 0, 85, 0.5);
+        border-radius: 3px;
+    }
+}
 </style>
 
 <script>
+// Mobile Menu Functionality
+(function() {
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mobileMenuDrawer = document.getElementById('mobileMenuDrawer');
+    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+    
+    if (!mobileMenuToggle || !mobileMenuDrawer || !mobileMenuOverlay) return;
+    
+    function openMobileMenu() {
+        mobileMenuDrawer.classList.add('active');
+        mobileMenuOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeMobileMenu() {
+        mobileMenuDrawer.classList.remove('active');
+        mobileMenuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    mobileMenuToggle.addEventListener('click', openMobileMenu);
+    mobileMenuClose.addEventListener('click', closeMobileMenu);
+    mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+    
+    // Toggle submenus
+    const navToggles = document.querySelectorAll('.mobile-menu-nav-toggle');
+    navToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-toggle');
+            const submenu = document.getElementById(targetId);
+            
+            if (submenu) {
+                this.classList.toggle('active');
+                submenu.classList.toggle('active');
+            }
+        });
+    });
+})();
+
 // Fade out navbar-bottom on scroll
 window.addEventListener('scroll', function() {
     const navbarBottom = document.getElementById('navbarBottom');
