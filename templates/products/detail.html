@@ -122,6 +122,66 @@
         transform: scale(1.2);
     }
     
+    /* Color Option Styles */
+    .color-option, .color-option-spec {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    
+    .color-option:hover, .color-option-spec:hover {
+        transform: scale(1.1);
+    }
+    
+    .color-option.border-\[#ff0055\], .color-option-spec.border-\[#ff0055\] {
+        border-width: 2px !important;
+        border-color: #ff0055 !important;
+    }
+    
+    /* Wishlist Button Styles */
+    .wishlist-btn {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(20, 20, 35, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .wishlist-btn:hover {
+        border-color: #ff0055;
+        background: rgba(255, 0, 85, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+    }
+    
+    .wishlist-btn i {
+        font-size: 20px;
+        color: #999;
+        transition: all 0.3s ease;
+    }
+    
+    .wishlist-btn:hover i {
+        color: #ff0055;
+    }
+    
+    .wishlist-btn i.fas {
+        color: #ff0055;
+        animation: heartBeat 0.5s ease;
+    }
+    
+    @keyframes heartBeat {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.3); }
+        50% { transform: scale(1.1); }
+        75% { transform: scale(1.2); }
+    }
+    
     /* ═══════════════════════════════════════════════════════════════════════════
        RELATED PRODUCTS CAROUSEL STYLES (from buy_products.css)
        ═══════════════════════════════════════════════════════════════════════════ */
@@ -230,17 +290,10 @@
                 <!-- Action Icons Column -->
                 <div class="flex flex-col gap-3 pt-2">
                     <!-- Wishlist Button -->
-                    <button onclick="toggleWishlist({{ product.id }})" 
-                            class="wishlist-toggle flex items-center justify-center w-12 h-12 rounded-lg bg-dark-800 border border-gray-700 hover:border-[#ff0055] transition-all duration-300 group"
-                            data-product-id="{{ product.id }}"
-                            data-in-wishlist="{% if product.id in wishlist_ids %}true{% else %}false{% endif %}">
-                        <svg class="w-6 h-6 {% if product.id in wishlist_ids %}text-[#ff0055] fill-current{% else %}text-gray-400{% endif %} group-hover:text-[#ff0055] transition-colors" 
-                             fill="{% if product.id in wishlist_ids %}currentColor{% else %}none{% endif %}" 
-                             stroke="currentColor" 
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                        </svg>
+                    <button class="wishlist-btn" 
+                            onclick="event.stopPropagation(); toggleWishlist({{ product.id }});"
+                            title="افزودن به علاقه‌مندی‌ها">
+                        <i class="{% if product.id in wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
                     </button>
                     
                     <!-- Share Button -->
@@ -253,19 +306,6 @@
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-                        </svg>
-                    </button>
-                    
-                    <!-- Compare Button -->
-                    <button onclick="addToCompare({{ product.id }})" 
-                            class="flex items-center justify-center w-12 h-12 rounded-lg bg-dark-800 border border-gray-700 hover:border-[#00ff85] transition-all duration-300 group"
-                            title="مقایسه">
-                        <svg class="w-6 h-6 text-gray-400 group-hover:text-[#00ff85] transition-colors" 
-                             fill="none" 
-                             stroke="currentColor" 
-                             viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                     </button>
                 </div>
@@ -386,16 +426,89 @@
                             </div>
                             {% endif %}
                             
-                            <!-- Color Selector -->
-                            <div class="flex items-center gap-3 justify-end w-full">
-                                <div class="flex gap-2">
-                                    <!-- Example colors - can be dynamic from product model -->
-                                    <button class="w-8 h-8 rounded-full bg-black border-2 border-[#ff0055] hover:scale-110 transition-transform" title="مشکی"></button>
-                                    <button class="w-8 h-8 rounded-full bg-white border-2 border-gray-600 hover:border-[#ff0055] hover:scale-110 transition-transform" title="سفید"></button>
-                                    <button class="w-8 h-8 rounded-full bg-blue-500 border-2 border-gray-600 hover:border-[#ff0055] hover:scale-110 transition-transform" title="آبی"></button>
+                            <!-- Color Selector - Dynamic from Variants or Specifications -->
+                            {% comment %} First check variants, then specifications {% endcomment %}
+                            
+                            {% comment %} Check if any variant has color {% endcomment %}
+                            {% if variants %}
+                                {% for variant in variants %}
+                                    {% if variant.attributes.color and forloop.first %}
+                                        <div class="flex items-center gap-3 justify-end w-full">
+                                            <div class="flex gap-2" id="colorSelector">
+                                                {% for v in variants %}
+                                                {% if v.attributes.color %}
+                                                <button 
+                                                    type="button"
+                                                    class="color-option w-8 h-8 rounded-full border-2 border-gray-600 hover:border-[#ff0055] hover:scale-110 transition-transform relative"
+                                                    data-variant-id="{{ v.id }}"
+                                                    data-color="{{ v.attributes.color }}"
+                                                    data-color-name="{{ v.attributes.color_name|default:v.attributes.color }}"
+                                                    data-price="{{ v.price }}"
+                                                    data-stock="{{ v.stock }}"
+                                                    onclick="selectColor(this)"
+                                                    title="{{ v.attributes.color_name|default:v.attributes.color }}"
+                                                    {% if v.attributes.color_hex %}
+                                                    style="background-color: {{ v.attributes.color_hex }};"
+                                                    {% elif v.attributes.color == 'black' or v.attributes.color == 'مشکی' %}
+                                                    style="background-color: #2d2d2d; border-color: rgba(255, 255, 255, 0.5);"
+                                                    {% elif v.attributes.color == 'white' or v.attributes.color == 'سفید' %}
+                                                    style="background-color: #ffffff; border-color: rgba(0, 0, 0, 0.3);"
+                                                    {% elif v.attributes.color == 'red' or v.attributes.color == 'قرمز' %}
+                                                    style="background-color: #ff0000;"
+                                                    {% elif v.attributes.color == 'blue' or v.attributes.color == 'آبی' %}
+                                                    style="background-color: #0000ff;"
+                                                    {% elif v.attributes.color == 'green' or v.attributes.color == 'سبز' %}
+                                                    style="background-color: #00ff00;"
+                                                    {% elif v.attributes.color == 'yellow' or v.attributes.color == 'زرد' %}
+                                                    style="background-color: #ffff00;"
+                                                    {% elif v.attributes.color == 'pink' or v.attributes.color == 'صورتی' %}
+                                                    style="background-color: #ff69b4;"
+                                                    {% elif v.attributes.color == 'purple' or v.attributes.color == 'بنفش' %}
+                                                    style="background-color: #800080;"
+                                                    {% elif v.attributes.color == 'orange' or v.attributes.color == 'نارنجی' %}
+                                                    style="background-color: #ffa500;"
+                                                    {% elif v.attributes.color == 'gray' or v.attributes.color == 'خاکستری' %}
+                                                    style="background-color: #808080;"
+                                                    {% elif v.attributes.color == 'brown' or v.attributes.color == 'قهوه‌ای' %}
+                                                    style="background-color: #8b4513;"
+                                                    {% else %}
+                                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"
+                                                    {% endif %}>
+                                                    <svg class="color-check hidden absolute inset-0 m-auto w-5 h-5 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                </button>
+                                                {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <span class="text-gray-400 text-sm">:رنگ</span>
+                                        </div>
+                                        <input type="hidden" id="selectedVariantId" name="variant_id" value="">
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            
+                            {% comment %} Fallback: Show colors from specifications {% endcomment %}
+                            {% if spec_colors %}
+                                <div class="flex items-center gap-3 justify-end w-full">
+                                    <div class="flex gap-2" id="colorSelectorSpec">
+                                        {% for color in spec_colors %}
+                                        <button 
+                                            type="button" 
+                                            class="color-option-spec w-8 h-8 rounded-full border-2 border-gray-600 hover:border-[#ff0055] hover:scale-110 transition-transform" 
+                                            {% if color.hex %}
+                                            style="background-color: {{ color.hex }};{% if color.border %} border-color: {{ color.border }};{% endif %}"
+                                            {% elif color.gradient %}
+                                            style="background: {{ color.gradient }};"
+                                            {% endif %}
+                                            title="{{ color.name }}" 
+                                            data-color="{{ color.name }}">
+                                        </button>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-gray-400 text-sm">:رنگ</span>
                                 </div>
-                                <span class="text-gray-400 text-sm">:رنگ</span>
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     
@@ -452,23 +565,22 @@
                             <form id="addToCartForm" class="mt-6 space-y-3">
                                 {% csrf_token %}
                                 <input type="hidden" id="quantity" name="quantity" value="1">
+                                <input type="hidden" id="productId" name="product_id" value="{{ product.id }}">
+                                <input type="hidden" id="selectedColor" name="selected_color" value="">
+                                <!-- Variant ID will be set by color selection JavaScript -->
                                 
                                 <!-- Quantity Selector -->
                                 <div class="flex items-center justify-center gap-3 mb-3">
                                     <button type="button" 
-                                            onclick="decrementQuantity()" 
-                                            class="w-10 h-10 flex items-center justify-center rounded-lg bg-dark-700 text-white hover:bg-[#ff0055] transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                                        </svg>
+                                            id="increaseBtn"
+                                            class="quantity-btn w-12 h-12 flex items-center justify-center rounded-lg bg-dark-700 text-white hover:bg-[#ff0055] transition-colors text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-dark-700">
+                                        +
                                     </button>
-                                    <span id="quantityDisplay" class="w-16 text-center text-white font-bold text-xl">1</span>
+                                    <span id="quantityDisplay" class="quantity-display w-16 text-center text-white font-bold text-xl">1</span>
                                     <button type="button" 
-                                            onclick="incrementQuantity()" 
-                                            class="w-10 h-10 flex items-center justify-center rounded-lg bg-dark-700 text-white hover:bg-[#ff0055] transition-colors">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                        </svg>
+                                            id="decreaseBtn"
+                                            class="quantity-btn w-12 h-12 flex items-center justify-center rounded-lg bg-dark-700 text-white hover:bg-[#ff0055] transition-colors text-2xl font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-dark-700">
+                                        −
                                     </button>
                                 </div>
                                 
@@ -709,53 +821,48 @@
                                 </div>
                             {% endif %}
                             
-                            <!-- Submit Review Section -->
+                            <!-- ثبت نظر جدید -->
                             {% if user.is_authenticated %}
                             <div class="mt-12 pt-8 border-t border-dark-700/50">
-                                <h3 class="text-2xl font-bold text-white text-center mb-8">ارسال نظر</h3>
+                                <h3 class="text-2xl font-bold text-white text-center mb-8">ثبت نظر شما</h3>
                                 
-                                <form method="POST" action="{% url 'products:add_review' product.id %}" class="max-w-2xl mx-auto space-y-6">
-                                    {% csrf_token %}
-                                    
-                                    <!-- Rating Stars -->
+                                <div class="max-w-2xl mx-auto space-y-6">
+                                    <!-- امتیاز -->
                                     <div class="text-center">
                                         <label class="block text-white font-semibold mb-4">امتیاز شما:</label>
-                                        <div class="flex justify-center gap-2 mb-2">
-                                            <button type="button" onclick="selectRating(1)" class="rating-star text-5xl text-gray-600 hover:text-yellow-400 transition">★</button>
-                                            <button type="button" onclick="selectRating(2)" class="rating-star text-5xl text-gray-600 hover:text-yellow-400 transition">★</button>
-                                            <button type="button" onclick="selectRating(3)" class="rating-star text-5xl text-gray-600 hover:text-yellow-400 transition">★</button>
-                                            <button type="button" onclick="selectRating(4)" class="rating-star text-5xl text-gray-600 hover:text-yellow-400 transition">★</button>
-                                            <button type="button" onclick="selectRating(5)" class="rating-star text-5xl text-gray-600 hover:text-yellow-400 transition">★</button>
+                                        <div class="flex justify-center gap-2">
+                                            <span onclick="selectStar(1)" id="s1" class="text-5xl text-yellow-400 cursor-pointer hover:scale-110 transition">★</span>
+                                            <span onclick="selectStar(2)" id="s2" class="text-5xl text-yellow-400 cursor-pointer hover:scale-110 transition">★</span>
+                                            <span onclick="selectStar(3)" id="s3" class="text-5xl text-yellow-400 cursor-pointer hover:scale-110 transition">★</span>
+                                            <span onclick="selectStar(4)" id="s4" class="text-5xl text-yellow-400 cursor-pointer hover:scale-110 transition">★</span>
+                                            <span onclick="selectStar(5)" id="s5" class="text-5xl text-yellow-400 cursor-pointer hover:scale-110 transition">★</span>
                                         </div>
-                                        <input type="hidden" name="rating" id="review-rating" value="5" required>
                                     </div>
                                     
-                                    <!-- Comment Textarea -->
+                                    <!-- متن نظر -->
                                     <div class="text-right">
-                                        <label for="review-comment" class="block text-white font-semibold mb-3">نظر شما:</label>
+                                        <label for="reviewText" class="block text-white font-semibold mb-3">نظر شما:</label>
                                         <textarea 
-                                            name="comment" 
-                                            id="review-comment" 
+                                            id="reviewText" 
                                             rows="6" 
-                                            required
                                             class="w-full px-4 py-3 bg-dark-700 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:border-[#ff0055] focus:outline-none resize-none"
-                                            placeholder="نظر خود را درباره این محصول بنویسید..."></textarea>
+                                            placeholder="نظر خود را درباره این محصول بنویسید (حداقل ۱۰ کاراکتر)..."></textarea>
                                     </div>
                                     
-                                    <!-- Submit Button -->
+                                    <!-- دکمه ثبت -->
                                     <div class="text-center">
-                                        <button type="submit" class="btn-neon-border gradient-pink-purple">
-                                            <i class="fas fa-paper-plane"></i>
+                                        <button onclick="submitReview()" id="btnSubmitReview" class="btn-neon-border gradient-pink-purple px-8 py-3">
+                                            <i class="fas fa-paper-plane ml-2"></i>
                                             <span>ثبت نظر</span>
                                         </button>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                             {% else %}
                             <div class="mt-12 pt-8 border-t border-dark-700/50 text-center">
                                 <p class="text-gray-400 mb-4">برای ثبت نظر ابتدا وارد شوید</p>
                                 <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn-neon-border cyan inline-flex">
-                                    <i class="fas fa-sign-in-alt"></i>
+                                    <i class="fas fa-sign-in-alt ml-2"></i>
                                     <span>ورود</span>
                                 </a>
                             </div>
@@ -988,6 +1095,99 @@
 
 {% block extra_js %}
 <script>
+// ═══════════════════════════════════════════════════════════════════════════
+// COLOR VARIANT SELECTION
+// ═══════════════════════════════════════════════════════════════════════════
+
+function selectColor(button) {
+    const variantId = button.getAttribute('data-variant-id');
+    const price = button.getAttribute('data-price');
+    const stock = button.getAttribute('data-stock');
+    const colorName = button.getAttribute('data-color-name');
+    
+    // Update selected state visually - حذف انتخاب قبلی
+    document.querySelectorAll('.color-option').forEach(btn => {
+        btn.classList.remove('border-[#ff0055]');
+        btn.classList.add('border-gray-600');
+        btn.querySelector('.color-check').classList.add('hidden');
+    });
+    
+    // اعمال انتخاب جدید
+    button.classList.remove('border-gray-600');
+    button.classList.add('border-[#ff0055]');
+    button.querySelector('.color-check').classList.remove('hidden');
+    
+    // Update hidden inputs
+    document.getElementById('selectedVariantId').value = variantId;
+    document.getElementById('selectedColor').value = colorName; // ذخیره رنگ
+    
+    // Update price display
+    const priceElement = document.querySelector('.price-current');
+    if (priceElement && price) {
+        const formattedPrice = parseInt(price).toLocaleString('fa-IR');
+        priceElement.innerHTML = formattedPrice + ' <span class="price-currency">تومان</span>';
+    }
+    
+    // Update stock status
+    const stockElement = document.querySelector('.product-stock');
+    if (stockElement && stock !== null) {
+        const stockNum = parseInt(stock);
+        if (stockNum > 10) {
+            stockElement.innerHTML = '<span class="in-stock"><i class="fas fa-check-circle"></i> موجود</span>';
+        } else if (stockNum > 0) {
+            stockElement.innerHTML = '<span class="in-stock"><i class="fas fa-check-circle"></i> ' + stockNum + ' عدد باقیمانده</span>';
+        } else {
+            stockElement.innerHTML = '<span class="out-of-stock"><i class="fas fa-times-circle"></i> ناموجود</span>';
+        }
+    }
+    
+    // Show notification
+    showToast('رنگ ' + colorName + ' انتخاب شد');
+}
+
+// Auto-select first color on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const firstColorBtn = document.querySelector('.color-option');
+    if (firstColorBtn) {
+        selectColor(firstColorBtn);
+    }
+    
+    // Handle specification colors (non-variant colors)
+    const specColorBtns = document.querySelectorAll('.color-option-spec');
+    specColorBtns.forEach((btn, index) => {
+        btn.addEventListener('click', function() {
+            // Remove selection from all spec colors - فقط یک رنگ
+            specColorBtns.forEach(b => {
+                b.classList.remove('border-[#ff0055]');
+                b.classList.add('border-gray-600');
+            });
+            // Add selection to clicked color
+            this.classList.remove('border-gray-600');
+            this.classList.add('border-[#ff0055]');
+            
+            // ذخیره رنگ انتخابی
+            const colorName = this.getAttribute('data-color');
+            document.getElementById('selectedColor').value = colorName;
+            
+            // Show toast
+            showToast('رنگ ' + colorName + ' انتخاب شد');
+        });
+        
+        // Auto-select first spec color
+        if (index === 0) {
+            btn.classList.remove('border-gray-600');
+            btn.classList.add('border-[#ff0055]');
+            // ذخیره اولین رنگ
+            const colorName = btn.getAttribute('data-color');
+            if (colorName && document.getElementById('selectedColor')) {
+                document.getElementById('selectedColor').value = colorName;
+            }
+        }
+    });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+
 // Gallery Image Changer
 function changeMainImage(url, element) {
     document.getElementById('mainProductImage').src = url;
@@ -997,52 +1197,178 @@ function changeMainImage(url, element) {
     element.classList.add('active');
 }
 
-// Quantity Controls
-function incrementQuantity() {
-    const input = document.getElementById('quantity');
-    const display = document.getElementById('quantityDisplay');
-    const max = {{ product.stock }};
-    const current = parseInt(input.value);
-    if (current < max) {
-        input.value = current + 1;
-        if (display) display.textContent = current + 1;
-    }
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// QUANTITY SELECTOR
+// ═══════════════════════════════════════════════════════════════════════════
 
-function decrementQuantity() {
-    const input = document.getElementById('quantity');
-    const display = document.getElementById('quantityDisplay');
-    const min = 1;
-    const current = parseInt(input.value);
-    if (current > min) {
-        input.value = current - 1;
-        if (display) display.textContent = current - 1;
-    }
-}
+let quantity = 1;
+const maxQuantity = {{ product.stock }}; // حداکثر تعداد از موجودی محصول
+const minQuantity = 1;
 
-// Review Rating System
-function selectRating(rating) {
-    // Update hidden input value
-    document.getElementById('review-rating').value = rating;
+const quantityDisplay = document.getElementById('quantityDisplay');
+const quantityInput = document.getElementById('quantity');
+const increaseBtn = document.getElementById('increaseBtn');
+const decreaseBtn = document.getElementById('decreaseBtn');
+
+function updateQuantity(newQuantity) {
+    quantity = newQuantity;
+    quantityDisplay.textContent = quantity;
+    quantityInput.value = quantity;
     
-    // Update star colors
-    const stars = document.querySelectorAll('.rating-star');
-    stars.forEach((star, index) => {
-        if (index < rating) {
+    // غیرفعال کردن دکمه‌ها در صورت رسیدن به حداقل یا حداکثر
+    decreaseBtn.disabled = quantity <= minQuantity;
+    increaseBtn.disabled = quantity >= maxQuantity;
+}
+
+increaseBtn.addEventListener('click', () => {
+    if (quantity < maxQuantity) {
+        updateQuantity(quantity + 1);
+    }
+});
+
+decreaseBtn.addEventListener('click', () => {
+    if (quantity > minQuantity) {
+        updateQuantity(quantity - 1);
+    }
+});
+
+// مقداردهی اولیه
+updateQuantity(1);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CSRF TOKEN HELPER
+// ═══════════════════════════════════════════════════════════════════════════
+
+// تابع استخراج کوکی
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // مقایسه با نام کوکی
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// دریافت CSRF Token
+const csrftoken = getCookie('csrftoken');
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ثبت نظر و امتیاز محصول
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STAR RATING SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+
+let selectedRating = 5; // امتیاز پیش‌فرض
+
+function selectStar(rating) {
+    selectedRating = rating;
+    console.log('⭐ امتیاز انتخابی:', rating);
+    
+    // رنگ‌آمیزی ستاره‌ها
+    for (let i = 1; i <= 5; i++) {
+        const star = document.getElementById('s' + i);
+        if (i <= rating) {
             star.classList.remove('text-gray-600');
             star.classList.add('text-yellow-400');
         } else {
-            star.classList.add('text-gray-600');
             star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-600');
         }
-    });
+    }
 }
 
-// Initialize with 5 stars selected on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Set initial rating to 5 stars
-    selectRating(5);
-});
+// نمایش پیام
+function showMessage(text, success) {
+    const msg = document.createElement('div');
+    msg.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        padding: 16px 24px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        background-color: ${success ? '#10b981' : '#ef4444'};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+    msg.textContent = text;
+    document.body.appendChild(msg);
+    setTimeout(() => msg.remove(), 3500);
+}
+
+// ارسال نظر
+function submitReview() {
+    const comment = document.getElementById('reviewText').value.trim();
+    const btn = document.getElementById('btnSubmitReview');
+    
+    // اعتبارسنجی
+    if (!comment || comment.length < 10) {
+        showMessage('لطفاً نظر خود را با حداقل ۱۰ کاراکتر وارد کنید', false);
+        return;
+    }
+    
+    console.log('📝 ارسال نظر:', {rating: selectedRating, comment: comment});
+    
+    // غیرفعال کردن دکمه
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i><span>در حال ارسال...</span>';
+    
+    const csrfToken = getCookie('csrftoken');
+    console.log('🔐 CSRF Token:', csrfToken);
+    
+    // ارسال به سرور
+    fetch('{% url "products:add_review" product.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            rating: selectedRating,
+            comment: comment
+        })
+    })
+    .then(response => {
+        console.log('📡 Response Status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('📦 Response Data:', data);
+        if (data.success) {
+            showMessage('نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد', true);
+            document.getElementById('reviewText').value = '';
+            selectedRating = 5;
+            
+            // بازگردانی ستاره‌ها به حالت اولیه
+            const stars = document.querySelectorAll('.star-btn');
+            stars.forEach(s => {
+                s.classList.remove('text-gray-600');
+                s.classList.add('text-yellow-400');
+            });
+        } else {
+            showMessage(data.message || 'خطا در ثبت نظر', false);
+        }
+    })
+    .catch(error => {
+        console.error('❌ خطا:', error);
+        showMessage('خطا در ارتباط با سرور', false);
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane ml-2"></i><span>ثبت نظر</span>';
+    });
+}
 
 // Share Product Function
 function shareProduct() {
@@ -1083,24 +1409,6 @@ function copyToClipboard(text) {
     });
 }
 
-// Add to Compare Function
-function addToCompare(productId) {
-    // Get existing compare list from localStorage
-    let compareList = JSON.parse(localStorage.getItem('compareList') || '[]');
-    
-    // Check if product already in compare list
-    if (compareList.includes(productId)) {
-        showNotification('این محصول قبلاً به لیست مقایسه اضافه شده است', 'info');
-        return;
-    }
-    
-    // Add to compare list
-    compareList.push(productId);
-    localStorage.setItem('compareList', JSON.stringify(compareList));
-    
-    showNotification('محصول به لیست مقایسه اضافه شد', 'success');
-}
-
 // Show Notification Function
 function showNotification(message, type = 'success') {
     // Remove existing notifications
@@ -1131,59 +1439,133 @@ function showNotification(message, type = 'success') {
 document.getElementById('addToCartForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    const quantity = document.getElementById('quantity').value;
-    const productId = {{ product.id }};
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const productUUID = '{{ product.uuid }}'; // استفاده از UUID به جای ID
+    const variantId = document.getElementById('selectedVariantId')?.value || null;
+    
+    // Get CSRF token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                      document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1] ||
+                      '{{ csrf_token }}';
+    
+    // Prepare request data
+    const requestData = {
+        product_id: productUUID,
+        quantity: quantity
+    };
+    
+    // Add variant_id if selected
+    if (variantId) {
+        requestData.variant_id = variantId;
+    }
+    
+    // اگر رنگ انتخاب شده بود، به عنوان custom data اضافه کن
+    const selectedColorName = document.getElementById('selectedColorName')?.value;
+    const selectedColorCode = document.getElementById('selectedColorCode')?.value;
+    if (selectedColorName) {
+        requestData.custom_color_name = selectedColorName;
+        requestData.custom_color_code = selectedColorCode;
+    }
     
     fetch('/orders/cart/add/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
+            'X-CSRFToken': csrftoken
         },
-        body: JSON.stringify({
-            product_id: productId,
-            quantity: quantity
-        })
+        body: JSON.stringify(requestData)
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show quantity selector
-            document.getElementById('quantitySelector').classList.remove('hidden');
-            document.getElementById('quantitySelector').classList.add('flex');
-            
             // Update button text
             const btn = document.getElementById('addToCartBtn');
             btn.querySelector('span').textContent = 'در سبد خرید';
+            btn.disabled = true;
+            btn.classList.add('opacity-75');
             
-            // Show success message without reload
-            alert('محصول با موفقیت به سبد خرید اضافه شد!');
+            // Show success message
+            showToast('محصول با موفقیت به سبد خرید اضافه شد!');
+            
+            // اختیاری: بروز کردن تعداد سبد در navbar
+            updateCartCount();
         } else {
-            alert('خطا در افزودن به سبد خرید: ' + (data.message || 'خطای نامشخص'));
+            showToast('خطا در افزودن به سبد خرید: ' + (data.message || 'خطای نامشخص'), 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('خطا در ارتباط با سرور');
+        showToast('خطا در ارتباط با سرور', 'error');
     });
 });
 
-// Wishlist Toggle
-function toggleWishlist(productId) {
-    fetch('/products/wishlist/toggle/' + productId + '/', {
-        method: 'POST',
+// تابع بروزرسانی تعداد سبد خرید
+function updateCartCount() {
+    fetch('/orders/api/cart/', {
+        method: 'GET',
         headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
+            'Content-Type': 'application/json'
         }
     })
     .then(response => response.json())
     .then(data => {
+        if (data.success && data.data) {
+            const cartCount = data.data.items_count || 0;
+            const cartBadge = document.querySelector('.cart-count');
+            if (cartBadge) {
+                cartBadge.textContent = cartCount;
+                if (cartCount > 0) {
+                    cartBadge.classList.remove('hidden');
+                }
+            }
+        }
+    })
+    .catch(error => console.error('Error updating cart count:', error));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WISHLIST TOGGLE
+// ═══════════════════════════════════════════════════════════════════════════
+
+function toggleWishlist(productId) {
+    const btn = event.currentTarget;
+    const icon = btn.querySelector('i');
+    
+    // Get CSRF token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                      document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    
+    // Send AJAX request to backend
+    fetch('/products/api/wishlist/toggle/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(response => response.json())
+    .then(data => {
         if (data.success) {
-            alert(data.added ? 'به علاقه‌مندی‌ها اضافه شد!' : 'از علاقه‌مندی‌ها حذف شد!');
+            // Toggle icon between solid (filled) and regular (outline)
+            if (data.added) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
+            
+            // Show toast notification
+            showToast(data.message || 'عملیات با موفقیت انجام شد');
+        } else {
+            console.error('Error:', data.error);
+            showToast('خطا: ' + (data.error || 'لطفا مجددا تلاش کنید'), 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
+        showToast('خطا در ارتباط با سرور', 'error');
     });
 }
 

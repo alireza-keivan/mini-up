@@ -349,6 +349,19 @@ class ProductDetailView(WishlistContextMixin, DetailView):
         # Check if product has variants
         context['has_variants'] = context['variants'].exists()
         
+        # Parse colors from specifications if no color variants
+        color_variants_exist = any(
+            v.attributes.get('color') for v in context['variants']
+        )
+        
+        if not color_variants_exist and product.specifications.get('رنگ'):
+            # Parse color string (e.g., "مشکی / سفید / شبکه‌ای و 3 تا RGB")
+            color_string = product.specifications.get('رنگ', '')
+            parsed_colors = self._parse_colors_from_string(color_string)
+            context['spec_colors'] = parsed_colors
+        else:
+            context['spec_colors'] = []
+        
         # Stock status
         context['stock_status'] = self._get_stock_status(product)
         
@@ -419,6 +432,65 @@ class ProductDetailView(WishlistContextMixin, DetailView):
         context['meta_description'] = product.meta_description or product.short_description
         
         return context
+    
+    def _parse_colors_from_string(self, color_string):
+        """
+        Parse color string from specifications.
+        Example: "مشکی / سفید / شبکه‌ای و 3 تا RGB" -> list of color dicts
+        """
+        colors = []
+        color_map = {
+            'مشکی': {'name': 'مشکی', 'hex': '#2d2d2d', 'border': 'rgba(255, 255, 255, 0.5)'},
+            'black': {'name': 'مشکی', 'hex': '#2d2d2d', 'border': 'rgba(255, 255, 255, 0.5)'},
+            'سفید': {'name': 'سفید', 'hex': '#ffffff', 'border': 'rgba(0, 0, 0, 0.3)'},
+            'white': {'name': 'سفید', 'hex': '#ffffff', 'border': 'rgba(0, 0, 0, 0.3)'},
+            'قرمز': {'name': 'قرمز', 'hex': '#ff0000'},
+            'red': {'name': 'قرمز', 'hex': '#ff0000'},
+            'آبی': {'name': 'آبی', 'hex': '#0000ff'},
+            'blue': {'name': 'آبی', 'hex': '#0000ff'},
+            'سبز': {'name': 'سبز', 'hex': '#00ff00'},
+            'green': {'name': 'سبز', 'hex': '#00ff00'},
+            'زرد': {'name': 'زرد', 'hex': '#ffff00'},
+            'yellow': {'name': 'زرد', 'hex': '#ffff00'},
+            'صورتی': {'name': 'صورتی', 'hex': '#ff69b4'},
+            'pink': {'name': 'صورتی', 'hex': '#ff69b4'},
+            'بنفش': {'name': 'بنفش', 'hex': '#800080'},
+            'purple': {'name': 'بنفش', 'hex': '#800080'},
+            'نارنجی': {'name': 'نارنجی', 'hex': '#ffa500'},
+            'orange': {'name': 'نارنجی', 'hex': '#ffa500'},
+            'خاکستری': {'name': 'خاکستری', 'hex': '#808080'},
+            'gray': {'name': 'خاکستری', 'hex': '#808080'},
+            'grey': {'name': 'خاکستری', 'hex': '#808080'},
+            'قهوه‌ای': {'name': 'قهوه‌ای', 'hex': '#8b4513'},
+            'brown': {'name': 'قهوه‌ای', 'hex': '#8b4513'},
+        }
+        
+        # Split by common separators
+        parts = color_string.replace('،', '/').replace(',', '/').split('/')
+        
+        for part in parts:
+            part = part.strip()
+            if not part:
+                continue
+            
+            # Check for RGB/شبکه‌ای
+            if 'rgb' in part.lower() or 'شبکه' in part:
+                colors.append({
+                    'name': 'RGB',
+                    'hex': None,
+                    'gradient': 'linear-gradient(135deg, #ff0055 0%, #00ffff 50%, #b400ff 100%)'
+                })
+                continue
+            
+            # Check against color map
+            part_lower = part.lower()
+            for key, value in color_map.items():
+                if key in part_lower:
+                    if value not in colors:  # Avoid duplicates
+                        colors.append(value)
+                    break
+        
+        return colors
     
     def _get_stock_status(self, product):
         """Get stock status for product."""
@@ -1131,25 +1203,38 @@ class CompareView(TemplateView):
 # REVIEW SUBMISSION
 # ═══════════════════════════════════════════════════════════════════════════════
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class AddReviewView(LoginRequiredMixin, View):
     """
     Handle product review submissions
-    Simple POST-only view using product ID
+    Support both JSON and form POST
     """
     login_url = '/accounts/login/'
     
     def post(self, request, product_id):
         """Handle review submission"""
+        import json
+        
         try:
             # Get the product
             product = Product.objects.get(id=product_id, is_active=True)
         except Product.DoesNotExist:
+            if request.content_type == 'application/json':
+                return JsonResponse({'success': False, 'message': 'محصول مورد نظر یافت نشد.'}, status=404)
             messages.error(request, 'محصول مورد نظر یافت نشد.')
             return redirect('products:list')
         
-        # Get form data
-        rating = request.POST.get('rating', '').strip()
-        comment = request.POST.get('comment', '').strip()
+        # Parse request data (JSON or form)
+        if request.content_type == 'application/json':
+            try:
+                data = json.loads(request.body)
+                rating = str(data.get('rating', '')).strip()
+                comment = str(data.get('comment', '')).strip()
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'message': 'داده‌های نامعتبر'}, status=400)
+        else:
+            rating = request.POST.get('rating', '').strip()
+            comment = request.POST.get('comment', '').strip()
         
         # Validate rating
         try:
@@ -1157,11 +1242,15 @@ class AddReviewView(LoginRequiredMixin, View):
             if not (1 <= rating_value <= 5):
                 raise ValueError()
         except (ValueError, TypeError):
+            if request.content_type == 'application/json':
+                return JsonResponse({'success': False, 'message': 'لطفاً امتیاز معتبر (۱ تا ۵) را انتخاب کنید.'}, status=400)
             messages.error(request, 'لطفاً امتیاز معتبر (۱ تا ۵) را انتخاب کنید.')
             return redirect('products:detail', slug=product.slug)
         
         # Validate comment
         if not comment or len(comment) < 10:
+            if request.content_type == 'application/json':
+                return JsonResponse({'success': False, 'message': 'لطفاً نظر خود را با حداقل ۱۰ کاراکتر وارد کنید.'}, status=400)
             messages.error(request, 'لطفاً نظر خود را با حداقل ۱۰ کاراکتر وارد کنید.')
             return redirect('products:detail', slug=product.slug)
         
@@ -1172,6 +1261,8 @@ class AddReviewView(LoginRequiredMixin, View):
         ).first()
         
         if existing_review:
+            if request.content_type == 'application/json':
+                return JsonResponse({'success': False, 'message': 'شما قبلاً برای این محصول نظر ثبت کرده‌اید.'}, status=400)
             messages.warning(request, 'شما قبلاً برای این محصول نظر ثبت کرده‌اید.')
             return redirect('products:detail', slug=product.slug)
         
@@ -1183,6 +1274,12 @@ class AddReviewView(LoginRequiredMixin, View):
             comment=comment,
             is_approved=False
         )
+        
+        if request.content_type == 'application/json':
+            return JsonResponse({
+                'success': True, 
+                'message': 'نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد.'
+            })
         
         messages.success(request, 'نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد.')
         return redirect('products:detail', slug=product.slug)
