@@ -247,6 +247,26 @@
        RELATED PRODUCTS CAROUSEL STYLES (from buy_products.css)
        ═══════════════════════════════════════════════════════════════════════════ */
     
+    /* Neon Card Link Styling */
+    .neon-card-link {
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .neon-card-link:hover {
+        text-decoration: none;
+    }
+
+    /* Smooth neon card hover animation */
+    .neon-product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .neon-card-link:hover .neon-product-card {
+        transform: translateY(-4px);
+    }
+    
     .bp-scroll-wrapper {
         scrollbar-width: thin;
         scrollbar-color: #4b5563 transparent;
@@ -330,10 +350,22 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
             {% if product.category %}
-            <a href="{% url 'products:category_detail' product.category.slug %}" 
-               class="text-gray-400 hover:text-[#ff0055] transition-colors">
-                {{ product.category.name }}
-            </a>
+                {% if product.category.slug == 'gaming-products' or product.category.slug == 'gaming-equipment' %}
+                <a href="{% url 'core:gaming_products' %}" 
+                   class="text-gray-400 hover:text-[#ff0055] transition-colors">
+                    محصولات گیمینگ
+                </a>
+                {% elif product.category.slug == 'buy-products' or product.category.slug == 'gaming-accessories' %}
+                <a href="{% url 'core:buy_products' %}" 
+                   class="text-gray-400 hover:text-[#ff0055] transition-colors">
+                    محصولات جانبی
+                </a>
+                {% else %}
+                <a href="{% url 'products:category_detail' product.category.slug %}" 
+                   class="text-gray-400 hover:text-[#ff0055] transition-colors">
+                    {{ product.category.name }}
+                </a>
+                {% endif %}
             <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
@@ -916,152 +948,76 @@
                         scrollbar-track-transparent cursor-grab active:cursor-grabbing">
                 
                 {% for related in related_products %}
-                <!-- Product Card -->
-                <article class="bp-product-card flex-shrink-0 w-72 md:w-80
-                                bg-gradient-to-br from-dark-800 to-dark-900
-                                rounded-2xl border border-gray-800/50
-                                overflow-hidden transition-all duration-500
-                                hover:border-neon-pink/50 hover:shadow-neon-pink
-                                group/card">
-                    
-                    <!-- Image Container -->
-                    <div class="bp-card-image relative h-48 overflow-hidden bg-dark-900">
-                        {% if related.image %}
-                        <img src="{{ related.image.url }}" 
-                             alt="{{ related.name }}"
-                             class="w-full h-full object-cover transition-transform duration-700
-                                    group-hover/card:scale-110"
-                             loading="lazy">
-                        {% else %}
-                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-dark-700 to-dark-800">
-                            <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Overlay Gradient -->
-                        <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent 
-                                    opacity-60 group-hover/card:opacity-40 transition-opacity duration-500"></div>
-                        
-                        <!-- Badges -->
-                        <div class="absolute top-3 right-3 flex flex-col gap-2">
-                            {% if related.is_featured %}
-                            <span class="px-3 py-1 text-xs font-bold rounded-full
-                                         bg-gradient-to-r from-neon-yellow to-orange-500 text-dark-900">
-                                ویژه
-                            </span>
-                            {% endif %}
-                            
-                            {% if related.compare_price and related.compare_price > related.price %}
-                            {% widthratio related.price related.compare_price 100 as discount_percent %}
-                            <span class="px-3 py-1 text-xs font-bold rounded-full
-                                         bg-gradient-to-r from-neon-pink to-red-500 text-white">
-                                {{ 100|add:"-"|add:discount_percent }}% تخفیف
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- Card Content -->
-                    <div class="bp-card-content p-5">
-                        <!-- Product Name -->
-                        <h3 class="text-lg font-bold text-white mb-2 
-                                   line-clamp-2 min-h-[3.5rem] 
-                                   group-hover/card:text-neon-cyan transition-colors duration-300">
-                            {{ related.name }}
-                        </h3>
-                        
-                        <!-- Product Meta -->
-                        <div class="flex items-center gap-3 mb-4 text-xs text-gray-500">
-                            {% if related.brand %}
-                            <span class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                </svg>
-                                {{ related.brand.name }}
-                            </span>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Stock Status -->
-                        <div class="mb-4">
-                            {% if related.stock > 0 %}
-                                {% if related.stock <= 5 %}
-                                <span class="flex items-center gap-2 text-sm text-yellow-500">
-                                    <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
-                                    فقط {{ related.stock }} عدد باقی‌مانده
-                                </span>
-                                {% else %}
-                                <span class="flex items-center gap-2 text-sm text-neon-green">
-                                    <span class="w-2 h-2 rounded-full bg-neon-green"></span>
-                                    موجود در انبار
-                                </span>
-                                {% endif %}
+                <!-- Wrap entire card in link -->
+                <a href="{% url 'products:detail' related.slug %}" 
+                   class="neon-card-link block flex-shrink-0 w-64 no-underline">
+                    <!-- Simple Neon Card -->
+                    <article class="neon-product-card relative bg-black/80 backdrop-blur-sm rounded-xl border-2 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.5)] overflow-hidden transition-all duration-300 group h-full
+                                   hover:shadow-[0_0_30px_rgba(34,211,238,0.9)] hover:border-cyan-300 hover:-translate-y-1">
+                        <div class="neon-card-image relative h-48 overflow-hidden bg-gray-900">
+                            {% if related.image %}
+                            <img src="{{ related.image.url }}" 
+                                 alt="{{ related.name }}"
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 group-hover:brightness-110"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"></div>
                             {% else %}
-                            <span class="flex items-center gap-2 text-sm text-red-500">
-                                <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                                ناموجود
-                            </span>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Price Section -->
-                        <div class="flex items-end justify-between mb-5">
-                            <div>
-                                {% if related.compare_price and related.compare_price > related.price %}
-                                <span class="text-gray-500 text-sm line-through block mb-1">
-                                    {{ related.compare_price|intcomma }} تومان
-                                </span>
-                                {% endif %}
-                                <span class="text-2xl font-black text-white">
-                                    {{ related.price|intcomma }}
-                                    <span class="text-sm font-normal text-gray-400">تومان</span>
-                                </span>
+                            <div class="absolute inset-0 flex items-center justify-center group-hover:bg-gray-800 transition-colors duration-300">
+                                <svg class="w-16 h-16 text-gray-700 group-hover:text-gray-600 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
                             </div>
+                            {% endif %}
                             
-                            {% if related.average_rating %}
-                            <div class="flex items-center gap-1 text-neon-yellow">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                                </svg>
-                                <span class="text-sm font-bold">{{ related.average_rating|floatformat:1 }}</span>
-                            </div>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="flex gap-3">
-                            <button class="flex-1 py-3 px-4 rounded-xl font-bold text-sm
-                                           bg-gradient-to-r from-neon-pink to-neon-purple text-white
-                                           hover:shadow-neon-pink transition-all duration-300
-                                           disabled:opacity-50 disabled:cursor-not-allowed
-                                           flex items-center justify-center gap-2"
-                                    onclick="addToCart({{ related.id }}, '{{ related.name }}')"
-                                    {% if related.stock <= 0 %}disabled{% endif %}>
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <!-- Wishlist/Favorite Button - Prevent link navigation -->
+                            <button type="button"
+                                    class="wishlist-btn absolute top-3 right-3 p-2 rounded-full backdrop-blur-sm transition-all duration-300
+                                           border border-cyan-400 bg-cyan-500/20 hover:bg-red-500/40 hover:border-red-400 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)] hover:scale-110
+                                           opacity-0 group-hover:opacity-100 z-10"
+                                    data-product-id="{{ related.id }}"
+                                    data-wishlist-toggle
+                                    onclick="event.preventDefault(); event.stopPropagation();"
+                                    aria-label="افزودن به علاقه‌مندی‌ها">
+                                <svg class="wishlist-heart w-5 h-5 text-white transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                 </svg>
-                                <span>افزودن به سبد</span>
                             </button>
-                            
-                            <a href="{% url 'products:detail' related.slug %}"
-                               class="w-12 h-12 rounded-xl border border-gray-700
-                                      flex items-center justify-center text-gray-400
-                                      hover:bg-neon-cyan hover:border-neon-cyan hover:text-dark-900
-                                      transition-all duration-300"
-                               title="مشاهده جزئیات">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                </svg>
-                            </a>
                         </div>
-                    </div>
-                </article>
+                        <div class="neon-card-content p-4 group-hover:bg-black/60 transition-colors duration-300">
+                            <div class="flex items-center gap-1 mb-2">
+                                {% for i in "12345" %}
+                                <svg class="w-3 h-3 fill-cyan-400 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                {% endfor %}
+                                <span class="ml-1 text-gray-400 text-xs">(5.0)</span>
+                            </div>
+                            <h3 class="text-cyan-400 text-base font-bold mb-2 line-clamp-2 group-hover:text-cyan-300 transition-colors">{{ related.name }}</h3>
+                            <p class="text-gray-300 text-xs line-clamp-2 mb-3">{{ related.short_description|default:"محصول با کیفیت" }}</p>
+                            <div class="flex items-center justify-between pt-3 border-t border-gray-800">
+                                <div class="flex flex-col">
+                                    {% if related.compare_price and related.compare_price > related.price %}
+                                    <span class="text-gray-500 text-xs line-through mb-1">
+                                        {{ related.compare_price|intcomma }}
+                                    </span>
+                                    {% endif %}
+                                    <span class="text-lg font-bold text-cyan-400">
+                                        {{ related.price|intcomma }}
+                                        <span class="text-xs font-normal">تومان</span>
+                                    </span>
+                                </div>
+                                <button type="button" 
+                                        class="add-to-cart-btn flex items-center gap-1 px-4 py-2 rounded-lg border border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/40 hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] transition-all text-sm z-10"
+                                        data-product-uuid="{{ related.uuid }}"
+                                        onclick="event.preventDefault(); event.stopPropagation();"
+                                        {% if related.stock <= 0 %}disabled{% endif %}>
+                                    <span class="font-medium">افزودن</span>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                </a>
                 {% endfor %}
                 
             </div>
@@ -1430,7 +1386,6 @@ function showNotification(message, type = 'success') {
 document.getElementById('addToCartForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const quantity = parseInt(document.getElementById('quantity').value);
     const productUUID = '{{ product.uuid }}';
     const variantId = document.getElementById('selectedVariantId')?.value?.trim() || null;
     const button = document.getElementById('addToCartBtn');
