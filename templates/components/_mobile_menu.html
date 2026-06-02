@@ -69,6 +69,17 @@
     </div>
     {% endif %}
 
+    <!-- ========================= SUPPORT TICKETS (AUTHENTICATED ONLY) ========================= -->
+    {% if user.is_authenticated %}
+    <div class="mobile-menu-tickets">
+        <a href="{% url 'consulting:ticket_list' %}" class="mobile-menu-tickets-btn">
+            <i class="fas fa-ticket-alt"></i>
+            <span>تیکت های پشتیبانی</span>
+            <i class="fas fa-chevron-left"></i>
+        </a>
+    </div>
+    {% endif %}
+
     <!-- ========================= SEARCH ========================= -->
     <div class="mobile-menu-search">
         <form action="{% url 'core:search' %}" method="GET">
@@ -182,3 +193,47 @@
     {% endif %}
 
 </aside>
+
+<style>
+    .mobile-menu-tickets {
+        padding: 0 1rem 1rem 1rem;
+        margin-top: -0.5rem;
+    }
+
+    .mobile-menu-tickets-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(59, 130, 246, 0.15));
+        border: 1px solid rgba(6, 182, 212, 0.4);
+        border-radius: 0.875rem;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(6, 182, 212, 0.1);
+    }
+
+    .mobile-menu-tickets-btn:hover {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(59, 130, 246, 0.25));
+        border-color: rgba(6, 182, 212, 0.6);
+        transform: translateX(-3px);
+        box-shadow: 0 6px 20px rgba(6, 182, 212, 0.2);
+    }
+
+    .mobile-menu-tickets-btn i:first-child {
+        font-size: 1.1rem;
+        color: #06b6d4;
+    }
+
+    .mobile-menu-tickets-btn span {
+        flex: 1;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .mobile-menu-tickets-btn i:last-child {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+    }
+</style>

@@ -6,6 +6,14 @@
 
 {% block content %}
 
+<style>
+    /* Override body background for home page */
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0a0a0f 100%) !important;
+        background-attachment: fixed;
+    }
+</style>
+
 <!-- ===============================================================================
      HERO SECTION WITH CUSTOM ALTURA-STYLE DESIGN
      =============================================================================== -->
@@ -39,9 +47,6 @@
             <div class="hero-buttons">
                 <a href="{% url 'core:virtual_services' %}" class="btn-primary-hero">
                     <span>مشاهده خدمات</span>
-                    <svg class="btn-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
                 </a>
                 <a href="{% url 'consulting:ticket_list' %}" class="btn-secondary-hero">
                     <span>تماس با ما</span>
@@ -78,9 +83,9 @@
     /* Hero Section Container */
     .hero-section-custom {
         position: relative;
-        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0a0a0f 100%); 
         overflow: hidden;
-        padding: 5rem 0 0 0;
+        padding: 5rem 0 8rem 0;
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -429,7 +434,7 @@
      BESTSELLER PRODUCTS CAROUSEL
      =============================================================================== -->
 {% if bestseller_products %}
-<section class="bestseller-section py-16 bg-gradient-to-b from-[#1a0a1f] to-[#0a0a0f]">
+<section class="bestseller-section py-16" style="background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0a0a0f 100%);">
     <div class="container mx-auto px-4 max-w-7xl">
         <!-- Section Header -->
         <div class="section-header text-center mb-10">
@@ -550,12 +555,15 @@
         transition: all 0.3s ease;
         border: 1px solid rgba(255, 255, 255, 0.15);
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 1;
     }
 
     .bestseller-card:hover {
         transform: translateY(-5px);
         border-color: rgba(255, 255, 255, 0.3);
         box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        z-index: 10;
     }
 
     .card-image-wrapper {
@@ -662,9 +670,16 @@
             let animationId;
             let isPaused = false;
             
-            // Clone items for seamless loop
+            // Clone items multiple times for seamless loop
             const items = wrapper.querySelectorAll('.bestseller-card');
-            items.forEach(item => {
+            const itemsArray = Array.from(items);
+            
+            // Clone items twice for smoother infinite effect
+            itemsArray.forEach(item => {
+                const clone = item.cloneNode(true);
+                wrapper.appendChild(clone);
+            });
+            itemsArray.forEach(item => {
                 const clone = item.cloneNode(true);
                 wrapper.appendChild(clone);
             });
@@ -674,9 +689,9 @@
                     scrollAmount += scrollSpeed;
                     wrapper.scrollLeft = scrollAmount;
                     
-                    // Reset scroll when reaching halfway (original items end)
-                    const maxScroll = wrapper.scrollWidth / 2;
-                    if (scrollAmount >= maxScroll) {
+                    // Seamless loop: reset when first set of clones ends
+                    const singleSetWidth = wrapper.scrollWidth / 3;
+                    if (scrollAmount >= singleSetWidth) {
                         scrollAmount = 0;
                         wrapper.scrollLeft = 0;
                     }
@@ -764,7 +779,7 @@
 <!-- ===============================================================================
      CATEGORY CAROUSEL SECTION (خدمات ما) - MOVED TO TOP
      =============================================================================== -->
-<section class="category-carousel-section py-20 bg-dark-800/50">
+<section class="category-carousel-section py-20" style="background: linear-gradient(135deg, #1a0a1f 0%, #0a0a0f 50%, #1a0a1f 100%);">
     <div class="container mx-auto px-4 max-w-6xl">
         <!-- Section Header -->
         <div class="section-header text-center mb-12">
@@ -1200,7 +1215,7 @@
      ARTICLES CAROUSEL SECTION
      =============================================================================== -->
 {% if latest_articles %}
-<section class="articles-carousel-section">
+<section class="articles-carousel-section" style="background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 100%);">
     <div class="articles-container">
         <h2 class="section-title">آخرین مقالات ما</h2>
         
@@ -1402,7 +1417,7 @@
      SOCIAL MEDIA LINKS SECTION
      =============================================================================== -->
 {% if social_links %}
-<section class="py-16 bg-dark-900/50">
+<section class="py-16" style="background: linear-gradient(135deg, #1a0a1f 0%, #0a0a0f 100%);">
     <div class="container mx-auto px-4 text-center">
         <h2 class="text-3xl font-bold text-white mb-4">
             ما را در شبکه‌های اجتماعی دنبال کنید
@@ -1504,7 +1519,7 @@
      YOUTUBE VIDEO SECTION
      =============================================================================== -->
 {% if youtube_video %}
-<section class="youtube-section py-20 bg-gradient-to-b from-dark-900/50 to-dark-800/30">
+<section class="youtube-section py-20" style="background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0a0a0f 100%);">
     <div class="container mx-auto px-4">
         <div class="max-w-5xl mx-auto">
             <div class="text-center mb-10">
@@ -1577,7 +1592,7 @@
      SERVICE DESCRIPTIONS WIDGET
      =============================================================================== -->
 {% if service_descriptions %}
-<section class="service-descriptions-section py-16 bg-dark-800/30">
+<section class="service-descriptions-section py-16" style="background: linear-gradient(135deg, #1a0a1f 0%, #0a0a0f 100%);">
     <div class="container mx-auto px-4">
         <h2 style="color: white; font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 3rem;">
             توضیحات خدمات ما

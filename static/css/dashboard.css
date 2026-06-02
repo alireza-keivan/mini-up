@@ -23,6 +23,26 @@
     flex-wrap: wrap;
 }
 
+/* Mobile optimization for tab buttons */
+@media (max-width: 768px) {
+    .tab-nav {
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .tab-nav button {
+        flex: 1 1 calc(50% - 0.25rem);
+        min-width: 0;
+        font-size: 0.75rem;
+        padding: 0.5rem 0.5rem;
+        justify-content: center;
+    }
+    
+    .tab-nav button i {
+        font-size: 0.875rem;
+    }
+}
+
 .tab-button {
     padding: 0.5rem 1rem;
     background: transparent;

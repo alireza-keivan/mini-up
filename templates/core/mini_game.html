@@ -8,8 +8,13 @@
 <style>
     /* Mobile responsive product cards - one per row, horizontal layout */
     @media (max-width: 768px) {
-        /* Hide only subtitle/description paragraphs on mobile, keep main title */
-        .mg-hero .absolute.inset-0.z-10 p {
+        /* Hide background image on mobile */
+        .mg-hero .relative.z-0 {
+            display: none !important;
+        }
+        
+        /* Hide hero content (title and descriptions) on mobile */
+        .mg-hero .absolute.inset-0.z-10 {
             display: none !important;
         }
         
@@ -128,7 +133,7 @@
 <section class="mg-hero relative w-auto overflow-hidden mb-16 -mt-1">
     <!-- Background Image -->
     <div class="relative z-0 w-full bg-black">
-        <img src="{% static 'images/backgrounds/blur.jpg' %}" 
+        <img src="{% static 'images/backgrounds/blur.png' %}" 
              alt="Mini Game Background"
              class="w-full h-auto">
         <!-- Dark Overlay for better text readability -->
@@ -146,13 +151,6 @@
         <p class="text-gray-300 text-base md:text-lg max-w-2xl mx-auto drop-shadow-md">
             از اعتبار بازی‌های محبوب تا آیتم‌های خاص و کمیاب. همه چیز برای تجربه گیمینگ بهتر شما
         </p>
-        
-        <!-- Scroll Down Indicator -->
-        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <svg class="w-8 h-8 text-neon-cyan drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-            </svg>
-        </div>
     </div>
 </section>
 

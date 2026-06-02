@@ -92,7 +92,11 @@ class CartService:
 
         # بررسی موجودی
         if product.product_type != 'virtual':
-            stock = variant.stock if variant else product.stock
+            if variant:
+                stock = variant.stock if variant.stock is not None else 0
+            else:
+                stock = product.stock if product.stock is not None else 0
+            
             if stock < quantity:
                 raise ValidationError(f'موجودی کافی نیست. حداکثر قابل سفارش: {stock}')
 

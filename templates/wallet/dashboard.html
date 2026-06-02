@@ -326,7 +326,23 @@
         }
 
         .modal-content {
-            padding: 1.5rem;
+            padding: 1.5rem 1.5rem 8rem 1.5rem !important;
+            max-height: 80vh !important;
+            overflow-y: auto !important;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-content form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 2rem;
+        }
+        
+        .modal-content form > *:last-child {
+            margin-top: auto;
+            margin-bottom: 0;
         }
 
         .amount-buttons {
@@ -335,6 +351,20 @@
 
         .amount-btn {
             min-width: 100%;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .submit-charge {
+            background: rgba(191, 0, 255, 0.9) !important;
+            border-color: rgba(191, 0, 255, 1) !important;
+            padding: 1.2rem !important;
+            font-size: 1rem !important;
+            box-shadow: 0 -4px 20px rgba(191, 0, 255, 0.4);
+            margin-top: 1.5rem !important;
+            margin-bottom: 0 !important;
         }
     }
 </style>

@@ -14,8 +14,9 @@ def cart_view(request):
     cart = CartService.get_cart(request)
     cart_items = cart.items.select_related('product', 'variant', 'product__category', 'product__brand').all()
     
-    # محاسبه جمع کل
-    subtotal = sum(item.line_total for item in cart_items)
+    # محاسبه جمع کل - از قیمت اصلی (قبل از تخفیف)
+    subtotal = sum(item.original_price * item.quantity for item in cart_items)
+    # محاسبه تخفیف کل محصولات
     discount = sum(item.discount_amount for item in cart_items)
     
     # کوپن اعمال شده
@@ -51,28 +52,50 @@ def update_cart_item(request, item_id):
     """
     بروزرسانی تعداد آیتم سبد خرید
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f'Updating cart item {item_id}')
         cart = CartService.get_cart(request)
+        logger.info(f'Got cart: {cart.id}')
+        
         cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
+        logger.info(f'Got cart item: {cart_item.id}')
         
         data = json.loads(request.body)
         quantity = int(data.get('quantity', 1))
+        logger.info(f'Requested quantity: {quantity}')
         
         CartService.update_item_quantity(cart_item, quantity)
+        logger.info('Successfully updated quantity')
         
         return JsonResponse({
             'success': True,
             'message': 'تعداد محصول بروزرسانی شد'
         })
-    except ValidationError as e:
+    except json.JSONDecodeError as e:
+        logger.error(f'JSON decode error: {str(e)}')
         return JsonResponse({
             'success': False,
-            'message': str(e)
+            'message': 'داده‌های ارسالی نامعتبر است'
+        }, status=400)
+    except ValidationError as e:
+        logger.error(f'Validation error: {str(e)}')
+        # Handle both string and list ValidationError messages
+        if hasattr(e, 'messages'):
+            message = ' '.join(e.messages)
+        else:
+            message = str(e)
+        return JsonResponse({
+            'success': False,
+            'message': message
         }, status=400)
     except Exception as e:
+        logger.error(f'Error updating cart item {item_id}: {str(e)}', exc_info=True)
         return JsonResponse({
             'success': False,
-            'message': 'خطا در بروزرسانی'
+            'message': f'خطا در بروزرسانی: {str(e)}'
         }, status=500)
 
 

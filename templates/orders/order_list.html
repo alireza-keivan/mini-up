@@ -62,6 +62,38 @@
         -webkit-text-fill-color: transparent;
     }
 
+    /* Mobile Filter Toggle Button */
+    .mobile-filter-toggle {
+        display: none;
+        background: transparent;
+        border: 2px solid #bf00ff;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .mobile-filter-toggle:hover {
+        box-shadow: 0 0 15px rgba(191, 0, 255, 0.4);
+        border-color: #ff0055;
+    }
+
+    .mobile-filter-toggle i {
+        transition: transform 0.3s ease;
+    }
+
+    .mobile-filter-toggle.active i {
+        transform: rotate(180deg);
+    }
+
     /* Filters Section */
     .filters-section {
         background: rgba(20, 20, 30, 0.8);
@@ -70,6 +102,21 @@
         padding: 1.5rem;
         margin-bottom: 2rem;
         backdrop-filter: blur(10px);
+    }
+
+    /* Mobile: Hide filters by default */
+    @media (max-width: 768px) {
+        .mobile-filter-toggle {
+            display: flex;
+        }
+
+        .filters-section {
+            display: none;
+        }
+
+        .filters-section.active {
+            display: block;
+        }
     }
 
     .filters-grid {
@@ -371,8 +418,15 @@
             </h1>
         </div>
 
+        <!-- Mobile Filter Toggle Button -->
+        <button class="mobile-filter-toggle" onclick="toggleFilters()">
+            <i class="fas fa-filter"></i>
+            <span>فیلتر سفارش‌ها</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+
         <!-- Filters -->
-        <div class="filters-section">
+        <div class="filters-section" id="filtersSection">
             <form method="get" action="{% url 'orders:order_list' %}">
                 <div class="filters-grid">
                     <div class="filter-group">
@@ -573,6 +627,15 @@ $(document).ready(function() {
         }
     });
 });
+
+// Toggle filters section on mobile
+function toggleFilters() {
+    const filtersSection = document.getElementById('filtersSection');
+    const toggleButton = document.querySelector('.mobile-filter-toggle');
+    
+    filtersSection.classList.toggle('active');
+    toggleButton.classList.toggle('active');
+}
 </script>
 
 {% endblock %}

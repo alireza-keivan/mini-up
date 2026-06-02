@@ -21,56 +21,79 @@
 
        <!-- Dashboard Header Section -->
 <div class="dashboard-header mb-6">
-    <!-- Top Bar: User Info & Wallet -->
+    <!-- Top Bar: User Info -->
     <div class="flex items-center justify-between gap-4 mb-6">
         
-        <!-- Right Side: User Info & Wallet -->
-        <div class="flex items-center gap-3">
-            <!-- User Info -->
-            <div class="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-full">
-                <div class="text-left" dir="ltr">
-                    <p class="text-white font-bold text-xs">
-                        {% if user.get_full_name %}
-                            {{ user.get_full_name }}
-                        {% else %}
-                            {{ user.id }}
-                        {% endif %}
-                    </p>
-                </div>
-                {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" class="w-8 h-8 rounded-lg object-cover border-2 border-blue-500">
-                {% else %}
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
-                        {{ user.get_full_name.0|default:user.id|default:'U' }}
-                    </div>
-                {% endif %}
+        <!-- User Info (No border on mobile) -->
+        <div class="flex items-center gap-2 md:bg-gray-800 md:px-3 md:py-1.5 md:rounded-full">
+            <div class="text-left" dir="ltr">
+                <p class="text-white font-bold text-sm md:text-xs">
+                    {% if user.get_full_name %}
+                        {{ user.get_full_name }}
+                    {% else %}
+                        {{ user.id }}
+                    {% endif %}
+                </p>
             </div>
-            <!-- Wallet Info -->
-            <a href="{% url 'wallet:dashboard' %}" class="flex items-center justify-between gap-2 bg-gray-800 px-3 py-1.5 rounded-full hover:bg-gray-700 transition-all cursor-pointer">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-wallet text-white text-xs"></i>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-white font-bold text-xs">جمع کیف پول من: {{ wallet.total_balance|floatformat:0|intcomma|default:'۰' }} ریال</p>
-                        
-                    </div>
+            {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" alt="{{ user.get_full_name }}" class="w-10 h-10 md:w-8 md:h-8 rounded-lg object-cover border-2 border-blue-500">
+            {% else %}
+                <div class="w-10 h-10 md:w-8 md:h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm md:text-xs">
+                    {{ user.get_full_name.0|default:user.id|default:'U' }}
                 </div>
-                
-                <!-- Wallet Arrow Button (Inside) -->
-                <div class="w-7 h-7 rounded-full flex items-center justify-center text-white flex-shrink-0">
-                    <i class="fas fa-chevron-left text-xs"></i>
-                </div>
-            </a>
-            
+            {% endif %}
         </div>
         
     </div>
     
-    <!-- Orders Section -->
-    <div class="mb-6">
-        <a href="{% url 'orders:order_list' %}" class="text-white font-bold text-base hover:text-purple-400 transition-colors">
-            سفارشات من
+    <!-- Action Buttons (Wallet, Orders, Tickets) -->
+    <div class="grid grid-cols-1 md:flex md:flex-wrap gap-3 md:gap-4 mb-6">
+        <!-- Wallet Button -->
+        <a href="{% url 'wallet:dashboard' %}" class="flex items-center justify-between gap-3 px-4 py-3 md:px-6 md:py-4 rounded-lg border-2 border-white bg-gradient-to-r from-blue-500/10 to-blue-600/10 hover:from-blue-500/20 hover:to-blue-600/20 transition-all shadow-md hover:shadow-lg hover:scale-105 cursor-pointer md:max-w-xs md:flex-1">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-wallet text-white text-lg md:text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-bold text-xs md:text-sm mb-1">کیف پول</p>
+                    <p class="text-gray-400 text-xs">{{ wallet.total_balance|floatformat:0|intcomma|default:'۰' }} ریال</p>
+                </div>
+            </div>
+            <div class="text-white flex-shrink-0">
+                <i class="fas fa-chevron-left text-sm"></i>
+            </div>
+        </a>
+        
+        <!-- Orders Button -->
+        <a href="{% url 'orders:order_list' %}" class="flex items-center justify-between gap-3 px-4 py-3 md:px-6 md:py-4 rounded-lg border-2 border-purple-500 bg-gradient-to-r from-purple-500/10 to-pink-600/10 hover:from-purple-500/20 hover:to-pink-600/20 transition-all shadow-md hover:shadow-lg hover:scale-105 cursor-pointer md:max-w-xs md:flex-1">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-shopping-bag text-white text-lg md:text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-bold text-xs md:text-sm mb-1">سفارشات من</p>
+                    <p class="text-gray-400 text-xs">مشاهده سفارشات</p>
+                </div>
+            </div>
+            <div class="text-white flex-shrink-0">
+                <i class="fas fa-chevron-left text-sm"></i>
+            </div>
+        </a>
+        
+        <!-- Tickets Button -->
+        <a href="{% url 'accounts:tickets' %}" class="flex items-center justify-between gap-3 px-4 py-3 md:px-6 md:py-4 rounded-lg border-2 border-cyan-500 bg-gradient-to-r from-cyan-500/10 to-cyan-600/10 hover:from-cyan-500/20 hover:to-cyan-600/20 transition-all shadow-md hover:shadow-lg hover:scale-105 cursor-pointer md:max-w-xs md:flex-1">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-ticket-alt text-white text-lg md:text-xl"></i>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-bold text-xs md:text-sm mb-1">تیکت های من</p>
+                    <p class="text-gray-400 text-xs">پشتیبانی و تیکت</p>
+                </div>
+            </div>
+            <div class="text-white flex-shrink-0">
+                <i class="fas fa-chevron-left text-sm"></i>
+            </div>
         </a>
     </div>
 </div>
@@ -79,7 +102,7 @@
         <div class="dashboard-card" x-data="dashboard()">
             
             <!-- Tab Navigation -->
-            <div class="tab-nav">
+            <div class="tab-nav flex flex-wrap gap-2 md:gap-4">
                 <button 
                     class="btn-tab-neon pink small"
                     :class="{ 'active': activeTab === 'info' }"
@@ -404,71 +427,309 @@
                     <h2 class="text-xl font-bold text-white mb-6">تنظیمات امنیتی</h2>
                     
                     <!-- Main Layout: Cards on Right, Content on Left -->
-                    <div class="flex gap-6 flex-row-reverse">
+                    <div class="flex gap-6 flex-row-reverse flex-col md:flex-row">
                         <!-- Right Side: Security Option Cards -->
-                        <div class="w-80 flex-shrink-0 space-y-6">
+                        <div class="w-full md:w-80 flex-shrink-0 space-y-6">
                             <!-- Card 1: Login Settings (Google Auth) -->
-                            <div class="security-option-card" 
-                                 style="background: rgba(20, 20, 35, 0.6); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 1.25rem; cursor: pointer; transition: all 0.3s ease;"
-                                 @click="activeSecuritySection = (activeSecuritySection === 'google-auth' ? null : 'google-auth')"
-                                 @mouseenter="$el.style.borderColor = 'rgba(255, 255, 255, 0.8)'; $el.style.transform = 'translateY(-2px)'; $el.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.3)'"
-                                 @mouseleave="$el.style.borderColor = 'rgba(255, 255, 255, 0.5)'; $el.style.transform = 'translateY(0)'; $el.style.boxShadow = 'none'">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="w-14 h-14 rounded-lg flex items-center justify-center" style="background: rgba(59, 130, 246, 0.2);">
-                                            <i class="fab fa-google text-2xl" style="color: #3b82f6;"></i>
+                            <div>
+                                <div class="security-option-card" 
+                                     style="background: rgba(20, 20, 35, 0.6); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 1.25rem; cursor: pointer; transition: all 0.3s ease;"
+                                     @click="activeSecuritySection = (activeSecuritySection === 'google-auth' ? null : 'google-auth')"
+                                     @mouseenter="$el.style.borderColor = 'rgba(255, 255, 255, 0.8)'; $el.style.transform = 'translateY(-2px)'; $el.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.3)'"
+                                     @mouseleave="$el.style.borderColor = 'rgba(255, 255, 255, 0.5)'; $el.style.transform = 'translateY(0)'; $el.style.boxShadow = 'none'">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-14 h-14 rounded-lg flex items-center justify-center" style="background: rgba(59, 130, 246, 0.2);">
+                                                <i class="fab fa-google text-2xl" style="color: #3b82f6;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4 class="text-white font-semibold mb-1">تنظیمات ورود به حساب</h4>
+                                            <p class="text-xs text-gray-400">{% if user.google_id %}متصل{% else %}موفق{% endif %}</p>
+                                        </div>
+                                        <div class="md:hidden">
+                                            <i class="fas fa-chevron-down text-gray-400 transition-transform" :class="{ 'rotate-180': activeSecuritySection === 'google-auth' }"></i>
                                         </div>
                                     </div>
-                                    <div class="flex-1">
-                                        <h4 class="text-white font-semibold mb-1">تنظیمات ورود به حساب</h4>
-                                        <p class="text-xs text-gray-400">{% if user.google_id %}متصل{% else %}موفق{% endif %}</p>
+                                </div>
+                                
+                                <!-- Mobile Content Below Card -->
+                                <div x-show="activeSecuritySection === 'google-auth'" x-transition class="md:hidden mt-4 p-4 rounded-lg" style="background: rgba(20, 20, 35, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <h3 class="text-lg font-bold text-white mb-4">
+                                        <i class="fab fa-google"></i>
+                                        احراز هویت با گوگل
+                                    </h3>
+                                    
+                                    {% if user.google_id %}
+                                    <div class="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+                                        <div class="flex items-center gap-3">
+                                            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                                            <div>
+                                                <p class="text-white font-semibold">حساب گوگل متصل است</p>
+                                                <p class="text-sm text-gray-400 mt-1">ایمیل: {{ user.email }}</p>
+                                            </div>
+                                        </div>
                                     </div>
+                                    {% else %}
+                                    <div class="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg mb-4">
+                                        <div class="flex items-start gap-3">
+                                            <i class="fas fa-info-circle text-blue-400 text-lg mt-0.5"></i>
+                                            <div class="text-sm text-gray-300">
+                                                <p class="font-semibold text-blue-400 mb-1">اتصال حساب گوگل</p>
+                                                <p>برای افزایش امنیت حساب کاربری خود، می‌توانید حساب گوگل خود را متصل کنید. این امکان به شما اجازه می‌دهد با استفاده از حساب گوگل نیز وارد شوید.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex justify-center">
+                                        <a href="{% url 'accounts:google_login' %}" 
+                                           class="btn btn-neon-border small"
+                                           style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-color: #3b82f6;">
+                                            <i class="fab fa-google"></i>
+                                            <span>اتصال با حساب گوگل</span>
+                                        </a>
+                                    </div>
+                                    {% endif %}
                                 </div>
                             </div>
                             
                             <!-- Card 2: Session Management -->
-                            <div class="security-option-card" 
-                                 style="background: rgba(20, 20, 35, 0.6); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 1.25rem; cursor: pointer; transition: all 0.3s ease;"
-                                 @click="activeSecuritySection = (activeSecuritySection === 'sessions' ? null : 'sessions')"
-                                 @mouseenter="$el.style.borderColor = 'rgba(255, 255, 255, 0.8)'; $el.style.transform = 'translateY(-2px)'; $el.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.3)'"
-                                 @mouseleave="$el.style.borderColor = 'rgba(255, 255, 255, 0.5)'; $el.style.transform = 'translateY(0)'; $el.style.boxShadow = 'none'">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="w-14 h-14 rounded-lg flex items-center justify-center" style="background: rgba(139, 92, 246, 0.2);">
-                                            <i class="fas fa-laptop text-2xl" style="color: #8b5cf6;"></i>
+                            <div>
+                                <div class="security-option-card" 
+                                     style="background: rgba(20, 20, 35, 0.6); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 1.25rem; cursor: pointer; transition: all 0.3s ease;"
+                                     @click="activeSecuritySection = (activeSecuritySection === 'sessions' ? null : 'sessions')"
+                                     @mouseenter="$el.style.borderColor = 'rgba(255, 255, 255, 0.8)'; $el.style.transform = 'translateY(-2px)'; $el.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.3)'"
+                                     @mouseleave="$el.style.borderColor = 'rgba(255, 255, 255, 0.5)'; $el.style.transform = 'translateY(0)'; $el.style.boxShadow = 'none'">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-14 h-14 rounded-lg flex items-center justify-center" style="background: rgba(139, 92, 246, 0.2);">
+                                                <i class="fas fa-laptop text-2xl" style="color: #8b5cf6;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4 class="text-white font-semibold mb-1">مدیریت نشست‌ها</h4>
+                                            <p class="text-xs text-gray-400">موفق</p>
+                                        </div>
+                                        <div class="md:hidden">
+                                            <i class="fas fa-chevron-down text-gray-400 transition-transform" :class="{ 'rotate-180': activeSecuritySection === 'sessions' }"></i>
                                         </div>
                                     </div>
-                                    <div class="flex-1">
-                                        <h4 class="text-white font-semibold mb-1">مدیریت نشست‌ها</h4>
-                                        <p class="text-xs text-gray-400">موفق</p>
+                                </div>
+                                
+                                <!-- Mobile Content Below Card -->
+                                <div x-show="activeSecuritySection === 'sessions'" x-transition class="md:hidden mt-4 p-4 rounded-lg" style="background: rgba(20, 20, 35, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <h3 class="text-lg font-bold text-white mb-4">
+                                        <i class="fas fa-laptop"></i>
+                                        مدیریت نشست‌های فعال
+                                    </h3>
+                                    
+                                    <div class="p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg mb-4">
+                                        <div class="flex items-start gap-3">
+                                            <i class="fas fa-info-circle text-purple-400 text-lg mt-0.5"></i>
+                                            <div class="text-sm text-gray-300">
+                                                <p class="font-semibold text-purple-400 mb-1">تاریخچه ورود</p>
+                                                <p>لیست دستگاه‌ها و مرورگرهایی که با آن‌ها وارد حساب کاربری خود شده‌اید.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-3">
+                                        <!-- Current Session -->
+                                        <div class="p-4 rounded-lg" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3);">
+                                            <div class="flex items-start justify-between">
+                                                <div class="flex items-start gap-3">
+                                                    <div class="text-purple-400 mt-1">
+                                                        <i class="fas fa-desktop text-xl"></i>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <div class="flex items-center gap-2 mb-1">
+                                                            <span class="text-white font-semibold">نشست فعلی</span>
+                                                            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">فعال</span>
+                                                        </div>
+                                                        <p class="text-sm text-gray-400" dir="ltr">User Agent: {{ request.META.HTTP_USER_AGENT|slice:":80" }}</p>
+                                                        <p class="text-sm text-gray-400 mt-1" dir="ltr">IP: {{ request.META.REMOTE_ADDR }}</p>
+                                                        <p class="text-xs text-gray-500 mt-1">آخرین فعالیت: الان</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Info Message -->
+                                        <div class="text-center text-sm text-gray-400 py-4">
+                                            <i class="fas fa-history mb-2 text-2xl text-gray-500"></i>
+                                            <p>تاریخچه ورود‌های قبلی در نسخه‌های بعدی اضافه خواهد شد</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             
                             <!-- Card 3: Wallet PIN -->
-                            <div class="security-option-card" 
-                                 style="background: rgba(20, 20, 35, 0.6); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 1.25rem; cursor: pointer; transition: all 0.3s ease;"
-                                 @click="activeSecuritySection = (activeSecuritySection === 'wallet-pin' ? null : 'wallet-pin')"
-                                 @mouseenter="$el.style.borderColor = 'rgba(255, 255, 255, 0.8)'; $el.style.transform = 'translateY(-2px)'; $el.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.3)'"
-                                 @mouseleave="$el.style.borderColor = 'rgba(255, 255, 255, 0.5)'; $el.style.transform = 'translateY(0)'; $el.style.boxShadow = 'none'">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="w-14 h-14 rounded-lg flex items-center justify-center" style="background: rgba(236, 72, 153, 0.2);">
-                                            <i class="fas fa-shield-alt text-2xl" style="color: #ec4899;"></i>
+                            <div>
+                                <div class="security-option-card" 
+                                     style="background: rgba(20, 20, 35, 0.6); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 16px; padding: 1.25rem; cursor: pointer; transition: all 0.3s ease;"
+                                     @click="activeSecuritySection = (activeSecuritySection === 'wallet-pin' ? null : 'wallet-pin')"
+                                     @mouseenter="$el.style.borderColor = 'rgba(255, 255, 255, 0.8)'; $el.style.transform = 'translateY(-2px)'; $el.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.3)'"
+                                     @mouseleave="$el.style.borderColor = 'rgba(255, 255, 255, 0.5)'; $el.style.transform = 'translateY(0)'; $el.style.boxShadow = 'none'">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-14 h-14 rounded-lg flex items-center justify-center" style="background: rgba(236, 72, 153, 0.2);">
+                                                <i class="fas fa-shield-alt text-2xl" style="color: #ec4899;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4 class="text-white font-semibold mb-1">امنیت برداشت از کیف پول</h4>
+                                            <p class="text-xs text-gray-400" x-text="hasPinCode ? 'موفق' : 'ناموفق'"></p>
+                                        </div>
+                                        <div class="md:hidden">
+                                            <i class="fas fa-chevron-down text-gray-400 transition-transform" :class="{ 'rotate-180': activeSecuritySection === 'wallet-pin' }"></i>
                                         </div>
                                     </div>
-                                    <div class="flex-1">
-                                        <h4 class="text-white font-semibold mb-1">امنیت برداشت از کیف پول</h4>
-                                        <p class="text-xs text-gray-400" x-text="hasPinCode ? 'موفق' : 'ناموفق'"></p>
+                                </div>
+                                
+                                <!-- Mobile Content Below Card -->
+                                <div x-show="activeSecuritySection === 'wallet-pin'" x-transition class="md:hidden mt-4 p-4 rounded-lg" style="background: rgba(20, 20, 35, 0.4); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <h3 class="text-lg font-bold text-white mb-4">
+                                        <i class="fas fa-shield-alt"></i>
+                                        رمز امنیتی کیف پول
+                                    </h3>
+                                    
+                                    <div class="mb-6 p-4 bg-pink-500/10 border border-pink-500/30 rounded-lg">
+                                        <div class="flex items-start gap-3">
+                                            <i class="fas fa-info-circle text-pink-400 text-lg mt-0.5"></i>
+                                            <div class="text-sm text-gray-300">
+                                                <p class="font-semibold text-pink-400 mb-1">رمز امنیتی کیف پول</p>
+                                                <p>برای افزایش امنیت خریدهای شما، یک رمز ۴ رقمی تنظیم کنید. این رمز هنگام خرید از کیف پول درخواست می‌شود.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- PIN Setup Section -->
+                                    <div x-show="!hasPinCode">
+                                        <h4 class="text-base font-bold text-white mb-3">
+                                            <i class="fas fa-shield-alt"></i>
+                                            تنظیم رمز امنیتی
+                                        </h4>
+                                        
+                                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                                            <form @submit.prevent="setupPin()">
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label text-sm">رمز ۴ رقمی</label>
+                                                    <input type="password" 
+                                                           class="form-input text-center text-lg tracking-widest"
+                                                           x-model="pinForm.pin"
+                                                           placeholder="****"
+                                                           maxlength="4"
+                                                           pattern="[0-9]{4}"
+                                                           inputmode="numeric"
+                                                           dir="ltr"
+                                                           required>
+                                                    <p class="text-xs text-gray-400 mt-1">فقط اعداد ۰ تا ۹</p>
+                                                </div>
+
+                                                <div class="form-group mb-4">
+                                                    <label class="form-label text-sm">تکرار رمز</label>
+                                                    <input type="password" 
+                                                           class="form-input text-center text-lg tracking-widest"
+                                                           x-model="pinForm.confirm_pin"
+                                                           placeholder="****"
+                                                           maxlength="4"
+                                                           pattern="[0-9]{4}"
+                                                           inputmode="numeric"
+                                                           dir="ltr"
+                                                           required>
+                                                </div>
+                                             
+                                                <div class="flex justify-center">      
+                                                    <button type="submit" 
+                                                            class="btn btn-neon-border small gradient-pink-purple"
+                                                            :disabled="settingPin">
+                                                        <span x-show="!settingPin">
+                                                            <i class="fas fa-check"></i>
+                                                            <span>تنظیم رمز امنیتی</span>
+                                                        </span>
+                                                        <span x-show="settingPin">
+                                                            <i class="fas fa-spinner fa-spin"></i>
+                                                            <span>در حال تنظیم...</span>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Change PIN Section -->
+                                    <div x-show="hasPinCode">
+                                        <h4 class="text-base font-bold text-white mb-3">
+                                            <i class="fas fa-key"></i>
+                                            تغییر رمز امنیتی
+                                        </h4>
+                                        
+                                        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                                            <form @submit.prevent="changePin()">
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label text-sm">رمز فعلی</label>
+                                                    <input type="password" 
+                                                           class="form-input text-center text-lg tracking-widest"
+                                                           x-model="changePinForm.current_pin"
+                                                           placeholder="****"
+                                                           maxlength="4"
+                                                           pattern="[0-9]{4}"
+                                                           inputmode="numeric"
+                                                           dir="ltr"
+                                                           required>
+                                                </div>
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label text-sm">رمز جدید</label>
+                                                    <input type="password" 
+                                                           class="form-input text-center text-lg tracking-widest"
+                                                           x-model="changePinForm.new_pin"
+                                                           placeholder="****"
+                                                           maxlength="4"
+                                                           pattern="[0-9]{4}"
+                                                           inputmode="numeric"
+                                                           dir="ltr"
+                                                           required>
+                                                </div>
+
+                                                <div class="form-group mb-4">
+                                                    <label class="form-label text-sm">تکرار رمز جدید</label>
+                                                    <input type="password" 
+                                                           class="form-input text-center text-lg tracking-widest"
+                                                           x-model="changePinForm.confirm_pin"
+                                                           placeholder="****"
+                                                           maxlength="4"
+                                                           pattern="[0-9]{4}"
+                                                           inputmode="numeric"
+                                                           dir="ltr"
+                                                           required>
+                                                </div>
+                                             
+                                                <div class="flex justify-center">      
+                                                    <button type="submit" 
+                                                            class="btn btn-neon-border small danger"
+                                                            :disabled="changingPin">
+                                                        <span x-show="!changingPin">
+                                                            <i class="fas fa-key"></i>
+                                                            <span>تغییر رمز امنیتی</span>
+                                                        </span>
+                                                        <span x-show="changingPin">
+                                                            <i class="fas fa-spinner fa-spin"></i>
+                                                            <span>در حال تغییر...</span>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Left Side: Content Area -->
-                        <div class="flex-1" style="min-height: 400px;">
+                        <!-- Left Side: Content Area (Desktop Only) -->
+                        <div class="hidden md:flex flex-1" style="min-height: 400px;">
                             <!-- Show message when nothing is selected -->
-                            <div x-show="!activeSecuritySection" class="flex items-center justify-center h-full">
+                            <div x-show="!activeSecuritySection" class="flex items-center justify-center h-full w-full">
                                 <div class="text-center">
                                     <i class="fas fa-shield-alt text-6xl text-gray-600 mb-4"></i>
                                     <p class="text-gray-400">یکی از گزینه‌های امنیتی را انتخاب کنید</p>
