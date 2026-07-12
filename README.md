@@ -18,53 +18,51 @@ The project follows a modular Django architecture, making future development and
 
 ## Demo
 
-### Home Page
+<h2>Homepage</h2>
 
-> *(Insert homepage screenshot here)*
-
+<p align="center">
+  <img src="src/homepage1.png" alt="Homepage" width="500"/>
+  <img src="src/homepage2.png" alt="Homepage" width="500"/>
+</p>
 ---
 
 ### Product Page
+<p align="center">
+  <img src="src/byproducts-1.png" alt="Homepage" width="500"/>
+  <img src="src/byproducts2.png" alt="Homepage" width="500"/>
+  <img src="src/byproducts filtering.png" alt="Homepage" width="500"/>
+</p>
 
-> *(Insert product page screenshot here)*
 
 ---
 
 ### Shopping Cart
 
-> *(Insert shopping cart screenshot here)*
-
+<p align="center">
+  <img src="src/bank.png" alt="Homepage" width="500"/>
+  <img src="src/wallet.png" alt="Homepage" width="500"/>
+</p>
 ---
-
-### Checkout
-
-> *(Insert checkout screenshot here)*
-
----
+### Orders
+<p align="center">
+  <img src="src/orders.png" alt="Homepage" width="500"/>
+</p>
 
 ### User Dashboard
-
-> *(Insert dashboard screenshot here)*
-
----
-
+<p align="center">
+  <img src="src/profile.png" alt="Homepage" width="500"/>
+</p>
 ### Admin Panel
 
-> *(Insert admin panel screenshot here)*
-
 ---
-
 ## Features
 
 ### Authentication
-
-- OTP Login
-- Google Authentication
-- User Profile Management
-- Secure Session Management
-
+<p align="center">
+  <img src="src/Screenshot from 2026-07-12 22-12-44.png" alt="Homepage" width="500"/>
+  <img src="src/security.png" alt="Homepage" width="500"/>
+</p>
 ---
-
 ### E-commerce
 
 - Physical Products
@@ -76,36 +74,12 @@ The project follows a modular Django architecture, making future development and
 - Shopping Cart
 - Order Management
 - Discount Coupons
-
 ---
-
-### Wallet System
-
-- Internal Wallet
-- Wallet Transactions
-- Recharge Requests
-- Payment History
-
----
-
 ### Support Center
-
-- Ticket System
-- Ticket Attachments
-- Conversation History
-
----
-
-### Content Management
-
-- Blog
-- Categories
-- Tags
-- FAQ
-- Static Pages
-- Announcements
-
----
+<p align="center">
+  <img src="src/ticket.png" alt="Homepage" width="500"/>
+  <img src="src/ticket2.png" alt="Homepage" width="500"/>
+</p>
 
 ### Administration
 
@@ -135,11 +109,6 @@ The Django administration panel provides centralized management for:
 - Django
 - Django REST Ready Architecture
 - PostgreSQL
-
-### Authentication
-
-- OTP Authentication
-- Google OAuth
 
 ### Frontend
 
@@ -218,67 +187,9 @@ The project contains a normalized schema supporting:
 
 ---
 
-## Screenshots
-
-### Homepage
-
-> *(Insert screenshot)*
-
----
-
-### Product Listing
-
-> *(Insert screenshot)*
-
----
-
-### Product Details
-
-> *(Insert screenshot)*
-
----
-
-### Shopping Cart
-
-> *(Insert screenshot)*
-
----
-
-### Checkout Process
-
-> *(Insert screenshot)*
-
----
-
-### User Profile
-
-> *(Insert screenshot)*
-
----
-
-### Wallet
-
-> *(Insert screenshot)*
-
----
-
-### Ticket System
-
-> *(Insert screenshot)*
-
----
-
 ### Blog
 
 > *(Insert screenshot)*
-
----
-
-### Django Administration
-
-> *(Insert screenshot)*
-
----
 
 ## Future Improvements
 
