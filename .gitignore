@@ -4,7 +4,7 @@ __pycache__/
 db.sqlite3
 .env
 *.log
-
+bin/
 # Media files (user uploads)
 media/
 
