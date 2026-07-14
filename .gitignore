@@ -26,3 +26,5 @@ pyvenv.cfg
 /static/css/main.css
 static/js/*.min.js
 templates/core/*backup*.html
+./lib64
+./lib
