@@ -16,7 +16,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'miniup_db',
         'USER': 'miniup_user',
-        'PASSWORD': 'miniup_secure_password_2025',
+        'PASSWORD': '09019230823',
         'HOST': 'localhost',
         'PORT': '5432',
         'CONN_MAX_AGE': 600,

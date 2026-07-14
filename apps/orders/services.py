@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from decimal import Decimal
 
 from .models import Cart, CartItem, Order, OrderItem, OrderStatusHistory
-import timedelta ############## MAYBE WRONG
+from datetime import timedelta ############## MAYBE WRONG
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # CART SERVICE
